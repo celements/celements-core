@@ -14,8 +14,9 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.internal.IEntityReferenceRandomCompleterRole;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,14 +33,16 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
   private XWikiContext context;
   private DefaultRightsAccessFacade rightsAccess;
   private XWikiGroupService groupSrvMock;
-  private IWebUtilsService webUtilsService;
+  private ModelContext modelContext;
+  private ModelUtils modelUtils;
 
   @Before
   public void setUp_DefaultRightsAccessFacadeTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
     rightsAccess = (DefaultRightsAccessFacade) Utils.getComponent(IRightsAccessFacadeRole.class);
-    webUtilsService = Utils.getComponent(IWebUtilsService.class);
+    modelContext = Utils.getComponent(ModelContext.class);
+    modelUtils = Utils.getComponent(ModelUtils.class);
     groupSrvMock = createMockAndAddToDefault(XWikiGroupService.class);
     expect(xwiki.getGroupService(same(context))).andReturn(groupSrvMock).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
@@ -120,7 +123,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
     XWikiRightService mockRightsService = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext().getUser()),
-        eq(webUtilsService.serializeRef(docRef)), same(context))).andReturn(true).once();
+        eq(modelUtils.serializeRef(docRef)), same(context))).andReturn(true).once();
 
     replayDefault();
     assertTrue(rightsAccess.hasAccessLevel(docRef, level));
@@ -168,7 +171,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testHasAccessLevel_spaceRef() throws Exception {
-    SpaceReference spaceRef = new SpaceReference("MySpace", webUtilsService.getWikiRef());
+    SpaceReference spaceRef = new SpaceReference("MySpace", modelContext.getWikiRef());
     DocumentReference docRef = new DocumentReference("untitled1", spaceRef);
     EAccessLevel level = EAccessLevel.EDIT;
     XWikiRightService mockRightsService = createMockAndAddToDefault(XWikiRightService.class);
@@ -178,7 +181,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
     expect(randomCompleterMock.randomCompleteSpaceRef(eq(spaceRef))).andReturn(docRef).once();
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext().getUser()),
-        eq(webUtilsService.serializeRef(docRef)), same(context))).andReturn(true).once();
+        eq(modelUtils.serializeRef(docRef)), same(context))).andReturn(true).once();
     prepareSpaceRights(spaceRef);
     replayDefault();
     assertTrue(rightsAccess.hasAccessLevel(spaceRef, level));
@@ -194,7 +197,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
     XWikiRightService mockRightsService = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext().getUser()),
-        eq(webUtilsService.serializeRef(docRef)), same(context))).andReturn(true).once();
+        eq(modelUtils.serializeRef(docRef)), same(context))).andReturn(true).once();
 
     replayDefault();
     assertTrue(rightsAccess.hasAccessLevel(attRef, level));
@@ -206,7 +209,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
     EAccessLevel level = EAccessLevel.EDIT;
 
     replayDefault();
-    assertFalse(rightsAccess.hasAccessLevel(webUtilsService.getWikiRef(), level));
+    assertFalse(rightsAccess.hasAccessLevel(modelContext.getWikiRef(), level));
     verifyDefault();
   }
 
@@ -219,7 +222,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
     XWikiRightService mockRightsService = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(user.getUser()), eq(
-        webUtilsService.serializeRef(docRef)), same(context))).andReturn(false).once();
+        modelUtils.serializeRef(docRef)), same(context))).andReturn(false).once();
 
     replayDefault();
     assertFalse(rightsAccess.hasAccessLevel(docRef, level, user));
@@ -237,7 +240,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
   }
 
   private void prepareEmptyGroupMembers(XWikiUser user) throws XWikiException {
-    DocumentReference userRef = webUtilsService.resolveDocumentReference(user.getUser());
+    DocumentReference userRef = modelUtils.resolveRef(user.getUser(), DocumentReference.class);
     if (XWikiRightService.GUEST_USER.equals(userRef.getName())) {
       expect(groupSrvMock.getAllGroupsReferencesForMember(eq(userRef), eq(0), eq(0), same(
           context))).andReturn(Collections.<DocumentReference>emptyList()).anyTimes();

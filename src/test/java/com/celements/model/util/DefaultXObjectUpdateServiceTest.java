@@ -18,7 +18,6 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -56,7 +55,7 @@ public class DefaultXObjectUpdateServiceTest extends AbstractComponentTest {
     Map<String, Object> fieldMap = new HashMap<>();
     String fieldName = "someField";
     String value = "asdf";
-    fieldMap.put(getWebUtils().serializeRef(classRef, true) + "." + fieldName, value);
+    fieldMap.put(getModelUtils().serializeRefLocal(classRef) + "." + fieldName, value);
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     doc.addXObject(obj);
@@ -76,7 +75,7 @@ public class DefaultXObjectUpdateServiceTest extends AbstractComponentTest {
     Map<String, Object> fieldMap = new HashMap<>();
     String fieldName = "someField";
     String value = "asdf";
-    fieldMap.put(getWebUtils().serializeRef(classRef, true) + "." + fieldName, value);
+    fieldMap.put(getModelUtils().serializeRefLocal(classRef) + "." + fieldName, value);
 
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, fieldName, new StringClass());
@@ -94,7 +93,7 @@ public class DefaultXObjectUpdateServiceTest extends AbstractComponentTest {
     Map<String, Object> fieldMap = new HashMap<>();
     String fieldName = "someField";
     String value = "asdf";
-    fieldMap.put(getWebUtils().serializeRef(classRef, true) + "." + fieldName, value);
+    fieldMap.put(getModelUtils().serializeRefLocal(classRef) + "." + fieldName, value);
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     obj.setStringValue(fieldName, value);
@@ -167,8 +166,8 @@ public class DefaultXObjectUpdateServiceTest extends AbstractComponentTest {
     verifyDefault();
   }
 
-  private IWebUtilsService getWebUtils() {
-    return Utils.getComponent(IWebUtilsService.class);
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }
