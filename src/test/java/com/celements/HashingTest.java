@@ -25,8 +25,8 @@ public class HashingTest extends AbstractComponentTest {
 
   private static final String FILE = "documents.txt";
   private static final String[] LANGUAGES = new String[] { "", "en", "de", "fr", "it" };
-  private static final long BIT_OFFSET = 12;
-  private static final int BIT_COLL_HANDLING = 4;
+  private static final long BIT_OFFSET = 11;
+  private static final int BIT_COLL_HANDLING = 2;
 
   private List<String> ORG_SPACES = Arrays.asList("Company.Company", "Person.Person", "Place.Place",
       "ProgonEvent.ProgonEvent");
@@ -68,12 +68,18 @@ public class HashingTest extends AbstractComponentTest {
       return fullName;
     }
 
+    @Override
+    public void remove() {
+      // TODO Auto-generated method stub
+
+    }
+
   }
 
   @Test
   public void test_generated() throws Exception {
     int orgCount = 1 * 1000 * 1000;
-    int eventCount = 8 * 1000 * 1000;
+    int eventCount = 27 * 1000 * 1000;
     int maxEventSpaces = Math.min(10, EVENT_SPACES.size());
     init(((orgCount * ORG_SPACES.size()) + (eventCount * maxEventSpaces)) * LANGUAGES.length);
     IdGenerationStrategy strategy = new IdFirst8Byte("MD5");
@@ -115,9 +121,12 @@ public class HashingTest extends AbstractComponentTest {
   }
 
   private void generateIds(IdGenerationStrategy strategy, Iterator<String> fullNameIter) {
+    int count = 0;
     while (fullNameIter.hasNext()) {
       String fullName = fullNameIter.next();
-      // System.out.println(fullName);
+      if ((++count % 1000000) == 0) {
+        System.out.println(Integer.toString(count) + " - " + fullName);
+      }
       for (String lang : LANGUAGES) {
         String serializedFN = serialize(fullName, lang);
         long id = generateId(serializedFN, strategy);
@@ -150,7 +159,7 @@ public class HashingTest extends AbstractComponentTest {
         id = ((id >> BIT_OFFSET) + 1) << BIT_OFFSET;
         collisionCount[Math.min(count - 1, 3)]++;
       } else {
-        throw new RuntimeException();
+        throw new RuntimeException(str);
       }
     }
     return id;
