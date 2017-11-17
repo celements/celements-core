@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Hex;
-import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.google.common.primitives.Longs;
@@ -61,7 +60,7 @@ public class HashingTest extends AbstractComponentTest {
     }
   }
 
-  @Test
+  // @Test
   public void checkForCollisions() throws Exception {
     run(new IdHashCode32());
     run(new IdHashCode());
