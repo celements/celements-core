@@ -1,100 +1,133 @@
 package com.celements;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
+import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.google.common.primitives.Longs;
 
+import gnu.trove.set.hash.TLongHashSet;
+
 public class HashingTest extends AbstractComponentTest {
 
-  private static final String FILE = "documents-generated.txt";
-  private static final String[] LANGUAGES = new String[] { "", "en", "de", "fr", "it", "es", "zh" };
-  private static final long BIT_OFFSET = 30;
-  private static final int BIT_COLL_HANDLING = 2;
+  private static final String FILE = "documents.txt";
+  private static final String[] LANGUAGES = new String[] { "", "en", "de", "fr", "it" };
+  private static final long BIT_OFFSET = 12;
+  private static final int BIT_COLL_HANDLING = 4;
 
-  private static Set<Long> map;
+  private List<String> ORG_SPACES = Arrays.asList("Company.Company", "Person.Person", "Place.Place",
+      "ProgonEvent.ProgonEvent");
+  private List<String> EVENT_SPACES = Arrays.asList("ImpEvents.", "progonall.", "inbox.",
+      "Collection29-201701161025.", "Collection2-201404281156.", "Collection14-201511271829.",
+      "Collection9-201409021755.", "Collection32-201702201154.", "Collection24-201609051443.",
+      "Collection33-201702201154.", "Collection13-201502261501.", "Collection31-201702201152.",
+      "Collection6-201406091541.", "Collection8-201406111135.", "Collection30-201701181541.",
+      "Collection11-201410161753.", "Collection15-201512161703.", "Collection26-201611291039.",
+      "Collection10-201409021757.");
+
+  private static TLongHashSet set;
   private static int[] collisionCount;
 
-  // @Test
-  public void generateDocuments() throws Exception {
-    generateDocumentListFile("", 10, (100 * 1000), (200 * 1000));
-  }
+  class FullNameGenerator implements Iterator<String> {
 
-  private void generateDocumentListFile(String path, int max, int orgDocCount, int eventDocCount)
-      throws Exception {
-    PrintWriter writer = new PrintWriter(path + "/documents-generated.txt", "UTF-8");
-    try {
-      List<String> orgDocs = Arrays.asList("Company.Company", "Person.Person", "Place.Place",
-          "ProgonEvent.ProgonEvent");
-      write(writer, orgDocs, max, orgDocCount);
-      List<String> eventDocs = Arrays.asList("ImpEvents", "progonall", "Collection29-201701161025",
-          "Collection2-201404281156", "Collection14-201511271829", "Collection9-201409021755",
-          "Collection32-201702201154", "Collection24-201609051443", "Collection33-201702201154",
-          "Collection13-201502261501", "Collection31-201702201152", "Collection6-201406091541",
-          "Collection8-201406111135", "Collection30-201701181541", "Collection11-201410161753",
-          "Collection15-201512161703", "Collection26-201611291039", "Collection10-201409021757");
-      write(writer, eventDocs, max, eventDocCount);
-    } finally {
-      writer.close();
+    private final List<String> spaces;
+    private final int maxCount;
+
+    private int count = 0;
+    private int spaceNb = 0;
+
+    FullNameGenerator(List<String> spaces, int maxCount) {
+      this.spaces = spaces;
+      this.maxCount = maxCount;
     }
-  }
 
-  private void write(PrintWriter writer, List<String> docs, int max, int count) {
-    for (int i = 0; i < Math.min(docs.size(), max); i++) {
-      for (int j = 1; j <= count; j++) {
-        writer.println(docs.get(i) + "." + j);
+    @Override
+    public boolean hasNext() {
+      return count <= maxCount;
+    }
+
+    @Override
+    public String next() {
+      String fullName = spaces.get(spaceNb) + count;
+      if ((spaceNb = ++spaceNb % spaces.size()) == 0) {
+        count++;
       }
+      return fullName;
     }
+
+  }
+
+  @Test
+  public void test_generated() throws Exception {
+    int orgCount = 1 * 1000 * 1000;
+    int eventCount = 8 * 1000 * 1000;
+    int maxEventSpaces = Math.min(10, EVENT_SPACES.size());
+    init(((orgCount * ORG_SPACES.size()) + (eventCount * maxEventSpaces)) * LANGUAGES.length);
+    IdGenerationStrategy strategy = new IdFirst8Byte("MD5");
+    generateIds(strategy, new FullNameGenerator(ORG_SPACES, orgCount));
+    generateIds(strategy, new FullNameGenerator(EVENT_SPACES.subList(0, maxEventSpaces),
+        eventCount));
+    printResult(strategy);
   }
 
   // @Test
-  public void checkForCollisions() throws Exception {
-    run(new IdHashCode32());
-    run(new IdHashCode());
-    for (String algo : Arrays.asList("MD5", /* "SHA1", */ "SHA-256")) {
-      run(new IdFirst8Byte(algo));
-      run(new IdCustomHashCode(algo));
-      run(new IdToHexAndHashCode(algo));
-      run(new IdXWiki(algo));
+  public void test_file() throws Exception {
+    runForFile(new IdHashCode32());
+    runForFile(new IdHashCode());
+    for (String algo : Arrays.asList("MD5"/* , "SHA1", "SHA-256" */)) {
+      runForFile(new IdFirst8Byte(algo));
+      runForFile(new IdCustomHashCode(algo));
+      runForFile(new IdToHexAndHashCode(algo));
+      runForFile(new IdXWiki(algo));
     }
   }
 
-  private void run(IdGenerationStrategy strategy) throws Exception {
-    map = new HashSet<>(20 * 1000 * 1000);
-    collisionCount = new int[(1 << BIT_COLL_HANDLING)];
-    BufferedReader reader = new BufferedReader(new InputStreamReader(
-        getClass().getClassLoader().getResourceAsStream(FILE)));
+  private void runForFile(IdGenerationStrategy strategy) throws IOException {
+    init(5582460);
+    File file = new File(System.getProperty("user.home") + File.separator + FILE);
+    LineIterator iter = FileUtils.lineIterator(file, "UTF-8");
     try {
-      String fullName = reader.readLine();
-      while (fullName != null) {
-        for (String lang : LANGUAGES) {
-          String serializedFN = serialize(fullName, lang);
-          long id = generateId(serializedFN, strategy);
-          map.add(id);
-        }
-        fullName = reader.readLine();
-      }
+      generateIds(strategy, iter);
     } finally {
-      reader.close();
       printResult(strategy);
+      iter.close();
+    }
+  }
+
+  private void init(int initCapacity) {
+    initCapacity += 1000;
+    System.out.println("Init TLongHashSet with capacity " + initCapacity);
+    set = new TLongHashSet(initCapacity, 1);
+    collisionCount = new int[(1 << BIT_COLL_HANDLING)];
+  }
+
+  private void generateIds(IdGenerationStrategy strategy, Iterator<String> fullNameIter) {
+    while (fullNameIter.hasNext()) {
+      String fullName = fullNameIter.next();
+      // System.out.println(fullName);
+      for (String lang : LANGUAGES) {
+        String serializedFN = serialize(fullName, lang);
+        long id = generateId(serializedFN, strategy);
+        set.add(id);
+      }
     }
   }
 
   private void printResult(IdGenerationStrategy strategy) {
-    System.out.println(map.size() + " - " + (64 - BIT_OFFSET - BIT_COLL_HANDLING) + "+"
+    System.out.println(set.size() + " - " + (64 - BIT_OFFSET - BIT_COLL_HANDLING) + "+"
         + BIT_COLL_HANDLING + "bit " + strategy + " - " + Arrays.toString(collisionCount));
   }
 
@@ -111,9 +144,9 @@ public class HashingTest extends AbstractComponentTest {
   private long generateId(String str, IdGenerationStrategy strategy) {
     int count = 0;
     long id = strategy.getId(str) << (BIT_COLL_HANDLING + BIT_OFFSET);
-    while (map.contains(id)) {
+    while (set.contains(id)) {
       if (count++ < (1 << BIT_COLL_HANDLING)) {
-        // System.out.println("Collision '" + toHex(id) + "': " + str + " - " + map.get(id));
+        System.out.println("Collision '" + toHex(id) + "' : " + str);
         id = ((id >> BIT_OFFSET) + 1) << BIT_OFFSET;
         collisionCount[Math.min(count - 1, 3)]++;
       } else {
