@@ -44,12 +44,12 @@ public class HashingTest extends AbstractComponentTest {
   class FullNameGenerator implements Iterator<String> {
 
     private final List<String> spaces;
-    private final int maxCount;
+    private final long maxCount;
 
-    private int count = 0;
+    private long count = 0;
     private int spaceNb = 0;
 
-    FullNameGenerator(List<String> spaces, int maxCount) {
+    FullNameGenerator(List<String> spaces, long maxCount) {
       this.spaces = spaces;
       this.maxCount = maxCount;
     }
@@ -78,8 +78,8 @@ public class HashingTest extends AbstractComponentTest {
 
   @Test
   public void test_generated() throws Exception {
-    int orgCount = 1 * 1000 * 1000;
-    int eventCount = 27 * 1000 * 1000;
+    long orgCount = 1 * 1000 * 1000;
+    long eventCount = 27 * 1000 * 1000;
     int maxEventSpaces = Math.min(10, EVENT_SPACES.size());
     init(((orgCount * ORG_SPACES.size()) + (eventCount * maxEventSpaces)) * LANGUAGES.length);
     IdGenerationStrategy strategy = new IdFirst8Byte("MD5");
@@ -113,11 +113,15 @@ public class HashingTest extends AbstractComponentTest {
     }
   }
 
-  private void init(int initCapacity) {
+  private void init(long initCapacity) {
     initCapacity += 1000;
-    System.out.println("Init TLongHashSet with capacity " + initCapacity);
-    set = new TLongHashSet(initCapacity, 1);
-    collisionCount = new int[(1 << BIT_COLL_HANDLING)];
+    if (initCapacity < Integer.MAX_VALUE) {
+      System.out.println("Init TLongHashSet with capacity " + initCapacity);
+      set = new TLongHashSet((int) initCapacity, 1);
+      collisionCount = new int[(1 << BIT_COLL_HANDLING)];
+    } else {
+      throw new RuntimeException(initCapacity + " too big for initial capacity");
+    }
   }
 
   private void generateIds(IdGenerationStrategy strategy, Iterator<String> fullNameIter) {
