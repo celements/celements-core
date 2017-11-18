@@ -79,7 +79,7 @@ public class HashingTest extends AbstractComponentTest {
   @Test
   public void test_generated() throws Exception {
     long orgCount = 1 * 1000 * 1000;
-    long eventCount = 27 * 1000 * 1000;
+    long eventCount = 28 * 1000 * 1000;
     int maxEventSpaces = Math.min(10, EVENT_SPACES.size());
     init(((orgCount * ORG_SPACES.size()) + (eventCount * maxEventSpaces)) * LANGUAGES.length);
     IdGenerationStrategy strategy = new IdFirst8Byte("MD5");
