@@ -551,7 +551,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField("cssname", "CSS Filename", 30);
     needsUpdate |= bclass.addBooleanField("alternate", "alternate", "yesno");
     needsUpdate |= bclass.addTextField("title", "Title", 30);
-    needsUpdate |= bclass.addBooleanField("is_rte_content", "is_rte_content", "yesno");
+    needsUpdate |= bclass.addBooleanField("is_rte_content", "Is RTE-Content", "yesno");
     needsUpdate |= bclass.addStaticListField("media", "Media",
         "all|aural|braille|embossed|handheld|print|projection|screen|tty|tv");
 
