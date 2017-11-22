@@ -11,33 +11,33 @@ public class IdCalculator {
 
   public final IdCalcStrategy strategy;
   private final HashingSet set;
+  private final boolean printCollisions;
 
-  public IdCalculator(HashingSet set, IdCalcStrategy strategy) {
+  public IdCalculator(HashingSet set, IdCalcStrategy strategy, boolean printCollisions) {
     this.set = set;
     this.strategy = strategy;
+    this.printCollisions = printCollisions;
   }
 
   public void calc(Iterator<String> fullNameIter) {
-    // BiMap<String, Long> origIdMap = HashBiMap.create();
     while (fullNameIter.hasNext()) {
       String fullName = fullNameIter.next();
-      long originalId = strategy.getId(serialize(fullName)) << (HashingTest.BIT_COLL_HANDLING
-          + HashingTest.BIT_OFFSET);
-      long correctedId = set.addWithCollisionHandling(originalId);
-      if (originalId != correctedId) {
-        System.out.println("Collision on '" + fullName + "': " + HashUtils.toHex(originalId)
-            + " -> " + HashUtils.toHex(correctedId));
+      long origId = strategy.getId(serialize(fullName)) << (set.bitCollHandling + set.bitOffset);
+      long corrId = set.addWithCollisionHandling(origId);
+      if (printCollisions && (origId != corrId)) {
+        System.out.println("Collision on '" + fullName + "': " + HashUtils.toHex(origId) + " -> "
+            + HashUtils.toHex(corrId));
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
       }
     }
-    // List<Long> origIds = new ArrayList<>(origIdMap.values());
-    // List<Long> corrIds = set.addWithCollisionHandling(origIds);
-    // for (int i = 0; i < origIds.size(); i++) {
-    // if (origIds.get(i) != corrIds.get(i)) {
-    // System.out.println("Collision on '" + origIdMap.inverse().get(origIds.get(i)) + "': "
-    // + HashUtils.toHex(origIds.get(i)) + " -> " + HashUtils.toHex(corrIds.get(i)));
-    // }
-    // }
-    HashUtils.printResult(set.size(), set.getCollisionCount(), strategy);
+  }
+
+  public String setToString() {
+    return set.toString();
   }
 
   // serializes string like LocalUidStringEntityReferenceSerializer from XWiki 4
