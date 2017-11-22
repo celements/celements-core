@@ -24,7 +24,7 @@ public class TestClassPackageLegacy extends AbstractLegacyClassPackage {
     return new ArrayList<>(classDefs);
   }
 
-  String legacyName = "celPageTypeClasses";
+  private String legacyName;
 
   @Override
   public String getLegacyName() {
