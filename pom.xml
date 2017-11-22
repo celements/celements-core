@@ -34,7 +34,7 @@
     <!-- Add here all your dependencies -->
     <dependency>
       <groupId>com.celements</groupId>
-      <artifactId>celements-xwiki</artifactId>
+      <artifactId>celements-model</artifactId>
       <version>1.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
