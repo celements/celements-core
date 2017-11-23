@@ -20,6 +20,7 @@
 package com.celements.web.classcollections;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -37,6 +38,11 @@ public class OldCoreClassConfig implements IOldCoreClassConfig {
   public DocumentReference getXWikiUsersClassRef(WikiReference wikiRef) {
     return new DocumentReference(XWIKI_USERS_CLASS_DOC, new SpaceReference(XWIKI_USERS_CLASS_SPACE,
         wikiRef));
+  }
+
+  @Override
+  public ClassReference getPhotoAlbumClassRef() {
+    return new ClassReference(PHOTO_ALBUM_CLASS_SPACE, PHOTO_ALBUM_CLASS_DOC);
   }
 
 }
