@@ -28,9 +28,9 @@ import java.io.StringReader;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 
-public class Html2TextTest extends AbstractBridgedComponentTestCase {
+public class Html2TextTest extends AbstractComponentTest {
 
   Html2Text h2t;
 
@@ -51,15 +51,17 @@ public class Html2TextTest extends AbstractBridgedComponentTestCase {
     Reader in = new StringReader(
         "<html><head></head><body><div>Test String!<span>Mit &Uuml;ml&auml;uten.</span><div></body></html>");
     h2t.parse(in);
-    assertEquals("Test String!\r\nMit Ümläuten.", h2t.getText());
+    assertEquals("Test String!Mit Ümläuten.", h2t.getText());
   }
 
   @Test
   public void testHandleText() {
     StringBuffer sb = new StringBuffer();
     h2t.injectStringBuffer(sb);
+    h2t.injectTanglingReturn(true);
     h2t.handleText(new char[] { 't', 'e', 's', 't' }, 100);
     assertEquals("test", h2t.getText());
+    h2t.injectTanglingReturn(true);
     h2t.handleText(new char[] { 'i', 't', ' ', 'n', 'o', 'w' }, 100);
     assertEquals("test\r\nit now", h2t.getText());
   }
@@ -77,4 +79,24 @@ public class Html2TextTest extends AbstractBridgedComponentTestCase {
     h2t.injectStringBuffer(new StringBuffer("Test String"));
     assertEquals("Test String", h2t.getText());
   }
+
+  @Test
+  public void testLink() throws Exception {
+    Reader in = new StringReader("<html><head></head><body>"
+        + "<p>Test (<a href=\"abc\">www.testerabc.gugs</a>) String!</p></body></html>");
+    h2t.parse(in);
+    assertEquals("Test (www.testerabc.gugs) String!", h2t.getText());
+  }
+
+  @Test
+  public void testComplex() throws Exception {
+    Reader in = new StringReader("<html><head></head><body>"
+        + "<p>Test (<a href=\"abc\">www.testerabc.gugs</a>) String!</p>"
+        + "<p>Second Test <span style=\"color:red;\">red word</span> String!</p>"
+        + "</body></html>");
+    h2t.parse(in);
+    assertEquals("Test (www.testerabc.gugs) String!\r\nSecond Test red word String!",
+        h2t.getText());
+  }
+
 }

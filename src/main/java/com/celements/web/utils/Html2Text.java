@@ -22,12 +22,15 @@ package com.celements.web.utils;
 import java.io.IOException;
 import java.io.Reader;
 
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.ParserDelegator;
 
 public class Html2Text extends HTMLEditorKit.ParserCallback {
 
-  StringBuffer s;
+  private StringBuffer s;
+  private boolean tanglingReturn = false;
 
   public void parse(Reader in) throws IOException {
     s = new StringBuffer();
@@ -37,11 +40,26 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
   }
 
   @Override
+  public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
+    if (t.breaksFlow()) {
+      tanglingReturn = true;
+    }
+  }
+
+  @Override
+  public void handleEndTag(HTML.Tag t, int pos) {
+    if (t.breaksFlow()) {
+      tanglingReturn = true;
+    }
+  }
+
+  @Override
   public void handleText(char[] text, int pos) {
-    if (s.length() > 0) {
+    if ((s.length() > 0) && tanglingReturn) {
       s.append("\r\n");
     }
     s.append(new String(text));
+    tanglingReturn = false;
   }
 
   public String getText() {
@@ -54,4 +72,9 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
   void injectStringBuffer(StringBuffer s) {
     this.s = s;
   }
+
+  void injectTanglingReturn(boolean tanglingReturn) {
+    this.tanglingReturn = tanglingReturn;
+  }
+
 }
