@@ -1,6 +1,7 @@
 package com.celements.web.classcollections;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -11,6 +12,8 @@ public interface IOldCoreClassConfig {
   public static final String PHOTO_ALBUM_CLASS_SPACE = "XWiki";
   public static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "."
       + PHOTO_ALBUM_CLASS_DOC;
+  public static final String PHOTO_ALBUM_TITLE = "title";
+  public static final String PHOTO_ALBUM_DESCRIPTION = "description";
   public static final String PHOTO_ALBUM_GALLERY_LAYOUT = "galleryLayout";
 
   public static final String XWIKI_USERS_CLASS_DOC = "XWikiUsers";
@@ -102,4 +105,7 @@ public interface IOldCoreClassConfig {
   public DocumentReference getFromStorageClassRef(WikiReference wikiRef);
 
   public DocumentReference getXWikiUsersClassRef(WikiReference wikiRef);
+
+  public ClassReference getPhotoAlbumClassRef();
+
 }
