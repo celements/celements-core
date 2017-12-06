@@ -48,8 +48,8 @@ public class Html2TextTest extends AbstractComponentTest {
 
   @Test
   public void testParse_complexContent() throws IOException {
-    Reader in = new StringReader(
-        "<html><head></head><body><div>Test String!<span>Mit &Uuml;ml&auml;uten.</span><div></body></html>");
+    Reader in = new StringReader("<html><head></head><body><div>Test String!<span>"
+        + "Mit &Uuml;ml&auml;uten.</span><div></body></html>");
     h2t.parse(in);
     assertEquals("Test String!Mit Ümläuten.", h2t.getText());
   }
@@ -92,11 +92,11 @@ public class Html2TextTest extends AbstractComponentTest {
   public void testComplex() throws Exception {
     Reader in = new StringReader("<html><head></head><body>"
         + "<p>Test (<a href=\"abc\">www.testerabc.gugs</a>) String!</p>"
-        + "<p>Second Test <span style=\"color:red;\">red word</span> String!</p>"
-        + "</body></html>");
+        + "<p>Second Test and newline<br/>before <span style=\"color:red;\">red word</span>"
+        + " String!</p></body></html>");
     h2t.parse(in);
-    assertEquals("Test (www.testerabc.gugs) String!\r\nSecond Test red word String!",
-        h2t.getText());
+    assertEquals("Test (www.testerabc.gugs) String!\r\nSecond Test and "
+        + "newline\r\nbefore red word String!", h2t.getText());
   }
 
 }

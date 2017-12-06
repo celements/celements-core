@@ -30,7 +30,7 @@ import javax.swing.text.html.parser.ParserDelegator;
 public class Html2Text extends HTMLEditorKit.ParserCallback {
 
   private StringBuffer s;
-  private boolean tanglingReturn = false;
+  private boolean danglingReturn = false;
 
   public void parse(Reader in) throws IOException {
     s = new StringBuffer();
@@ -39,27 +39,34 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
     delegator.parse(in, this, Boolean.TRUE);
   }
 
+  private void addDanglingReturn(HTML.Tag t) {
+    if (t.breaksFlow()) {
+      danglingReturn = true;
+    }
+  }
+
   @Override
   public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
-    if (t.breaksFlow()) {
-      tanglingReturn = true;
-    }
+    addDanglingReturn(t);
+  }
+
+  @Override
+  public void handleSimpleTag(HTML.Tag t, MutableAttributeSet a, int pos) {
+    addDanglingReturn(t);
   }
 
   @Override
   public void handleEndTag(HTML.Tag t, int pos) {
-    if (t.breaksFlow()) {
-      tanglingReturn = true;
-    }
+    addDanglingReturn(t);
   }
 
   @Override
   public void handleText(char[] text, int pos) {
-    if ((s.length() > 0) && tanglingReturn) {
+    if ((s.length() > 0) && danglingReturn) {
       s.append("\r\n");
     }
     s.append(new String(text));
-    tanglingReturn = false;
+    danglingReturn = false;
   }
 
   public String getText() {
@@ -74,7 +81,7 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
   }
 
   void injectTanglingReturn(boolean tanglingReturn) {
-    this.tanglingReturn = tanglingReturn;
+    this.danglingReturn = tanglingReturn;
   }
 
 }
