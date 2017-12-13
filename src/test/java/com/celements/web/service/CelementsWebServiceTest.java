@@ -155,4 +155,13 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
     assertEquals("http://www.%C3%BCparties.ch", ret);
   }
 
+  @Test
+  public void testEncodeUrlToUtf8_withSlashes() throws Exception {
+    String url = "http://www.üparties.ch/test1/test2";
+    replayDefault();
+    String ret = service.encodeUrlToUtf8(url);
+    verifyDefault();
+    assertEquals("http://www.%C3%BCparties.ch/test1/test2", ret);
+  }
+
 }
