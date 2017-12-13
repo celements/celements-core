@@ -301,7 +301,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       } catch (UnsupportedEncodingException exp) {
         _LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
       }
-      urlStr = (urlPrefix + urlStr).replaceAll("%2F", "/");
+      urlStr = urlPrefix + urlStr.replaceAll("%2F", "/");
     }
     return urlStr;
   }
