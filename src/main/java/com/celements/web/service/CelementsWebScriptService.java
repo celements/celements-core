@@ -35,6 +35,8 @@ import java.util.Set;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -630,6 +632,42 @@ public class CelementsWebScriptService implements ScriptService {
 
   private String getDeletedAttachmentsHql() {
     return "select datt.id from DeletedAttachment as datt order by datt.filename asc";
+  }
+
+  /**
+   * permanentlyEmptyAttachmentTrash delete all documents after waitDays and minWaitDays
+   *
+   * @return
+   */
+  public boolean permanentlyEmptyAttachmentTrash(int waitDays) {
+    int result = 0;
+    Calendar beforeWaiteDaysCal = Calendar.getInstance();
+    beforeWaiteDaysCal.add(Calendar.DATE, -waitDays);
+    Date delBeforeDate = beforeWaiteDaysCal.getTime();
+    if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
+      try {
+        Session sess = getNewHibSession(getContext());
+        Transaction transaction = sess.beginTransaction();
+        org.hibernate.Query query = sess.createQuery("delete from xwikiattrecyclebin"
+            + " where XDA_DATE < :deleteBeforeDate");
+        query.setParameter("deleteBeforeDate", delBeforeDate);
+        result = query.executeUpdate();
+        LOGGER.info("deleted [{}] attachments in database [{}].", result,
+            getContext().getDatabase());
+        transaction.commit();
+      } catch (XWikiException exp) {
+        LOGGER.error("permanentlyEmptyAttachmentTrash: failed to get a hibernate session. ", exp);
+      }
+    } else {
+      LOGGER.error("deleting document trash needs admin rights.");
+    }
+    return (result > 0);
+  }
+
+  private Session getNewHibSession(XWikiContext context) throws XWikiException {
+    Session session = context.getWiki().getHibernateStore().getSessionFactory().openSession();
+    context.getWiki().getHibernateStore().setDatabase(session, context);
+    return session;
   }
 
   /**
