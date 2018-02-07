@@ -92,7 +92,6 @@ com.celements.webform.WebFormService
 com.celements.webform.WebFormScriptService
 com.celements.appScript.AppScriptScriptService
 com.celements.mandatory.XWikiXWikiRights
-com.celements.query.QueryExecutionService
 com.celements.parents.XDocParents
 com.celements.parents.DocumentParentsLister
 com.celements.scheduler.classes.SchedulerClassConfig
