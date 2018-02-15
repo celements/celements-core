@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hibernate.cfg.Configuration;
+import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.xwiki.component.annotation.Component;
@@ -29,36 +31,54 @@ public class TestScriptService implements ScriptService {
   @Requirement
   private HibernateSessionFactory sessionFactory;
 
-  public String getClassPrimaryKeyName(DocumentReference docRef) throws DocumentNotExistsException {
-    if (webUtils.isSuperAdminUser()) {
-      PersistentClass mapping = getMapping(docRef);
-      return mapping.getTable().getName() + "_" + mapping.getIdentifierProperty().getName();
-    }
-    return null;
-  }
-
-  public List<String> getClassPropertyNames(DocumentReference docRef)
-      throws DocumentNotExistsException {
+  public List<String> getMappings() {
     if (webUtils.isSuperAdminUser()) {
       List<String> ret = new ArrayList<>();
-      @SuppressWarnings("unchecked")
-      Iterator<Property> propertyIter = getMapping(docRef).getPropertyIterator();
-      while (propertyIter.hasNext()) {
-        ret.add(propertyIter.next().getName());
+      for (Iterator<PersistentClass> iter = getHibConfig().getClassMappings(); iter.hasNext();) {
+        PersistentClass mapping = iter.next();
+        ret.add(getInfo(mapping));
       }
       return ret;
     }
     return null;
   }
 
+  public String getClassPrimaryKeyName(DocumentReference docRef) throws DocumentNotExistsException {
+    if (webUtils.isSuperAdminUser()) {
+      PersistentClass mapping = getMapping(docRef);
+      return getInfo(mapping);
+    }
+    return null;
+  }
+
+  private String getInfo(PersistentClass mapping) {
+    Property idProperty = mapping.getIdentifierProperty();
+    String idStr = "<" + idProperty.getName() + " : ";
+    for (Iterator<Column> iter = idProperty.getColumnIterator(); iter.hasNext();) {
+      idStr += iter.next().getName() + " ";
+    }
+    idStr += ">";
+    String propStr = "[";
+    for (Iterator<Property> iter = mapping.getPropertyIterator(); iter.hasNext();) {
+      propStr += iter.next().getName() + " ";
+    }
+    propStr += "]";
+    return mapping.getEntityName() + " - " + mapping.getTable().getName() + " - " + idStr + " - "
+        + propStr;
+  }
+
   private PersistentClass getMapping(DocumentReference docRef) throws DocumentNotExistsException {
     BaseClass bClass = modelAccess.getDocument(docRef).getXClass();
-    PersistentClass mapping = sessionFactory.getConfiguration().getClassMapping(bClass.getName());
+    PersistentClass mapping = getHibConfig().getClassMapping(bClass.getName());
     if (mapping != null) {
       return mapping;
     } else {
       throw new IllegalArgumentException("no mapping");
     }
+  }
+
+  private Configuration getHibConfig() {
+    return sessionFactory.getConfiguration();
   }
 
 }
