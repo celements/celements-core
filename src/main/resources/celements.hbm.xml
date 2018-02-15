@@ -18,7 +18,7 @@
     </property>
   </class>
   <class entity-name="Celements2.MenuName" table="cel_menunames">
-    <id name="id" type="integer" unsaved-value="undefined">
+    <id name="id" type="long" unsaved-value="undefined">
       <column name="MN_ID" not-null="true" />
       <generator class="assigned" />
     </id>
