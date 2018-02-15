@@ -53,9 +53,12 @@ public class TestScriptService implements ScriptService {
 
   private String getInfo(PersistentClass mapping) {
     Property idProperty = mapping.getIdentifierProperty();
-    String idStr = "<" + idProperty.getName() + " : ";
-    for (Iterator<Column> iter = idProperty.getColumnIterator(); iter.hasNext();) {
-      idStr += iter.next().getName() + " ";
+    String idStr = "<";
+    if (idProperty != null) {
+      idStr += idProperty.getName() + " (" + idProperty.getType().getName() + ") : ";
+      for (Iterator<Column> iter = idProperty.getColumnIterator(); iter.hasNext();) {
+        idStr += iter.next().getName() + " ";
+      }
     }
     idStr += ">";
     String propStr = "[";
