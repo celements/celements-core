@@ -6,8 +6,10 @@ import java.util.List;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Column;
+import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.hibernate.mapping.SimpleValue;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -52,13 +54,16 @@ public class TestScriptService implements ScriptService {
   }
 
   private String getInfo(PersistentClass mapping) {
-    Property idProperty = mapping.getIdentifierProperty();
     String idStr = "<";
-    if (idProperty != null) {
-      idStr += idProperty.getName() + " (" + idProperty.getType().getName() + ") : ";
+    KeyValue identifier = mapping.getIdentifier();
+    if (identifier instanceof SimpleValue) {
+      SimpleValue idProperty = (SimpleValue) identifier;
+      idStr += idProperty.getTypeName() + " (" + idProperty.getType().getName() + ") : ";
       for (Iterator<Column> iter = idProperty.getColumnIterator(); iter.hasNext();) {
         idStr += iter.next().getName() + " ";
       }
+    } else {
+      idStr += identifier;
     }
     idStr += ">";
     String propStr = "[";
