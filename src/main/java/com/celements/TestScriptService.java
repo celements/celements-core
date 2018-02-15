@@ -54,25 +54,42 @@ public class TestScriptService implements ScriptService {
   }
 
   private String getInfo(PersistentClass mapping) {
-    String idStr = "<";
+    String propStr = "[";
+    for (Iterator<Property> iter = mapping.getPropertyIterator(); iter.hasNext();) {
+      propStr += iter.next().getName() + " ";
+    }
+    propStr += "]";
+    return mapping.getEntityName() + " - " + mapping.getTable().getName() + " - " + getId1(mapping)
+        + " " + getId2(mapping) + " - " + propStr;
+  }
+
+  private String getId1(PersistentClass mapping) {
+    String idStr = "{";
+    Property idProperty = mapping.getIdentifierProperty();
+    if (idProperty != null) {
+      idStr += idProperty.getName() + " of " + idProperty.getType().getName() + " : ";
+      for (Iterator<Column> iter = idProperty.getColumnIterator(); iter.hasNext();) {
+        idStr += iter.next().getName() + " ";
+      }
+    }
+    idStr += "}";
+    return idStr;
+  }
+
+  private String getId2(PersistentClass mapping) {
+    String idStr = "{";
     KeyValue identifier = mapping.getIdentifier();
     if (identifier instanceof SimpleValue) {
       SimpleValue idProperty = (SimpleValue) identifier;
-      idStr += idProperty.getTypeName() + " (" + idProperty.getType().getName() + ") : ";
+      idStr += idProperty.getTypeName() + " of " + idProperty.getType().getName() + " : ";
       for (Iterator<Column> iter = idProperty.getColumnIterator(); iter.hasNext();) {
         idStr += iter.next().getName() + " ";
       }
     } else {
       idStr += identifier;
     }
-    idStr += ">";
-    String propStr = "[";
-    for (Iterator<Property> iter = mapping.getPropertyIterator(); iter.hasNext();) {
-      propStr += iter.next().getName() + " ";
-    }
-    propStr += "]";
-    return mapping.getEntityName() + " - " + mapping.getTable().getName() + " - " + idStr + " - "
-        + propStr;
+    idStr += "}";
+    return idStr;
   }
 
   private PersistentClass getMapping(DocumentReference docRef) throws DocumentNotExistsException {
