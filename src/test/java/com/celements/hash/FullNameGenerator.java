@@ -3,6 +3,8 @@ package com.celements.hash;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
 public class FullNameGenerator implements Iterator<String> {
 
   private final List<String> spaces;
@@ -14,21 +16,25 @@ public class FullNameGenerator implements Iterator<String> {
   private int langPos = 0;
 
   FullNameGenerator(List<String> spaces, List<String> langs, long startCount, long maxCount) {
-    this.spaces = spaces;
-    this.languages = langs;
+    this.spaces = ImmutableList.copyOf(spaces);
+    this.languages = ImmutableList.copyOf(langs);
     this.count = startCount;
     this.maxCount = maxCount;
   }
 
+  public synchronized long getCount() {
+    return count * spaces.size() * languages.size();
+  }
+
   @Override
-  public boolean hasNext() {
+  public synchronized boolean hasNext() {
     return count < maxCount;
   }
 
   @Override
-  public String next() {
+  public synchronized String next() {
     String lang = languages.get(langPos);
-    String fullName = spaces.get(spacePos) + count + (lang.isEmpty() ? "" : (":" + lang));
+    String fullName = spaces.get(spacePos) + "." + count + (lang.isEmpty() ? "" : ("." + lang));
     if ((langPos = ++langPos % languages.size()) == 0) {
       if ((spacePos = ++spacePos % spaces.size()) == 0) {
         count++;
