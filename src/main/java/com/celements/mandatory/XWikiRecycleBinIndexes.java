@@ -1,6 +1,5 @@
 package com.celements.mandatory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,9 +12,9 @@ import com.celements.query.IQueryExecutionServiceRole;
 import com.xpn.xwiki.XWikiException;
 
 @Component("celements.mandatory.addIndexToRecycleBin")
-public class AddDateIDXAsIndexToRecycleBin implements IMandatoryDocumentRole {
+public class XWikiRecycleBinIndexes implements IMandatoryDocumentRole {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AddDateIDXAsIndexToRecycleBin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRecycleBinIndexes.class);
 
   @Requirement
   IQueryExecutionServiceRole queryExecService;
@@ -27,15 +26,10 @@ public class AddDateIDXAsIndexToRecycleBin implements IMandatoryDocumentRole {
 
   @Override
   public void checkDocuments() throws XWikiException {
-    LOGGER.info("executing AddDateIDXAsIndexToRecycleBin");
-    // FIXME make sure that these operations are ONLY executed ONCE on any DB.
-    queryExecService.executeWriteSQLs(getIndexSQLs());
-  }
-
-  private List<String> getIndexSQLs() {
-    List<String> ret = new ArrayList<String>();
-    ret.add(getSQLIndexToRecycleBin());
-    return ret;
+    LOGGER.info("executing XWikiRecycleBinIndexes");
+    if (queryExecService.existsConstraint("prefix_db", "xwikirecyclebin", "dateIDX")) {
+      queryExecService.executeWriteSQL(getSQLIndexToRecycleBin());
+    }
   }
 
   String getSQLIndexToRecycleBin() {
