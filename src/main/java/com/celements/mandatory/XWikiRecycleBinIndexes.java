@@ -11,10 +11,12 @@ import org.xwiki.component.annotation.Requirement;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.xpn.xwiki.XWikiException;
 
-@Component("celements.mandatory.addIndexToRecycleBin")
+@Component(XWikiRecycleBinIndexes.NAME)
 public class XWikiRecycleBinIndexes implements IMandatoryDocumentRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRecycleBinIndexes.class);
+
+  public static final String NAME = "celements.mandatory.addIndexToRecycleBin";
 
   @Requirement
   IQueryExecutionServiceRole queryExecService;
