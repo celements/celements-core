@@ -36,7 +36,7 @@ public class XWikiRecycleBinIndexesTest extends AbstractComponentTest {
   public void testCheckDocuments() throws Exception {
     String sql = xWikiRecycleBinIndexes.getSQLIndexToRecycleBin();
     expect(queryExecServiceMock.existsConstraint("prefix_db", "xwikirecyclebin",
-        "dateIDX")).andReturn(true).once();
+        "dateIDX")).andReturn(false).once();
     expect(queryExecServiceMock.executeWriteSQL(sql)).andReturn(0).once();
 
     replayDefault();
@@ -47,7 +47,7 @@ public class XWikiRecycleBinIndexesTest extends AbstractComponentTest {
   @Test
   public void testCheckDocuments_noContraintExists() throws Exception {
     expect(queryExecServiceMock.existsConstraint("prefix_db", "xwikirecyclebin",
-        "dateIDX")).andReturn(false).once();
+        "dateIDX")).andReturn(true).once();
 
     replayDefault();
     xWikiRecycleBinIndexes.checkDocuments();

@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 
+import com.celements.model.context.ModelContext;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.xpn.xwiki.XWikiException;
 
@@ -21,6 +23,12 @@ public class XWikiRecycleBinIndexes implements IMandatoryDocumentRole {
   @Requirement
   IQueryExecutionServiceRole queryExecService;
 
+  @Requirement
+  private ModelContext modelContext;
+
+  @Requirement
+  private ConfigurationSource configSource;
+
   @Override
   public List<String> dependsOnMandatoryDocuments() {
     return Collections.emptyList();
@@ -29,7 +37,12 @@ public class XWikiRecycleBinIndexes implements IMandatoryDocumentRole {
   @Override
   public void checkDocuments() throws XWikiException {
     LOGGER.info("executing XWikiRecycleBinIndexes");
-    if (queryExecService.existsConstraint("prefix_db", "xwikirecyclebin", "dateIDX")) {
+    System.out.println("<<<<<<<<<<<<<<<<<<<< XWikiRecycleBinIndexes checkDocuments IN");
+    String prefixAndDb = configSource.getProperty("xwiki.db.prefix", String.class)
+        + modelContext.getMainWikiRef().getName();
+    System.out.println("<<<<<<<<<<<<<<<<<<<< XWikiRecycleBinIndexes checkDocuments prefixAndDb: "
+        + prefixAndDb);
+    if (!queryExecService.existsConstraint("prefix_db", "xwikirecyclebin", "dateIDX")) {
       queryExecService.executeWriteSQL(getSQLIndexToRecycleBin());
     }
   }
