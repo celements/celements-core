@@ -128,3 +128,4 @@ com.celements.pagetype.classes.PageTypeClassPackage
 com.celements.migrator.MenuNameMappingCelements2_8
 com.celements.migrator.MenuBar_SubMenuItemsClassMigrator
 com.celements.migrator.TreeNodeRelativeParent_Database
+com.celements.mandatory.XWikiRecycleBinIndexes
