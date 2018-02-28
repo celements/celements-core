@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.query.IQueryExecutionServiceRole;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.web.Utils;
 
 public class XWikiRecycleBinIndexesTest extends AbstractComponentTest {
@@ -17,12 +18,15 @@ public class XWikiRecycleBinIndexesTest extends AbstractComponentTest {
 
   private IQueryExecutionServiceRole queryExecServiceMock;
 
+  private XWiki xwiki;
+
   @Before
   @Override
   public void setUp() throws Exception {
     super.setUp();
     xWikiRecycleBinIndexes = (XWikiRecycleBinIndexes) Utils.getComponent(
         IMandatoryDocumentRole.class, XWikiRecycleBinIndexes.NAME);
+    xwiki = getWikiMock();
     queryExecServiceMock = createMockAndAddToDefault(IQueryExecutionServiceRole.class);
     xWikiRecycleBinIndexes.queryExecService = queryExecServiceMock;
   }
@@ -35,8 +39,10 @@ public class XWikiRecycleBinIndexesTest extends AbstractComponentTest {
   @Test
   public void testCheckDocuments() throws Exception {
     String sql = xWikiRecycleBinIndexes.getSQLIndexToRecycleBin();
-    expect(queryExecServiceMock.existsConstraint("prefix_db", "xwikirecyclebin",
-        "dateIDX")).andReturn(false).once();
+    String prefixParam = "xwiki.db.prefix";
+    expect(xwiki.Param(eq(prefixParam))).andReturn("prefix_").atLeastOnce();
+    expect(queryExecServiceMock.existsIndex("prefix_xwikidb", "xwikirecyclebin",
+        "dateIDX")).andReturn(false).atLeastOnce();
     expect(queryExecServiceMock.executeWriteSQL(sql)).andReturn(0).once();
 
     replayDefault();
@@ -46,8 +52,10 @@ public class XWikiRecycleBinIndexesTest extends AbstractComponentTest {
 
   @Test
   public void testCheckDocuments_noContraintExists() throws Exception {
-    expect(queryExecServiceMock.existsConstraint("prefix_db", "xwikirecyclebin",
-        "dateIDX")).andReturn(true).once();
+    String prefixParam = "xwiki.db.prefix";
+    expect(xwiki.Param(eq(prefixParam))).andReturn("prefix_").atLeastOnce();
+    expect(queryExecServiceMock.existsIndex("prefix_xwikidb", "xwikirecyclebin",
+        "dateIDX")).andReturn(true).atLeastOnce();
 
     replayDefault();
     xWikiRecycleBinIndexes.checkDocuments();
