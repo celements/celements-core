@@ -101,12 +101,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public void init(XWikiContext context) {
     // TODO move to ApplicationReadyEvent listener after migration to xwiki 4
     LOGGER.trace("init called database [" + context.getDatabase() + "]");
-    if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart", "1"))) {
-      new CheckClassesCommand().checkClasses();
-    }
-    if ("1".equals(context.getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
-      new CheckMandatoryDocuments().checkMandatoryDocuments();
-    }
     super.init(context);
   }
 
