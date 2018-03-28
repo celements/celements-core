@@ -99,7 +99,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   @Override
   public void init(XWikiContext context) {
-    // TODO move to ApplicationReadyEvent listener after migration to xwiki 4
     LOGGER.trace("init called database [" + context.getDatabase() + "]");
     super.init(context);
   }
