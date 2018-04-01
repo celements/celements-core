@@ -177,7 +177,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
   private boolean checkPageType(XWikiDocument wikiPrefDoc) throws XWikiException {
     boolean dirty = false;
     DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(
-        webUtilsService.getWikiRef());
+        modelContext.getWikiRef());
     BaseObject pageTypeObj = wikiPrefDoc.getXObject(pageTypeClassRef, false, getContext());
     if (pageTypeObj == null) {
       pageTypeObj = wikiPrefDoc.newXObject(pageTypeClassRef, getContext());
