@@ -36,7 +36,6 @@ com.celements.web.classcollections.DocumentDetailsClasses
 com.celements.web.service.WebUtilsScriptService
 com.celements.web.classcollections.OldCoreClasses
 com.celements.web.classcollections.OldCoreLegacyClasses
-com.celements.mandatory.MandatoryDocumentCompositor
 com.celements.mandatory.CelementsGroups
 com.celements.mandatory.XWikiXWikiPreferences
 com.celements.menu.access.MenuAccessService
@@ -128,4 +127,3 @@ com.celements.pagetype.classes.PageTypeClassPackage
 com.celements.migrator.MenuNameMappingCelements2_8
 com.celements.migrator.MenuBar_SubMenuItemsClassMigrator
 com.celements.migrator.TreeNodeRelativeParent_Database
-com.celements.mandatory.XWikiRecycleBinIndexes
