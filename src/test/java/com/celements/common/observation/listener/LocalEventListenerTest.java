@@ -4,12 +4,14 @@ import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.io.NotSerializableException;
 import java.io.Serializable;
 
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
@@ -31,7 +33,8 @@ public class LocalEventListenerTest extends AbstractComponentTest {
         RemoteObservationManager.class);
     listener = (LocalEventListener) Utils.getComponent(EventListener.class,
         LocalEventListener.NAME);
-    listener.lastLoggedMap.clear();
+    listener.injectLogger(LoggerFactory.getLogger(LocalEventListener.class));
+    listener.logCountMap.clear();
   }
 
   @Test
@@ -66,6 +69,7 @@ public class LocalEventListenerTest extends AbstractComponentTest {
     Object source = createMockAndAddToDefault(Serializable.class);
     Object data = createMockAndAddToDefault(Serializable.class);
     Capture<LocalEventData> localEvDataCapt = new Capture<>();
+
     getMock(RemoteObservationManager.class).notify(capture(localEvDataCapt));
     expectLastCall().once();
 
@@ -90,56 +94,64 @@ public class LocalEventListenerTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_onEvent_error() {
+  public void test_onEvent_Exception() {
     Event event = AllEvent.ALLEVENT;
     Object source = createMockAndAddToDefault(Serializable.class);
     Object data = createMockAndAddToDefault(Serializable.class);
+    Throwable cause = new RuntimeException();
+
     getMock(RemoteObservationManager.class).notify(isA(LocalEventData.class));
-    expectLastCall().andThrow(new RuntimeException()).once();
+    expectLastCall().andThrow(cause).once();
 
     replayDefault();
     listener.onEvent(event, source, data);
     verifyDefault();
+
+    assertFalse(listener.logCountMap.containsKey(event.getClass()));
   }
 
   @Test
-  public void test_onEvent_notSerialzable_source() {
-    Event event = AllEvent.ALLEVENT;
-    Object source = createMockAndAddToDefault(Object.class);
-    Object data = createMockAndAddToDefault(Serializable.class);
-
-    replayDefault();
-    listener.onEvent(event, source, data);
-    verifyDefault();
-  }
-
-  @Test
-  public void test_onEvent_notSerialzable_data() {
-    Event event = AllEvent.ALLEVENT;
-    Object source = createMockAndAddToDefault(Serializable.class);
-    Object data = createMockAndAddToDefault(Object.class);
-
-    replayDefault();
-    listener.onEvent(event, source, data);
-    verifyDefault();
-  }
-
-  @Test
-  public void test_onEvent_logging() {
+  public void test_onEvent_NotSerializableException() {
     Event event = AllEvent.ALLEVENT;
     Object source = createMockAndAddToDefault(Object.class);
     Object data = createMockAndAddToDefault(Object.class);
-    listener = new LocalEventListener(createMockAndAddToDefault(Logger.class));
-    listener.LOGGER.warn(anyObject(String.class));
+    Throwable exc = new RuntimeException("", new NotSerializableException());
+
+    getMock(RemoteObservationManager.class).notify(isA(LocalEventData.class));
+    expectLastCall().andThrow(exc).once();
+
+    replayDefault();
+    listener.onEvent(event, source, data);
+    verifyDefault();
+
+    assertTrue(listener.logCountMap.containsKey(event.getClass()));
+    assertEquals(1, listener.logCountMap.get(event.getClass()).count.get());
+  }
+
+  @Test
+  public void test_onEvent_NotSerializableException_logging() {
+    int runCount = 13;
+    Event event = AllEvent.ALLEVENT;
+    Object source = createMockAndAddToDefault(Object.class);
+    Object data = createMockAndAddToDefault(Object.class);
+    Logger loggerMock = listener.injectLogger(createMockAndAddToDefault(Logger.class));
+
+    Throwable exc = new RuntimeException("", new NotSerializableException());
+    getMock(RemoteObservationManager.class).notify(isA(LocalEventData.class));
+    expectLastCall().andThrow(exc).anyTimes();
+    loggerMock.warn(anyObject(String.class), same(exc));
     expectLastCall().times(2);
+    expect(loggerMock.isDebugEnabled()).andReturn(true).anyTimes();
+    loggerMock.debug(anyObject(String.class), same(exc));
+    expectLastCall().atLeastOnce();
+
     replayDefault();
-    for (int i = 0; i < 10; i++) {
-      listener.checkSerializability(event.getClass(), source, data);
+    for (int i = 0; i < runCount; i++) {
+      listener.onEvent(event, source, data);
     }
-    listener.lastLoggedMap.put(event.getClass(), System.currentTimeMillis() - ((1000L * 60 * 60)
-        + 1));
-    for (int i = 0; i < 10; i++) {
-      listener.checkSerializability(event.getClass(), source, data);
+    assertEquals(runCount, listener.logCountMap.remove(event.getClass()).count.get());
+    for (int i = 0; i < runCount; i++) {
+      listener.onEvent(event, source, data);
     }
     verifyDefault();
   }

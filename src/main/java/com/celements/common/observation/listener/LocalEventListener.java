@@ -1,9 +1,11 @@
 package com.celements.common.observation.listener;
 
-import java.io.Serializable;
-import java.text.MessageFormat;
+import static java.text.MessageFormat.*;
+
+import java.io.NotSerializableException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,22 +22,11 @@ import com.celements.common.observation.converter.Local;
 @Component(LocalEventListener.NAME)
 public class LocalEventListener extends org.xwiki.observation.remote.internal.LocalEventListener {
 
-  final Logger LOGGER;
+  private Logger LOGGER = LoggerFactory.getLogger(LocalEventListener.class);
 
   public static final String NAME = "observation.remote";
 
-  final Map<Class<? extends Event>, Long> lastLoggedMap = new ConcurrentHashMap<>();
-
-  public LocalEventListener() {
-    LOGGER = LoggerFactory.getLogger(LocalEventListener.class);
-  }
-
-  /**
-   * for test purposes only
-   */
-  LocalEventListener(Logger logger) {
-    LOGGER = logger;
-  }
+  final Map<Class<? extends Event>, LogCounter> logCountMap = new ConcurrentHashMap<>();
 
   @Override
   public String getName() {
@@ -48,10 +39,12 @@ public class LocalEventListener extends org.xwiki.observation.remote.internal.Lo
     if (type.isAnnotationPresent(Local.class)) {
       LOGGER.info("skipping local event '{}'", event.getClass());
     } else {
-      if (checkSerializability(type, source, data)) {
-        try {
-          super.onEvent(event, source, data);
-        } catch (Exception exc) {
+      try {
+        super.onEvent(event, source, data);
+      } catch (Exception exc) {
+        if (containsNotSerializableException(exc)) {
+          logNotSerializableException(type, source, data, exc);
+        } else {
           LOGGER.error("unable to notify remote event [{}], source [{}], data [{}]", type, source,
               data, exc);
         }
@@ -59,26 +52,51 @@ public class LocalEventListener extends org.xwiki.observation.remote.internal.Lo
     }
   }
 
-  boolean checkSerializability(Class<? extends Event> type, Object source, Object data) {
-    boolean serializable = true;
-    String msg = "unable to notify remote event [{0}]";
-    if (!(source instanceof Serializable)) {
-      msg += ", source [{1}] not serializable";
-      serializable = false;
-    }
-    if (!(data instanceof Serializable)) {
-      msg += ", data [{2}] not serializable";
-      serializable = false;
-    }
-    if (!serializable && wasLoggedLongerThanOneHourAgo(type)) {
-      lastLoggedMap.put(type, System.currentTimeMillis());
-      LOGGER.warn(MessageFormat.format(msg, type.getSimpleName(), source, data));
-    }
-    return serializable;
+  private boolean containsNotSerializableException(Throwable exc) {
+    return (exc != null) && ((exc instanceof NotSerializableException)
+        || containsNotSerializableException(exc.getCause()));
   }
 
-  private boolean wasLoggedLongerThanOneHourAgo(Class<? extends Event> type) {
-    return (System.currentTimeMillis() - lastLoggedMap.getOrDefault(type, 0L)) > (1000L * 60 * 60);
+  private void logNotSerializableException(Class<? extends Event> type, Object source, Object data,
+      Exception exc) {
+    String msg = "not serializable remote event [{0}], source [{1}], data [{2}]";
+    LogCounter logCount = logCountMap.get(type);
+    if ((logCount == null) || logCount.isOneHourAgo()) {
+      logCountMap.put(type, new LogCounter());
+      if (logCount != null) {
+        msg += ", occured {3} times within last hour (since {4})";
+        msg = format(msg, type.getSimpleName(), source, data, logCount.count, logCount.time);
+      } else {
+        msg = format(msg, type.getSimpleName(), source, data);
+      }
+      LOGGER.warn(msg, exc);
+    } else if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(format(msg, type.getSimpleName(), source, data), exc);
+    }
+    logCountMap.get(type).increment();
+  }
+
+  static class LogCounter {
+
+    final long time = System.currentTimeMillis();
+    final AtomicLong count = new AtomicLong();
+
+    public boolean isOneHourAgo() {
+      return (System.currentTimeMillis() - time) >= (1000L * 60 * 60);
+    }
+
+    public void increment() {
+      count.incrementAndGet();
+    }
+
+  }
+
+  /**
+   * for test purposes only
+   */
+  Logger injectLogger(Logger logger) {
+    LOGGER = logger;
+    return LOGGER;
   }
 
 }
