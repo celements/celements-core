@@ -60,12 +60,12 @@ public class LocalEventListener extends org.xwiki.observation.remote.internal.Lo
   private void logNotSerializableException(Class<? extends Event> type, Object source, Object data,
       Exception exc) {
     String msg = "not serializable remote event [{0}], source [{1}], data [{2}]";
-    LogCounter logCount = logCountMap.get(type);
-    if ((logCount == null) || logCount.isOneHourAgo()) {
-      logCountMap.put(type, new LogCounter());
-      if (logCount != null) {
+    if (!logCountMap.containsKey(type) || logCountMap.get(type).isOneHourAgo()) {
+      final LogCounter replacedLogCount = logCountMap.put(type, new LogCounter());
+      if (replacedLogCount != null) {
         msg += ", occured {3} times within last hour (since {4})";
-        msg = format(msg, type.getSimpleName(), source, data, logCount.count, logCount.time);
+        msg = format(msg, type.getSimpleName(), source, data, replacedLogCount.count,
+            replacedLogCount.time);
       } else {
         msg = format(msg, type.getSimpleName(), source, data);
       }
