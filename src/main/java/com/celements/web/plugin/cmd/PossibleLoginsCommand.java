@@ -1,29 +1,23 @@
 package com.celements.web.plugin.cmd;
 
-import org.xwiki.context.Execution;
+import org.mutabilitydetector.internal.com.google.common.base.Joiner;
 
-import com.celements.web.classcollections.OldCoreClasses;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.web.UserService;
 import com.xpn.xwiki.web.Utils;
 
+@Deprecated
 public class PossibleLoginsCommand {
 
+  /**
+   * @deprecated instead use {@link UserService#getPossibleUserLoginFields()}
+   */
+  @Deprecated
   public String getPossibleLogins() {
-    String possibleLogins = getContext().getWiki().getXWikiPreference(
-        OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY, "celements.login.userfields",
-        "loginname", getContext());
-    if ((possibleLogins == null) || "".equals(possibleLogins.trim())) {
-      possibleLogins = "loginname";
-    }
-    return possibleLogins;
+    return Joiner.on(",").join(getUserService().getPossibleUserLoginFields());
   }
 
-  private XWikiContext getContext() {
-    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
-  }
-
-  private Execution getExecution() {
-    return Utils.getComponent(Execution.class);
+  private UserService getUserService() {
+    return Utils.getComponent(UserService.class);
   }
 
 }
