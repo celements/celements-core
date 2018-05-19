@@ -1,43 +1,80 @@
 package com.celements.web;
 
+import static com.celements.web.classcollections.IOldCoreClassConfig.*;
+import static com.google.common.base.Preconditions.*;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
+import com.celements.marshalling.ReferenceMarshaller;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentAccessException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.context.ModelContext;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.ModelUtils;
+import com.celements.query.IQueryExecutionServiceRole;
+import com.celements.rights.access.EAccessLevel;
+import com.celements.web.classes.oldcore.XWikiGroupsClass;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
+import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
-import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
+import com.celements.web.plugin.cmd.SendValidationFailedException;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.token.NewCelementsTokenForUserCommand;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiUser;
 
-public class CelementsUserService {
+@Component
+public class CelementsUserService implements UserService {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(CelementsUserService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CelementsUserService.class);
+
+  private static final Function<String, DocumentReference> DOC_REF_RESOLVER = new ReferenceMarshaller<>(
+      DocumentReference.class).getResolver();
+  private static final String DEFAULT_POSSIBLE_LOGIN = "loginname";
+
+  @Requirement(XWikiUsersClass.CLASS_DEF_HINT)
+  private ClassDefinition usersClass;
+
+  @Requirement(XWikiGroupsClass.CLASS_DEF_HINT)
+  private ClassDefinition groupsClass;
+
+  @Requirement(XWikiRightsClass.CLASS_DEF_HINT)
+  private ClassDefinition rightsClass;
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  private QueryManager queryManager;
+
+  @Requirement
+  private IQueryExecutionServiceRole queryExecService;
 
   @Requirement
   private IModelAccessFacade modelAccess;
@@ -45,74 +82,73 @@ public class CelementsUserService {
   @Requirement
   private ModelUtils modelUtils;
 
-  @Requirement(XWikiRightsClass.CLASS_DEF_HINT)
-  private ClassDefinition xWikiRightsClass;
+  @Requirement
+  private IWebUtilsService webUtils;
 
   @Requirement
   private ModelContext context;
 
-  // TODO get rid of
-  @Deprecated
-  private XWikiContext getContext() {
-    return context.getXWikiContext();
+  @Override
+  public SpaceReference getUserSpaceRef() {
+    return new SpaceReference(XWIKI_USERS_CLASS_SPACE, context.getWikiRef());
   }
 
-  // TODO get rid of
-  @Deprecated
-  private XWiki getXWiki() {
-    return getContext().getWiki();
+  @Override
+  public DocumentReference completeUserDocRef(String accountName) {
+    DocumentReference userDocRef;
+    if (accountName.startsWith(getUserSpaceRef().getName() + ".")) {
+      userDocRef = modelUtils.resolveRef(accountName, DocumentReference.class);
+    } else {
+      userDocRef = new DocumentReference(accountName, getUserSpaceRef());
+    }
+    return userDocRef;
   }
 
-  public synchronized @NotNull XWikiUser createNewUser(@NotNull Map<String, String> userData,
-      @NotNull String possibleLogins, boolean validate) throws UserCreateException {
-    DocumentReference userDocRef = getOrGenerateUserDocRef(userData.remove("xwikiname"));
-    String validkey = "";
-    int success = -1;
+  @Override
+  public XWikiUser newXWikiUser(DocumentReference userDocRef) {
+    return new XWikiUser(modelUtils.serializeRefLocal(userDocRef));
+  }
+
+  @Override
+  public Set<String> getPossibleUserLoginFields() {
+    Set<String> ret = ImmutableSet.copyOf(getSplitXWikiPreference(
+        XWIKI_PREFERENCES_CELLOGIN_PROPERTY, "celements.login.userfields", DEFAULT_POSSIBLE_LOGIN));
+    if (ret.isEmpty()) {
+      ret = ImmutableSet.of(DEFAULT_POSSIBLE_LOGIN);
+    }
+    return ret;
+  }
+
+  @Override
+  public XWikiUser createUser(String accountName, Map<String, String> userData, boolean validate)
+      throws UserCreateException {
+    userData.put("xwikiname", checkNotNull(Strings.emptyToNull(accountName)));
+    return createUser(userData, validate);
+  }
+
+  @Override
+  public synchronized XWikiUser createUser(Map<String, String> userData, boolean validate)
+      throws UserCreateException {
     try {
-      if (areIdentifiersUnique(userData, possibleLogins, getContext())) {
-        if (!userData.containsKey("password")) {
-          String password = RandomStringUtils.randomAlphanumeric(8);
-          userData.put("password", password);
-        }
-        if (!userData.containsKey("validkey")) {
-          validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
-          userData.put("validkey", validkey);
-        } else {
-          validkey = userData.get("validkey");
-        }
-        if (!userData.containsKey("active")) {
-          userData.put("active", "0");
-        }
-        String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
-        success = getXWiki().createUser(userDocRef.getName(), userData, getXWikiUsersClassDocRef(),
-            content, null, "edit", getContext());
-      }
-    } catch (XWikiException excp) {
-      _LOGGER.error("Exception while creating a new user", excp);
-      throw new UserCreateException(excp);
-    }
-    XWikiUser newUser = null;
-    if (success == 1) {
-      setRightsOnUserDoc(userDocRef);
-      newUser = new XWikiUser(modelUtils.serializeRefLocal(userDocRef));
-      if (validate) {
-        _LOGGER.info("send account validation mail with data: accountname='" + userDocRef.getName()
-            + "', email='" + userData.get("email") + "', validkey='" + validkey + "'");
-        try {
-          new PasswordRecoveryAndEmailValidationCommand().sendValidationMessage(userData.get(
-              "email"), validkey, webUtilsService.resolveDocumentReference(
-                  "Tools.AccountActivationMail"), webUtilsService.getDefaultAdminLanguage());
-        } catch (XWikiException e) {
-          _LOGGER.error("Exception while sending validation mail to '" + userData.get("email")
-              + "'", e);
-          throw new UserCreateException(e);
+      DocumentReference userDocRef = getOrGenerateUserDocRef(userData.remove("xwikiname"));
+      XWikiDocument userDoc = modelAccess.createDocument(userDocRef);
+      XWikiUser user = newXWikiUser(userDocRef);
+      if (areIdentifiersUnique(userData)) {
+        createUserFromData(userDoc, userData);
+        setRightsOnUser(userDoc, Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
+            EAccessLevel.DELETE));
+        modelAccess.saveDocument(userDoc, webUtils.getAdminMessageTool().get(
+            "core.comment.createdUser"));
+        addUserToDefaultGroups(user);
+        if (validate) {
+          new PasswordRecoveryAndEmailValidationCommand().sendNewValidationToAccountEmail(
+              user.getUser());
         }
       }
+      return user;
+    } catch (DocumentAccessException | QueryException | SendValidationFailedException exc) {
+      throw new UserCreateException(exc);
     }
-    if (newUser == null) {
-      throw new UserCreateException("Failed to create a new user");
-    }
-    return newUser;
   }
 
   private DocumentReference getOrGenerateUserDocRef(String accountName) {
@@ -120,56 +156,151 @@ public class CelementsUserService {
     if (accountName.isEmpty()) {
       accountName = RandomStringUtils.randomAlphanumeric(12);
     }
-    SpaceReference userSpaceRef = new SpaceReference("XWiki", context.getWikiRef());
-    DocumentReference userDocRef = new DocumentReference(accountName, userSpaceRef);
+    DocumentReference userDocRef = completeUserDocRef(accountName);
     while (modelAccess.exists(userDocRef)) {
-      userDocRef = new DocumentReference(RandomStringUtils.randomAlphanumeric(12), userSpaceRef);
+      userDocRef = new DocumentReference(RandomStringUtils.randomAlphanumeric(12),
+          getUserSpaceRef());
     }
     return userDocRef;
   }
 
-  private DocumentReference getXWikiUsersClassDocRef() {
-    return webUtilsService.resolveDocumentReference("XWiki.XWikiUsers");
-  }
-
-  void setRightsOnUserDoc(DocumentReference userDocRef) throws UserCreateException {
+  public void createUserFromData(XWikiDocument userDoc, Map<String, String> userData)
+      throws DocumentAccessException {
+    XWikiUser user = newXWikiUser(userDoc.getDocumentReference());
+    userDoc.setParentReference(usersClass.getClassReference());
+    userDoc.setCreator(user.getUser());
+    userDoc.setAuthor(user.getUser());
+    userDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
+    userData.putIfAbsent("active", "0");
+    userData.putIfAbsent("password", RandomStringUtils.randomAlphanumeric(8));
     try {
-      XWikiDocument doc = modelAccess.getDocument(userDocRef);
-      List<BaseObject> rightsObjs = modelAccess.getXObjects(doc, xWikiRightsClass.getClassRef());
-      if (rightsObjs.size() > 0) {
-        rightsObjs.get(0).setStringValue("users", webUtilsService.getRefLocalSerializer().serialize(
-            doc.getDocumentReference()));
-        rightsObjs.get(0).set("allow", "1", getContext());
-        rightsObjs.get(0).set("levels", "view,edit,delete", getContext());
-        rightsObjs.get(0).set("groups", "", getContext());
-      }
-      if (rightsObjs.size() > 1) {
-        rightsObjs.get(1).set("users", "", getContext());
-        rightsObjs.get(1).set("allow", "1", getContext());
-        rightsObjs.get(1).set("levels", "view,edit,delete", getContext());
-        rightsObjs.get(1).set("groups", "XWiki.XWikiAdminGroup", getContext());
-      }
-
-      modelAccess.saveDocument(doc, "added rights objects to created user");
-    } catch (DocumentLoadException | DocumentNotExistsException | DocumentSaveException excp) {
-      _LOGGER.error("Exception while trying to add rights to newly created user", excp);
-      throw new UserCreateException(excp);
+      BaseObject userObject = XWikiObjectEditor.on(userDoc).filter(usersClass).createFirst();
+      getXWiki().getUserClass(context.getXWikiContext()).fromMap(userData, userObject);
+    } catch (XWikiException xwe) {
+      throw new DocumentAccessException(usersClass.getClassReference().getDocRef(), xwe);
     }
   }
 
-  private boolean areIdentifiersUnique(Map<String, String> userData, String possibleLogins,
-      XWikiContext context) throws XWikiException {
+  private void setRightsOnUser(XWikiDocument doc, List<EAccessLevel> rights) {
+    XWikiObjectEditor userRightObjEditor = XWikiObjectEditor.on(doc).filter(rightsClass);
+    userRightObjEditor.filter(XWikiRightsClass.FIELD_USERS, Arrays.asList(newXWikiUser(
+        doc.getDocumentReference())));
+    userRightObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
+    userRightObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
+    userRightObjEditor.createFirst();
+    XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(doc).filter(rightsClass);
+    admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, Arrays.asList(getAdminGroupName()));
+    admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
+    admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
+    admGrpObjEditor.createFirst();
+  }
+
+  private void addUserToDefaultGroups(XWikiUser user) {
+
+    FluentIterable<String> defaultGroupNames = FluentIterable.from(getSplitXWikiPreference(
+        "initialGroups", "xwiki.users.initialGroups", getAdminGroupName()));
+    for (DocumentReference groupDocRef : defaultGroupNames.transform(DOC_REF_RESOLVER)) {
+      try {
+        addUserToGroup(user, groupDocRef);
+        LOGGER.info("createUser - added user '{}' to group '{}'", user, groupDocRef);
+      } catch (DocumentAccessException exc) {
+        LOGGER.warn("createUser - failed adding user '{}' to group '{}'", user, groupDocRef, exc);
+      }
+    }
+  }
+
+  private void addUserToGroup(XWikiUser user, DocumentReference groupDocRef)
+      throws DocumentNotExistsException, DocumentSaveException {
+    XWikiDocument groupDoc = modelAccess.getDocument(groupDocRef);
+    XWikiObjectEditor.on(groupDoc).filter(XWikiGroupsClass.FIELD_MEMBER,
+        user).createFirstIfNotExists();
+    modelAccess.saveDocument(groupDoc, webUtils.getAdminMessageTool().get(
+        "core.comment.addedUserToGroup"));
+    try {
+      XWikiGroupService gservice = getXWiki().getGroupService(context.getXWikiContext());
+      gservice.addUserToGroup(user.getUser(), context.getWikiRef().getName(),
+          modelUtils.serializeRefLocal(groupDocRef), context.getXWikiContext());
+    } catch (XWikiException xwe) {
+      LOGGER.warn("Failed to update group service cache", xwe);
+    }
+  }
+
+  private boolean areIdentifiersUnique(Map<String, String> userData) throws QueryException {
+    Set<String> possibleLogins = getPossibleUserLoginFields();
     boolean isUnique = true;
     for (String key : userData.keySet()) {
-      if (!"".equals(key.trim()) && (("," + possibleLogins + ",").indexOf("," + key + ",") >= 0)) {
-        String user = new UserNameForUserDataCommand().getUsernameForUserData(userData.get(key),
-            possibleLogins, context);
-        if ((user == null) || (user.length() > 0)) { // user == "" means there is no such user
+      if (!"".equals(key.trim()) && possibleLogins.contains(key)) {
+        Optional<XWikiUser> user = getUserForData(userData.get(key), possibleLogins);
+        if (user.isPresent()) {
           isUnique = false;
         }
       }
     }
     return isUnique;
+  }
+
+  private String getAdminGroupName() {
+    return "XWiki.XWikiAdminGroup";
+  }
+
+  @Override
+  public Optional<XWikiUser> getUserForData(String login) throws QueryException {
+    return getUserForData(login, getPossibleUserLoginFields());
+  }
+
+  @Override
+  public Optional<XWikiUser> getUserForData(String login,
+      Collection<String> possibleUserLoginFields) throws QueryException {
+    checkArgument(!Strings.nullToEmpty(login).trim().isEmpty());
+    checkNotNull(possibleUserLoginFields);
+    if (possibleUserLoginFields.isEmpty()) {
+      possibleUserLoginFields.add(DEFAULT_POSSIBLE_LOGIN);
+    }
+    List<DocumentReference> userDocRefs = queryExecService.executeAndGetDocRefs(
+        getUserQueryForPossibleLogin(login, possibleUserLoginFields));
+    LOGGER.info("getUserForData - for login [{}] and possibleLogins [{}]", userDocRefs.get(0),
+        login, possibleUserLoginFields);
+    if (userDocRefs.size() == 1) {
+      return Optional.of(newXWikiUser(userDocRefs.get(0)));
+    } else {
+      return Optional.absent();
+    }
+  }
+
+  private Query getUserQueryForPossibleLogin(String login, Collection<String> possibleFields)
+      throws QueryException {
+    StringBuilder xwql = new StringBuilder();
+    xwql.append("from doc.object(XWiki.XWikiUsers) usr where doc.space = :space and ");
+    if (possibleFields.contains(DEFAULT_POSSIBLE_LOGIN)) {
+      xwql.append("lower(doc.name) = :login");
+    } else {
+      Iterator<String> iter = possibleFields.iterator();
+      while (iter.hasNext()) {
+        String field = iter.next();
+        if (StringUtils.isAlphanumeric(field)) {
+          xwql.append("lower(usr.").append(field).append(") = :login");
+          if (iter.hasNext()) {
+            xwql.append(" or ");
+          }
+        }
+      }
+    }
+    Query query = queryManager.createQuery(xwql.toString(), Query.XWQL);
+    query.bindValue("space", getUserSpaceRef().getName());
+    query.bindValue("login", login.toLowerCase().replace("'", "''"));
+    return query;
+  }
+
+  private Iterable<String> getSplitXWikiPreference(String prefName, String cfgParam,
+      String defaultValue) {
+    String prefValue = Strings.nullToEmpty(getXWiki().getXWikiPreference(prefName, cfgParam,
+        defaultValue, context.getXWikiContext()));
+    return Splitter.on(",").omitEmptyStrings().split(prefValue);
+  }
+
+  @Deprecated
+  private XWiki getXWiki() {
+    return context.getXWikiContext().getWiki();
   }
 
 }
