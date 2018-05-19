@@ -23,7 +23,9 @@ import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,11 +35,11 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommand {
@@ -104,7 +106,7 @@ public class NewCelementsTokenForUserCommand {
         + "where doc.fullName = :doc and obj.validuntil < :now order by obj.number desc";
     try {
       DocumentReference docRef = userDoc.getDocumentReference();
-      Query query = getQueryManagerComponent().createQuery(xwql, Query.XWQL);
+      Query query = getQueryManager().createQuery(xwql, Query.XWQL);
       query.bindValue("now", new Date());
       query.bindValue("doc", getWebUtilsService().getRefLocalSerializer().serialize(docRef));
       query.setWiki(docRef.getLastSpaceReference().getParent().getName());
@@ -131,7 +133,7 @@ public class NewCelementsTokenForUserCommand {
     return new DocumentReference(wikiRef.getName(), "Classes", "TokenClass");
   }
 
-  QueryManager getQueryManagerComponent() {
+  QueryManager getQueryManager() {
     if (injected_queryManager != null) {
       return injected_queryManager;
     }
@@ -142,21 +144,27 @@ public class NewCelementsTokenForUserCommand {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
+  /**
+   * @deprecated instead use {@link #getUniqueValidationKey()}
+   */
+  @Deprecated
   public String getUniqueValidationKey(XWikiContext context) throws XWikiException {
-    XWikiStoreInterface storage = context.getWiki().getStore();
-
-    String hql = "select str.value from BaseObject as obj, StringProperty as str ";
-    hql += "where obj.className='XWiki.XWikiUsers' ";
-    hql += "and obj.id=str.id.id ";
-    hql += "and str.id.name='validkey' ";
-    hql += "and str.value<>''";
-    List<String> existingKeys = storage.search(hql, 0, 0, context);
-
-    String validkey = "";
-    while (validkey.equals("") || existingKeys.contains(validkey)) {
-      validkey = context.getWiki().generateRandomString(24);
+    try {
+      return getUniqueValidationKey();
+    } catch (QueryException exc) {
+      throw new XWikiException(0, 0, "wrapper", exc);
     }
+  }
 
+  public String getUniqueValidationKey() throws QueryException {
+    String xwql = "select usr.validkey from Document doc, doc.object(XWiki.XWikiUsers) usr "
+        + "where usr.validkey <> ''";
+    Set<String> existingKeys = ImmutableSet.copyOf(getQueryManager().createQuery(xwql,
+        Query.XWQL).<String>execute());
+    String validkey;
+    do {
+      validkey = RandomStringUtils.randomAlphanumeric(24);
+    } while (existingKeys.contains(validkey));
     return validkey;
   }
 
