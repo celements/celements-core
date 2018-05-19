@@ -59,7 +59,6 @@ public class CelementsUserService implements UserService {
 
   private static final Function<String, DocumentReference> DOC_REF_RESOLVER = new ReferenceMarshaller<>(
       DocumentReference.class).getResolver();
-  private static final String DEFAULT_POSSIBLE_LOGIN = "loginname";
 
   @Requirement(XWikiUsersClass.CLASS_DEF_HINT)
   private ClassDefinition usersClass;
@@ -110,13 +109,9 @@ public class CelementsUserService implements UserService {
   }
 
   @Override
-  public Set<String> getPossibleUserLoginFields() {
-    Set<String> ret = ImmutableSet.copyOf(getSplitXWikiPreference(
-        XWIKI_PREFERENCES_CELLOGIN_PROPERTY, "celements.login.userfields", DEFAULT_POSSIBLE_LOGIN));
-    if (ret.isEmpty()) {
-      ret = ImmutableSet.of(DEFAULT_POSSIBLE_LOGIN);
-    }
-    return ret;
+  public Set<String> getPossibleLoginFields() {
+    return ImmutableSet.copyOf(getSplitXWikiPreference(XWIKI_PREFERENCES_CELLOGIN_PROPERTY,
+        "celements.login.userfields", DEFAULT_LOGIN_FIELD));
   }
 
   @Override
@@ -226,7 +221,7 @@ public class CelementsUserService implements UserService {
   }
 
   private boolean areIdentifiersUnique(Map<String, String> userData) throws QueryException {
-    Set<String> possibleLogins = getPossibleUserLoginFields();
+    Set<String> possibleLogins = getPossibleLoginFields();
     boolean isUnique = true;
     for (String key : userData.keySet()) {
       if (!"".equals(key.trim()) && possibleLogins.contains(key)) {
@@ -245,43 +240,40 @@ public class CelementsUserService implements UserService {
 
   @Override
   public Optional<XWikiUser> getUserForData(String login) throws QueryException {
-    return getUserForData(login, getPossibleUserLoginFields());
+    return getUserForData(login, getPossibleLoginFields());
   }
 
   @Override
-  public Optional<XWikiUser> getUserForData(String login,
-      Collection<String> possibleUserLoginFields) throws QueryException {
+  public Optional<XWikiUser> getUserForData(String login, Collection<String> possibleLoginFields)
+      throws QueryException {
     checkArgument(!Strings.nullToEmpty(login).trim().isEmpty());
-    checkNotNull(possibleUserLoginFields);
-    if (possibleUserLoginFields.isEmpty()) {
-      possibleUserLoginFields.add(DEFAULT_POSSIBLE_LOGIN);
+    checkNotNull(possibleLoginFields);
+    if (possibleLoginFields.isEmpty()) {
+      possibleLoginFields.add(DEFAULT_LOGIN_FIELD);
     }
     List<DocumentReference> userDocRefs = queryExecService.executeAndGetDocRefs(
-        getUserQueryForPossibleLogin(login, possibleUserLoginFields));
-    LOGGER.info("getUserForData - for login [{}] and possibleLogins [{}]", userDocRefs.get(0),
-        login, possibleUserLoginFields);
+        getUserQueryForPossibleLogin(login, possibleLoginFields));
+    LOGGER.info("getUserForData - for login [{}] and possibleLoginFields [{}]:", userDocRefs.get(0),
+        login, possibleLoginFields, userDocRefs);
     if (userDocRefs.size() == 1) {
       return Optional.of(newXWikiUser(userDocRefs.get(0)));
-    } else {
-      return Optional.absent();
     }
+    return Optional.absent();
   }
 
-  private Query getUserQueryForPossibleLogin(String login, Collection<String> possibleFields)
+  private Query getUserQueryForPossibleLogin(String login, Collection<String> possibleLoginFields)
       throws QueryException {
     StringBuilder xwql = new StringBuilder();
     xwql.append("from doc.object(XWiki.XWikiUsers) usr where doc.space = :space and ");
-    if (possibleFields.contains(DEFAULT_POSSIBLE_LOGIN)) {
-      xwql.append("lower(doc.name) = :login");
-    } else {
-      Iterator<String> iter = possibleFields.iterator();
-      while (iter.hasNext()) {
-        String field = iter.next();
-        if (StringUtils.isAlphanumeric(field)) {
-          xwql.append("lower(usr.").append(field).append(") = :login");
-          if (iter.hasNext()) {
-            xwql.append(" or ");
-          }
+    Iterator<String> iter = possibleLoginFields.iterator();
+    while (iter.hasNext()) {
+      String field = iter.next();
+      if (StringUtils.isAlphanumeric(field)) {
+        xwql.append("lower(");
+        xwql.append(DEFAULT_LOGIN_FIELD.equals(field) ? "doc" : "usr").append(".").append(field);
+        xwql.append(") = :login");
+        if (iter.hasNext()) {
+          xwql.append(" or ");
         }
       }
     }

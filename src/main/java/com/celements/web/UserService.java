@@ -17,6 +17,8 @@ import com.xpn.xwiki.user.api.XWikiUser;
 @ComponentRole
 public interface UserService {
 
+  public static final String DEFAULT_LOGIN_FIELD = "name";
+
   @NotNull
   SpaceReference getUserSpaceRef();
 
@@ -27,7 +29,7 @@ public interface UserService {
   XWikiUser newXWikiUser(@NotNull DocumentReference userDocRef);
 
   @NotNull
-  Set<String> getPossibleUserLoginFields();
+  Set<String> getPossibleLoginFields();
 
   @NotNull
   XWikiUser createUser(@NotNull String accountName, @NotNull Map<String, String> userData,

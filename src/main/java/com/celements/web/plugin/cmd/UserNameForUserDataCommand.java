@@ -24,6 +24,7 @@ import org.xwiki.query.QueryException;
 
 import com.celements.web.UserService;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -39,10 +40,13 @@ public class UserNameForUserDataCommand {
   public String getUsernameForUserData(String login, String possibleLogins, XWikiContext context)
       throws XWikiException {
     try {
-      Optional<XWikiUser> user = getUserService().getUserForData(login, Splitter.on(
-          ",").omitEmptyStrings().splitToList(possibleLogins));
-      if (user.isPresent()) {
-        return user.get().getUser();
+      if (!Strings.nullToEmpty(login).isEmpty() && (possibleLogins != null)) {
+        possibleLogins.replace("loginname", UserService.DEFAULT_LOGIN_FIELD);
+        Optional<XWikiUser> user = getUserService().getUserForData(login, Splitter.on(
+            ",").omitEmptyStrings().splitToList(possibleLogins));
+        if (user.isPresent()) {
+          return user.get().getUser();
+        }
       }
       return "";
     } catch (QueryException exc) {

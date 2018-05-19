@@ -9,11 +9,11 @@ import com.xpn.xwiki.web.Utils;
 public class PossibleLoginsCommand {
 
   /**
-   * @deprecated instead use {@link UserService#getPossibleUserLoginFields()}
+   * @deprecated instead use {@link UserService#getPossibleLoginFields()}
    */
   @Deprecated
   public String getPossibleLogins() {
-    return Joiner.on(",").join(getUserService().getPossibleUserLoginFields());
+    return Joiner.on(",").join(getUserService().getPossibleLoginFields());
   }
 
   private UserService getUserService() {
