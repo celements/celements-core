@@ -28,8 +28,10 @@ import com.celements.model.access.exception.DocumentAccessException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
@@ -115,14 +117,14 @@ public class CelementsUserService implements UserService {
   }
 
   @Override
-  public XWikiUser createUser(String accountName, Map<String, String> userData, boolean validate)
-      throws UserCreateException {
+  public DocumentReference createUser(String accountName, Map<String, String> userData,
+      boolean validate) throws UserCreateException {
     userData.put("xwikiname", checkNotNull(Strings.emptyToNull(accountName)));
     return createUser(userData, validate);
   }
 
   @Override
-  public synchronized XWikiUser createUser(Map<String, String> userData, boolean validate)
+  public synchronized DocumentReference createUser(Map<String, String> userData, boolean validate)
       throws UserCreateException {
     try {
       DocumentReference userDocRef = getOrGenerateUserDocRef(userData.remove("xwikiname"));
@@ -140,7 +142,7 @@ public class CelementsUserService implements UserService {
               user.getUser());
         }
       }
-      return user;
+      return userDocRef;
     } catch (DocumentAccessException | QueryException | SendValidationFailedException exc) {
       throw new UserCreateException(exc);
     }
@@ -166,8 +168,9 @@ public class CelementsUserService implements UserService {
     userDoc.setCreator(user.getUser());
     userDoc.setAuthor(user.getUser());
     userDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
-    userData.putIfAbsent("active", "0");
-    userData.putIfAbsent("password", RandomStringUtils.randomAlphanumeric(8));
+    userData.putIfAbsent(XWikiUsersClass.FIELD_ACTIVE.getName(), "0");
+    userData.putIfAbsent(XWikiUsersClass.FIELD_PASSWORD.getName(),
+        RandomStringUtils.randomAlphanumeric(8));
     try {
       BaseObject userObject = XWikiObjectEditor.on(userDoc).filter(usersClass).createFirst();
       getXWiki().getUserClass(context.getXWikiContext()).fromMap(userData, userObject);
@@ -293,6 +296,29 @@ public class CelementsUserService implements UserService {
   @Deprecated
   private XWiki getXWiki() {
     return context.getXWikiContext().getWiki();
+  }
+
+  @Override
+  public Optional<String> getUserEmail(DocumentReference userDocRef) {
+    return getUserFieldValue(userDocRef, XWikiUsersClass.FIELD_EMAIL);
+  }
+
+  @Override
+  public boolean isUserActive(DocumentReference userDocRef) {
+    return getUserFieldValue(userDocRef, XWikiUsersClass.FIELD_ACTIVE).or(false);
+  }
+
+  private <T> Optional<T> getUserFieldValue(DocumentReference userDocRef, ClassField<T> field) {
+    try {
+      Optional<BaseObject> obj = XWikiObjectFetcher.on(modelAccess.getDocument(userDocRef)).filter(
+          usersClass).first();
+      if (obj.isPresent()) {
+        return modelAccess.getFieldValue(obj.get(), field);
+      }
+    } catch (DocumentNotExistsException exp) {
+      LOGGER.info("getUserObject failed", exp);
+    }
+    return Optional.absent();
   }
 
 }

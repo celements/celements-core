@@ -32,11 +32,11 @@ public interface UserService {
   Set<String> getPossibleLoginFields();
 
   @NotNull
-  XWikiUser createUser(@NotNull String accountName, @NotNull Map<String, String> userData,
+  DocumentReference createUser(@NotNull String accountName, @NotNull Map<String, String> userData,
       boolean validate) throws UserCreateException;
 
   @NotNull
-  XWikiUser createUser(@NotNull Map<String, String> userData, boolean validate)
+  DocumentReference createUser(@NotNull Map<String, String> userData, boolean validate)
       throws UserCreateException;
 
   @NotNull
@@ -45,5 +45,10 @@ public interface UserService {
   @NotNull
   Optional<XWikiUser> getUserForData(@NotNull String login,
       @NotNull Collection<String> possibleLogins) throws QueryException;
+
+  @NotNull
+  Optional<String> getUserEmail(@NotNull DocumentReference userDocRef);
+
+  boolean isUserActive(@NotNull DocumentReference userDocRef);
 
 }
