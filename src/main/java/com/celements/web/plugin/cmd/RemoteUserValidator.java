@@ -24,15 +24,19 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.query.QueryException;
 
 import com.celements.sajson.Builder;
+import com.celements.web.UserService;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.CelementsWebPlugin;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.web.Utils;
 
 public class RemoteUserValidator {
 
@@ -45,27 +49,23 @@ public class RemoteUserValidator {
     if (validationAllowed(context)) {
       Principal principal = null;
       try {
-        String login = getCelementsweb(context).getUsernameForUserData(username,
-            context.getWiki().getXWikiPreference(OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY,
-                "loginname", context), context);
-        principal = context.getWiki().getAuthService().authenticate(login, password, context);
-      } catch (XWikiException e) {
-        mLogger.error("DENYING access: Exception while authenticating.", e);
+        Optional<XWikiUser> user = getUserService().getUserForData(username);
+        if (user.isPresent()) {
+          principal = context.getWiki().getAuthService().authenticate(user.get().getUser(),
+              password, context);
+        }
+      } catch (QueryException | XWikiException exc) {
+        mLogger.error("DENYING access: Exception while authenticating.", exc);
       }
       if (principal != null) {
         mLogger.debug("Authentication successful, now checking group");
         if (context.getWiki().getUser(principal.getName(), context).isUserInGroup(memberOfGroup)) {
           mLogger.debug("Group matched requirement, now checking if account is active.");
-          try {
-            if (checkActive(principal.getName(), context) == 1) {
-              mLogger.debug("GRANTING access to " + principal.getName() + "!");
-              resultJSON = getResultJSON(username, true, null, returnGroups, context);
-            } else {
-              mLogger.warn("DENYING access: account '" + username + "' is inactive.");
-              resultJSON = getResultJSON(null, false, "useraccount_inactive", null, context);
-            }
-          } catch (XWikiException e) {
-            mLogger.error("DENYING access: exception while checking if account is " + "active");
+          if (checkActive(principal.getName(), context)) {
+            mLogger.debug("GRANTING access to " + principal.getName() + "!");
+            resultJSON = getResultJSON(username, true, null, returnGroups, context);
+          } else {
+            mLogger.warn("DENYING access: account '" + username + "' is inactive.");
             resultJSON = getResultJSON(null, false, "useraccount_inactive", null, context);
           }
         } else {
@@ -173,8 +173,8 @@ public class RemoteUserValidator {
   }
 
   // Copy & Paste and customise from bugged method in XWiki class.
-  private int checkActive(String user, XWikiContext context) throws XWikiException {
-    int active = 1;
+  private boolean checkActive(String user, XWikiContext context) {
+    boolean active = true;
     // These users are necessarly active
     if (user.equals(XWikiRightService.GUEST_USER_FULLNAME) || (user.equals(
         XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
@@ -182,12 +182,16 @@ public class RemoteUserValidator {
     }
     String checkactivefield = context.getWiki().getXWikiPreference("auth_active_check", context);
     if (checkactivefield.equals("1")) {
-      XWikiDocument userdoc = context.getWiki().getDocument(user, context);
-      active = userdoc.getIntValue("XWiki.XWikiUsers", "active");
+      active = getUserService().isUserActive(getUserService().completeUserDocRef(user));
     } else {
       mLogger.warn("XWikiPreferences field auth_active_check != 1 which means all users"
           + "are always handled as active");
     }
     return active;
   }
+
+  private UserService getUserService() {
+    return Utils.getComponent(UserService.class);
+  }
+
 }
