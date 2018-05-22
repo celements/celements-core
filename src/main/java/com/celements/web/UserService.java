@@ -49,6 +49,9 @@ public interface UserService {
   @NotNull
   Optional<String> getUserEmail(@NotNull DocumentReference userDocRef);
 
+  @NotNull
+  Optional<String> getUserAdminLanguage(@NotNull DocumentReference userDocRef);
+
   boolean isUserActive(@NotNull DocumentReference userDocRef);
 
 }
