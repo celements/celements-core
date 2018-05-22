@@ -9,10 +9,11 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.query.QueryException;
 
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserCreateException;
+import com.celements.auth.user.UserInstantiationException;
 import com.google.common.base.Optional;
-import com.xpn.xwiki.user.api.XWikiUser;
 
 @ComponentRole
 public interface UserService {
@@ -26,32 +27,23 @@ public interface UserService {
   DocumentReference completeUserDocRef(@NotNull String accountName);
 
   @NotNull
-  XWikiUser newXWikiUser(@NotNull DocumentReference userDocRef);
+  User getUser(@NotNull DocumentReference userDocRef) throws UserInstantiationException;
 
   @NotNull
   Set<String> getPossibleLoginFields();
 
   @NotNull
-  DocumentReference createUser(@NotNull String accountName, @NotNull Map<String, String> userData,
+  User createNewUser(@NotNull String accountName, @NotNull Map<String, String> userData,
       boolean validate) throws UserCreateException;
 
   @NotNull
-  DocumentReference createUser(@NotNull Map<String, String> userData, boolean validate)
+  User createNewUser(@NotNull Map<String, String> userData, boolean validate)
       throws UserCreateException;
 
   @NotNull
-  Optional<XWikiUser> getUserForData(@NotNull String login) throws QueryException;
+  Optional<User> getUserForData(@NotNull String login);
 
   @NotNull
-  Optional<XWikiUser> getUserForData(@NotNull String login,
-      @NotNull Collection<String> possibleLogins) throws QueryException;
-
-  @NotNull
-  Optional<String> getUserEmail(@NotNull DocumentReference userDocRef);
-
-  @NotNull
-  Optional<String> getUserAdminLanguage(@NotNull DocumentReference userDocRef);
-
-  boolean isUserActive(@NotNull DocumentReference userDocRef);
+  Optional<User> getUserForData(@NotNull String login, @NotNull Collection<String> possibleLogins);
 
 }

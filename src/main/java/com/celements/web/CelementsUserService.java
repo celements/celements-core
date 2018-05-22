@@ -22,16 +22,18 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
+import com.celements.auth.user.CelementsUser;
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserCreateException;
+import com.celements.auth.user.UserInstantiationException;
 import com.celements.marshalling.ReferenceMarshaller;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentAccessException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
-import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
-import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
@@ -53,6 +55,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.web.Utils;
 
 @Component
 public class CelementsUserService implements UserService {
@@ -106,8 +109,10 @@ public class CelementsUserService implements UserService {
   }
 
   @Override
-  public XWikiUser newXWikiUser(DocumentReference userDocRef) {
-    return new XWikiUser(modelUtils.serializeRefLocal(userDocRef));
+  public User getUser(DocumentReference userDocRef) throws UserInstantiationException {
+    User user = Utils.getComponent(User.class, CelementsUser.NAME);
+    user.initialize(userDocRef);
+    return user;
   }
 
   @Override
@@ -117,33 +122,33 @@ public class CelementsUserService implements UserService {
   }
 
   @Override
-  public DocumentReference createUser(String accountName, Map<String, String> userData,
-      boolean validate) throws UserCreateException {
+  public User createNewUser(String accountName, Map<String, String> userData, boolean validate)
+      throws UserCreateException {
     userData.put("xwikiname", checkNotNull(Strings.emptyToNull(accountName)));
-    return createUser(userData, validate);
+    return createNewUser(userData, validate);
   }
 
   @Override
-  public synchronized DocumentReference createUser(Map<String, String> userData, boolean validate)
+  public synchronized User createNewUser(Map<String, String> userData, boolean validate)
       throws UserCreateException {
     try {
       DocumentReference userDocRef = getOrGenerateUserDocRef(userData.remove("xwikiname"));
       XWikiDocument userDoc = modelAccess.createDocument(userDocRef);
-      XWikiUser user = newXWikiUser(userDocRef);
       if (areIdentifiersUnique(userData)) {
         createUserFromData(userDoc, userData);
         setRightsOnUser(userDoc, Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
             EAccessLevel.DELETE));
         modelAccess.saveDocument(userDoc, webUtils.getAdminMessageTool().get(
             "core.comment.createdUser"));
-        addUserToDefaultGroups(user);
+        addUserToDefaultGroups(userDocRef);
         if (validate) {
           new PasswordRecoveryAndEmailValidationCommand().sendNewValidationToAccountEmail(
-              user.getUser());
+              userDocRef);
         }
       }
-      return userDocRef;
-    } catch (DocumentAccessException | QueryException | SendValidationFailedException exc) {
+      return getUser(userDocRef);
+    } catch (DocumentAccessException | QueryException | SendValidationFailedException
+        | UserInstantiationException exc) {
       throw new UserCreateException(exc);
     }
   }
@@ -163,10 +168,10 @@ public class CelementsUserService implements UserService {
 
   public void createUserFromData(XWikiDocument userDoc, Map<String, String> userData)
       throws DocumentAccessException {
-    XWikiUser user = newXWikiUser(userDoc.getDocumentReference());
+    String userFN = modelUtils.serializeRefLocal(userDoc.getDocumentReference());
     userDoc.setParentReference(usersClass.getClassReference());
-    userDoc.setCreator(user.getUser());
-    userDoc.setAuthor(user.getUser());
+    userDoc.setCreator(userFN);
+    userDoc.setAuthor(userFN);
     userDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
     userData.putIfAbsent(XWikiUsersClass.FIELD_ACTIVE.getName(), "0");
     userData.putIfAbsent(XWikiUsersClass.FIELD_PASSWORD.getName(),
@@ -181,7 +186,7 @@ public class CelementsUserService implements UserService {
 
   private void setRightsOnUser(XWikiDocument doc, List<EAccessLevel> rights) {
     XWikiObjectEditor userRightObjEditor = XWikiObjectEditor.on(doc).filter(rightsClass);
-    userRightObjEditor.filter(XWikiRightsClass.FIELD_USERS, Arrays.asList(newXWikiUser(
+    userRightObjEditor.filter(XWikiRightsClass.FIELD_USERS, Arrays.asList(asXWikiUser(
         doc.getDocumentReference())));
     userRightObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
     userRightObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
@@ -193,30 +198,30 @@ public class CelementsUserService implements UserService {
     admGrpObjEditor.createFirst();
   }
 
-  private void addUserToDefaultGroups(XWikiUser user) {
-
+  private void addUserToDefaultGroups(DocumentReference userDocRef) {
     FluentIterable<String> defaultGroupNames = FluentIterable.from(getSplitXWikiPreference(
         "initialGroups", "xwiki.users.initialGroups", getAdminGroupName()));
     for (DocumentReference groupDocRef : defaultGroupNames.transform(DOC_REF_RESOLVER)) {
       try {
-        addUserToGroup(user, groupDocRef);
-        LOGGER.info("createUser - added user '{}' to group '{}'", user, groupDocRef);
+        addUserToGroup(userDocRef, groupDocRef);
+        LOGGER.info("createUser - added user '{}' to group '{}'", userDocRef, groupDocRef);
       } catch (DocumentAccessException exc) {
-        LOGGER.warn("createUser - failed adding user '{}' to group '{}'", user, groupDocRef, exc);
+        LOGGER.warn("createUser - failed adding user '{}' to group '{}'", userDocRef, groupDocRef,
+            exc);
       }
     }
   }
 
-  private void addUserToGroup(XWikiUser user, DocumentReference groupDocRef)
+  private void addUserToGroup(DocumentReference userDocRef, DocumentReference groupDocRef)
       throws DocumentNotExistsException, DocumentSaveException {
     XWikiDocument groupDoc = modelAccess.getDocument(groupDocRef);
     XWikiObjectEditor.on(groupDoc).filter(XWikiGroupsClass.FIELD_MEMBER,
-        user).createFirstIfNotExists();
+        userDocRef).createFirstIfNotExists();
     modelAccess.saveDocument(groupDoc, webUtils.getAdminMessageTool().get(
         "core.comment.addedUserToGroup"));
     try {
       XWikiGroupService gservice = getXWiki().getGroupService(context.getXWikiContext());
-      gservice.addUserToGroup(user.getUser(), context.getWikiRef().getName(),
+      gservice.addUserToGroup(asXWikiUser(userDocRef).getUser(), context.getWikiRef().getName(),
           modelUtils.serializeRefLocal(groupDocRef), context.getXWikiContext());
     } catch (XWikiException xwe) {
       LOGGER.warn("Failed to update group service cache", xwe);
@@ -228,8 +233,7 @@ public class CelementsUserService implements UserService {
     boolean isUnique = true;
     for (String key : userData.keySet()) {
       if (!"".equals(key.trim()) && possibleLogins.contains(key)) {
-        Optional<XWikiUser> user = getUserForData(userData.get(key), possibleLogins);
-        if (user.isPresent()) {
+        if (getUserForData(userData.get(key), possibleLogins).isPresent()) {
           isUnique = false;
         }
       }
@@ -242,24 +246,28 @@ public class CelementsUserService implements UserService {
   }
 
   @Override
-  public Optional<XWikiUser> getUserForData(String login) throws QueryException {
+  public Optional<User> getUserForData(String login) {
     return getUserForData(login, getPossibleLoginFields());
   }
 
   @Override
-  public Optional<XWikiUser> getUserForData(String login, Collection<String> possibleLoginFields)
-      throws QueryException {
+  public Optional<User> getUserForData(String login, Collection<String> possibleLoginFields) {
     checkArgument(!Strings.nullToEmpty(login).trim().isEmpty());
     checkNotNull(possibleLoginFields);
     if (possibleLoginFields.isEmpty()) {
       possibleLoginFields.add(DEFAULT_LOGIN_FIELD);
     }
-    List<DocumentReference> userDocRefs = queryExecService.executeAndGetDocRefs(
-        getUserQueryForPossibleLogin(login, possibleLoginFields));
-    LOGGER.info("getUserForData - for login [{}] and possibleLoginFields [{}]:", userDocRefs.get(0),
-        login, possibleLoginFields, userDocRefs);
-    if (userDocRefs.size() == 1) {
-      return Optional.of(newXWikiUser(userDocRefs.get(0)));
+    try {
+      List<DocumentReference> userDocRefs = queryExecService.executeAndGetDocRefs(
+          getUserQueryForPossibleLogin(login, possibleLoginFields));
+      LOGGER.info("getUserForData - for login [{}] and possibleLoginFields [{}]: {}", login,
+          possibleLoginFields, userDocRefs);
+      if (userDocRefs.size() == 1) {
+        return Optional.of(getUser(userDocRefs.get(0)));
+      }
+    } catch (QueryException | UserInstantiationException exc) {
+      LOGGER.info("getUserForData - failed for login [{}] and possibleLoginFields [{}]", login,
+          possibleLoginFields, exc);
     }
     return Optional.absent();
   }
@@ -298,27 +306,8 @@ public class CelementsUserService implements UserService {
     return context.getXWikiContext().getWiki();
   }
 
-  @Override
-  public Optional<String> getUserEmail(DocumentReference userDocRef) {
-    return getUserFieldValue(userDocRef, XWikiUsersClass.FIELD_EMAIL);
-  }
-
-  @Override
-  public boolean isUserActive(DocumentReference userDocRef) {
-    return getUserFieldValue(userDocRef, XWikiUsersClass.FIELD_ACTIVE).or(false);
-  }
-
-  private <T> Optional<T> getUserFieldValue(DocumentReference userDocRef, ClassField<T> field) {
-    try {
-      Optional<BaseObject> obj = XWikiObjectFetcher.on(modelAccess.getDocument(userDocRef)).filter(
-          usersClass).first();
-      if (obj.isPresent()) {
-        return modelAccess.getFieldValue(obj.get(), field);
-      }
-    } catch (DocumentNotExistsException exp) {
-      LOGGER.info("getUserObject failed", exp);
-    }
-    return Optional.absent();
+  private XWikiUser asXWikiUser(DocumentReference userDocRef) {
+    return new XWikiUser(modelUtils.serializeRefLocal(userDocRef));
   }
 
 }
