@@ -1,4 +1,4 @@
-package com.celements.web;
+package com.celements.auth.user;
 
 import java.util.Collection;
 import java.util.Map;
@@ -10,9 +10,6 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.auth.user.User;
-import com.celements.auth.user.UserCreateException;
-import com.celements.auth.user.UserInstantiationException;
 import com.google.common.base.Optional;
 
 @ComponentRole

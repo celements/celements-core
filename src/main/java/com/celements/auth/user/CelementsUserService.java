@@ -1,4 +1,4 @@
-package com.celements.web;
+package com.celements.auth.user;
 
 import static com.celements.web.classcollections.IOldCoreClassConfig.*;
 import static com.google.common.base.Preconditions.*;
@@ -22,10 +22,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
-import com.celements.auth.user.CelementsUser;
-import com.celements.auth.user.User;
-import com.celements.auth.user.UserCreateException;
-import com.celements.auth.user.UserInstantiationException;
 import com.celements.marshalling.ReferenceMarshaller;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentAccessException;
