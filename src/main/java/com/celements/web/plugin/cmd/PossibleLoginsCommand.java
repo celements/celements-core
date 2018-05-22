@@ -2,7 +2,7 @@ package com.celements.web.plugin.cmd;
 
 import org.mutabilitydetector.internal.com.google.common.base.Joiner;
 
-import com.celements.web.UserService;
+import com.celements.auth.user.UserService;
 import com.xpn.xwiki.web.Utils;
 
 @Deprecated
