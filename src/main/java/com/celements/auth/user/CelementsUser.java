@@ -58,6 +58,11 @@ public class CelementsUser implements User {
   }
 
   @Override
+  public XWikiUser asXWikiUser() {
+    return new XWikiUser(modelUtils.serializeRefLocal(getDocRef()));
+  }
+
+  @Override
   public Optional<String> getEmail() {
     return getUserFieldValue(XWikiUsersClass.FIELD_EMAIL);
   }
@@ -82,11 +87,6 @@ public class CelementsUser implements User {
 
   private XWikiObjectFetcher getUserObjectFetcher() {
     return XWikiObjectFetcher.on(userDoc).filter(usersClass);
-  }
-
-  @Override
-  public XWikiUser asXWikiUser() {
-    return new XWikiUser(modelUtils.serializeRefLocal(getDocRef()));
   }
 
   @Override

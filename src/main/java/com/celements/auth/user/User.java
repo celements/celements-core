@@ -19,14 +19,14 @@ public interface User {
   DocumentReference getDocRef();
 
   @NotNull
+  XWikiUser asXWikiUser();
+
+  @NotNull
   Optional<String> getEmail();
 
   @NotNull
   Optional<String> getAdminLanguage();
 
   boolean isActive();
-
-  @NotNull
-  XWikiUser asXWikiUser();
 
 }

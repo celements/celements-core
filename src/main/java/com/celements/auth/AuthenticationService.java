@@ -61,7 +61,7 @@ public class AuthenticationService implements IAuthenticationServiceRole {
   @Override
   public Map<String, String> activateAccount(String activationCode)
       throws AccountActivationFailedException {
-    LOGGER.debug("activateAccount: for code " + activationCode);
+    LOGGER.debug("activateAccount: for code '{}'", activationCode);
     try {
       String hashedCode = getPasswordHash("hash:SHA-512:", activationCode);
       Optional<User> user = userService.getUserForData(hashedCode, Arrays.asList(
@@ -103,13 +103,11 @@ public class AuthenticationService implements IAuthenticationServiceRole {
 
   @Override
   @Deprecated
-  public boolean hasAccessLevel(String level, String user, boolean isUser, DocumentReference docRef)
-      throws XWikiException {
+  public boolean hasAccessLevel(String level, String userName, boolean isUser,
+      DocumentReference docRef) throws XWikiException {
+    XWikiUser user = new XWikiUser(userName);
     Optional<EAccessLevel> right = EAccessLevel.getAccessLevel(level);
-    if (right.isPresent()) {
-      return rightsAccess.hasAccessLevel(docRef, right.get(), new XWikiUser(user));
-    }
-    return false;
+    return right.isPresent() ? rightsAccess.hasAccessLevel(docRef, right.get(), user) : false;
   }
 
 }

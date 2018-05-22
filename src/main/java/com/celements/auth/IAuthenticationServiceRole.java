@@ -24,7 +24,7 @@ public interface IAuthenticationServiceRole {
    * @deprecated since 3.0 instead use {@link IRightsAccessFacadeRole}
    */
   @Deprecated
-  public boolean hasAccessLevel(String level, String user, boolean isUser, DocumentReference docRef)
-      throws XWikiException;
+  public boolean hasAccessLevel(String level, String userName, boolean isUser,
+      DocumentReference docRef) throws XWikiException;
 
 }
