@@ -6,8 +6,8 @@ import java.util.Map;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.UserCreateException;
-import com.celements.web.UserService;
+import com.celements.auth.user.UserCreateException;
+import com.celements.auth.user.UserService;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiUser;
 
@@ -21,20 +21,20 @@ public interface ICelementsWebServiceRole {
   public String getEmailAdressForUser(DocumentReference userDocRef);
 
   /**
-   * @deprecated since 3.0 instead use {@link UserService#createUser(Map, boolean)}
+   * @deprecated since 3.0 instead use {@link UserService#createNewUser(Map, boolean)}
    */
   @Deprecated
   public int createUser(boolean validate) throws XWikiException;
 
   /**
-   * @deprecated since 1.139 instead use {@link UserService#createUser(Map, boolean)}
+   * @deprecated since 1.139 instead use {@link UserService#createNewUser(Map, boolean)}
    */
   @Deprecated
   public int createUser(Map<String, String> userData, String possibleLogins, boolean validate)
       throws XWikiException;
 
   /**
-   * @deprecated since 3.0 instead use {@link UserService#createUser(Map, boolean)}
+   * @deprecated since 3.0 instead use {@link UserService#createNewUser(Map, boolean)}
    */
   @Deprecated
   public XWikiUser createNewUser(Map<String, String> userData, String possibleLogins,

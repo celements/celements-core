@@ -14,15 +14,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.classes.ClassDefinition;
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserCreateException;
+import com.celements.auth.user.UserInstantiationException;
+import com.celements.auth.user.UserService;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
 import com.celements.rendering.RenderCommand;
-import com.celements.web.UserCreateException;
-import com.celements.web.UserService;
-import com.celements.web.classes.oldcore.XWikiRightsClass;
-import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -33,42 +35,48 @@ import com.xpn.xwiki.web.XWikiResponse;
 @Component
 public class CelementsWebService implements ICelementsWebServiceRole {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
 
   private List<String> supportedAdminLangList;
 
   @Requirement
-  private IWebUtilsService webUtilsService;
-
-  @Requirement
   private UserService userService;
 
-  @Requirement(XWikiRightsClass.CLASS_DEF_HINT)
-  private ClassDefinition xWikiRightsClass;
+  @Requirement
+  private IModelAccessFacade modelAccess;
 
   @Requirement
-  private Execution execution;
+  private ModelUtils modelUtils;
 
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  @Requirement
+  private ModelContext context;
+
+  @Deprecated
+  private XWikiContext getXWikiContext() {
+    return context.getXWikiContext();
   }
 
   @Deprecated
   public String getEmailAdressForUser(String username) {
-    return getEmailAdressForUser(webUtilsService.resolveDocumentReference(username));
+    return getEmailAdressForUser(userService.completeUserDocRef(username));
   }
 
   @Override
   @Deprecated
   public String getEmailAdressForUser(DocumentReference userDocRef) {
-    return userService.getUserEmail(userDocRef).orNull();
+    try {
+      User user = userService.getUser(userDocRef);
+      return user.getEmail().orNull();
+    } catch (UserInstantiationException exc) {
+      LOGGER.info("getEmailAdressForUser - invalid user", exc);
+      return null;
+    }
   }
 
   @Override
   @Deprecated
   public int createUser(boolean validate) throws XWikiException {
-    String possibleLogins = new PossibleLoginsCommand().getPossibleLogins();
-    return createUser(getUniqueNameValueRequestMap(), possibleLogins, validate);
+    return createUser(getUniqueNameValueRequestMap(), null, validate);
   }
 
   @Override
@@ -94,14 +102,13 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   @Deprecated
   public synchronized @NotNull XWikiUser createNewUser(@NotNull Map<String, String> userData,
       @NotNull String possibleLogins, boolean validate) throws UserCreateException {
-    // TODO delegate
-    return null;
+    return userService.createNewUser(userData, validate).asXWikiUser();
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Map<String, String> getUniqueNameValueRequestMap() {
-    Map<String, String[]> params = getContext().getRequest().getParameterMap();
+    Map<String, String[]> params = context.getRequest().get().getParameterMap();
     Map<String, String> resultMap = new HashMap<>();
     for (String key : params.keySet()) {
       if ((params.get(key) != null) && (params.get(key).length > 0)) {
@@ -124,25 +131,24 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   @Override
   public boolean writeUTF8Response(String filename, String renderDocFullName) {
     boolean success = false;
-    if (getContext().getWiki().exists(webUtilsService.resolveDocumentReference(renderDocFullName),
-        getContext())) {
-      XWikiDocument renderDoc;
-      try {
-        renderDoc = getContext().getWiki().getDocument(webUtilsService.resolveDocumentReference(
-            renderDocFullName), getContext());
-        adjustResponseHeader(filename, getContext().getResponse());
-        setResponseContent(renderDoc, getContext().getResponse());
-      } catch (XWikiException e) {
-        _LOGGER.error("", e);
-      }
-      getContext().setFinished(true);
+    try {
+      XWikiDocument renderDoc = modelAccess.getDocument(modelUtils.resolveRef(renderDocFullName,
+          DocumentReference.class));
+      adjustResponseHeader(filename, context.getResponse().get());
+      setResponseContent(renderDoc, context.getResponse().get());
+      success = true;
+    } catch (DocumentNotExistsException exc) {
+      LOGGER.info("writeUTF8Response - failed for '{}'", renderDocFullName, exc);
+    } catch (XWikiException exc) {
+      LOGGER.error("writeUTF8Response - failed for '{}'", renderDocFullName, exc);
     }
+    getXWikiContext().setFinished(true);
     return success;
   }
 
   private void adjustResponseHeader(String filename, XWikiResponse response) {
     response.setContentType("text/plain");
-    String ofilename = Util.encodeURI(filename, getContext()).replaceAll("\\+", " ");
+    String ofilename = Util.encodeURI(filename, getXWikiContext()).replaceAll("\\+", " ");
     response.addHeader("Content-disposition", "attachment; filename=\"" + ofilename
         + "\"; charset='UTF-8'");
   }
@@ -182,7 +188,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       try {
         urlStr = URLEncoder.encode(mainUrl, "UTF-8");
       } catch (UnsupportedEncodingException exp) {
-        _LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
+        LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
       }
       urlStr = urlPrefix + urlStr.replaceAll("%2F", "/");
     }
@@ -192,9 +198,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   @Override
   public void sendRedirect(String urlStr) {
     try {
-      getContext().getResponse().sendRedirect(encodeUrlToUtf8(urlStr));
+      context.getResponse().get().sendRedirect(encodeUrlToUtf8(urlStr));
     } catch (IOException exp) {
-      _LOGGER.error("Failed to redirect to url [" + urlStr + "]", exp);
+      LOGGER.error("Failed to redirect to url [" + urlStr + "]", exp);
     }
   }
 
