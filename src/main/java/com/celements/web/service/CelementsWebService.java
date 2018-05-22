@@ -20,12 +20,12 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.UserCreateException;
+import com.celements.web.UserService;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -40,6 +40,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   @Requirement
   private IWebUtilsService webUtilsService;
 
+  @Requirement
+  private UserService userService;
+
   @Requirement(XWikiRightsClass.CLASS_DEF_HINT)
   private ClassDefinition xWikiRightsClass;
 
@@ -50,37 +53,26 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Deprecated
   public String getEmailAdressForUser(String username) {
     return getEmailAdressForUser(webUtilsService.resolveDocumentReference(username));
   }
 
   @Override
+  @Deprecated
   public String getEmailAdressForUser(DocumentReference userDocRef) {
-    if (getContext().getWiki().exists(userDocRef, getContext())) {
-      try {
-        XWikiDocument doc = getContext().getWiki().getDocument(userDocRef, getContext());
-        BaseObject obj = doc.getXObject(webUtilsService.resolveDocumentReference(
-            "XWiki.XWikiUsers"));
-        if (obj != null) {
-          return obj.getStringValue("email");
-        }
-      } catch (XWikiException exp) {
-        _LOGGER.error("Exception while getting a XWikiDocument. docRef:['" + userDocRef + "]'",
-            exp);
-      }
-    }
-    return null;
+    return userService.getUserEmail(userDocRef).orNull();
   }
 
-  // TODO deprecate ?
   @Override
+  @Deprecated
   public int createUser(boolean validate) throws XWikiException {
     String possibleLogins = new PossibleLoginsCommand().getPossibleLogins();
     return createUser(getUniqueNameValueRequestMap(), possibleLogins, validate);
   }
 
-  // TODO deprecate
   @Override
+  @Deprecated
   public synchronized int createUser(Map<String, String> userData, String possibleLogins,
       boolean validate) throws XWikiException {
     try {
@@ -99,6 +91,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   }
 
   @Override
+  @Deprecated
   public synchronized @NotNull XWikiUser createNewUser(@NotNull Map<String, String> userData,
       @NotNull String possibleLogins, boolean validate) throws UserCreateException {
     // TODO delegate

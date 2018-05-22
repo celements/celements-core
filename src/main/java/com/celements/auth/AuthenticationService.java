@@ -14,6 +14,7 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -70,10 +71,9 @@ public class AuthenticationService implements IAuthenticationServiceRole {
         BaseObject obj = doc.getXObject(userObjRef);
         _LOGGER.debug("activateAccount: userObj = " + obj);
 
-        // obj.set("validkey", "", context);
-        obj.set("active", "1", getContext());
-        obj.set("force_pwd_change", "1", getContext());
-        obj.set("password", password, getContext());
+        modelAccess.setProperty(obj, XWikiUsersClass.FIELD_ACTIVE, true);
+        modelAccess.setProperty(obj, XWikiUsersClass.FIELD_FORCE_PWD_CHANGE, true);
+        modelAccess.setProperty(obj, XWikiUsersClass.FIELD_PASSWORD, password);
 
         modelAccess.saveDocument(doc, "activate account");
 
