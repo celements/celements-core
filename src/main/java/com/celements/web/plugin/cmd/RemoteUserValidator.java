@@ -26,12 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.celements.auth.user.User;
-import com.celements.auth.user.UserInstantiationException;
 import com.celements.auth.user.UserService;
+import com.celements.model.util.ModelUtils;
 import com.celements.sajson.Builder;
-import com.celements.web.classcollections.OldCoreClasses;
-import com.celements.web.plugin.CelementsWebPlugin;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
@@ -42,97 +41,83 @@ public class RemoteUserValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RemoteUserValidator.class);
 
-  private CelementsWebPlugin injectedCelementsWeb;
-
   public String isValidUserJSON(String username, String password, String memberOfGroup,
       List<String> returnGroups, XWikiContext context) {
-    String resultJSON = getResultJSON(null, false, "access_denied", null, context);
+    String resultJSON = getErrorJSON("access_denied");
     if (validationAllowed(context)) {
-      Principal principal = null;
       try {
         Optional<User> user = getUserService().getUserForData(username);
-        if (user.isPresent()) {
-          principal = context.getWiki().getAuthService().authenticate(
-              user.get().asXWikiUser().getUser(), password, context);
+        if (user.isPresent() && authenticate(user.get(), password, context)) {
+          LOGGER.debug("Authentication successful, now checking group");
+          if (user.get().asXWikiUser().isUserInGroup(memberOfGroup, context)) {
+            LOGGER.debug("Group matched requirement, now checking if account is active.");
+            if (checkActive(user.get(), context)) {
+              LOGGER.debug("GRANTING access to " + user.get() + "!");
+              resultJSON = getResultJSON(user.get(), username, returnGroups, context);
+            } else {
+              LOGGER.warn("DENYING access: account '" + username + "' is inactive.");
+              resultJSON = getErrorJSON("useraccount_inactive");
+            }
+          } else {
+            LOGGER.warn("DENYING access: user is not in group '" + memberOfGroup + "'.");
+            resultJSON = getErrorJSON("user_not_in_group");
+          }
+        } else {
+          LOGGER.warn("DENYING access: authentication failed");
+          resultJSON = getErrorJSON("wrong_username_password");
         }
       } catch (XWikiException exc) {
         LOGGER.error("DENYING access: Exception while authenticating.", exc);
-      }
-      if (principal != null) {
-        LOGGER.debug("Authentication successful, now checking group");
-        if (context.getWiki().getUser(principal.getName(), context).isUserInGroup(memberOfGroup)) {
-          LOGGER.debug("Group matched requirement, now checking if account is active.");
-          if (checkActive(principal.getName(), context)) {
-            LOGGER.debug("GRANTING access to " + principal.getName() + "!");
-            resultJSON = getResultJSON(username, true, null, returnGroups, context);
-          } else {
-            LOGGER.warn("DENYING access: account '" + username + "' is inactive.");
-            resultJSON = getResultJSON(null, false, "useraccount_inactive", null, context);
-          }
-        } else {
-          LOGGER.warn("DENYING access: user is not in group '" + memberOfGroup + "'.");
-          resultJSON = getResultJSON(null, false, "user_not_in_group", null, context);
-        }
-      } else {
-        LOGGER.warn("DENYING access: authentication failed");
-        resultJSON = getResultJSON(null, false, "wrong_username_password", null, context);
       }
     }
     return resultJSON;
   }
 
-  private CelementsWebPlugin getCelementsweb(XWikiContext context) {
-    if (injectedCelementsWeb != null) {
-      return injectedCelementsWeb;
-    }
-    return (CelementsWebPlugin) context.getWiki().getPlugin("celementsweb", context);
+  private boolean authenticate(User user, String password, XWikiContext context)
+      throws XWikiException {
+    Principal principal = context.getWiki().getAuthService().authenticate(
+        getModelUtils().serializeRefLocal(user.getDocRef()), password, context);
+    return (principal != null) && user.getDocRef().equals(getModelUtils().resolveRef(
+        principal.getName()));
   }
 
-  // For Testing
-  void injectCelementsWeb(CelementsWebPlugin celementsweb) {
-    injectedCelementsWeb = celementsweb;
-  }
-
-  // Access can only be true if there is no error message. When there is an error, access
-  // is always false.
-  String getResultJSON(String username, boolean access, String errorMsg, List<String> returnGroups,
-      XWikiContext context) {
+  String getErrorJSON(String errorMsg) {
     Builder jsonBuilder = new Builder();
     jsonBuilder.openDictionary();
-    if (hasValue(errorMsg)) {
-      jsonBuilder.addStringProperty("access", "false");
-      jsonBuilder.addStringProperty("error", errorMsg);
-    } else if (hasValue(username)) {
-      jsonBuilder.addStringProperty("access", access + "");
-      jsonBuilder.addStringProperty("username", username);
-      jsonBuilder.openProperty("group_membership");
-      jsonBuilder.openDictionary();
-      if (returnGroups != null) {
-        for (String group : returnGroups) {
-          String groupName = group.substring(group.lastIndexOf(".") + 1);
-          groupName = context.getMessageTool().get("cel_groupname_" + groupName);
-          jsonBuilder.addStringProperty(groupName, isGroupMember(username, group, context));
-        }
-      }
-      jsonBuilder.closeDictionary();
-    }
+    jsonBuilder.addStringProperty("access", "false");
+    jsonBuilder.addStringProperty("error", errorMsg);
     jsonBuilder.closeDictionary();
     return jsonBuilder.getJSON();
   }
 
-  String isGroupMember(String username, String group, XWikiContext context) {
-    boolean inGroup = false;
-    String userDocName = null;
-    if ((group != null) && !group.contains(":") && !group.equals("XWiki.XWikiAllGroup")) {
-      try {
-        userDocName = getCelementsweb(context).getUsernameForUserData(username,
-            context.getWiki().getXWikiPreference(OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY,
-                "loginname", context), context);
-      } catch (XWikiException e) {
-        LOGGER.error("Could not get user for username '" + username + "'.");
+  String getResultJSON(User user, String username, List<String> returnGroups,
+      XWikiContext context) {
+    Builder jsonBuilder = new Builder();
+    jsonBuilder.openDictionary();
+    jsonBuilder.addStringProperty("access", "true");
+    jsonBuilder.addStringProperty("username", username);
+    jsonBuilder.openProperty("group_membership");
+    jsonBuilder.openDictionary();
+    if (returnGroups != null) {
+      for (String group : returnGroups) {
+        String groupName = group.substring(group.lastIndexOf(".") + 1);
+        groupName = context.getMessageTool().get("cel_groupname_" + groupName);
+        jsonBuilder.addStringProperty(groupName, isGroupMember(user, group, context));
       }
-      if ((userDocName != null) && (userDocName.trim().length() > 0)) {
-        inGroup = context.getWiki().getUser(userDocName, context).isUserInGroup(group);
+    }
+    jsonBuilder.closeDictionary();
+    jsonBuilder.closeDictionary();
+    return jsonBuilder.getJSON();
+  }
+
+  String isGroupMember(User user, String group, XWikiContext context) {
+    boolean inGroup = false;
+    if ((user != null) && !Strings.nullToEmpty(group).isEmpty() && !group.contains(":")
+        && !group.equals("XWiki.XWikiAllGroup")) {
+      try {
+        inGroup = user.asXWikiUser().isUserInGroup(group, context);
+      } catch (XWikiException xwe) {
+        LOGGER.error("Could not check group '{}' for user '{}'", group, user, xwe);
       }
     }
     return String.valueOf(inGroup);
@@ -169,32 +154,22 @@ public class RemoteUserValidator {
     return false;
   }
 
-  boolean hasValue(String value) {
-    return (value != null) && (value.trim().length() > 0);
-  }
-
   // Copy & Paste and customise from bugged method in XWiki class.
-  private boolean checkActive(String accountName, XWikiContext context) {
+  private boolean checkActive(User user, XWikiContext context) {
     boolean active;
     // These users are necessarly active
+    String accountName = getModelUtils().serializeRefLocal(user.getDocRef());
     if (accountName.equals(XWikiRightService.GUEST_USER_FULLNAME) || (accountName.equals(
         XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
       active = true;
     } else {
-      try {
-        User user = getUserService().getUser(getUserService().completeUserDocRef(accountName));
-        String checkactivefield = context.getWiki().getXWikiPreference("auth_active_check",
-            context);
-        if (checkactivefield.equals("1")) {
-          active = user.isActive();
-        } else {
-          LOGGER.warn("XWikiPreferences field auth_active_check != 1 which means all users"
-              + "are always handled as active");
-          active = true;
-        }
-      } catch (UserInstantiationException exc) {
-        LOGGER.warn("checkActive - failed '{}'", exc);
-        active = false;
+      String checkactivefield = context.getWiki().getXWikiPreference("auth_active_check", context);
+      if (checkactivefield.equals("1")) {
+        active = user.isActive();
+      } else {
+        LOGGER.warn("XWikiPreferences field auth_active_check != 1 which means all users"
+            + "are always handled as active");
+        active = true;
       }
     }
     return active;
@@ -202,6 +177,10 @@ public class RemoteUserValidator {
 
   private UserService getUserService() {
     return Utils.getComponent(UserService.class);
+  }
+
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }

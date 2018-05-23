@@ -265,7 +265,7 @@ public class CelementsUserService implements UserService {
     checkArgument(!Strings.nullToEmpty(login).trim().isEmpty());
     checkNotNull(possibleLoginFields);
     if (possibleLoginFields.isEmpty()) {
-      possibleLoginFields.add(DEFAULT_LOGIN_FIELD);
+      possibleLoginFields = Arrays.asList(DEFAULT_LOGIN_FIELD);
     }
     try {
       List<DocumentReference> userDocRefs = queryExecService.executeAndGetDocRefs(
