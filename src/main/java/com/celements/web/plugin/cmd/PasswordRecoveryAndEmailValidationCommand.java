@@ -363,7 +363,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
   @Deprecated
   public String getNewValidationTokenForUser(String accountName, XWikiContext context)
       throws XWikiException {
-    return getNewValidationTokenForUser(getWebUtilsService().resolveDocumentReference(accountName));
+    return getNewValidationTokenForUser(getUserService().completeUserDocRef(accountName));
   }
 
   /**
@@ -387,13 +387,12 @@ public class PasswordRecoveryAndEmailValidationCommand {
   public String createNewValidationTokenForUser(@NotNull DocumentReference userDocRef)
       throws CreatingValidationTokenFailedException {
     try {
-      getUserService().getUser(userDocRef);
-      XWikiDocument userDoc = getModelAccess().getDocument(userDocRef);
+      XWikiDocument userDoc = getUserService().getUser(userDocRef).getDocument();
       final String validkey = getAuthService().getUniqueValidationKey();
       getModelAccess().setProperty(userDoc, XWikiUsersClass.FIELD_VALID_KEY, validkey);
       getModelAccess().saveDocument(userDoc, "creating new validkey");
       return validkey;
-    } catch (UserInstantiationException | QueryException | DocumentAccessException exp) {
+    } catch (UserInstantiationException | QueryException | DocumentSaveException exp) {
       throw new CreatingValidationTokenFailedException("Failed to create a new validkey for user: "
           + userDocRef.getName(), exp);
     }
