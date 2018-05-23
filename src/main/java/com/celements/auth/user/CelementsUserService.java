@@ -127,8 +127,12 @@ public class CelementsUserService implements UserService {
 
   @Override
   public Set<String> getPossibleLoginFields() {
-    return ImmutableSet.copyOf(getSplitXWikiPreference(XWIKI_PREFERENCES_CELLOGIN_PROPERTY,
-        "celements.login.userfields", DEFAULT_LOGIN_FIELD));
+    Set<String> fields = ImmutableSet.copyOf(getSplitXWikiPreference(
+        XWIKI_PREFERENCES_CELLOGIN_PROPERTY, "celements.login.userfields", DEFAULT_LOGIN_FIELD));
+    if (fields.isEmpty()) {
+      fields = ImmutableSet.of(DEFAULT_LOGIN_FIELD);
+    }
+    return fields;
   }
 
   @Override
@@ -307,7 +311,7 @@ public class CelementsUserService implements UserService {
   private Iterable<String> getSplitXWikiPreference(String prefName, String cfgParam,
       String defaultValue) {
     String prefValue = Strings.nullToEmpty(getXWiki().getXWikiPreference(prefName, cfgParam,
-        defaultValue, context.getXWikiContext()));
+        defaultValue, context.getXWikiContext())).trim();
     return Splitter.on(",").omitEmptyStrings().split(prefValue);
   }
 

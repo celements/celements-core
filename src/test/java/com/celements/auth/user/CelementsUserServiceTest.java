@@ -13,6 +13,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
@@ -72,6 +73,35 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
         service.getUser(userDocRef);
       }
     }.evaluate();
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getPossibleLoginFields_none() {
+    expect(getWikiMock().getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"), eq(
+        UserService.DEFAULT_LOGIN_FIELD), same(getContext()))).andReturn(null).once();
+    replayDefault();
+    assertEquals(ImmutableSet.of(UserService.DEFAULT_LOGIN_FIELD),
+        service.getPossibleLoginFields());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getPossibleLoginFields_local() {
+    expect(getWikiMock().getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"), eq(
+        UserService.DEFAULT_LOGIN_FIELD), same(getContext()))).andReturn("a,b").once();
+    replayDefault();
+    assertEquals(ImmutableSet.of("a", "b"), service.getPossibleLoginFields());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getPossibleLoginFields_whiteSpaces() {
+    expect(getWikiMock().getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"), eq(
+        UserService.DEFAULT_LOGIN_FIELD), same(getContext()))).andReturn("   ").once();
+    replayDefault();
+    assertEquals(ImmutableSet.of(UserService.DEFAULT_LOGIN_FIELD),
+        service.getPossibleLoginFields());
     verifyDefault();
   }
 
