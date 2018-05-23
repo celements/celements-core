@@ -33,14 +33,14 @@ import com.xpn.xwiki.web.Utils;
 public class UserNameForUserDataCommand {
 
   /**
-   * @deprecated since 3.0 instead use {@link UserService#getUserForData(String, java.util.List)}
+   * @deprecated since 3.0 instead use {@link UserService#getUserForLoginField(String, java.util.List)}
    */
   @Deprecated
   public String getUsernameForUserData(String login, String possibleLogins, XWikiContext context)
       throws XWikiException {
     if (!Strings.nullToEmpty(login).isEmpty() && (possibleLogins != null)) {
       possibleLogins.replace("loginname", UserService.DEFAULT_LOGIN_FIELD);
-      Optional<User> user = getUserService().getUserForData(login, Splitter.on(
+      Optional<User> user = getUserService().getUserForLoginField(login, Splitter.on(
           ",").omitEmptyStrings().splitToList(possibleLogins));
       if (user.isPresent()) {
         return user.get().asXWikiUser().getUser();

@@ -45,9 +45,10 @@ public interface UserService {
       throws UserCreateException;
 
   @NotNull
-  Optional<User> getUserForData(@NotNull String login);
+  Optional<User> getUserForLoginField(@NotNull String login);
 
   @NotNull
-  Optional<User> getUserForData(@NotNull String login, @NotNull Collection<String> possibleLogins);
+  Optional<User> getUserForLoginField(@NotNull String login,
+      @NotNull Collection<String> possibleLoginFields);
 
 }

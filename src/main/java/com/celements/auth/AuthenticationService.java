@@ -72,7 +72,7 @@ public class AuthenticationService implements IAuthenticationServiceRole {
     LOGGER.debug("activateAccount: for code '{}'", activationCode);
     try {
       String hashedCode = getPasswordHash("hash:SHA-512:", activationCode);
-      Optional<User> user = userService.getUserForData(hashedCode, Arrays.asList(
+      Optional<User> user = userService.getUserForLoginField(hashedCode, Arrays.asList(
           XWikiUsersClass.FIELD_VALID_KEY.getName()));
       LOGGER.debug("activateAccount: user = {}", user.orNull());
       if (user.isPresent()) {

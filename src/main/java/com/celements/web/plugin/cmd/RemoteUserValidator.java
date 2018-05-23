@@ -46,7 +46,7 @@ public class RemoteUserValidator {
     String resultJSON = getErrorJSON("access_denied");
     if (validationAllowed(context)) {
       try {
-        Optional<User> user = getUserService().getUserForData(username);
+        Optional<User> user = getUserService().getUserForLoginField(username);
         if (user.isPresent() && authenticate(user.get(), password, context)) {
           LOGGER.debug("Authentication successful, now checking group");
           if (user.get().asXWikiUser().isUserInGroup(memberOfGroup, context)) {

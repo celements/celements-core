@@ -247,7 +247,7 @@ public class CelementsUserService implements UserService {
     boolean isUnique = true;
     for (String key : userData.keySet()) {
       if (!"".equals(key.trim()) && possibleLogins.contains(key)) {
-        if (getUserForData(userData.get(key), possibleLogins).isPresent()) {
+        if (getUserForLoginField(userData.get(key), possibleLogins).isPresent()) {
           isUnique = false;
         }
       }
@@ -260,12 +260,12 @@ public class CelementsUserService implements UserService {
   }
 
   @Override
-  public Optional<User> getUserForData(String login) {
-    return getUserForData(login, getPossibleLoginFields());
+  public Optional<User> getUserForLoginField(String login) {
+    return getUserForLoginField(login, getPossibleLoginFields());
   }
 
   @Override
-  public Optional<User> getUserForData(String login, Collection<String> possibleLoginFields) {
+  public Optional<User> getUserForLoginField(String login, Collection<String> possibleLoginFields) {
     checkArgument(!Strings.nullToEmpty(login).trim().isEmpty());
     checkNotNull(possibleLoginFields);
     if (possibleLoginFields.isEmpty()) {

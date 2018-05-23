@@ -71,7 +71,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
   public String recoverPassword() {
     String email = Strings.nullToEmpty(getContext().getRequest().get("j_username")).trim();
     if (!email.isEmpty()) {
-      Optional<User> account = getUserService().getUserForData(email, Arrays.asList("email"));
+      Optional<User> account = getUserService().getUserForLoginField(email, Arrays.asList("email"));
       if (account.isPresent()) {
         return recoverPassword(account.get().getDocRef(), email);
       }
