@@ -1,5 +1,6 @@
 package com.celements.auth.user;
 
+import static com.celements.auth.user.UserTestUtils.*;
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -12,10 +13,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
-import com.celements.model.classes.ClassDefinition;
-import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class CelementsUserServiceTest extends AbstractComponentTest {
@@ -75,19 +73,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
       }
     }.evaluate();
     verifyDefault();
-  }
-
-  private BaseObject addUserObj(XWikiDocument userDoc) {
-    BaseObject userObj = new BaseObject();
-    userObj.setDocumentReference(userDocRef);
-    userObj.setXClassReference(getUserClass().getClassReference().getDocRef(
-        userDoc.getDocumentReference().getWikiReference()));
-    userDoc.addXObject(userObj);
-    return userObj;
-  }
-
-  private ClassDefinition getUserClass() {
-    return Utils.getComponent(ClassDefinition.class, XWikiUsersClass.CLASS_DEF_HINT);
   }
 
 }
