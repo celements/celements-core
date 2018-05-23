@@ -1,6 +1,7 @@
 package com.celements.auth.user;
 
 import static com.celements.web.classcollections.IOldCoreClassConfig.*;
+import static com.google.common.base.MoreObjects.*;
 import static com.google.common.base.Preconditions.*;
 
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -50,6 +52,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
@@ -90,7 +93,12 @@ public class CelementsUserService implements UserService {
 
   @Override
   public SpaceReference getUserSpaceRef() {
-    return new SpaceReference(XWIKI_USERS_CLASS_SPACE, context.getWikiRef());
+    return getUserSpaceRef(null);
+  }
+
+  @Override
+  public SpaceReference getUserSpaceRef(WikiReference wikiRef) {
+    return new SpaceReference(XWIKI_USERS_CLASS_SPACE, firstNonNull(wikiRef, context.getWikiRef()));
   }
 
   @Override
@@ -109,6 +117,12 @@ public class CelementsUserService implements UserService {
     User user = Utils.getComponent(User.class, CelementsUser.NAME);
     user.initialize(userDocRef);
     return user;
+  }
+
+  @Override
+  public boolean isGuestUser(DocumentReference userDocRef) {
+    return userDocRef.getLastSpaceReference().getName().equals(getUserSpaceRef().getName())
+        && userDocRef.getName().equals(XWikiRightService.GUEST_USER);
   }
 
   @Override

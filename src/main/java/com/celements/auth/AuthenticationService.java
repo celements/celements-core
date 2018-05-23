@@ -3,6 +3,7 @@ package com.celements.auth;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
@@ -10,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.celements.auth.user.User;
 import com.celements.auth.user.UserService;
@@ -22,6 +26,7 @@ import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -32,6 +37,9 @@ import com.xpn.xwiki.user.api.XWikiUser;
 public class AuthenticationService implements IAuthenticationServiceRole {
 
   private static Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
+
+  @Requirement
+  private QueryManager queryManager;
 
   @Requirement
   private UserService userService;
@@ -108,6 +116,19 @@ public class AuthenticationService implements IAuthenticationServiceRole {
     XWikiUser user = new XWikiUser(userName);
     Optional<EAccessLevel> right = EAccessLevel.getAccessLevel(level);
     return right.isPresent() ? rightsAccess.hasAccessLevel(docRef, right.get(), user) : false;
+  }
+
+  @Override
+  public String getUniqueValidationKey() throws QueryException {
+    String xwql = "select usr.validkey from Document doc, doc.object(XWiki.XWikiUsers) usr "
+        + "where usr.validkey <> ''";
+    Set<String> existingKeys = ImmutableSet.copyOf(queryManager.createQuery(xwql,
+        Query.XWQL).<String>execute());
+    String validkey;
+    do {
+      validkey = RandomStringUtils.randomAlphanumeric(24);
+    } while (existingKeys.contains(validkey));
+    return validkey;
   }
 
 }

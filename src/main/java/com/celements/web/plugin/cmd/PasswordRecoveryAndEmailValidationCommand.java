@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryException;
 
+import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.auth.user.User;
 import com.celements.auth.user.UserInstantiationException;
 import com.celements.auth.user.UserService;
@@ -46,7 +47,6 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.context.ModelContext;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
@@ -137,7 +137,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
   private String setUserFieldsForPasswordRecovery(DocumentReference userDocRef)
       throws QueryException, DocumentNotExistsException, DocumentSaveException {
     XWikiDocument userDoc = getModelAccess().getDocument(userDocRef);
-    String validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey();
+    String validkey = getAuthService().getUniqueValidationKey();
     getModelAccess().setProperty(userDoc, XWikiUsersClass.FIELD_FORCE_PWD_CHANGE, true);
     getModelAccess().setProperty(userDoc, XWikiUsersClass.FIELD_VALID_KEY, validkey);
     getModelAccess().saveDocument(userDoc, "Password Recovery - set validkey and force_pwd_change",
@@ -389,7 +389,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
     try {
       getUserService().getUser(userDocRef);
       XWikiDocument userDoc = getModelAccess().getDocument(userDocRef);
-      final String validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey();
+      final String validkey = getAuthService().getUniqueValidationKey();
       getModelAccess().setProperty(userDoc, XWikiUsersClass.FIELD_VALID_KEY, validkey);
       getModelAccess().saveDocument(userDoc, "creating new validkey");
       return validkey;
@@ -588,6 +588,10 @@ public class PasswordRecoveryAndEmailValidationCommand {
 
   private UserService getUserService() {
     return Utils.getComponent(UserService.class);
+  }
+
+  private IAuthenticationServiceRole getAuthService() {
+    return Utils.getComponent(IAuthenticationServiceRole.class);
   }
 
 }
