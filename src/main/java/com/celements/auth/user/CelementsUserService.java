@@ -266,46 +266,62 @@ public class CelementsUserService implements UserService {
 
   @Override
   public Optional<User> getUserForLoginField(String login, Collection<String> possibleLoginFields) {
-    checkArgument(!Strings.nullToEmpty(login).trim().isEmpty());
-    checkNotNull(possibleLoginFields);
-    if (possibleLoginFields.isEmpty()) {
-      possibleLoginFields = Arrays.asList(DEFAULT_LOGIN_FIELD);
+    login = Strings.nullToEmpty(login).trim();
+    checkArgument(!login.isEmpty());
+    if ((possibleLoginFields == null) || possibleLoginFields.isEmpty()) {
+      possibleLoginFields = ImmutableSet.of(DEFAULT_LOGIN_FIELD);
     }
-    try {
-      List<DocumentReference> userDocRefs = queryExecService.executeAndGetDocRefs(
-          getUserQueryForPossibleLogin(login, possibleLoginFields));
-      LOGGER.info("getUserForData - for login [{}] and possibleLoginFields [{}]: {}", login,
-          possibleLoginFields, userDocRefs);
-      if (userDocRefs.size() == 1) {
-        return Optional.of(getUser(userDocRefs.get(0)));
+    User user = null;
+    if (possibleLoginFields.contains(DEFAULT_LOGIN_FIELD)) {
+      try {
+        user = getUser(completeUserDocRef(login));
+      } catch (UserInstantiationException exc) {
+        LOGGER.debug("getUserForData - login [{}] is not valid user name", login, exc);
       }
-    } catch (QueryException | UserInstantiationException exc) {
-      LOGGER.info("getUserForData - failed for login [{}] and possibleLoginFields [{}]", login,
-          possibleLoginFields, exc);
     }
-    return Optional.absent();
+    if (user == null) {
+      user = loadUniqueUserForQuery(login, possibleLoginFields);
+    }
+    return Optional.fromNullable(user);
   }
 
-  private Query getUserQueryForPossibleLogin(String login, Collection<String> possibleLoginFields)
-      throws QueryException {
+  private User loadUniqueUserForQuery(String login, Collection<String> possibleLoginFields) {
+    User user = null;
+    try {
+      Query query = queryManager.createQuery(buildPossibleLoginXwql(possibleLoginFields.iterator()),
+          Query.XWQL);
+      query.bindValue("space", getUserSpaceRef().getName());
+      query.bindValue("login", login.toLowerCase().replace("'", "''"));
+      List<DocumentReference> userDocRefs = queryExecService.executeAndGetDocRefs(query);
+      LOGGER.info("loadUniqueUserForQuery - for login [{}] and possibleLoginFields [{}]: {}", login,
+          possibleLoginFields, userDocRefs);
+      if (userDocRefs.size() == 1) {
+        user = getUser(userDocRefs.get(0));
+      } else if (userDocRefs.size() > 1) {
+        LOGGER.warn("loadUniqueUserForQuery - multiple results for [{}]", login);
+      }
+    } catch (QueryException | UserInstantiationException exc) {
+      LOGGER.warn("getUserForData - failed for login [{}] and possibleLoginFields [{}]", login,
+          possibleLoginFields, exc);
+    }
+    return user;
+  }
+
+  String buildPossibleLoginXwql(Iterator<String> possibleLoginFields) {
     StringBuilder xwql = new StringBuilder();
     xwql.append("from doc.object(XWiki.XWikiUsers) usr where doc.space = :space and ");
-    Iterator<String> iter = possibleLoginFields.iterator();
-    while (iter.hasNext()) {
-      String field = iter.next();
+    while (possibleLoginFields.hasNext()) {
+      String field = possibleLoginFields.next();
       if (StringUtils.isAlphanumeric(field)) {
         xwql.append("lower(");
         xwql.append(DEFAULT_LOGIN_FIELD.equals(field) ? "doc" : "usr").append(".").append(field);
         xwql.append(") = :login");
-        if (iter.hasNext()) {
+        if (possibleLoginFields.hasNext()) {
           xwql.append(" or ");
         }
       }
     }
-    Query query = queryManager.createQuery(xwql.toString(), Query.XWQL);
-    query.bindValue("space", getUserSpaceRef().getName());
-    query.bindValue("login", login.toLowerCase().replace("'", "''"));
-    return query;
+    return xwql.toString();
   }
 
   private Iterable<String> getSplitXWikiPreference(String prefName, String cfgParam,

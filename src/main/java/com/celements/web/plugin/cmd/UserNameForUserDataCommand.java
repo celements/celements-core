@@ -19,11 +19,13 @@
  */
 package com.celements.web.plugin.cmd;
 
-import org.mutabilitydetector.internal.com.google.common.base.Splitter;
+import java.util.Collection;
+import java.util.Collections;
 
 import com.celements.auth.user.User;
 import com.celements.auth.user.UserService;
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -33,15 +35,19 @@ import com.xpn.xwiki.web.Utils;
 public class UserNameForUserDataCommand {
 
   /**
-   * @deprecated since 3.0 instead use {@link UserService#getUserForLoginField(String, java.util.List)}
+   * @deprecated since 3.0 instead use
+   *             {@link UserService#getUserForLoginField(String, java.util.List)}
    */
   @Deprecated
   public String getUsernameForUserData(String login, String possibleLogins, XWikiContext context)
       throws XWikiException {
-    if (!Strings.nullToEmpty(login).isEmpty() && (possibleLogins != null)) {
-      possibleLogins.replace("loginname", UserService.DEFAULT_LOGIN_FIELD);
-      Optional<User> user = getUserService().getUserForLoginField(login, Splitter.on(
-          ",").omitEmptyStrings().splitToList(possibleLogins));
+    if (!Strings.nullToEmpty(login).trim().isEmpty()) {
+      Collection<String> possibleLoginFields = Collections.emptyList();
+      if (possibleLogins != null) {
+        possibleLogins = possibleLogins.replace("loginname", UserService.DEFAULT_LOGIN_FIELD);
+        possibleLoginFields = Splitter.on(",").omitEmptyStrings().splitToList(possibleLogins);
+      }
+      Optional<User> user = getUserService().getUserForLoginField(login, possibleLoginFields);
       if (user.isPresent()) {
         return user.get().asXWikiUser().getUser();
       }

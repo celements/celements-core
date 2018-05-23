@@ -49,6 +49,6 @@ public interface UserService {
 
   @NotNull
   Optional<User> getUserForLoginField(@NotNull String login,
-      @NotNull Collection<String> possibleLoginFields);
+      @Nullable Collection<String> possibleLoginFields);
 
 }
