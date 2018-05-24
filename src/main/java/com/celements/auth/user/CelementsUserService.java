@@ -55,7 +55,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
@@ -106,7 +105,7 @@ public class CelementsUserService implements UserService {
   }
 
   @Override
-  public DocumentReference completeUserDocRef(String accountName) {
+  public DocumentReference resolveUserDocRef(String accountName) {
     DocumentReference userDocRef = modelUtils.resolveRef(accountName, DocumentReference.class,
         getUserSpaceRef());
     return References.adjustRef(userDocRef, DocumentReference.class, new EntityReference(
@@ -118,12 +117,6 @@ public class CelementsUserService implements UserService {
     User user = Utils.getComponent(User.class, CelementsUser.NAME);
     user.initialize(userDocRef);
     return user;
-  }
-
-  @Override
-  public boolean isGuestUser(DocumentReference userDocRef) {
-    return userDocRef.getLastSpaceReference().getName().equals(getUserSpaceRef().getName())
-        && userDocRef.getName().equals(XWikiRightService.GUEST_USER);
   }
 
   @Override
@@ -173,7 +166,7 @@ public class CelementsUserService implements UserService {
     if (accountName.isEmpty()) {
       accountName = RandomStringUtils.randomAlphanumeric(12);
     }
-    DocumentReference userDocRef = completeUserDocRef(accountName);
+    DocumentReference userDocRef = resolveUserDocRef(accountName);
     while (modelAccess.exists(userDocRef)) {
       userDocRef = new DocumentReference(RandomStringUtils.randomAlphanumeric(12),
           getUserSpaceRef());
@@ -274,7 +267,7 @@ public class CelementsUserService implements UserService {
     User user = null;
     if (possibleLoginFields.contains(DEFAULT_LOGIN_FIELD)) {
       try {
-        user = getUser(completeUserDocRef(login));
+        user = getUser(resolveUserDocRef(login));
       } catch (UserInstantiationException exc) {
         LOGGER.debug("getUserForData - login [{}] is not valid user name", login, exc);
       }

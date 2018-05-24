@@ -1,5 +1,6 @@
 package com.celements.auth.user;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -9,6 +10,7 @@ import com.google.common.base.Optional;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
 
+@NotThreadSafe
 @ComponentRole
 public interface User {
 

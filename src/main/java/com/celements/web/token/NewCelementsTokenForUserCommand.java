@@ -43,6 +43,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommand {
@@ -78,7 +79,7 @@ public class NewCelementsTokenForUserCommand {
   @Deprecated
   public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus, int minutesValid,
       XWikiContext context) throws XWikiException {
-    DocumentReference userDocRef = getUserService().completeUserDocRef(accountName);
+    DocumentReference userDocRef = getUserService().resolveUserDocRef(accountName);
     try {
       return getNewCelementsTokenForUser(userDocRef, guestPlus, minutesValid);
     } catch (UserInstantiationException exc) {
@@ -99,7 +100,8 @@ public class NewCelementsTokenForUserCommand {
     LOGGER.info("getNewCelementsTokenForUser - guestPlus [{}] for user [{}]", guestPlus,
         userDocRef);
     String validkey = null;
-    if (guestPlus && getUserService().isGuestUser(userDocRef)) {
+    if (guestPlus && XWikiRightService.GUEST_USER_FULLNAME.equals(getModelUtils().serializeRefLocal(
+        userDocRef))) {
       userDocRef = getXWikiGuestPlusDocRef(userDocRef.getWikiReference());
     }
     XWikiDocument userDoc = getUserService().getUser(userDocRef).getDocument();

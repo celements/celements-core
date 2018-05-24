@@ -2,6 +2,8 @@ package com.celements.auth.user;
 
 import java.util.Objects;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
@@ -20,6 +22,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 
+@NotThreadSafe
 @Component(CelementsUser.NAME)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class CelementsUser implements User {

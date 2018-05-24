@@ -66,12 +66,12 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_completeUserDocRef() throws Exception {
-    assertEquals(userDocRef, service.completeUserDocRef("msladek"));
-    assertEquals(userDocRef, service.completeUserDocRef("XWiki.msladek"));
-    assertEquals(userDocRef, service.completeUserDocRef("Space.msladek"));
-    assertEquals(userDocRef, service.completeUserDocRef("xwikidb:Space.msladek"));
-    assertEquals(new DocumentReference("otherdb", "XWiki", "msladek"), service.completeUserDocRef(
+  public void test_resolveUserDocRef() throws Exception {
+    assertEquals(userDocRef, service.resolveUserDocRef("msladek"));
+    assertEquals(userDocRef, service.resolveUserDocRef("XWiki.msladek"));
+    assertEquals(userDocRef, service.resolveUserDocRef("Space.msladek"));
+    assertEquals(userDocRef, service.resolveUserDocRef("xwikidb:Space.msladek"));
+    assertEquals(new DocumentReference("otherdb", "XWiki", "msladek"), service.resolveUserDocRef(
         "otherdb:Space.msladek"));
   }
 
@@ -190,7 +190,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getUserForLoginField_name_exists() throws Exception {
     String login = "mSladek";
-    XWikiDocument doc = expectDoc(service.completeUserDocRef(login));
+    XWikiDocument doc = expectDoc(service.resolveUserDocRef(login));
     addUserObj(doc);
 
     replayDefault();
@@ -203,7 +203,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getUserForLoginField_name_query() throws Exception {
     String login = "mSladek";
-    expect(getMock(ModelAccessStrategy.class).exists(service.completeUserDocRef(login),
+    expect(getMock(ModelAccessStrategy.class).exists(service.resolveUserDocRef(login),
         "")).andReturn(false);
     expectUserQuery(login, Arrays.asList(UserService.DEFAULT_LOGIN_FIELD), Arrays.asList(
         userDocRef));
@@ -232,7 +232,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   public void test_getUserForLoginField_multipleResults() throws Exception {
     String login = "mSladek";
     List<String> possibleLoginFields = Arrays.asList("asdf", "fdsa");
-    expectUserQuery(login, possibleLoginFields, Arrays.asList(service.completeUserDocRef(login),
+    expectUserQuery(login, possibleLoginFields, Arrays.asList(service.resolveUserDocRef(login),
         userDocRef));
 
     replayDefault();

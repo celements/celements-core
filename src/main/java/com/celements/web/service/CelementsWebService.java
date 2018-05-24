@@ -58,7 +58,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
 
   @Deprecated
   public String getEmailAdressForUser(String username) {
-    return getEmailAdressForUser(userService.completeUserDocRef(username));
+    return getEmailAdressForUser(userService.resolveUserDocRef(username));
   }
 
   @Override

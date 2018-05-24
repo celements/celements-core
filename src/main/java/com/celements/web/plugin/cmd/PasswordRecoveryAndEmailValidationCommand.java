@@ -86,7 +86,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
   public String recoverPassword(String account, String input) {
     DocumentReference userDocRef = null;
     if (!Strings.nullToEmpty(account).trim().isEmpty()) {
-      userDocRef = getUserService().completeUserDocRef(account);
+      userDocRef = getUserService().resolveUserDocRef(account);
     }
     return recoverPassword(userDocRef, input);
   }
@@ -296,7 +296,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
   @Deprecated
   public boolean sendNewValidationToAccountEmail(String accountName)
       throws SendValidationFailedException {
-    DocumentReference userDocRef = getUserService().completeUserDocRef(accountName);
+    DocumentReference userDocRef = getUserService().resolveUserDocRef(accountName);
     return sendNewValidationToAccountEmail(userDocRef);
   }
 
@@ -308,7 +308,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
   @Deprecated
   public boolean sendNewValidationToAccountEmail(String accountName,
       DocumentReference activationMailDocRef) throws SendValidationFailedException {
-    DocumentReference userDocRef = getUserService().completeUserDocRef(accountName);
+    DocumentReference userDocRef = getUserService().resolveUserDocRef(accountName);
     return sendNewValidationToAccountEmail(userDocRef, activationMailDocRef);
   }
 
@@ -363,7 +363,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
   @Deprecated
   public String getNewValidationTokenForUser(String accountName, XWikiContext context)
       throws XWikiException {
-    return getNewValidationTokenForUser(getUserService().completeUserDocRef(accountName));
+    return getNewValidationTokenForUser(getUserService().resolveUserDocRef(accountName));
   }
 
   /**
