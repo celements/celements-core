@@ -161,6 +161,7 @@ public class CelementsUserService implements UserService {
     }
   }
 
+  // TODO use instead when available: [CELDEV-692] NextFreeDocService getNextFreeRandomDocRef
   synchronized DocumentReference getOrGenerateUserDocRef(String accountName) {
     accountName = Strings.nullToEmpty(accountName);
     if (accountName.isEmpty()) {
