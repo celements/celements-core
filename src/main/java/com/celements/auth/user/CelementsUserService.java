@@ -61,7 +61,7 @@ import com.xpn.xwiki.web.Utils;
 @Component
 public class CelementsUserService implements UserService {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CelementsUserService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelementsUserService.class);
 
   static final Function<String, DocumentReference> DOC_REF_RESOLVER = new ReferenceMarshaller<>(
       DocumentReference.class).getResolver();
@@ -137,7 +137,7 @@ public class CelementsUserService implements UserService {
   }
 
   @Override
-  public synchronized User createNewUser(Map<String, String> userData, boolean validate)
+  public User createNewUser(Map<String, String> userData, boolean validate)
       throws UserCreateException {
     try {
       DocumentReference userDocRef = getOrGenerateUserDocRef(userData.remove("xwikiname"));
@@ -161,7 +161,7 @@ public class CelementsUserService implements UserService {
     }
   }
 
-  DocumentReference getOrGenerateUserDocRef(String accountName) {
+  synchronized DocumentReference getOrGenerateUserDocRef(String accountName) {
     accountName = Strings.nullToEmpty(accountName);
     if (accountName.isEmpty()) {
       accountName = RandomStringUtils.randomAlphanumeric(12);
