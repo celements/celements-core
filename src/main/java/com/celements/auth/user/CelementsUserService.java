@@ -308,7 +308,11 @@ public class CelementsUserService implements UserService {
       String field = possibleLoginFields.next();
       if (StringUtils.isAlphanumeric(field)) {
         xwql.append("lower(");
-        xwql.append(DEFAULT_LOGIN_FIELD.equals(field) ? "doc" : "usr").append(".").append(field);
+        if (DEFAULT_LOGIN_FIELD.equals(field)) {
+          xwql.append("doc.name");
+        } else {
+          xwql.append("usr.").append(field);
+        }
         xwql.append(") = :login");
         if (possibleLoginFields.hasNext()) {
           xwql.append(" or ");

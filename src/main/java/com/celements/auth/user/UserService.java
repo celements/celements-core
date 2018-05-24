@@ -17,7 +17,7 @@ import com.google.common.base.Optional;
 @ComponentRole
 public interface UserService {
 
-  public static final String DEFAULT_LOGIN_FIELD = "name";
+  public static final String DEFAULT_LOGIN_FIELD = "loginname";
 
   /**
    * @return the default user space reference for the current wiki

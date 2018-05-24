@@ -44,7 +44,6 @@ public class UserNameForUserDataCommand {
     if (!Strings.nullToEmpty(login).trim().isEmpty()) {
       Collection<String> possibleLoginFields = Collections.emptyList();
       if (possibleLogins != null) {
-        possibleLogins = possibleLogins.replace("loginname", UserService.DEFAULT_LOGIN_FIELD);
         possibleLoginFields = Splitter.on(",").omitEmptyStrings().splitToList(possibleLogins);
       }
       Optional<User> user = getUserService().getUserForLoginField(login, possibleLoginFields);
