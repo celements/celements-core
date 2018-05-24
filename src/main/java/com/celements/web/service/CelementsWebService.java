@@ -35,7 +35,7 @@ import com.xpn.xwiki.web.XWikiResponse;
 @Component
 public class CelementsWebService implements ICelementsWebServiceRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
 
   private List<String> supportedAdminLangList;
 
