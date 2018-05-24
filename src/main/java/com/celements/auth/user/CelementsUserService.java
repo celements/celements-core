@@ -182,8 +182,8 @@ public class CelementsUserService implements UserService {
     userDoc.setCreator(userFN);
     userDoc.setAuthor(userFN);
     userDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
-    userData.putIfAbsent(XWikiUsersClass.FIELD_ACTIVE.getName(), "0");
-    userData.putIfAbsent(XWikiUsersClass.FIELD_PASSWORD.getName(),
+    putIfAbsent(userData, XWikiUsersClass.FIELD_ACTIVE.getName(), "0");
+    putIfAbsent(userData, XWikiUsersClass.FIELD_PASSWORD.getName(),
         RandomStringUtils.randomAlphanumeric(24));
     try {
       BaseObject userObject = XWikiObjectEditor.on(userDoc).filter(usersClass).createFirst();
@@ -331,6 +331,15 @@ public class CelementsUserService implements UserService {
 
   private XWikiUser asXWikiUser(DocumentReference userDocRef) {
     return new XWikiUser(modelUtils.serializeRefLocal(userDocRef));
+  }
+
+  // helper until Java 8 Map#putIfAbsent is available
+  private <V> V putIfAbsent(Map<V, V> map, V key, V value) {
+    V v = map.get(key);
+    if (v == null) {
+      v = map.put(key, value);
+    }
+    return v;
   }
 
 }
