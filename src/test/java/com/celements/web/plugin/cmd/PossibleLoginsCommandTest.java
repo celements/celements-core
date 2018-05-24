@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.celements.auth.user.UserService;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -26,16 +27,16 @@ public class PossibleLoginsCommandTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testGetPossibleLogins_none() {
     expect(xwiki.getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"), eq(
-        "loginname"), same(context))).andReturn(null).anyTimes();
+        UserService.DEFAULT_LOGIN_FIELD), same(context))).andReturn(null).anyTimes();
     replayDefault();
-    assertEquals("loginname", possibleLoginsCmd.getPossibleLogins());
+    assertEquals(UserService.DEFAULT_LOGIN_FIELD, possibleLoginsCmd.getPossibleLogins());
     verifyDefault();
   }
 
   @Test
   public void testGetPossibleLogins_local() {
     expect(xwiki.getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"), eq(
-        "loginname"), same(getContext()))).andReturn("a,b").once();
+        UserService.DEFAULT_LOGIN_FIELD), same(getContext()))).andReturn("a,b").once();
     replayDefault();
     assertEquals("a,b", possibleLoginsCmd.getPossibleLogins());
     verifyDefault();
@@ -44,9 +45,9 @@ public class PossibleLoginsCommandTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testGetPossibleLogins_whiteSpaces() {
     expect(xwiki.getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"), eq(
-        "loginname"), same(context))).andReturn("   ").once();
+        UserService.DEFAULT_LOGIN_FIELD), same(context))).andReturn("   ").once();
     replayDefault();
-    assertEquals("loginname", possibleLoginsCmd.getPossibleLogins());
+    assertEquals(UserService.DEFAULT_LOGIN_FIELD, possibleLoginsCmd.getPossibleLogins());
     verifyDefault();
   }
 

@@ -19,85 +19,43 @@
  */
 package com.celements.web.plugin.cmd;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.celements.web.service.IWebUtilsService;
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserService;
+import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
+@Deprecated
 public class UserNameForUserDataCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(UserNameForUserDataCommand.class);
-
+  /**
+   * @deprecated since 3.0 instead use
+   *             {@link UserService#getUserForLoginField(String, java.util.List)}
+   */
+  @Deprecated
   public String getUsernameForUserData(String login, String possibleLogins, XWikiContext context)
       throws XWikiException {
-    String userDoc = "";
-
-    if ((login != null) && (login.trim().length() > 0) && (possibleLogins != null)) {
-      String[] fields = possibleLogins.split(",");
-
-      String hql = ", BaseObject as obj, StringProperty as str where ";
-      hql += "doc.space='XWiki' ";
-      hql += "and obj.name=doc.fullName ";
-      hql += "and obj.className='XWiki.XWikiUsers' ";
-      hql += "and obj.id=str.id.id ";
-      hql += "and (";
-      for (int i = 0; i < fields.length; i++) {
-        if (i > 0) {
-          hql += "or ";
-        }
-        hql += "str.id.name='" + fields[i] + "' ";
+    if (!Strings.nullToEmpty(login).trim().isEmpty()) {
+      Collection<String> possibleLoginFields = Collections.emptyList();
+      if (possibleLogins != null) {
+        possibleLoginFields = Splitter.on(",").omitEmptyStrings().splitToList(possibleLogins);
       }
-      hql += ") and lower(str.value)='" + login.toLowerCase().replace("'", "''") + "'";
-
-      XWikiStoreInterface storage = context.getWiki().getStore();
-      List<String> users = storage.searchDocumentsNames(hql, 0, 0, context);
-      LOGGER.info("searching users for " + login + " and found " + users.size());
-
-      int usersFound = 0;
-      for (String tmpUserDoc : users) {
-        if (!tmpUserDoc.trim().equals("")) {
-          usersFound++;
-          userDoc = tmpUserDoc;
-        }
-      }
-      if (usersFound > 1) {
-        LOGGER.warn("Found more than one user for login '" + login + "' in possible fields '"
-            + possibleLogins + "'");
-        return null;
-      }
-
-      if ((userDoc.trim().length() == 0) && (possibleLogins.matches("(.*,)?loginname(,.*)?"))) {
-        if (!login.startsWith("XWiki.")) {
-          login = "XWiki." + login;
-        }
-        if (context.getWiki().exists(login, context)) {
-          userDoc = login;
-        } else {
-          List<String> argsList = new ArrayList<>();
-          argsList.add(login.replaceAll("XWiki.", ""));
-          List<XWikiDocument> docs = storage.searchDocuments("where lower(doc.name)=?", argsList,
-              context);
-          if (docs.size() == 1) {
-            userDoc = Utils.getComponent(IWebUtilsService.class).getRefLocalSerializer().serialize(
-                docs.get(0).getDocumentReference());
-          } else if (docs.size() > 1) {
-            return null;
-          }
-        }
+      Optional<User> user = getUserService().getUserForLoginField(login, possibleLoginFields);
+      if (user.isPresent()) {
+        return user.get().asXWikiUser().getUser();
       }
     }
-
-    LOGGER.info("Find login for '" + login + "' in fields: '" + possibleLogins + "' Result: '"
-        + userDoc + "'");
-
-    return userDoc;
+    return "";
   }
+
+  private UserService getUserService() {
+    return Utils.getComponent(UserService.class);
+  }
+
 }
