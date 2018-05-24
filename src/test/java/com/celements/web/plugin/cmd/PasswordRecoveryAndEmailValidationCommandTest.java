@@ -19,7 +19,6 @@
  */
 package com.celements.web.plugin.cmd;
 
-import static com.celements.auth.user.UserTestUtils.*;
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -222,7 +221,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     String token = "asdf";
     User user = createMockAndAddToDefault(User.class);
     expect(userServiceMock.getUser(userDocRef)).andReturn(user);
-    XWikiDocument userDoc = createAndExpectUserDoc(userDocRef);
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
     expect(user.getDocument()).andReturn(userDoc);
     expect(authServiceMock.getUniqueValidationKey()).andReturn(token);
     expect(modelAccessMock.setProperty(userDoc, XWikiUsersClass.FIELD_VALID_KEY, token)).andReturn(
@@ -257,7 +256,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     Throwable cause = new QueryException("", null, null);
     User user = createMockAndAddToDefault(User.class);
     expect(userServiceMock.getUser(userDocRef)).andReturn(user);
-    XWikiDocument userDoc = createAndExpectUserDoc(userDocRef);
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
     expect(user.getDocument()).andReturn(userDoc);
     expect(authServiceMock.getUniqueValidationKey()).andThrow(cause);
 
@@ -279,7 +278,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     String token = "asdf";
     User user = createMockAndAddToDefault(User.class);
     expect(userServiceMock.getUser(userDocRef)).andReturn(user);
-    XWikiDocument userDoc = createAndExpectUserDoc(userDocRef);
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
     expect(user.getDocument()).andReturn(userDoc);
     expect(authServiceMock.getUniqueValidationKey()).andReturn(token);
     expect(modelAccessMock.setProperty(userDoc, XWikiUsersClass.FIELD_VALID_KEY, token)).andReturn(

@@ -17,7 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -33,6 +35,7 @@ import com.celements.model.classes.ClassDefinition;
 import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.ModelUtils;
+import com.celements.model.util.References;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiGroupsClass;
@@ -61,8 +64,9 @@ public class CelementsUserService implements UserService {
 
   private static Logger LOGGER = LoggerFactory.getLogger(CelementsUserService.class);
 
-  private static final Function<String, DocumentReference> DOC_REF_RESOLVER = new ReferenceMarshaller<>(
+  static final Function<String, DocumentReference> DOC_REF_RESOLVER = new ReferenceMarshaller<>(
       DocumentReference.class).getResolver();
+  static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
   @Requirement(XWikiUsersClass.CLASS_DEF_HINT)
   private ClassDefinition usersClass;
@@ -103,13 +107,10 @@ public class CelementsUserService implements UserService {
 
   @Override
   public DocumentReference completeUserDocRef(String accountName) {
-    DocumentReference userDocRef;
-    if (accountName.startsWith(getUserSpaceRef().getName() + ".")) {
-      userDocRef = modelUtils.resolveRef(accountName, DocumentReference.class);
-    } else {
-      userDocRef = new DocumentReference(accountName, getUserSpaceRef());
-    }
-    return userDocRef;
+    DocumentReference userDocRef = modelUtils.resolveRef(accountName, DocumentReference.class,
+        getUserSpaceRef());
+    return References.adjustRef(userDocRef, DocumentReference.class, new EntityReference(
+        XWIKI_USERS_CLASS_SPACE, EntityType.SPACE));
   }
 
   @Override
@@ -167,7 +168,7 @@ public class CelementsUserService implements UserService {
     }
   }
 
-  private DocumentReference getOrGenerateUserDocRef(String accountName) {
+  DocumentReference getOrGenerateUserDocRef(String accountName) {
     accountName = Strings.nullToEmpty(accountName);
     if (accountName.isEmpty()) {
       accountName = RandomStringUtils.randomAlphanumeric(12);
@@ -180,16 +181,17 @@ public class CelementsUserService implements UserService {
     return userDocRef;
   }
 
-  public void createUserFromData(XWikiDocument userDoc, Map<String, String> userData)
+  void createUserFromData(XWikiDocument userDoc, Map<String, String> userData)
       throws DocumentAccessException {
     String userFN = modelUtils.serializeRefLocal(userDoc.getDocumentReference());
-    userDoc.setParentReference(usersClass.getClassReference());
+    userDoc.setParentReference((EntityReference) usersClass.getDocRef(
+        userDoc.getDocumentReference().getWikiReference()));
     userDoc.setCreator(userFN);
     userDoc.setAuthor(userFN);
     userDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
     userData.putIfAbsent(XWikiUsersClass.FIELD_ACTIVE.getName(), "0");
     userData.putIfAbsent(XWikiUsersClass.FIELD_PASSWORD.getName(),
-        RandomStringUtils.randomAlphanumeric(8));
+        RandomStringUtils.randomAlphanumeric(24));
     try {
       BaseObject userObject = XWikiObjectEditor.on(userDoc).filter(usersClass).createFirst();
       getXWiki().getUserClass(context.getXWikiContext()).fromMap(userData, userObject);
@@ -198,23 +200,23 @@ public class CelementsUserService implements UserService {
     }
   }
 
-  private void setRightsOnUser(XWikiDocument doc, List<EAccessLevel> rights) {
-    XWikiObjectEditor userRightObjEditor = XWikiObjectEditor.on(doc).filter(rightsClass);
+  void setRightsOnUser(XWikiDocument userDoc, List<EAccessLevel> rights) {
+    XWikiObjectEditor userRightObjEditor = XWikiObjectEditor.on(userDoc).filter(rightsClass);
     userRightObjEditor.filter(XWikiRightsClass.FIELD_USERS, Arrays.asList(asXWikiUser(
-        doc.getDocumentReference())));
+        userDoc.getDocumentReference())));
     userRightObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
     userRightObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
     userRightObjEditor.createFirst();
-    XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(doc).filter(rightsClass);
-    admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, Arrays.asList(getAdminGroupName()));
+    XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(userDoc).filter(rightsClass);
+    admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, Arrays.asList(XWIKI_ADMIN_GROUP_FN));
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
     admGrpObjEditor.createFirst();
   }
 
-  private void addUserToDefaultGroups(DocumentReference userDocRef) {
+  void addUserToDefaultGroups(DocumentReference userDocRef) {
     FluentIterable<String> defaultGroupNames = FluentIterable.from(getSplitXWikiPreference(
-        "initialGroups", "xwiki.users.initialGroups", getAdminGroupName()));
+        "initialGroups", "xwiki.users.initialGroups", XWIKI_ADMIN_GROUP_FN));
     for (DocumentReference groupDocRef : defaultGroupNames.transform(DOC_REF_RESOLVER)) {
       try {
         addUserToGroup(userDocRef, groupDocRef);
@@ -228,6 +230,8 @@ public class CelementsUserService implements UserService {
 
   private void addUserToGroup(DocumentReference userDocRef, DocumentReference groupDocRef)
       throws DocumentNotExistsException, DocumentSaveException {
+    WikiReference wiki = userDocRef.getWikiReference();
+    groupDocRef = References.adjustRef(groupDocRef, DocumentReference.class, wiki);
     XWikiDocument groupDoc = modelAccess.getDocument(groupDocRef);
     XWikiObjectEditor.on(groupDoc).filter(XWikiGroupsClass.FIELD_MEMBER,
         userDocRef).createFirstIfNotExists();
@@ -235,7 +239,7 @@ public class CelementsUserService implements UserService {
         "core.comment.addedUserToGroup"));
     try {
       XWikiGroupService gservice = getXWiki().getGroupService(context.getXWikiContext());
-      gservice.addUserToGroup(asXWikiUser(userDocRef).getUser(), context.getWikiRef().getName(),
+      gservice.addUserToGroup(asXWikiUser(userDocRef).getUser(), wiki.getName(),
           modelUtils.serializeRefLocal(groupDocRef), context.getXWikiContext());
     } catch (XWikiException xwe) {
       LOGGER.warn("Failed to update group service cache", xwe);
@@ -246,17 +250,13 @@ public class CelementsUserService implements UserService {
     Set<String> possibleLogins = getPossibleLoginFields();
     boolean isUnique = true;
     for (String key : userData.keySet()) {
-      if (!"".equals(key.trim()) && possibleLogins.contains(key)) {
+      if (!key.trim().isEmpty() && possibleLogins.contains(key)) {
         if (getUserForLoginField(userData.get(key), possibleLogins).isPresent()) {
           isUnique = false;
         }
       }
     }
     return isUnique;
-  }
-
-  private String getAdminGroupName() {
-    return "XWiki.XWikiAdminGroup";
   }
 
   @Override

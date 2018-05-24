@@ -59,7 +59,9 @@ public class NewCelementsTokenForUserCommandTest extends AbstractComponentTest {
   public void test_getNewCelementsTokenForUser() throws Exception {
     String token = "asdf";
     DocumentReference userDocRef = new DocumentReference("db", "XWiki", "User");
-    XWikiDocument userDoc = createAndExpectUserDoc(userDocRef);
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    addUserObj(userDoc);
+    expect(modelAccessMock.getDocument(userDocRef)).andReturn(userDoc);
     expect(authServiceMock.getUniqueValidationKey()).andReturn(token);
     expectNewBaseObject(cmd.getTokenClassRef().getDocRef(userDocRef.getWikiReference()));
     modelAccessMock.saveDocument(userDoc);
