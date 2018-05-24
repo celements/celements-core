@@ -36,7 +36,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 @Component
 public class AuthenticationService implements IAuthenticationServiceRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
 
   @Requirement
   private QueryManager queryManager;
