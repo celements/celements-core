@@ -119,19 +119,20 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getPossibleLoginFields_none() {
-    expectPossibleLoginFields(null);
+  public void test_getPossibleLoginFields() {
+    expectPossibleLoginFields("validkey,invalid,loginname,illegal,email");
     replayDefault();
-    assertEquals(ImmutableSet.of(UserService.DEFAULT_LOGIN_FIELD),
+    assertEquals(ImmutableSet.of("validkey", "loginname", "email"),
         service.getPossibleLoginFields());
     verifyDefault();
   }
 
   @Test
-  public void test_getPossibleLoginFields_local() {
-    expectPossibleLoginFields("a,b");
+  public void test_getPossibleLoginFields_none() {
+    expectPossibleLoginFields(null);
     replayDefault();
-    assertEquals(ImmutableSet.of("a", "b"), service.getPossibleLoginFields());
+    assertEquals(ImmutableSet.of(UserService.DEFAULT_LOGIN_FIELD),
+        service.getPossibleLoginFields());
     verifyDefault();
   }
 
@@ -178,7 +179,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getUserForLoginField_notExists() throws Exception {
     String login = "mSladek";
-    List<String> possibleLoginFields = Arrays.asList("asdf");
+    List<String> possibleLoginFields = Arrays.asList("email");
     expectUserQuery(login, possibleLoginFields, Collections.<DocumentReference>emptyList());
 
     replayDefault();
@@ -231,12 +232,26 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getUserForLoginField_multipleResults() throws Exception {
     String login = "mSladek";
-    List<String> possibleLoginFields = Arrays.asList("asdf", "fdsa");
+    List<String> possibleLoginFields = Arrays.asList("email", "validkey");
     expectUserQuery(login, possibleLoginFields, Arrays.asList(service.resolveUserDocRef(login),
         userDocRef));
 
     replayDefault();
     Optional<User> user = service.getUserForLoginField(login, possibleLoginFields);
+    verifyDefault();
+    assertFalse(user.isPresent());
+  }
+
+  @Test
+  public void test_getUserForLoginField_invalidField() throws Exception {
+    String login = "mSladek";
+    expect(getMock(ModelAccessStrategy.class).exists(service.resolveUserDocRef(login),
+        "")).andReturn(false);
+    expectUserQuery(login, Arrays.asList(UserService.DEFAULT_LOGIN_FIELD),
+        Collections.<DocumentReference>emptyList());
+
+    replayDefault();
+    Optional<User> user = service.getUserForLoginField(login, Arrays.asList("asdf"));
     verifyDefault();
     assertFalse(user.isPresent());
   }
