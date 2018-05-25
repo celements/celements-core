@@ -381,7 +381,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_addUserToDefaultGroups() throws Exception {
-    List<String> groups = Arrays.asList(XWIKI_ADMIN_GROUP_FN, "XWiki.OtherGroup");
+    List<String> groups = Arrays.asList(XWIKI_ALL_GROUP_FN, "XWiki.OtherGroup");
     expectInitialGroups(groups);
     XWikiDocument admGrpDoc = expectGroupAdd(groups.get(0));
     XWikiDocument othGrpDoc = expectGroupAdd(groups.get(1));
@@ -421,6 +421,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     getMock(ModelAccessStrategy.class).saveDocument(same(userDoc), anyObject(String.class), eq(
         false));
     expectInitialGroups(Collections.<String>emptyList());
+    expectGroupAdd(XWIKI_ALL_GROUP_FN);
 
     expect(getMock(ModelAccessStrategy.class).exists(userDocRef, "")).andReturn(true);
     expect(getMock(ModelAccessStrategy.class).getDocument(userDocRef, "")).andReturn(userDoc);
@@ -462,8 +463,8 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   private void expectInitialGroups(List<String> groups) {
-    expect(getWikiMock().getXWikiPreference(eq("initialGroups"), anyObject(String.class), anyObject(
-        String.class), same(getContext()))).andReturn(Joiner.on(',').join(groups));
+    expect(getWikiMock().getXWikiPreference(eq("initialGroups"), eq("xwiki.users.initialGroups"),
+        eq(""), same(getContext()))).andReturn(Joiner.on(',').join(groups));
   }
 
   private BaseClass expectUserClassFromMap(Map<String, String> userData) throws XWikiException {
