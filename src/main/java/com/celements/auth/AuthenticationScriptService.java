@@ -12,6 +12,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.rights.access.RightsAccessScriptService;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.RemoteUserValidator;
@@ -245,6 +246,7 @@ public class AuthenticationScriptService implements ScriptService {
   /**
    * API to check rights on a document for a given user or group
    *
+   * @deprecated since 3.0 use {@link RightsAccessScriptService}
    * @param level
    *          right to check (view, edit, comment, delete)
    * @param user
@@ -255,6 +257,7 @@ public class AuthenticationScriptService implements ScriptService {
    *          document on which to check the rights
    * @return true if right is granted/false if not
    */
+  @Deprecated
   public boolean hasAccessLevel(String level, String user, boolean isUser,
       DocumentReference docRef) {
     try {

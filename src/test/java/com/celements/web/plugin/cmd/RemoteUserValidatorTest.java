@@ -19,401 +19,355 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.web.plugin.CelementsWebPlugin;
-import com.xpn.xwiki.XWiki;
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserService;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.util.ModelUtils;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
+public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   RemoteUserValidator cmd;
   XWikiContext context;
+
+  private XWikiAuthService xWikiAuthServiceMock;
+  private UserService userServiceMock;
 
   @Before
   public void setUp_RemoteUserValidatorTest() throws Exception {
     cmd = new RemoteUserValidator();
     context = getContext();
+    userServiceMock = registerComponentMock(UserService.class);
+    xWikiAuthServiceMock = createMockAndAddToDefault(XWikiAuthService.class);
+    expect(getWikiMock().getAuthService()).andReturn(xWikiAuthServiceMock).anyTimes();
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
+    expect(getWikiMock().getXWikiPreference(eq("auth_active_check"), anyObject(
+        XWikiContext.class))).andReturn("1").anyTimes();
   }
 
   @Test
-  public void testIsValidUserJSON_validationNotAllowed() {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_isValidUserJSON_validationNotAllowed() {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    replay(httpRequest, request);
+
+    replayDefault();
     assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.isValidUserJSON("",
         "", "", null, context));
-    verify(httpRequest, request);
+    verifyDefault();
   }
 
   @Test
-  public void testIsValidUserJSON_principalNull() throws XWikiException {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_isValidUserJSON_noUser() throws XWikiException {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    XWiki wiki = new XWiki();
-    context.setWiki(wiki);
-    CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
-    cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("loginname"), same(
-        context))).andReturn("").once();
-    replay(celementsweb, httpRequest, request);
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.<User>absent());
+
+    replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
     assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_username_password\"}",
         cmd.isValidUserJSON("blabla@mail.com", "", "", null, context));
-    verify(celementsweb, httpRequest, request);
+    verifyDefault();
   }
 
   @Test
-  public void testIsValidUserJSON_validUser_wrongGroup() throws XWikiException {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_isValidUserJSON_notAuthenticated() throws XWikiException {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    XWiki xwiki = getWikiMock();
-    context.setWiki(xwiki);
-    XWikiAuthService auth = createMock(XWikiAuthService.class);
-    expect(xwiki.getAuthService()).andReturn(auth).once();
-    Principal principal = createMock(Principal.class);
-    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context))).andReturn(
-        principal).once();
-    expect(principal.getName()).andReturn("XWiki.7sh2lya35").anyTimes();
-    User user = createMock(User.class);
-    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
-    expect(user.isUserInGroup(eq("grp"))).andReturn(false);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
-        "email,loginname").once();
-    CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
-    cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
-        context))).andReturn("XWiki.7sh2lya35").once();
-    replay(auth, celementsweb, httpRequest, principal, request, user, xwiki);
+    User userMock = createUserMock("XWiki.7sh2lya35");
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expect(xWikiAuthServiceMock.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(
+        context))).andReturn(null).once();
+
+    replayDefault();
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
+    context.setUser("xwiki:XWiki.superadmin");
+    assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_username_password\"}",
+        cmd.isValidUserJSON("blabla@mail.com", "pwd", "", null, context));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_isValidUserJSON_validUser_wrongGroup() throws XWikiException {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    context.setRequest(request);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
+    expect(httpRequest.getRemoteHost()).andReturn("  ");
+    User userMock = createUserMock("XWiki.7sh2lya35");
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expectAuth("XWiki.7sh2lya35", "pwd");
+    expectInGroup(userMock, "grp", false);
+
+    replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
     assertEquals("{\"access\" : \"false\", \"error\" : \"user_not_in_group\"}", cmd.isValidUserJSON(
         "blabla@mail.com", "pwd", "grp", null, context));
-    verify(auth, celementsweb, httpRequest, principal, request, user, xwiki);
+    verifyDefault();
   }
 
   @Test
-  public void testIsValidUserJSON_validUser_isInGroup_inactiveUser() throws XWikiException {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_isValidUserJSON_validUser_isInGroup_inactiveUser() throws XWikiException {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    XWiki xwiki = getWikiMock();
-    context.setWiki(xwiki);
-    XWikiAuthService auth = createMock(XWikiAuthService.class);
-    expect(xwiki.getAuthService()).andReturn(auth).once();
-    Principal principal = createMock(Principal.class);
-    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context))).andReturn(
-        principal).once();
-    expect(principal.getName()).andReturn("XWiki.7sh2lya35").anyTimes();
-    User user = createMock(User.class);
-    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
-    expect(xwiki.getXWikiPreference(eq("auth_active_check"), same(context))).andReturn(
-        "1").atLeastOnce();
-    XWikiDocument doc = createMock(XWikiDocument.class);
-    expect(xwiki.getDocument(eq("XWiki.7sh2lya35"), same(context))).andReturn(doc).once();
-    expect(doc.getIntValue(eq("XWiki.XWikiUsers"), eq("active"))).andReturn(0).once();
-    expect(user.isUserInGroup(eq("grp"))).andReturn(true);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
-        "email,loginname").once();
-    CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
-    cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
-        context))).andReturn("XWiki.7sh2lya35").once();
-    replay(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
+    User userMock = createUserMock("XWiki.7sh2lya35");
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expectAuth("XWiki.7sh2lya35", "pwd");
+    expectInGroup(userMock, "grp", true);
+    expect(userMock.isActive()).andReturn(false);
+
+    replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
     assertEquals("{\"access\" : \"false\", \"error\" : \"useraccount_inactive\"}",
         cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null, context));
-    verify(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
+    verifyDefault();
   }
 
   @Test
   public void testIsValidUserJSON_validUser_isInGroup_noRetGroup() throws XWikiException {
-    XWikiRequest request = createMock(XWikiRequest.class);
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    XWiki xwiki = getWikiMock();
-    context.setWiki(xwiki);
-    XWikiAuthService auth = createMock(XWikiAuthService.class);
-    expect(xwiki.getAuthService()).andReturn(auth).once();
-    Principal principal = createMock(Principal.class);
-    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context))).andReturn(
-        principal).once();
-    expect(principal.getName()).andReturn("XWiki.7sh2lya35").anyTimes();
-    User user = createMock(User.class);
-    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
-    expect(xwiki.getXWikiPreference(eq("auth_active_check"), same(context))).andReturn(
-        "1").atLeastOnce();
-    XWikiDocument doc = createMock(XWikiDocument.class);
-    expect(xwiki.getDocument(eq("XWiki.7sh2lya35"), same(context))).andReturn(doc).once();
-    expect(doc.getIntValue(eq("XWiki.XWikiUsers"), eq("active"))).andReturn(1).once();
-    expect(user.isUserInGroup(eq("grp"))).andReturn(true);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
-        "email,loginname").once();
-    CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
-    cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
-        context))).andReturn("XWiki.7sh2lya35").once();
-    replay(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
+    User userMock = createUserMock("XWiki.7sh2lya35");
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expectAuth("XWiki.7sh2lya35", "pwd");
+    expectInGroup(userMock, "grp", true);
+    expect(userMock.isActive()).andReturn(true);
+
+    replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
     assertEquals("{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", "
         + "\"group_membership\" : {}}", cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null,
             context));
-    verify(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
+    verifyDefault();
   }
 
   @Test
   public void testIsValidUserJSON_validUser_isInGroup_retGroup() throws XWikiException {
-    XWikiContext context = createMock(XWikiContext.class);
+    context = createMockAndAddToDefault(XWikiContext.class);
     expect(context.getUser()).andReturn("xwiki:XWiki.superadmin").anyTimes();
-    XWikiRequest request = createMock(XWikiRequest.class);
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     expect(context.getRequest()).andReturn(request).anyTimes();
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    XWiki xwiki = getWikiMock();
-    expect(context.getWiki()).andReturn(xwiki).anyTimes();
-    XWikiAuthService auth = createMock(XWikiAuthService.class);
-    expect(xwiki.getAuthService()).andReturn(auth).once();
-    Principal principal = createMock(Principal.class);
-    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context))).andReturn(
-        principal).once();
-    expect(principal.getName()).andReturn("XWiki.7sh2lya35").anyTimes();
-    User user = createMock(User.class);
-    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("auth_active_check"), same(context))).andReturn(
-        "1").atLeastOnce();
-    XWikiDocument doc = createMock(XWikiDocument.class);
-    expect(xwiki.getDocument(eq("XWiki.7sh2lya35"), same(context))).andReturn(doc).once();
-    expect(doc.getIntValue(eq("XWiki.XWikiUsers"), eq("active"))).andReturn(1).once();
-    expect(user.isUserInGroup(eq("XWiki.MemOfGroup"))).andReturn(true).anyTimes();
-    expect(user.isUserInGroup(eq("XWiki.TestGroup1"))).andReturn(true).anyTimes();
-    expect(user.isUserInGroup(eq("XWiki.TestGroup2"))).andReturn(false).anyTimes();
-    expect(user.isUserInGroup(eq("XWiki.TestGroup3"))).andReturn(true).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
-        "email,loginname").anyTimes();
-    CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
-    cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
-        context))).andReturn("XWiki.7sh2lya35").anyTimes();
-    List<String> retGroup = new ArrayList<>();
-    retGroup.add("XWiki.TestGroup1");
-    retGroup.add("XWiki.TestGroup2");
-    retGroup.add("XWiki.TestGroup3");
-    XWikiMessageTool messageTool = createMock(XWikiMessageTool.class);
-    expect(context.getMessageTool()).andReturn(messageTool).anyTimes();
-    expect(messageTool.get(eq("cel_groupname_TestGroup1"))).andReturn("grp1").anyTimes();
-    expect(messageTool.get(eq("cel_groupname_TestGroup2"))).andReturn("grp2").anyTimes();
-    expect(messageTool.get(eq("cel_groupname_TestGroup3"))).andReturn("grp3").anyTimes();
-    replay(auth, celementsweb, context, doc, httpRequest, messageTool, principal, request, user,
-        xwiki);
+    expect(context.getWiki()).andReturn(getWikiMock()).anyTimes();
+    expect(context.getMessageTool()).andReturn(getMessageToolStub()).anyTimes();
+
+    User userMock = createUserMock("XWiki.7sh2lya35");
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expectAuth("XWiki.7sh2lya35", "pwd");
+    expect(userMock.isActive()).andReturn(true);
+    List<String> returnGroups = Arrays.asList("XWiki.TestGroup1", "XWiki.TestGroup2",
+        "XWiki.TestGroup3");
+    XWikiUser xUserMock = createMockAndAddToDefault(XWikiUser.class);
+    expect(userMock.asXWikiUser()).andReturn(xUserMock).anyTimes();
+    expectInGroup(xUserMock, "XWiki.MemOfGroup", true);
+    expectInGroup(xUserMock, returnGroups.get(0), true);
+    expectInGroup(xUserMock, returnGroups.get(1), false);
+    expectInGroup(xUserMock, returnGroups.get(2), true);
+
+    replayDefault();
+    String ret = cmd.isValidUserJSON("blabla@mail.com", "pwd", "XWiki.MemOfGroup", returnGroups,
+        context);
+    verifyDefault();
     assertEquals("{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", "
-        + "\"group_membership\" : {\"grp1\" : \"true\", \"grp2\""
-        + " : \"false\", \"grp3\" : \"true\"}}", cmd.isValidUserJSON("blabla@mail.com", "pwd",
-            "XWiki.MemOfGroup", retGroup, context));
-    verify(auth, celementsweb, context, doc, httpRequest, messageTool, principal, request, user,
-        xwiki);
+        + "\"group_membership\" : {\"TestGroup1\" : \"true\", \"TestGroup2\""
+        + " : \"false\", \"TestGroup3\" : \"true\"}}", ret);
   }
 
   @Test
-  public void testIsGroupMember_null() {
-    assertEquals("false", cmd.isGroupMember("blabla@mail.com", null, context));
+  public void test_isGroupMember_null() {
+    User userMock = createUserMock("XWiki.7sh2lya35");
+
+    replayDefault();
+    assertEquals("false", cmd.isGroupMember(null, null, context));
+    assertEquals("false", cmd.isGroupMember(userMock, null, context));
+    assertEquals("false", cmd.isGroupMember(userMock, "", context));
+    verifyDefault();
   }
 
   @Test
-  public void testIsGroupMember_blackListOtherDB() {
-    assertEquals("false", cmd.isGroupMember("blabla@mail.com", "xwiki:XWiki.Admin", context));
+  public void test_isGroupMember_blackListOtherDB() {
+    User userMock = createUserMock("XWiki.7sh2lya35");
+
+    replayDefault();
+    assertEquals("false", cmd.isGroupMember(userMock, "xwiki:XWiki.Admin", context));
+    verifyDefault();
   }
 
   @Test
-  public void testIsGroupMember_blackListAllGroup() {
-    assertEquals("false", cmd.isGroupMember("blabla@mail.com", "XWiki.XWikiAllGroup", context));
+  public void test_isGroupMember_blackListAllGroup() {
+    User userMock = createUserMock("XWiki.7sh2lya35");
+
+    replayDefault();
+    assertEquals("false", cmd.isGroupMember(userMock, "XWiki.XWikiAllGroup", context));
+    verifyDefault();
   }
 
   @Test
-  public void testIsGroupMember_notInGroup() throws XWikiException {
-    XWiki xwiki = getWikiMock();
-    context.setWiki(xwiki);
-    CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
-    cmd.injectCelementsWeb(celementsweb);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
-        "email,loginname").once();
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
-        context))).andReturn("XWiki.7sh2lya35").once();
-    User user = createMock(User.class);
-    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
-    expect(user.isUserInGroup(eq("XWiki.TestGroup"))).andReturn(false).once();
-    replay(celementsweb, user, xwiki);
-    assertEquals("false", cmd.isGroupMember("blabla@mail.com", "XWiki.TestGroup", context));
-    verify(celementsweb, user, xwiki);
+  public void test_isGroupMember_notInGroup() throws XWikiException {
+    User userMock = createUserMock("XWiki.7sh2lya35");
+    String group = "XWiki.TestGroup";
+    expectInGroup(userMock, group, false);
+
+    replayDefault();
+    assertEquals("false", cmd.isGroupMember(userMock, group, context));
+    verifyDefault();
   }
 
   @Test
-  public void testIsGroupMember_inGroup() throws XWikiException {
-    XWiki xwiki = getWikiMock();
-    context.setWiki(xwiki);
-    CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
-    cmd.injectCelementsWeb(celementsweb);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
-        "email,loginname").once();
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
-        context))).andReturn("XWiki.7sh2lya35").once();
-    User user = createMock(User.class);
-    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
-    expect(user.isUserInGroup(eq("XWiki.TestGroup"))).andReturn(true).once();
-    replay(celementsweb, user, xwiki);
-    assertEquals("true", cmd.isGroupMember("blabla@mail.com", "XWiki.TestGroup", context));
-    verify(celementsweb, user, xwiki);
+  public void test_isGroupMember_inGroup() throws XWikiException {
+    User userMock = createUserMock("XWiki.7sh2lya35");
+    String group = "XWiki.TestGroup";
+    expectInGroup(userMock, group, true);
+
+    replayDefault();
+    assertEquals("true", cmd.isGroupMember(userMock, group, context));
+    verifyDefault();
   }
 
   @Test
-  public void testGetResultJSON() {
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getResultJSON(null,
-        false, "access_denied", null, context));
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getResultJSON(null,
-        true, "access_denied", null, context));
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getResultJSON("",
-        true, "access_denied", null, context));
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getResultJSON(
-        "haXX0r", true, "access_denied", null, context));
-    assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_group\"}", cmd.getResultJSON(
-        "user@synventis.com", false, "wrong_group", null, context));
+  public void test_getErrorJSON() {
+    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getErrorJSON(
+        "access_denied"));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_group\"}", cmd.getErrorJSON(
+        "wrong_group"));
+  }
+
+  @Test
+  public void test_getResultJSON() throws Exception {
+    User userMock = createUserMock("XWiki.7sh2lya35");
+
+    replayDefault();
     assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
-        + "\"group_membership\" : {}}", cmd.getResultJSON("user@synventis.com", true, "", null,
+        + "\"group_membership\" : {}}", cmd.getResultJSON(userMock, "user@synventis.com", null,
             context));
-    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
-        + "\"group_membership\" : {}}", cmd.getResultJSON("user@synventis.com", true, null, null,
-            context));
+    verifyDefault();
   }
 
   @Test
-  public void testGetResultJSON_withReturnGroups() throws XWikiException {
-    XWikiContext context = createMock(XWikiContext.class);
-    XWiki xwiki = getWikiMock();
-    expect(context.getWiki()).andReturn(xwiki).anyTimes();
-    CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
-    cmd.injectCelementsWeb(celementsweb);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
-        "email,loginname").atLeastOnce();
-    expect(celementsweb.getUsernameForUserData(eq("user@synventis.com"), eq("email,loginname"),
-        same(context))).andReturn("XWiki.7sh2lya35").atLeastOnce();
-    User user = createMock(User.class);
-    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).atLeastOnce();
-    expect(user.isUserInGroup(eq("XWiki.TestGroup1"))).andReturn(true).atLeastOnce();
-    expect(user.isUserInGroup(eq("XWiki.TestGroup2"))).andReturn(false).atLeastOnce();
-    List<String> returnGroups = new ArrayList<>();
-    returnGroups.add("XWiki.TestGroup1");
-    XWikiMessageTool messageTool = createMock(XWikiMessageTool.class);
-    expect(context.getMessageTool()).andReturn(messageTool).anyTimes();
-    expect(messageTool.get(eq("cel_groupname_TestGroup1"))).andReturn("grp1").anyTimes();
-    expect(messageTool.get(eq("cel_groupname_TestGroup2"))).andReturn("grp2").anyTimes();
-    replay(celementsweb, context, messageTool, user, xwiki);
+  public void test_getResultJSON_withReturnGroups() throws Exception {
+    User userMock = createUserMock("XWiki.7sh2lya35");
+    List<String> returnGroups = Arrays.asList("XWiki.TestGroup1", "XWiki.TestGroup2");
+    XWikiUser xUserMock = createMockAndAddToDefault(XWikiUser.class);
+    expect(userMock.asXWikiUser()).andReturn(xUserMock).anyTimes();
+    expectInGroup(xUserMock, returnGroups.get(0), true);
+    expectInGroup(xUserMock, returnGroups.get(1), false);
+
+    replayDefault();
     assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
-        + "\"group_membership\" : {\"grp1\" : \"true\"}}", cmd.getResultJSON("user@synventis.com",
-            true, null, returnGroups, context));
-    returnGroups.add("XWiki.TestGroup2");
-    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
-        + "\"group_membership\" : {\"grp1\" : \"true\", \"grp2\" : \"false\"}}", cmd.getResultJSON(
-            "user@synventis.com", true, null, returnGroups, context));
-    verify(celementsweb, context, messageTool, user, xwiki);
+        + "\"group_membership\" : {\"TestGroup1\" : \"true\", \"TestGroup2\" : \"false\"}}",
+        cmd.getResultJSON(userMock, "user@synventis.com", returnGroups, context));
+    verifyDefault();
   }
 
   @Test
-  public void testValidationAllowed_superadmin() {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_validationAllowed_superadmin() {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    replay(httpRequest, request);
+
+    replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
     assertTrue(cmd.validationAllowed(context));
-    verify(httpRequest, request);
+    verifyDefault();
   }
 
   @Test
-  public void testValidationAllowed_noHostInRequest_null() {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_validationAllowed_noHostInRequest_null() {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    replay(httpRequest, request);
+
+    replayDefault();
     assertFalse(cmd.validationAllowed(context));
-    verify(httpRequest, request);
+    verifyDefault();
   }
 
   @Test
-  public void testValidationAllowed_noHostInRequest_empty() {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_validationAllowed_noHostInRequest_empty() {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    replay(httpRequest, request);
+
+    replayDefault();
     assertFalse(cmd.validationAllowed(context));
-    verify(httpRequest, request);
+    verifyDefault();
   }
 
   @Test
-  public void testValidationAllowed_noConfigFound_noObj() {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_validationAllowed_noConfigFound_noObj() {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
     XWikiDocument doc = new XWikiDocument();
     context.setDoc(doc);
-    replay(httpRequest, request);
+
+    replayDefault();
     assertFalse(cmd.validationAllowed(context));
-    verify(httpRequest, request);
+    verifyDefault();
   }
 
   @Test
-  public void testValidationAllowed_noConfigFound_hasObj() {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_validationAllowed_noConfigFound_hasObj() {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
     XWikiDocument doc = new XWikiDocument();
@@ -421,16 +375,17 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     BaseObject obj = new BaseObject();
     obj.setStringValue("host", "another.host.com");
     doc.addObject("Classes.RemoteUserValidationClass", obj);
-    replay(httpRequest, request);
+
+    replayDefault();
     assertFalse(cmd.validationAllowed(context));
-    verify(httpRequest, request);
+    verifyDefault();
   }
 
   @Test
-  public void testValidationAllowed_secretEmpty() {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_validationAllowed_secretEmpty() {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
     XWikiDocument doc = new XWikiDocument();
@@ -440,16 +395,17 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     obj.setStringValue("serverSecret", "");
     expect(request.get(eq("secret"))).andReturn("").once();
     doc.addObject("Classes.RemoteUserValidationClass", obj);
-    replay(httpRequest, request);
+
+    replayDefault();
     assertFalse(cmd.validationAllowed(context));
-    verify(httpRequest, request);
+    verifyDefault();
   }
 
   @Test
-  public void testValidationAllowed_secretNoMatch() {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_validationAllowed_secretNoMatch() {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(request.get(eq("secret"))).andReturn("sn34ky").once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
@@ -459,16 +415,17 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     obj.setStringValue("host", "test.synventis.com:10080");
     obj.setStringValue("serverSecret", "s3cr3tC0d3");
     doc.addObject("Classes.RemoteUserValidationClass", obj);
-    replay(httpRequest, request);
+
+    replayDefault();
     assertFalse(cmd.validationAllowed(context));
-    verify(httpRequest, request);
+    verifyDefault();
   }
 
   @Test
-  public void testValidationAllowed_allowed() {
-    XWikiRequest request = createMock(XWikiRequest.class);
+  public void test_validationAllowed_allowed() {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(request.get(eq("secret"))).andReturn("s3cr3tC0d3").once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
@@ -478,26 +435,40 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     obj.setStringValue("host", "test.synventis.com:10080");
     obj.setStringValue("secret", "s3cr3tC0d3");
     doc.addObject("Classes.RemoteUserValidationClass", obj);
-    replay(httpRequest, request);
+
+    replayDefault();
     assertTrue(cmd.validationAllowed(context));
-    verify(httpRequest, request);
+    verifyDefault();
   }
 
-  @Test
-  public void testHasValue_false() {
-    assertFalse(cmd.hasValue(""));
-    assertFalse(cmd.hasValue(" "));
-    assertFalse(cmd.hasValue("\n"));
-    assertFalse(cmd.hasValue("\t"));
-    assertFalse(cmd.hasValue("     "));
+  private Principal expectAuth(String username, String password) throws XWikiException {
+    Principal principal = createMockAndAddToDefault(Principal.class);
+    expect(principal.getName()).andReturn(username).anyTimes();
+    expect(xWikiAuthServiceMock.authenticate(eq(username), eq(password), same(context))).andReturn(
+        principal).once();
+    return principal;
   }
 
-  @Test
-  public void testHasValue_true() {
-    assertTrue(cmd.hasValue("a"));
-    assertTrue(cmd.hasValue("a  "));
-    assertTrue(cmd.hasValue("  A"));
-    assertTrue(cmd.hasValue("hi there"));
+  private User createUserMock(String username) {
+    User userMock = createMockAndAddToDefault(User.class);
+    expect(userMock.getDocRef()).andReturn(Utils.getComponent(ModelUtils.class).resolveRef(username,
+        DocumentReference.class)).anyTimes();
+    return userMock;
+  }
+
+  private XWikiUser expectInGroup(User userMock, String group, boolean isInGrp)
+      throws XWikiException {
+    XWikiUser xUserMock = createMockAndAddToDefault(XWikiUser.class);
+    expect(userMock.asXWikiUser()).andReturn(xUserMock).anyTimes();
+    expectInGroup(xUserMock, group, isInGrp);
+    return xUserMock;
+  }
+
+  private void expectInGroup(XWikiUser xUserMock, String group, boolean isInGrp)
+      throws XWikiException {
+    expect(xUserMock.isUserInGroup(group, context)).andReturn(isInGrp);
+    String name = group.substring(group.indexOf(".") + 1);
+    getMessageToolStub().injectMessage("cel_groupname_" + name, name);
   }
 
 }

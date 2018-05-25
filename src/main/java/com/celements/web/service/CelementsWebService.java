@@ -14,25 +14,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserCreateException;
+import com.celements.auth.user.UserInstantiationException;
+import com.celements.auth.user.UserService;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
-import com.celements.model.access.exception.DocumentSaveException;
-import com.celements.model.classes.ClassDefinition;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
 import com.celements.rendering.RenderCommand;
-import com.celements.web.UserCreateException;
-import com.celements.web.classes.oldcore.XWikiRightsClass;
-import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
-import com.celements.web.plugin.cmd.PossibleLoginsCommand;
-import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
-import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -40,55 +35,52 @@ import com.xpn.xwiki.web.XWikiResponse;
 @Component
 public class CelementsWebService implements ICelementsWebServiceRole {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
 
   private List<String> supportedAdminLangList;
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  private UserService userService;
 
   @Requirement
   private IModelAccessFacade modelAccess;
 
-  @Requirement(XWikiRightsClass.CLASS_DEF_HINT)
-  private ClassDefinition xWikiRightsClass;
+  @Requirement
+  private ModelUtils modelUtils;
 
   @Requirement
-  private Execution execution;
+  private ModelContext context;
 
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  @Deprecated
+  private XWikiContext getXWikiContext() {
+    return context.getXWikiContext();
   }
 
+  @Deprecated
   public String getEmailAdressForUser(String username) {
-    return getEmailAdressForUser(webUtilsService.resolveDocumentReference(username));
+    return getEmailAdressForUser(userService.resolveUserDocRef(username));
   }
 
   @Override
+  @Deprecated
   public String getEmailAdressForUser(DocumentReference userDocRef) {
-    if (getContext().getWiki().exists(userDocRef, getContext())) {
-      try {
-        XWikiDocument doc = getContext().getWiki().getDocument(userDocRef, getContext());
-        BaseObject obj = doc.getXObject(webUtilsService.resolveDocumentReference(
-            "XWiki.XWikiUsers"));
-        if (obj != null) {
-          return obj.getStringValue("email");
-        }
-      } catch (XWikiException exp) {
-        _LOGGER.error("Exception while getting a XWikiDocument. docRef:['" + userDocRef + "]'",
-            exp);
-      }
+    try {
+      User user = userService.getUser(userDocRef);
+      return user.getEmail().orNull();
+    } catch (UserInstantiationException exc) {
+      LOGGER.info("getEmailAdressForUser - invalid user", exc);
+      return null;
     }
-    return null;
   }
 
   @Override
+  @Deprecated
   public int createUser(boolean validate) throws XWikiException {
-    String possibleLogins = new PossibleLoginsCommand().getPossibleLogins();
-    return createUser(getUniqueNameValueRequestMap(), possibleLogins, validate);
+    return createUser(getUniqueNameValueRequestMap(), null, validate);
   }
 
   @Override
+  @Deprecated
   public synchronized int createUser(Map<String, String> userData, String possibleLogins,
       boolean validate) throws XWikiException {
     try {
@@ -107,102 +99,16 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   }
 
   @Override
+  @Deprecated
   public synchronized @NotNull XWikiUser createNewUser(@NotNull Map<String, String> userData,
       @NotNull String possibleLogins, boolean validate) throws UserCreateException {
-    String accountName = "";
-    String accountFullName = null;
-    if (userData.containsKey("xwikiname")) {
-      accountName = userData.get("xwikiname");
-      userData.remove("xwikiname");
-    } else {
-      while (accountName.equals("") || getContext().getWiki().exists(
-          webUtilsService.resolveDocumentReference(accountFullName), getContext())) {
-        accountName = getContext().getWiki().generateRandomString(12);
-        accountFullName = "XWiki." + accountName;
-      }
-    }
-    String validkey = "";
-    int success = -1;
-    try {
-      if (areIdentifiersUnique(userData, possibleLogins, getContext())) {
-        if (!userData.containsKey("password")) {
-          String password = getContext().getWiki().generateRandomString(8);
-          userData.put("password", password);
-        }
-        if (!userData.containsKey("validkey")) {
-          validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
-          userData.put("validkey", validkey);
-        } else {
-          validkey = userData.get("validkey");
-        }
-        if (!userData.containsKey("active")) {
-          userData.put("active", "0");
-        }
-        String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
-
-        success = getContext().getWiki().createUser(accountName, userData,
-            webUtilsService.resolveDocumentReference("XWiki.XWikiUsers"), content, null, "edit",
-            getContext());
-      }
-    } catch (XWikiException excp) {
-      _LOGGER.error("Exception while creating a new user", excp);
-      throw new UserCreateException(excp);
-    }
-
-    XWikiUser newUser = null;
-    if (success == 1) {
-      setRightsOnUserDoc(accountFullName);
-      newUser = new XWikiUser(accountFullName);
-      if (validate) {
-        _LOGGER.info("send account validation mail with data: accountname='" + accountName
-            + "', email='" + userData.get("email") + "', validkey='" + validkey + "'");
-        try {
-          new PasswordRecoveryAndEmailValidationCommand().sendValidationMessage(userData.get(
-              "email"), validkey, webUtilsService.resolveDocumentReference(
-                  "Tools.AccountActivationMail"), webUtilsService.getDefaultAdminLanguage());
-        } catch (XWikiException e) {
-          _LOGGER.error("Exception while sending validation mail to '" + userData.get("email")
-              + "'", e);
-          throw new UserCreateException(e);
-        }
-      }
-    }
-    if (newUser == null) {
-      throw new UserCreateException("Failed to create a new user");
-    }
-    return newUser;
-  }
-
-  void setRightsOnUserDoc(@NotNull String accountFullName) throws UserCreateException {
-    try {
-      XWikiDocument doc = modelAccess.getDocument(webUtilsService.resolveDocumentReference(
-          accountFullName)); // accountFullName
-      List<BaseObject> rightsObjs = modelAccess.getXObjects(doc, xWikiRightsClass.getClassRef());
-      if (rightsObjs.size() > 0) {
-        rightsObjs.get(0).setStringValue("users", webUtilsService.getRefLocalSerializer().serialize(
-            doc.getDocumentReference()));
-        rightsObjs.get(0).set("allow", "1", getContext());
-        rightsObjs.get(0).set("levels", "view,edit,delete", getContext());
-        rightsObjs.get(0).set("groups", "", getContext());
-      }
-      if (rightsObjs.size() > 1) {
-        rightsObjs.get(1).set("users", "", getContext());
-        rightsObjs.get(1).set("allow", "1", getContext());
-        rightsObjs.get(1).set("levels", "view,edit,delete", getContext());
-        rightsObjs.get(1).set("groups", "XWiki.XWikiAdminGroup", getContext());
-      }
-
-      modelAccess.saveDocument(doc, "added rights objects to created user");
-    } catch (DocumentLoadException | DocumentNotExistsException | DocumentSaveException excp) {
-      _LOGGER.error("Exception while trying to add rights to newly created user", excp);
-      throw new UserCreateException(excp);
-    }
+    return userService.createNewUser(userData, validate).asXWikiUser();
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Map<String, String> getUniqueNameValueRequestMap() {
-    Map<String, String[]> params = getContext().getRequest().getParameterMap();
+    Map<String, String[]> params = context.getRequest().get().getParameterMap();
     Map<String, String> resultMap = new HashMap<>();
     for (String key : params.keySet()) {
       if ((params.get(key) != null) && (params.get(key).length > 0)) {
@@ -212,22 +118,6 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       }
     }
     return resultMap;
-  }
-
-  private boolean areIdentifiersUnique(Map<String, String> userData, String possibleLogins,
-      XWikiContext context) throws XWikiException {
-    boolean isUnique = true;
-    for (String key : userData.keySet()) {
-      if (!"".equals(key.trim()) && (("," + possibleLogins + ",").indexOf("," + key + ",") >= 0)) {
-        String user = new UserNameForUserDataCommand().getUsernameForUserData(userData.get(key),
-            possibleLogins, context);
-        if ((user == null) || (user.length() > 0)) { // user == "" means there is no such
-                                                     // user
-          isUnique = false;
-        }
-      }
-    }
-    return isUnique;
   }
 
   @Override
@@ -241,25 +131,24 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   @Override
   public boolean writeUTF8Response(String filename, String renderDocFullName) {
     boolean success = false;
-    if (getContext().getWiki().exists(webUtilsService.resolveDocumentReference(renderDocFullName),
-        getContext())) {
-      XWikiDocument renderDoc;
-      try {
-        renderDoc = getContext().getWiki().getDocument(webUtilsService.resolveDocumentReference(
-            renderDocFullName), getContext());
-        adjustResponseHeader(filename, getContext().getResponse());
-        setResponseContent(renderDoc, getContext().getResponse());
-      } catch (XWikiException e) {
-        _LOGGER.error("", e);
-      }
-      getContext().setFinished(true);
+    try {
+      XWikiDocument renderDoc = modelAccess.getDocument(modelUtils.resolveRef(renderDocFullName,
+          DocumentReference.class));
+      adjustResponseHeader(filename, context.getResponse().get());
+      setResponseContent(renderDoc, context.getResponse().get());
+      success = true;
+    } catch (DocumentNotExistsException exc) {
+      LOGGER.info("writeUTF8Response - failed for '{}'", renderDocFullName, exc);
+    } catch (XWikiException exc) {
+      LOGGER.error("writeUTF8Response - failed for '{}'", renderDocFullName, exc);
     }
+    getXWikiContext().setFinished(true);
     return success;
   }
 
   private void adjustResponseHeader(String filename, XWikiResponse response) {
     response.setContentType("text/plain");
-    String ofilename = Util.encodeURI(filename, getContext()).replaceAll("\\+", " ");
+    String ofilename = Util.encodeURI(filename, getXWikiContext()).replaceAll("\\+", " ");
     response.addHeader("Content-disposition", "attachment; filename=\"" + ofilename
         + "\"; charset='UTF-8'");
   }
@@ -299,7 +188,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       try {
         urlStr = URLEncoder.encode(mainUrl, "UTF-8");
       } catch (UnsupportedEncodingException exp) {
-        _LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
+        LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
       }
       urlStr = urlPrefix + urlStr.replaceAll("%2F", "/");
     }
@@ -309,9 +198,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   @Override
   public void sendRedirect(String urlStr) {
     try {
-      getContext().getResponse().sendRedirect(encodeUrlToUtf8(urlStr));
+      context.getResponse().get().sendRedirect(encodeUrlToUtf8(urlStr));
     } catch (IOException exp) {
-      _LOGGER.error("Failed to redirect to url [" + urlStr + "]", exp);
+      LOGGER.error("Failed to redirect to url [" + urlStr + "]", exp);
     }
   }
 
