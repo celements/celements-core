@@ -66,6 +66,7 @@ public class CelementsUserService implements UserService {
 
   static final Function<String, DocumentReference> DOC_REF_RESOLVER = new ReferenceMarshaller<>(
       DocumentReference.class).getResolver();
+  static final String XWIKI_ALL_GROUP_FN = "XWiki.XWikiAllGroup";
   static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
   @Requirement(XWikiUsersClass.CLASS_DEF_HINT)
@@ -212,8 +213,8 @@ public class CelementsUserService implements UserService {
 
   void addUserToDefaultGroups(DocumentReference userDocRef) {
     FluentIterable<String> defaultGroupNames = FluentIterable.from(getSplitXWikiPreference(
-        "initialGroups", "xwiki.users.initialGroups", XWIKI_ADMIN_GROUP_FN));
-    for (DocumentReference groupDocRef : defaultGroupNames.transform(DOC_REF_RESOLVER)) {
+        "initialGroups", "xwiki.users.initialGroups", "")).append(XWIKI_ALL_GROUP_FN);
+    for (DocumentReference groupDocRef : defaultGroupNames.transform(DOC_REF_RESOLVER).toSet()) {
       try {
         addUserToGroup(userDocRef, groupDocRef);
         LOGGER.info("createUser - added user '{}' to group '{}'", userDocRef, groupDocRef);
