@@ -8,16 +8,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.auth.user.UserService;
+import com.celements.model.context.ModelContext;
 import com.celements.rights.access.RightsAccessScriptService;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.RemoteUserValidator;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
-import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -27,30 +27,32 @@ import com.xpn.xwiki.user.api.XWikiUser;
 @Component("authentication")
 public class AuthenticationScriptService implements ScriptService {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(AuthenticationScriptService.class);
-
-  @Requirement
-  private IWebUtilsService webUtilsService;
+  private static Logger LOGGER = LoggerFactory.getLogger(AuthenticationScriptService.class);
 
   @Requirement
   private IAuthenticationServiceRole authenticationService;
 
   @Requirement
-  private Execution execution;
+  private UserService userService;
 
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  @Requirement
+  private ModelContext context;
+
+  @Deprecated
+  private XWikiContext getXWikiContext() {
+    return context.getXWikiContext();
   }
 
+  // TODO [CELDEV-698] rights checks missing
   public String getUsernameForUserData(String login) {
     String possibleLogins = new PossibleLoginsCommand().getPossibleLogins();
     String account = "";
     try {
-      _LOGGER.debug("executing getUsernameForUserData in plugin");
+      LOGGER.debug("executing getUsernameForUserData in plugin");
       account = new UserNameForUserDataCommand().getUsernameForUserData(login, possibleLogins,
-          getContext());
+          getXWikiContext());
     } catch (XWikiException exp) {
-      _LOGGER.error("Failed to get usernameForUserData for login [" + login
+      LOGGER.error("Failed to get usernameForUserData for login [" + login
           + "] and possibleLogins [" + possibleLogins + "].", exp);
     }
     return account;
@@ -60,15 +62,15 @@ public class AuthenticationScriptService implements ScriptService {
     String account = "";
     if (hasProgrammingRights() || hasAdminRights()) {
       try {
-        _LOGGER.debug("executing getUsernameForUserData in plugin");
+        LOGGER.debug("executing getUsernameForUserData in plugin");
         account = new UserNameForUserDataCommand().getUsernameForUserData(login, possibleLogins,
-            getContext());
+            getXWikiContext());
       } catch (XWikiException exp) {
-        _LOGGER.error("Failed to get usernameForUserData for login [" + login
+        LOGGER.error("Failed to get usernameForUserData for login [" + login
             + "] and possibleLogins [" + possibleLogins + "].", exp);
       }
     } else {
-      _LOGGER.debug("missing ProgrammingRights for [" + getContext().get("sdoc")
+      LOGGER.debug("missing ProgrammingRights for [" + context.getXWikiContext().get("sdoc")
           + "]: getUsernameForUserData cannot be executed!");
     }
     return account;
@@ -85,12 +87,12 @@ public class AuthenticationScriptService implements ScriptService {
   public boolean sendNewValidation(String user, String possibleFields) {
     if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
         && (user.trim().length() > 0)) {
-      _LOGGER.debug("sendNewValidation for user [" + user + "].");
+      LOGGER.debug("sendNewValidation for user [" + user + "].");
       try {
         return new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
             possibleFields);
       } catch (XWikiException exp) {
-        _LOGGER.error("sendNewValidation: failed.", exp);
+        LOGGER.error("sendNewValidation: failed.", exp);
       }
     }
     return false;
@@ -100,55 +102,52 @@ public class AuthenticationScriptService implements ScriptService {
       DocumentReference mailContentDocRef) {
     if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
         && (user.trim().length() > 0)) {
-      _LOGGER.debug("sendNewValidation for user [" + user + "] using mail [" + mailContentDocRef
+      LOGGER.debug("sendNewValidation for user [" + user + "] using mail [" + mailContentDocRef
           + "].");
       try {
         new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user, possibleFields,
             mailContentDocRef);
       } catch (XWikiException exp) {
-        _LOGGER.error("sendNewValidation: failed.", exp);
+        LOGGER.error("sendNewValidation: failed.", exp);
       }
     } else {
-      _LOGGER.warn("sendNewValidation: new validation email for user [" + user + "] not sent.");
+      LOGGER.warn("sendNewValidation: new validation email for user [" + user + "] not sent.");
     }
   }
 
   public String getNewValidationTokenForUser() {
-    if (hasProgrammingRights() && (getContext().getUser() != null)) {
+    if (hasProgrammingRights() && (context.getUser() != null)) {
       try {
-        DocumentReference accountDocRef = webUtilsService.resolveDocumentReference(
-            getContext().getUser());
+        DocumentReference accountDocRef = userService.resolveUserDocRef(
+            context.getUser().getUser());
         return new PasswordRecoveryAndEmailValidationCommand().getNewValidationTokenForUser(
             accountDocRef);
       } catch (XWikiException exp) {
-        _LOGGER.error("Failed to create new validation Token for user: " + getContext().getUser(),
-            exp);
+        LOGGER.error("Failed to create new validation Token for user: " + context.getUser(), exp);
       }
     }
     return null;
   }
 
   public String getNewCelementsTokenForUser(Boolean guestPlus) {
-    if (getContext().getUser() != null) {
+    if (context.getUser() != null) {
       try {
         return new NewCelementsTokenForUserCommand().getNewCelementsTokenForUserWithAuthentication(
-            getContext().getUser(), guestPlus, getContext());
+            context.getUser().getUser(), guestPlus, getXWikiContext());
       } catch (XWikiException exp) {
-        _LOGGER.error("Failed to create new validation Token for user: " + getContext().getUser(),
-            exp);
+        LOGGER.error("Failed to create new validation Token for user: " + context.getUser(), exp);
       }
     }
     return null;
   }
 
   public String getNewCelementsTokenForUser(Boolean guestPlus, int minutesValid) {
-    if (getContext().getUser() != null) {
+    if (context.getUser() != null) {
       try {
         return new NewCelementsTokenForUserCommand().getNewCelementsTokenForUserWithAuthentication(
-            getContext().getUser(), guestPlus, minutesValid, getContext());
+            context.getUser().getUser(), guestPlus, minutesValid, getXWikiContext());
       } catch (XWikiException exp) {
-        _LOGGER.error("Failed to create new validation Token for user: " + getContext().getUser(),
-            exp);
+        LOGGER.error("Failed to create new validation Token for user: " + context.getUser(), exp);
       }
     }
     return null;
@@ -162,37 +161,39 @@ public class AuthenticationScriptService implements ScriptService {
     try {
       return authenticationService.activateAccount(activationCode);
     } catch (AccountActivationFailedException authExp) {
-      _LOGGER.info("Failed to activate account", authExp);
+      LOGGER.info("Failed to activate account", authExp);
     }
     return Collections.emptyMap();
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * TODO [CELDEV-698] Please get rid of throwing an exception to the view (client), use try/catch
    * and write the exception in a log-file
    */
   public String getUniqueValidationKey() throws XWikiException {
-    return new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
+    return new NewCelementsTokenForUserCommand().getUniqueValidationKey(getXWikiContext());
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * TODO [CELDEV-698] Please get rid of throwing an exception to the view (client), use try/catch
    * and write the exception in a log-file
+   * also rights check missing
    */
   public String recoverPassword() throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword();
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * TODO [CELDEV-698] Please get rid of throwing an exception to the view (client), use try/catch
    * and write the exception in a log-file
+   * also rights check missing
    */
   public String recoverPassword(String account) throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(account, account);
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * TODO [CELDEV-698] Please get rid of throwing an exception to the view (client), use try/catch
    * and write the exception in a log-file
    */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
@@ -202,7 +203,7 @@ public class AuthenticationScriptService implements ScriptService {
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * TODO [CELDEV-698] Please get rid of throwing an exception to the view (client), use try/catch
    * and write the exception in a log-file
    */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
@@ -216,29 +217,30 @@ public class AuthenticationScriptService implements ScriptService {
     RemoteUserValidator validater = new RemoteUserValidator();
     if (hasProgrammingRights()) {
       return validater.isValidUserJSON(username, password, memberOfGroup, returnGroupMemberships,
-          getContext());
+          getXWikiContext());
     }
     return null;
   }
 
   public String getLogoutRedirectURL() {
-    XWiki xwiki = getContext().getWiki();
+    XWiki xwiki = getXWikiContext().getWiki();
     String logoutRedirectConf = xwiki.getSpacePreference("LogoutRedirect",
-        "celements.logoutRedirect", xwiki.getDefaultSpace(getContext()) + ".WebHome", getContext());
+        "celements.logoutRedirect", xwiki.getDefaultSpace(getXWikiContext()) + ".WebHome",
+        getXWikiContext());
     String logoutRedirectURL = logoutRedirectConf;
     if (!logoutRedirectConf.startsWith("http://") && !logoutRedirectConf.startsWith("https://")) {
-      logoutRedirectURL = xwiki.getURL(logoutRedirectConf, "view", "logout=1", getContext());
+      logoutRedirectURL = xwiki.getURL(logoutRedirectConf, "view", "logout=1", getXWikiContext());
     }
     return logoutRedirectURL;
   }
 
   public String getLoginRedirectURL() {
-    XWiki xwiki = getContext().getWiki();
+    XWiki xwiki = getXWikiContext().getWiki();
     String loginRedirectConf = xwiki.getSpacePreference("LoginRedirect", "celements.loginRedirect",
-        xwiki.getDefaultSpace(getContext()) + ".WebHome", getContext());
+        xwiki.getDefaultSpace(getXWikiContext()) + ".WebHome", getXWikiContext());
     String loginRedirectURL = loginRedirectConf;
     if (!loginRedirectConf.startsWith("http://") && !loginRedirectConf.startsWith("https://")) {
-      loginRedirectURL = xwiki.getURL(loginRedirectConf, "view", "", getContext());
+      loginRedirectURL = xwiki.getURL(loginRedirectConf, "view", "", getXWikiContext());
     }
     return loginRedirectURL;
   }
@@ -263,17 +265,19 @@ public class AuthenticationScriptService implements ScriptService {
     try {
       return authenticationService.hasAccessLevel(level, user, isUser, docRef);
     } catch (Exception exp) {
-      _LOGGER.warn("hasAccessLevel failed for level[" + level + "] user[" + user + "] " + "docRef["
+      LOGGER.warn("hasAccessLevel failed for level[" + level + "] user[" + user + "] " + "docRef["
           + docRef + "] isUser[" + isUser + "]", exp);
       return false;
     }
   }
 
+  // TODO [CELDEV-698] use RightsAccessService
   private boolean hasProgrammingRights() {
-    return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
+    return getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext());
   }
 
+  // TODO [CELDEV-698] use RightsAccessService
   private boolean hasAdminRights() {
-    return getContext().getWiki().getRightService().hasAdminRights(getContext());
+    return getXWikiContext().getWiki().getRightService().hasAdminRights(getXWikiContext());
   }
 }
