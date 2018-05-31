@@ -1,5 +1,7 @@
 package com.celements.auth;
 
+import static com.google.common.base.MoreObjects.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
@@ -34,6 +37,9 @@ public class AuthenticationScriptService implements ScriptService {
 
   @Requirement
   private UserService userService;
+
+  @Requirement
+  private ConfigurationSource cfgSrc;
 
   @Requirement
   private ModelContext context;
@@ -269,6 +275,10 @@ public class AuthenticationScriptService implements ScriptService {
           + docRef + "] isUser[" + isUser + "]", exp);
       return false;
     }
+  }
+
+  public boolean isLoginDisabled() {
+    return firstNonNull(cfgSrc.getProperty("celements.auth.login.disabled", false), false);
   }
 
   // TODO [CELDEV-698] use RightsAccessService
