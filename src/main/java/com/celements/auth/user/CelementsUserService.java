@@ -46,6 +46,7 @@ import com.celements.web.plugin.cmd.SendValidationFailedException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
@@ -65,6 +66,7 @@ public class CelementsUserService implements UserService {
 
   static final Function<String, DocumentReference> DOC_REF_RESOLVER = new ReferenceMarshaller<>(
       DocumentReference.class).getResolver();
+  static final String XWIKI_ALL_GROUP_FN = "XWiki.XWikiAllGroup";
   static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
   @Requirement(XWikiUsersClass.CLASS_DEF_HINT)
@@ -121,8 +123,9 @@ public class CelementsUserService implements UserService {
 
   @Override
   public Set<String> getPossibleLoginFields() {
-    Set<String> fields = ImmutableSet.copyOf(getSplitXWikiPreference(
-        XWIKI_PREFERENCES_CELLOGIN_PROPERTY, "celements.login.userfields", DEFAULT_LOGIN_FIELD));
+    Set<String> fields = FluentIterable.from(getSplitXWikiPreference(
+        XWIKI_PREFERENCES_CELLOGIN_PROPERTY, "celements.login.userfields",
+        DEFAULT_LOGIN_FIELD)).filter(new UserClassFieldFilter()).toSet();
     if (fields.isEmpty()) {
       fields = ImmutableSet.of(DEFAULT_LOGIN_FIELD);
     }
@@ -210,8 +213,8 @@ public class CelementsUserService implements UserService {
 
   void addUserToDefaultGroups(DocumentReference userDocRef) {
     FluentIterable<String> defaultGroupNames = FluentIterable.from(getSplitXWikiPreference(
-        "initialGroups", "xwiki.users.initialGroups", XWIKI_ADMIN_GROUP_FN));
-    for (DocumentReference groupDocRef : defaultGroupNames.transform(DOC_REF_RESOLVER)) {
+        "initialGroups", "xwiki.users.initialGroups", "")).append(XWIKI_ALL_GROUP_FN);
+    for (DocumentReference groupDocRef : defaultGroupNames.transform(DOC_REF_RESOLVER).toSet()) {
       try {
         addUserToGroup(userDocRef, groupDocRef);
         LOGGER.info("createUser - added user '{}' to group '{}'", userDocRef, groupDocRef);
@@ -262,7 +265,9 @@ public class CelementsUserService implements UserService {
   public Optional<User> getUserForLoginField(String login, Collection<String> possibleLoginFields) {
     login = Strings.nullToEmpty(login).trim();
     checkArgument(!login.isEmpty());
-    if ((possibleLoginFields == null) || possibleLoginFields.isEmpty()) {
+    possibleLoginFields = FluentIterable.from(firstNonNull(possibleLoginFields,
+        ImmutableSet.<String>of())).filter(new UserClassFieldFilter()).toSet();
+    if (possibleLoginFields.isEmpty()) {
       possibleLoginFields = ImmutableSet.of(DEFAULT_LOGIN_FIELD);
     }
     User user = null;
@@ -305,7 +310,7 @@ public class CelementsUserService implements UserService {
     StringBuilder xwql = new StringBuilder();
     xwql.append("from doc.object(XWiki.XWikiUsers) usr where doc.space = :space and ");
     while (possibleLoginFields.hasNext()) {
-      String field = possibleLoginFields.next();
+      String field = possibleLoginFields.next().toLowerCase();
       if (StringUtils.isAlphanumeric(field)) {
         xwql.append("lower(");
         if (DEFAULT_LOGIN_FIELD.equals(field)) {
@@ -320,6 +325,15 @@ public class CelementsUserService implements UserService {
       }
     }
     return xwql.toString();
+  }
+
+  private class UserClassFieldFilter implements Predicate<String> {
+
+    @Override
+    public boolean apply(String field) {
+      field = field.toLowerCase();
+      return DEFAULT_LOGIN_FIELD.equals(field) || usersClass.getField(field).isPresent();
+    }
   }
 
   private Iterable<String> getSplitXWikiPreference(String prefName, String cfgParam,

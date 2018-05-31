@@ -36,9 +36,9 @@ public class PossibleLoginsCommandTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testGetPossibleLogins_local() {
     expect(xwiki.getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"), eq(
-        UserService.DEFAULT_LOGIN_FIELD), same(getContext()))).andReturn("a,b").once();
+        UserService.DEFAULT_LOGIN_FIELD), same(getContext()))).andReturn("email,loginname").once();
     replayDefault();
-    assertEquals("a,b", possibleLoginsCmd.getPossibleLogins());
+    assertEquals("email,loginname", possibleLoginsCmd.getPossibleLogins());
     verifyDefault();
   }
 
