@@ -23,6 +23,8 @@ import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassReference;
@@ -51,30 +53,18 @@ public class NewCelementsTokenForUserCommand {
   private static Logger LOGGER = LoggerFactory.getLogger(NewCelementsTokenForUserCommand.class);
 
   /**
-   * @param accountName
-   * @param guestPlus.
-   *          if user is XWiki.XWikiGuest and guestPlus is true the account
-   *          XWiki.XWikiGuestPlus will be used to get the token.
-   * @param context
-   * @return token (or null if token can not be generated)
-   * @throws XWikiException
+   * @deprecated since 3.0 instead use
+   *             {@link #getNewCelementsTokenForUser(DocumentReference, boolean)}
    */
+  @Deprecated
   public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus,
       XWikiContext context) throws XWikiException {
     return getNewCelementsTokenForUser(accountName, guestPlus, 1440, context);
   }
 
   /**
-   * @deprecated instead use {@link #getNewCelementsTokenForUser(DocumentReference, boolean, int)}
-   * @param accountName
-   * @param guestPlus.
-   *          if user is XWiki.XWikiGuest and guestPlus is true the account
-   *          XWiki.XWikiGuestPlus will be used to get the token.
-   * @param minutesValid
-   *          how long should the token be valid in minutes.
-   * @param context
-   * @return token (or null if token can not be generated)
-   * @throws XWikiException
+   * @deprecated since 3.0 instead use
+   *             {@link #getNewCelementsTokenForUser(DocumentReference, boolean, int)}
    */
   @Deprecated
   public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus, int minutesValid,
@@ -90,23 +80,51 @@ public class NewCelementsTokenForUserCommand {
     }
   }
 
-  public String getNewCelementsTokenForUser(DocumentReference userDocRef, boolean guestPlus)
-      throws UserInstantiationException, QueryException, DocumentSaveException {
+  /**
+   * @param userDocRef
+   * @param guestPlus
+   *          if user is XWiki.XWikiGuest and guestPlus is true the account
+   *          XWiki.XWikiGuestPlus will be used to get the token
+   * @return the generated token
+   * @throws UserInstantiationException
+   *           if given user is invalid
+   * @throws QueryException
+   *           if unable to generate token
+   * @throws DocumentSaveException
+   *           if unable to save the user doc
+   */
+  public @NotNull String getNewCelementsTokenForUser(@NotNull DocumentReference userDocRef,
+      boolean guestPlus) throws UserInstantiationException, QueryException, DocumentSaveException {
     return getNewCelementsTokenForUser(userDocRef, guestPlus, 1440);
   }
 
-  public String getNewCelementsTokenForUser(DocumentReference userDocRef, boolean guestPlus,
-      int minutesValid) throws UserInstantiationException, QueryException, DocumentSaveException {
+  /**
+   * @param userDocRef
+   * @param guestPlus
+   *          if user is XWiki.XWikiGuest and guestPlus is true the account
+   *          XWiki.XWikiGuestPlus will be used to get the token
+   * @param minutesValid
+   *          how long should the token be valid in minutes
+   * @return the generated token
+   * @throws UserInstantiationException
+   *           if given user is invalid
+   * @throws QueryException
+   *           if unable to generate token
+   * @throws DocumentSaveException
+   *           if unable to save the user doc
+   */
+  public @NotNull String getNewCelementsTokenForUser(@NotNull DocumentReference userDocRef,
+      boolean guestPlus, int minutesValid) throws UserInstantiationException, QueryException,
+      DocumentSaveException {
     LOGGER.info("getNewCelementsTokenForUser - guestPlus [{}] for user [{}]", guestPlus,
         userDocRef);
-    String validkey = null;
     if (guestPlus && XWikiRightService.GUEST_USER_FULLNAME.equals(getModelUtils().serializeRefLocal(
         userDocRef))) {
       userDocRef = getXWikiGuestPlusDocRef(userDocRef.getWikiReference());
     }
     XWikiDocument userDoc = getUserService().getUser(userDocRef).getDocument();
     removeOutdatedTokens(userDoc);
-    validkey = createTokenObject(userDoc, minutesValid);
+    String validkey = createTokenObject(userDoc, minutesValid);
     getModelAccess().saveDocument(userDoc);
     LOGGER.debug("getNewCelementsTokenForUser - sucessfully created token for user [{}]",
         userDocRef);
