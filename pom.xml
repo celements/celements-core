@@ -28,14 +28,14 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-core</artifactId>
-  <version>3.2-SNAPSHOT</version>
+  <version>3.3-SNAPSHOT</version>
   <description>Celements Core</description>
   <dependencies>
     <!-- Add here all your dependencies -->
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-model</artifactId>
-      <version>3.3-SNAPSHOT</version>
+      <version>3.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
