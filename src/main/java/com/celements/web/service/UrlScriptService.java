@@ -20,6 +20,9 @@ public class UrlScriptService implements ScriptService {
   @Requirement
   private ModelContext context;
 
+  @Requirement
+  private ICelementsWebServiceRole celementsweb;
+
   public String getExternalAttachmentURL(Attachment attr, String action) {
     return getExternalAttachmentURL(attr, action, null);
   }
@@ -28,8 +31,8 @@ public class UrlScriptService implements ScriptService {
     DocumentReference attrDocRef = attr.getDocument().getDocumentReference();
     URL url = context.getXWikiContext().getURLFactory().createAttachmentURL(attr.getFilename(),
         attrDocRef.getLastSpaceReference().getName(), attrDocRef.getName(), action, queryString,
-        context.getXWikiContext().getDatabase(), context.getXWikiContext());
-    return url.toString();
+        attrDocRef.getRoot().getName(), context.getXWikiContext());
+    return celementsweb.encodeUrlToUtf8(url.toString());
   }
 
 }
