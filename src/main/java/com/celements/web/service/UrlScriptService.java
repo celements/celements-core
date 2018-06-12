@@ -23,6 +23,14 @@ public class UrlScriptService implements ScriptService {
   @Requirement
   private ICelementsWebServiceRole celementsweb;
 
+  public String getURL(DocumentReference docRef, String action, String queryString) {
+    URL url = context.getXWikiContext().getURLFactory().createURL(
+        docRef.getLastSpaceReference().getName(), docRef.getName(), action, queryString, null,
+        docRef.getRoot().getName(), context.getXWikiContext());
+    return celementsweb.encodeUrlToUtf8(context.getXWikiContext().getURLFactory().getURL(url,
+        context.getXWikiContext()));
+  }
+
   public String getExternalAttachmentURL(Attachment attr, String action) {
     return getExternalAttachmentURL(attr, action, null);
   }
