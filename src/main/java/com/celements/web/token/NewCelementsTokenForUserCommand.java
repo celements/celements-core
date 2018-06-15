@@ -37,6 +37,7 @@ import com.celements.auth.user.UserInstantiationException;
 import com.celements.auth.user.UserService;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
@@ -154,7 +155,7 @@ public class NewCelementsTokenForUserCommand {
     // XXX doesn't guarantee a unique key regarding tokens
     String validkey = getAuthService().getUniqueValidationKey();
     BaseObject obj = XWikiObjectEditor.on(userDoc).filter(getTokenClassRef()).createFirst();
-    obj.setStringValue("tokenvalue", validkey);
+    obj.set("tokenvalue", validkey, getContext().getXWikiContext());
     Calendar myCal = Calendar.getInstance();
     myCal.add(Calendar.MINUTE, minutesValid);
     obj.setDateValue("validuntil", myCal.getTime());
@@ -241,6 +242,10 @@ public class NewCelementsTokenForUserCommand {
 
   ModelUtils getModelUtils() {
     return Utils.getComponent(ModelUtils.class);
+  }
+
+  ModelContext getContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
 }
