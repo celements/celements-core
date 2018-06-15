@@ -40,6 +40,8 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 
 public class NewCelementsTokenForUserCommandTest extends AbstractComponentTest {
 
@@ -63,7 +65,10 @@ public class NewCelementsTokenForUserCommandTest extends AbstractComponentTest {
     addUserObj(userDoc);
     expect(modelAccessMock.getDocument(userDocRef)).andReturn(userDoc);
     expect(authServiceMock.getUniqueValidationKey()).andReturn(token);
-    expectNewBaseObject(cmd.getTokenClassRef().getDocRef(userDocRef.getWikiReference()));
+    BaseClass bClass = expectNewBaseObject(cmd.getTokenClassRef().getDocRef(
+        userDocRef.getWikiReference()));
+    PasswordClass pwClass = new PasswordClass();
+    expect(bClass.get("tokenvalue")).andReturn(pwClass);
     modelAccessMock.saveDocument(userDoc);
     expectLastCall();
 
@@ -71,7 +76,8 @@ public class NewCelementsTokenForUserCommandTest extends AbstractComponentTest {
     assertEquals(token, cmd.getNewCelementsTokenForUser(userDocRef, false));
     verifyDefault();
     assertEquals(1, getTokenObjects(userDoc).count());
-    assertEquals(token, getTokenObjects(userDoc).first().get().getStringValue("tokenvalue"));
+    assertEquals(pwClass.getEquivalentPassword("hash:SHA-512:", token), getTokenObjects(
+        userDoc).first().get().getStringValue("tokenvalue"));
     assertNotNull(getTokenObjects(userDoc).first().get().getDateValue("validuntil"));
   }
 
