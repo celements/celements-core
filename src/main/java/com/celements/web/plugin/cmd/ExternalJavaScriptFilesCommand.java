@@ -204,8 +204,10 @@ public class ExternalJavaScriptFilesCommand {
           "WebPreferences"), context));
       PageTypeReference pageTypeRef = getPageTypeResolver().getPageTypeRefForCurrentDoc();
       try {
-        addAllExtJSfilesFromDoc(getModelAccess().getDocument(
-            getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef)));
+        if (pageTypeRef != null) {
+          addAllExtJSfilesFromDoc(getModelAccess().getDocument(
+              getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef)));
+        }
       } catch (DocumentNotExistsException exp) {
         LOGGER.info("Could not get Document with docRef {} ",
             getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef), exp);
