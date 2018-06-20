@@ -130,3 +130,4 @@ com.celements.migrator.TreeNodeRelativeParent_Database
 com.celements.auth.user.CelementsUser
 com.celements.auth.user.CelementsUserService
 com.celements.web.service.UrlScriptService
+com.celements.web.service.UrlService
