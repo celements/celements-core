@@ -29,10 +29,13 @@ import org.xwiki.model.reference.DocumentReference;
 @ComponentRole
 public interface UrlService {
 
+  @NotNull
   public String getURL(@NotNull DocumentReference docRef);
 
+  @NotNull
   public String getURL(@NotNull DocumentReference docRef, @Nullable String action);
 
+  @NotNull
   public String getURL(@NotNull DocumentReference docRef, @Nullable String action,
       @Nullable String queryString);
 
@@ -46,10 +49,13 @@ public interface UrlService {
   public String getURL(@NotNull AttachmentReference docRef, @Nullable String action,
       @Nullable String queryString);
 
+  @NotNull
   public String getExternalURL(@NotNull DocumentReference docRef);
 
+  @NotNull
   public String getExternalURL(@NotNull DocumentReference docRef, @Nullable String action);
 
+  @NotNull
   public String getExternalURL(@NotNull DocumentReference docRef, @Nullable String action,
       @Nullable String queryString);
 

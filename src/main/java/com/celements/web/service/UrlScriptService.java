@@ -36,6 +36,18 @@ public class UrlScriptService implements ScriptService {
     return urlService.getExternalURL(docRef, action, queryString);
   }
 
+  public String getURL(AttachmentReference attRef) {
+    return urlService.getURL(attRef);
+  }
+
+  public String getURL(AttachmentReference attrRef, String action) {
+    return urlService.getURL(attrRef, action);
+  }
+
+  public String getURL(AttachmentReference attrRef, String action, String queryString) {
+    return urlService.getURL(attrRef, action, queryString);
+  }
+
   public String getExternalURL(AttachmentReference attRef) {
     return urlService.getExternalURL(attRef);
   }
