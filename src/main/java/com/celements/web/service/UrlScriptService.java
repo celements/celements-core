@@ -10,7 +10,7 @@ import org.xwiki.script.service.ScriptService;
 public class UrlScriptService implements ScriptService {
 
   @Requirement
-  private IUrlService urlService;
+  private UrlService urlService;
 
   public String getURL(DocumentReference docRef) {
     return urlService.getURL(docRef);

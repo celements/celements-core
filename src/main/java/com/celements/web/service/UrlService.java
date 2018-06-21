@@ -1,103 +1,66 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.celements.web.service;
 
-import java.net.URL;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.exception.DocumentNotExistsException;
-import com.celements.model.context.ModelContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.web.XWikiURLFactory;
+@ComponentRole
+public interface UrlService {
 
-public class UrlService implements IUrlService {
+  public String getURL(@NotNull DocumentReference docRef);
 
-  private static Logger LOGGER = LoggerFactory.getLogger(UrlService.class);
+  public String getURL(@NotNull DocumentReference docRef, @Nullable String action);
 
-  @Requirement
-  private ModelContext context;
+  public String getURL(@NotNull DocumentReference docRef, @Nullable String action,
+      @Nullable String queryString);
 
-  @Requirement
-  private IModelAccessFacade modelAccess;
+  @NotNull
+  public String getURL(@NotNull AttachmentReference docRef);
 
-  @Requirement
-  private ICelementsWebServiceRole celementsweb;
+  @NotNull
+  public String getURL(@NotNull AttachmentReference docRef, @Nullable String action);
 
-  @Override
-  public String getURL(DocumentReference docRef) {
-    return getURL(docRef, "view");
-  }
+  @NotNull
+  public String getURL(@NotNull AttachmentReference docRef, @Nullable String action,
+      @Nullable String queryString);
 
-  @Override
-  public String getURL(DocumentReference docRef, String action) {
-    return getURL(docRef, action, null);
-  }
+  public String getExternalURL(@NotNull DocumentReference docRef);
 
-  @Override
-  public String getURL(DocumentReference docRef, String action, String queryString) {
-    String spaceName = docRef.getLastSpaceReference().getName();
-    String docName = docRef.getName();
-    String wikiName = docRef.getWikiReference().getName();
-    URL url = getUrlFactory().createURL(spaceName, docName, action, queryString, null, wikiName,
-        context.getXWikiContext());
-    return celementsweb.encodeUrlToUtf8(getUrlFactory().getURL(url, context.getXWikiContext()));
-  }
+  public String getExternalURL(@NotNull DocumentReference docRef, @Nullable String action);
 
-  @Override
-  public String getExternalURL(DocumentReference docRef) {
-    return getExternalURL(docRef, "view");
-  }
+  public String getExternalURL(@NotNull DocumentReference docRef, @Nullable String action,
+      @Nullable String queryString);
 
-  @Override
-  public String getExternalURL(DocumentReference docRef, String action) {
-    return getExternalURL(docRef, action, null);
-  }
+  @NotNull
+  public String getExternalURL(@NotNull AttachmentReference attRef);
 
-  @Override
-  public String getExternalURL(DocumentReference docRef, String action, String queryString) {
-    String spaceName = docRef.getLastSpaceReference().getName();
-    String docName = docRef.getName();
-    String wikiName = docRef.getWikiReference().getName();
-    URL url = getUrlFactory().createExternalURL(spaceName, docName, action, queryString, null,
-        wikiName, context.getXWikiContext());
-    return celementsweb.encodeUrlToUtf8(url.toString());
-  }
+  @NotNull
+  public String getExternalURL(@NotNull AttachmentReference attrRef, @Nullable String action);
 
-  @Override
-  public String getExternalURL(AttachmentReference attRef) {
-    return getExternalURL(attRef, "download");
-  }
-
-  @Override
-  public String getExternalURL(AttachmentReference attrRef, String action) {
-    return getExternalURL(attrRef, action, null);
-  }
-
-  @Override
-  public String getExternalURL(AttachmentReference attrRef, String action, String queryString) {
-    String ret = "";
-    DocumentReference attrDocRef = attrRef.getDocumentReference();
-    try {
-      XWikiAttachment att = modelAccess.getDocument(attrDocRef).getAttachment(attrRef.getName());
-      String fileName = att.getFilename();
-      String spaceName = attrDocRef.getLastSpaceReference().getName();
-      String docName = attrDocRef.getName();
-      String wikiName = attrDocRef.getWikiReference().getName();
-      URL url = getUrlFactory().createAttachmentURL(fileName, spaceName, docName, action,
-          queryString, wikiName, context.getXWikiContext());
-      ret = celementsweb.encodeUrlToUtf8(url.toString());
-    } catch (DocumentNotExistsException exp) {
-      LOGGER.warn("Document for docRef '{}' not found", attrDocRef);
-    }
-    return ret;
-  }
-
-  private XWikiURLFactory getUrlFactory() {
-    return context.getXWikiContext().getURLFactory();
-  }
+  @NotNull
+  public String getExternalURL(@NotNull AttachmentReference attrRef, @Nullable String action,
+      @Nullable String queryString);
 
 }
