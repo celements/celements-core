@@ -30,43 +30,43 @@ import org.xwiki.model.reference.DocumentReference;
 public interface UrlService {
 
   @NotNull
-  public String getURL(@NotNull DocumentReference docRef);
+  public String getURL(@Nullable DocumentReference docRef);
 
   @NotNull
-  public String getURL(@NotNull DocumentReference docRef, @Nullable String action);
+  public String getURL(@Nullable DocumentReference docRef, @Nullable String action);
 
   @NotNull
-  public String getURL(@NotNull DocumentReference docRef, @Nullable String action,
+  public String getURL(@Nullable DocumentReference docRef, @Nullable String action,
       @Nullable String queryString);
 
   @NotNull
-  public String getURL(@NotNull AttachmentReference docRef);
+  public String getURL(@Nullable AttachmentReference docRef);
 
   @NotNull
-  public String getURL(@NotNull AttachmentReference docRef, @Nullable String action);
+  public String getURL(@Nullable AttachmentReference docRef, @Nullable String action);
 
   @NotNull
-  public String getURL(@NotNull AttachmentReference docRef, @Nullable String action,
+  public String getURL(@Nullable AttachmentReference docRef, @Nullable String action,
       @Nullable String queryString);
 
   @NotNull
-  public String getExternalURL(@NotNull DocumentReference docRef);
+  public String getExternalURL(@Nullable DocumentReference docRef);
 
   @NotNull
-  public String getExternalURL(@NotNull DocumentReference docRef, @Nullable String action);
+  public String getExternalURL(@Nullable DocumentReference docRef, @Nullable String action);
 
   @NotNull
-  public String getExternalURL(@NotNull DocumentReference docRef, @Nullable String action,
+  public String getExternalURL(@Nullable DocumentReference docRef, @Nullable String action,
       @Nullable String queryString);
 
   @NotNull
-  public String getExternalURL(@NotNull AttachmentReference attRef);
+  public String getExternalURL(@Nullable AttachmentReference attRef);
 
   @NotNull
-  public String getExternalURL(@NotNull AttachmentReference attrRef, @Nullable String action);
+  public String getExternalURL(@Nullable AttachmentReference attrRef, @Nullable String action);
 
   @NotNull
-  public String getExternalURL(@NotNull AttachmentReference attrRef, @Nullable String action,
+  public String getExternalURL(@Nullable AttachmentReference attrRef, @Nullable String action,
       @Nullable String queryString);
 
 }

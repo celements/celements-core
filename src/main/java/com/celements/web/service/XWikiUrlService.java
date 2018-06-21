@@ -12,7 +12,7 @@ import com.celements.model.context.ModelContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 @Component
-public class XWikiURLService implements UrlService {
+public class XWikiUrlService implements UrlService {
 
   @Requirement
   private ModelContext context;
