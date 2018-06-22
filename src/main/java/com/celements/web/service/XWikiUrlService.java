@@ -1,6 +1,11 @@
 package com.celements.web.service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -9,6 +14,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 @Component
@@ -19,9 +25,6 @@ public class XWikiUrlService implements UrlService {
 
   @Requirement
   private IModelAccessFacade modelAccess;
-
-  @Requirement
-  private ICelementsWebServiceRole celementsweb;
 
   @Override
   public String getURL(DocumentReference docRef) {
@@ -112,19 +115,31 @@ public class XWikiUrlService implements UrlService {
   }
 
   private String toInternalString(URL url) {
-    String ret = "";
-    if (url != null) {
-      ret = celementsweb.encodeUrlToUtf8(getUrlFactory().getURL(url, context.getXWikiContext()));
-    }
-    return ret;
+    return getUrlFactory().getURL(url, context.getXWikiContext());
   }
 
   private String toExternalString(URL url) {
-    String ret = "";
-    if (url != null) {
-      ret = celementsweb.encodeUrlToUtf8(url.toString());
+    return Objects.toString(url, "");
+  }
+
+  @Override
+  public String encodeUrl(String url) {
+    return encodeUrl(url, StandardCharsets.UTF_8);
+  }
+
+  @Override
+  public String encodeUrl(String url, Charset encoding) {
+    String scheme = "";
+    int schemeIndex = Strings.nullToEmpty(url).indexOf("://");
+    if (schemeIndex > 0) {
+      scheme = url.substring(0, schemeIndex + 3);
+      url = url.substring(schemeIndex + 3);
     }
-    return ret;
+    try {
+      return scheme + URLEncoder.encode(url, encoding.name()).replaceAll("%2F", "/");
+    } catch (UnsupportedEncodingException exp) {
+      throw new RuntimeException("Failed to encode: " + encoding.name(), exp);
+    }
   }
 
 }

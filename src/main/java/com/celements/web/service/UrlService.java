@@ -19,6 +19,8 @@
  */
 package com.celements.web.service;
 
+import java.nio.charset.Charset;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -68,5 +70,11 @@ public interface UrlService {
   @NotNull
   public String getExternalURL(@Nullable AttachmentReference attrRef, @Nullable String action,
       @Nullable String queryString);
+
+  @NotNull
+  String encodeUrl(@Nullable String url);
+
+  @NotNull
+  String encodeUrl(@Nullable String url, @NotNull Charset encoding);
 
 }

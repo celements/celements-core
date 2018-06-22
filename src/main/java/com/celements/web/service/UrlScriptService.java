@@ -1,5 +1,7 @@
 package com.celements.web.service;
 
+import java.nio.charset.Charset;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
@@ -58,6 +60,14 @@ public class UrlScriptService implements ScriptService {
 
   public String getExternalURL(AttachmentReference attrRef, String action, String queryString) {
     return urlService.getExternalURL(attrRef, action, queryString);
+  }
+
+  public String encodeUrl(String url) {
+    return urlService.encodeUrl(url);
+  }
+
+  public String encodeUrl(String url, String encoding) {
+    return urlService.encodeUrl(url, Charset.forName(encoding));
   }
 
 }
