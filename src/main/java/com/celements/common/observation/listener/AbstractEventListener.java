@@ -1,7 +1,5 @@
 package com.celements.common.observation.listener;
 
-import java.util.Collection;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -15,6 +13,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
+import com.celements.configuration.ConfigSourceUtils;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
 import com.celements.web.service.IWebUtilsService;
@@ -71,18 +70,8 @@ public abstract class AbstractEventListener implements EventListener {
   }
 
   public synchronized boolean isDisabled() {
-    return disabled || isDisabledInConfigSrc();
-  }
-
-  private boolean isDisabledInConfigSrc() {
-    boolean disabled = false;
-    Object prop = configSrc.getProperty(CFG_SRC_KEY);
-    if (prop instanceof Collection) {
-      disabled = ((Collection<?>) prop).contains(getName());
-    } else if (prop instanceof String) {
-      disabled = prop.toString().trim().equals(getName());
-    }
-    return disabled;
+    return disabled || ConfigSourceUtils.getStringListProperty(configSrc, CFG_SRC_KEY).contains(
+        getName());
   }
 
   public synchronized void enable() {
