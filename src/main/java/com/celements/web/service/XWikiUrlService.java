@@ -129,6 +129,7 @@ public class XWikiUrlService implements UrlService {
 
   @Override
   public String encodeUrl(String url, Charset encoding) {
+    // TODO wrong, e.g. port encoded. use new URL(url) to split
     String scheme = "";
     int schemeIndex = Strings.nullToEmpty(url).indexOf("://");
     if (schemeIndex > 0) {
