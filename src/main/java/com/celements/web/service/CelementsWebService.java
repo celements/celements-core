@@ -2,7 +2,6 @@ package com.celements.web.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +37,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
 
   private List<String> supportedAdminLangList;
+
+  @Requirement
+  private UrlService urlService;
 
   @Requirement
   private UserService userService;
@@ -178,21 +180,10 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     this.supportedAdminLangList = supportedAdminLangList;
   }
 
+  @Deprecated
   @Override
   public String encodeUrlToUtf8(String urlStr) {
-    String pattern = "://";
-    int findIndex = urlStr.indexOf(pattern);
-    if (findIndex > 0) {
-      String urlPrefix = urlStr.substring(0, findIndex + pattern.length());
-      String mainUrl = urlStr.substring(findIndex + pattern.length());
-      try {
-        urlStr = URLEncoder.encode(mainUrl, "UTF-8");
-      } catch (UnsupportedEncodingException exp) {
-        LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
-      }
-      urlStr = urlPrefix + urlStr.replaceAll("%2F", "/");
-    }
-    return urlStr;
+    return urlService.encodeUrl(urlStr);
   }
 
   @Override
