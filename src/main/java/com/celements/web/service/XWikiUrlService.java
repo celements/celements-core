@@ -1,9 +1,9 @@
 package com.celements.web.service;
 
 import static com.google.common.base.MoreObjects.*;
-import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Strings.*;
 
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -24,6 +24,11 @@ public class XWikiUrlService implements UrlService {
   private ModelContext context;
 
   @Override
+  public String getURL() {
+    return getURL(getCurrentReference());
+  }
+
+  @Override
   public String getURL(EntityReference ref) {
     return getURL(ref, null);
   }
@@ -36,6 +41,11 @@ public class XWikiUrlService implements UrlService {
   @Override
   public String getURL(EntityReference ref, String action, String queryString) {
     return createURLObject(ref, action, queryString).getFile();
+  }
+
+  @Override
+  public String getExternalURL() {
+    return getExternalURL(getCurrentReference());
   }
 
   @Override
@@ -67,16 +77,17 @@ public class XWikiUrlService implements UrlService {
     }
   }
 
-  private URL createURLObject(EntityReference ref, String action, String queryString)
-      throws IllegalArgumentException {
+  private URL createURLObject(EntityReference ref, String action, String queryString) {
     URL url;
-    checkArgument(ref != null, "given reference is null");
-    String wikiName = extractName(ref, EntityType.WIKI);
+    ref = firstNonNull(ref, getCurrentReference());
+    String wikiName = firstNonNull(ref.extractReference(EntityType.WIKI),
+        context.getWikiRef()).getName();
     String spaceName = extractName(ref, EntityType.SPACE);
-    checkArgument(spaceName != null, "given reference contains no space");
-    String docName = nullToEmpty(extractName(ref, EntityType.DOCUMENT));
+    String docName = extractName(ref, EntityType.DOCUMENT);
     String fileName = extractName(ref, EntityType.ATTACHMENT);
-    if (fileName == null) {
+    if (spaceName.isEmpty()) {
+      url = getServerUrl(wikiName, queryString);
+    } else if (fileName.isEmpty()) {
       action = firstNonNull(emptyToNull(action), "view");
       url = getUrlFactory().createURL(spaceName, docName, action, queryString, null, wikiName,
           context.getXWikiContext());
@@ -90,7 +101,26 @@ public class XWikiUrlService implements UrlService {
 
   private String extractName(EntityReference ref, EntityType type) {
     EntityReference extractedRef = ref.extractReference(type);
-    return (extractedRef != null) ? extractedRef.getName() : null;
+    return (extractedRef != null) ? extractedRef.getName() : "";
+  }
+
+  private EntityReference getCurrentReference() {
+    if (context.getDoc() != null) {
+      return context.getDoc().getDocumentReference();
+    } else {
+      return context.getWikiRef();
+    }
+  }
+
+  private URL getServerUrl(String wikiName, String queryString) {
+    try {
+      UriBuilder builder = UriBuilder.fromUri(context.getXWikiContext().getWiki().getServerURL(
+          wikiName, context.getXWikiContext()).toURI());
+      builder.replaceQuery(queryString);
+      return builder.build().toURL();
+    } catch (MalformedURLException | URISyntaxException exc) {
+      throw new RuntimeException(exc);
+    }
   }
 
   private XWikiURLFactory getUrlFactory() {

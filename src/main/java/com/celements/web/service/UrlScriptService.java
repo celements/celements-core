@@ -13,36 +13,44 @@ public class UrlScriptService implements ScriptService {
   @Requirement
   private UrlService urlService;
 
+  public String getURL() {
+    return urlService.getURL();
+  }
+
   public String getURL(EntityReference ref) {
-    return (ref != null) ? urlService.getURL(ref) : "";
+    return urlService.getURL(ref);
   }
 
   public String getURL(EntityReference ref, String action) {
-    return (ref != null) ? urlService.getURL(ref, action) : "";
+    return urlService.getURL(ref, action);
   }
 
   public String getURL(EntityReference ref, String action, String queryString) {
-    return (ref != null) ? urlService.getURL(ref, action, queryString) : "";
+    return urlService.getURL(ref, action, queryString);
+  }
+
+  public String getExternalURL() {
+    return urlService.getExternalURL();
   }
 
   public String getExternalURL(EntityReference ref) {
-    return (ref != null) ? urlService.getExternalURL(ref) : "";
+    return urlService.getExternalURL(ref);
   }
 
   public String getExternalURL(EntityReference ref, String action) {
-    return (ref != null) ? urlService.getExternalURL(ref, action) : "";
+    return urlService.getExternalURL(ref, action);
   }
 
   public String getExternalURL(EntityReference ref, String action, String queryString) {
-    return (ref != null) ? urlService.getExternalURL(ref, action, queryString) : "";
+    return urlService.getExternalURL(ref, action, queryString);
   }
 
   UriBuilder createURIBuilder(EntityReference ref) {
-    return (ref != null) ? urlService.createURIBuilder(ref) : null;
+    return urlService.createURIBuilder(ref);
   }
 
   UriBuilder createURIBuilder(EntityReference ref, String action) {
-    return (ref != null) ? urlService.createURIBuilder(ref, action) : null;
+    return urlService.createURIBuilder(ref, action);
   }
 
 }
