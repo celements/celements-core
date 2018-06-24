@@ -51,7 +51,7 @@ public interface ICelementsWebServiceRole {
   public void sendRedirect(String urlStr);
 
   /**
-   * @deprecated since 3.1 instead use {@link UrlService#encodeUrl(String)}
+   * @deprecated since 3.1, only intended for internal usage
    */
   @Deprecated
   public String encodeUrlToUtf8(String urlStr);
