@@ -1,11 +1,10 @@
 package com.celements.web.service;
 
-import java.nio.charset.Charset;
+import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
 
 @Component("url")
@@ -14,60 +13,36 @@ public class UrlScriptService implements ScriptService {
   @Requirement
   private UrlService urlService;
 
-  public String getURL(DocumentReference docRef) {
-    return urlService.getURL(docRef);
+  public String getURL(EntityReference ref) {
+    return (ref != null) ? urlService.getURL(ref) : "";
   }
 
-  public String getURL(DocumentReference docRef, String action) {
-    return urlService.getURL(docRef, action);
+  public String getURL(EntityReference ref, String action) {
+    return (ref != null) ? urlService.getURL(ref, action) : "";
   }
 
-  public String getURL(DocumentReference docRef, String action, String queryString) {
-    return urlService.getURL(docRef, action, queryString);
+  public String getURL(EntityReference ref, String action, String queryString) {
+    return (ref != null) ? urlService.getURL(ref, action, queryString) : "";
   }
 
-  public String getExternalURL(DocumentReference docRef) {
-    return urlService.getExternalURL(docRef);
+  public String getExternalURL(EntityReference ref) {
+    return (ref != null) ? urlService.getExternalURL(ref) : "";
   }
 
-  public String getExternalURL(DocumentReference docRef, String action) {
-    return urlService.getExternalURL(docRef, action);
+  public String getExternalURL(EntityReference ref, String action) {
+    return (ref != null) ? urlService.getExternalURL(ref, action) : "";
   }
 
-  public String getExternalURL(DocumentReference docRef, String action, String queryString) {
-    return urlService.getExternalURL(docRef, action, queryString);
+  public String getExternalURL(EntityReference ref, String action, String queryString) {
+    return (ref != null) ? urlService.getExternalURL(ref, action, queryString) : "";
   }
 
-  public String getURL(AttachmentReference attRef) {
-    return urlService.getURL(attRef);
+  UriBuilder createURIBuilder(EntityReference ref) {
+    return (ref != null) ? urlService.createURIBuilder(ref) : null;
   }
 
-  public String getURL(AttachmentReference attrRef, String action) {
-    return urlService.getURL(attrRef, action);
-  }
-
-  public String getURL(AttachmentReference attrRef, String action, String queryString) {
-    return urlService.getURL(attrRef, action, queryString);
-  }
-
-  public String getExternalURL(AttachmentReference attRef) {
-    return urlService.getExternalURL(attRef);
-  }
-
-  public String getExternalURL(AttachmentReference attrRef, String action) {
-    return urlService.getExternalURL(attrRef, action);
-  }
-
-  public String getExternalURL(AttachmentReference attrRef, String action, String queryString) {
-    return urlService.getExternalURL(attrRef, action, queryString);
-  }
-
-  public String encodeUrl(String url) {
-    return urlService.encodeUrl(url);
-  }
-
-  public String encodeUrl(String url, String encoding) {
-    return urlService.encodeUrl(url, Charset.forName(encoding));
+  UriBuilder createURIBuilder(EntityReference ref, String action) {
+    return (ref != null) ? urlService.createURIBuilder(ref, action) : null;
   }
 
 }
