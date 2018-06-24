@@ -6,7 +6,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -210,17 +209,14 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     try {
       URL url = new URL(urlStr);
       UriBuilder builder = UriBuilder.fromUri(url.toURI());
-      builder.host(URLEncoder.encode(url.getHost(), "UTF-8"));
+      builder.host(url.getHost());
       builder.port(url.getPort());
-      builder.replacePath(URLEncoder.encode(url.getPath(), "UTF-8").replaceAll("%2F", "/"));
+      builder.replacePath(url.getPath());
       URI uri = builder.build();
       LOGGER.info("encodeUrlForRedirect - [{}] from [{}]", uri, urlStr);
       return uri.toString();
     } catch (URISyntaxException exc) {
       throw new MalformedURLException(exc.getMessage());
-    } catch (UnsupportedEncodingException exc) {
-      LOGGER.error("Failed to encode url [{}] to utf-8", urlStr, exc);
-      return urlStr;
     }
   }
 
