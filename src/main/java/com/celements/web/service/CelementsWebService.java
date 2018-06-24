@@ -3,6 +3,7 @@ package com.celements.web.service;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -212,7 +213,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       builder.host(URLEncoder.encode(url.getHost(), "UTF-8"));
       builder.port(url.getPort());
       builder.replacePath(URLEncoder.encode(url.getPath(), "UTF-8").replaceAll("%2F", "/"));
-      return builder.build().toString();
+      URI uri = builder.build();
+      LOGGER.info("encodeUrlForRedirect - [{}] from [{}]", uri, urlStr);
+      return uri.toString();
     } catch (URISyntaxException exc) {
       throw new MalformedURLException(exc.getMessage());
     } catch (UnsupportedEncodingException exc) {
