@@ -21,9 +21,20 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
 
   @Test
   public void testEncodeUrlToUtf8() throws Exception {
-    String url = "https://www.üparties.ch:8080/täst/töst?köy=välüe#änchör";
-    assertEquals("https://www.%C3%BCparties.ch:8080/t%C3%A4st/t%C3%B6st?köy=välüe#änchör",
-        service.encodeUrlForRedirect(url));
+    String url = "http://www.üparties.ch";
+    replayDefault();
+    String ret = service.encodeUrlToUtf8(url);
+    verifyDefault();
+    assertEquals("http://www.%C3%BCparties.ch", ret);
+  }
+
+  @Test
+  public void testEncodeUrlToUtf8_withSlashes() throws Exception {
+    String url = "http://www.üparties.ch/test1/test2";
+    replayDefault();
+    String ret = service.encodeUrlToUtf8(url);
+    verifyDefault();
+    assertEquals("http://www.%C3%BCparties.ch/test1/test2", ret);
   }
 
 }
