@@ -2,13 +2,17 @@ package com.celements.web.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
 
   private List<String> supportedAdminLangList;
+
+  @Requirement
+  private UrlService urlService;
 
   @Requirement
   private UserService userService;
@@ -178,29 +185,38 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     this.supportedAdminLangList = supportedAdminLangList;
   }
 
+  @Deprecated
   @Override
   public String encodeUrlToUtf8(String urlStr) {
-    String pattern = "://";
-    int findIndex = urlStr.indexOf(pattern);
-    if (findIndex > 0) {
-      String urlPrefix = urlStr.substring(0, findIndex + pattern.length());
-      String mainUrl = urlStr.substring(findIndex + pattern.length());
-      try {
-        urlStr = URLEncoder.encode(mainUrl, "UTF-8");
-      } catch (UnsupportedEncodingException exp) {
-        LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
-      }
-      urlStr = urlPrefix + urlStr.replaceAll("%2F", "/");
+    try {
+      return encodeUrlForRedirect(urlStr);
+    } catch (MalformedURLException exc) {
+      LOGGER.error("Failed to encode url [{}] to utf-8", urlStr, exc);
+      return urlStr;
     }
-    return urlStr;
   }
 
   @Override
   public void sendRedirect(String urlStr) {
     try {
-      context.getResponse().get().sendRedirect(encodeUrlToUtf8(urlStr));
+      context.getResponse().get().sendRedirect(encodeUrlForRedirect(urlStr));
     } catch (IOException exp) {
       LOGGER.error("Failed to redirect to url [" + urlStr + "]", exp);
+    }
+  }
+
+  String encodeUrlForRedirect(String urlStr) throws MalformedURLException {
+    try {
+      URL url = new URL(urlStr);
+      UriBuilder builder = UriBuilder.fromUri(url.toURI());
+      builder.host(url.getHost());
+      builder.port(url.getPort());
+      builder.replacePath(url.getPath());
+      URI uri = builder.build();
+      LOGGER.info("encodeUrlForRedirect - [{}] from [{}]", uri, urlStr);
+      return uri.toString();
+    } catch (URISyntaxException exc) {
+      throw new MalformedURLException(exc.getMessage());
     }
   }
 
