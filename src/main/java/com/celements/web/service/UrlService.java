@@ -30,35 +30,29 @@ import org.xwiki.model.reference.EntityReference;
 public interface UrlService {
 
   @NotNull
-  public String getURL();
+  public String getURL(@NotNull EntityReference ref);
 
   @NotNull
-  public String getURL(@Nullable EntityReference ref);
+  public String getURL(@NotNull EntityReference ref, @Nullable String action);
 
   @NotNull
-  public String getURL(@Nullable EntityReference ref, @Nullable String action);
-
-  @NotNull
-  public String getURL(@Nullable EntityReference ref, @Nullable String action,
+  public String getURL(@NotNull EntityReference ref, @Nullable String action,
       @Nullable String queryString);
 
   @NotNull
-  public String getExternalURL();
+  public String getExternalURL(@NotNull EntityReference ref);
 
   @NotNull
-  public String getExternalURL(@Nullable EntityReference ref);
+  public String getExternalURL(@NotNull EntityReference ref, @Nullable String action);
 
   @NotNull
-  public String getExternalURL(@Nullable EntityReference ref, @Nullable String action);
-
-  @NotNull
-  public String getExternalURL(@Nullable EntityReference ref, @Nullable String action,
+  public String getExternalURL(@NotNull EntityReference ref, @Nullable String action,
       @Nullable String queryString);
 
   @NotNull
-  UriBuilder createURIBuilder(@Nullable EntityReference ref);
+  UriBuilder createURIBuilder(@NotNull EntityReference ref);
 
   @NotNull
-  UriBuilder createURIBuilder(@Nullable EntityReference ref, @Nullable String action);
+  UriBuilder createURIBuilder(@NotNull EntityReference ref, @Nullable String action);
 
 }

@@ -10,8 +10,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.common.test.ExceptionAsserter;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -56,6 +59,19 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_getURL_space() throws Exception {
+    SpaceReference spaceRef = docRef.getLastSpaceReference();
+    String file = "/space/";
+    URL url = new URL("http", "wiki.celements.com", 8080, file);
+    expect(urlFactoryMock.createURL("space", "", "view", null, null, "wiki",
+        getContext())).andReturn(url);
+
+    replayDefault();
+    assertEquals(file, service.getURL(spaceRef));
+    verifyDefault();
+  }
+
+  @Test
   public void test_getURL_attachment() throws Exception {
     AttachmentReference attRef = new AttachmentReference("file", docRef);
     String file = "/download/space/page/file";
@@ -68,18 +84,31 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
     verifyDefault();
   }
 
-  // @Test
-  // public void test_getURL_null() throws Exception {
-  // replayDefault();
-  // new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
-  //
-  // @Override
-  // protected void execute() throws IllegalArgumentException {
-  // service.getURL();
-  // }
-  // }.evaluate();
-  // verifyDefault();
-  // }
+  @Test
+  public void test_getURL_wiki() throws Exception {
+    replayDefault();
+    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
+
+      @Override
+      protected void execute() throws IllegalArgumentException {
+        service.getURL(docRef.getWikiReference());
+      }
+    }.evaluate();
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getURL_null() throws Exception {
+    replayDefault();
+    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
+
+      @Override
+      protected void execute() throws IllegalArgumentException {
+        service.getURL(null);
+      }
+    }.evaluate();
+    verifyDefault();
+  }
 
   @Test
   public void test_getExternalURL() throws Exception {
@@ -95,18 +124,46 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
     verifyDefault();
   }
 
-  // @Test
-  // public void test_getExternalURL_null() throws Exception {
-  // replayDefault();
-  // new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
-  //
-  // @Override
-  // protected void execute() throws IllegalArgumentException {
-  // service.getExternalURL(null);
-  // }
-  // }.evaluate();
-  // verifyDefault();
-  // }
+  @Test
+  public void test_getExternalURL_wiki() throws Exception {
+    WikiReference wikiRef = docRef.getWikiReference();
+    String queryString = "key=value1&key=value2";
+    URL url = new URL("http", "wiki.celements.com", 8080, "/?" + queryString);
+    expect(getWikiMock().getServerURL(wikiRef.getName(), getContext())).andReturn(url);
+
+    replayDefault();
+    assertEquals(url.toString(), service.getExternalURL(wikiRef, "view", queryString));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getExternalURL_wiki_inexistent() throws Exception {
+    final WikiReference wikiRef = docRef.getWikiReference();
+    expect(getWikiMock().getServerURL(wikiRef.getName(), getContext())).andReturn(null);
+
+    replayDefault();
+    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
+
+      @Override
+      protected void execute() throws IllegalArgumentException {
+        service.getExternalURL(wikiRef);
+      }
+    }.evaluate();
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getExternalURL_null() throws Exception {
+    replayDefault();
+    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
+
+      @Override
+      protected void execute() throws IllegalArgumentException {
+        service.getExternalURL(null);
+      }
+    }.evaluate();
+    verifyDefault();
+  }
 
   @Test
   public void test_createURIBuilder() throws Exception {
@@ -119,17 +176,17 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
     verifyDefault();
   }
 
-  // @Test
-  // public void test_createURIBuilder_null() throws Exception {
-  // replayDefault();
-  // new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
-  //
-  // @Override
-  // protected void execute() throws IllegalArgumentException {
-  // service.createURIBuilder(null);
-  // }
-  // }.evaluate();
-  // verifyDefault();
-  // }
+  @Test
+  public void test_createURIBuilder_null() throws Exception {
+    replayDefault();
+    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
+
+      @Override
+      protected void execute() throws IllegalArgumentException {
+        service.createURIBuilder(null);
+      }
+    }.evaluate();
+    verifyDefault();
+  }
 
 }
