@@ -1,10 +1,15 @@
 package com.celements.web.service;
 
+import static org.mutabilitydetector.internal.com.google.common.base.MoreObjects.*;
+
+import javax.ws.rs.core.UriBuilder;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
+
+import com.celements.model.context.ModelContext;
 
 @Component("url")
 public class UrlScriptService implements ScriptService {
@@ -12,52 +17,59 @@ public class UrlScriptService implements ScriptService {
   @Requirement
   private UrlService urlService;
 
-  public String getURL(DocumentReference docRef) {
-    return urlService.getURL(docRef);
+  @Requirement
+  private ModelContext context;
+
+  public String getURL() {
+    return urlService.getURL(getCurrentReference());
   }
 
-  public String getURL(DocumentReference docRef, String action) {
-    return urlService.getURL(docRef, action);
+  public String getURL(EntityReference ref) {
+    return urlService.getURL(firstNonNull(ref, getCurrentReference()));
   }
 
-  public String getURL(DocumentReference docRef, String action, String queryString) {
-    return urlService.getURL(docRef, action, queryString);
+  public String getURL(EntityReference ref, String action) {
+    return urlService.getURL(firstNonNull(ref, getCurrentReference()), action);
   }
 
-  public String getExternalURL(DocumentReference docRef) {
-    return urlService.getExternalURL(docRef);
+  public String getURL(EntityReference ref, String action, String queryString) {
+    return urlService.getURL(firstNonNull(ref, getCurrentReference()), action, queryString);
   }
 
-  public String getExternalURL(DocumentReference docRef, String action) {
-    return urlService.getExternalURL(docRef, action);
+  public String getExternalURL() {
+    return urlService.getExternalURL(getCurrentReference());
   }
 
-  public String getExternalURL(DocumentReference docRef, String action, String queryString) {
-    return urlService.getExternalURL(docRef, action, queryString);
+  public String getExternalURL(EntityReference ref) {
+    return urlService.getExternalURL(firstNonNull(ref, getCurrentReference()));
   }
 
-  public String getURL(AttachmentReference attRef) {
-    return urlService.getURL(attRef);
+  public String getExternalURL(EntityReference ref, String action) {
+    return urlService.getExternalURL(firstNonNull(ref, getCurrentReference()), action);
   }
 
-  public String getURL(AttachmentReference attrRef, String action) {
-    return urlService.getURL(attrRef, action);
+  public String getExternalURL(EntityReference ref, String action, String queryString) {
+    return urlService.getExternalURL(firstNonNull(ref, getCurrentReference()), action, queryString);
   }
 
-  public String getURL(AttachmentReference attrRef, String action, String queryString) {
-    return urlService.getURL(attrRef, action, queryString);
+  public UriBuilder createURIBuilder() {
+    return urlService.createURIBuilder(getCurrentReference());
   }
 
-  public String getExternalURL(AttachmentReference attRef) {
-    return urlService.getExternalURL(attRef);
+  UriBuilder createURIBuilder(EntityReference ref) {
+    return urlService.createURIBuilder(firstNonNull(ref, getCurrentReference()));
   }
 
-  public String getExternalURL(AttachmentReference attrRef, String action) {
-    return urlService.getExternalURL(attrRef, action);
+  UriBuilder createURIBuilder(EntityReference ref, String action) {
+    return urlService.createURIBuilder(firstNonNull(ref, getCurrentReference()), action);
   }
 
-  public String getExternalURL(AttachmentReference attrRef, String action, String queryString) {
-    return urlService.getExternalURL(attrRef, action, queryString);
+  private EntityReference getCurrentReference() {
+    if (context.getDoc() != null) {
+      return context.getDoc().getDocumentReference();
+    } else {
+      return context.getWikiRef();
+    }
   }
 
 }

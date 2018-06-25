@@ -21,52 +21,38 @@ package com.celements.web.service;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 @ComponentRole
 public interface UrlService {
 
   @NotNull
-  public String getURL(@Nullable DocumentReference docRef);
+  public String getURL(@NotNull EntityReference ref);
 
   @NotNull
-  public String getURL(@Nullable DocumentReference docRef, @Nullable String action);
+  public String getURL(@NotNull EntityReference ref, @Nullable String action);
 
   @NotNull
-  public String getURL(@Nullable DocumentReference docRef, @Nullable String action,
+  public String getURL(@NotNull EntityReference ref, @Nullable String action,
       @Nullable String queryString);
 
   @NotNull
-  public String getURL(@Nullable AttachmentReference docRef);
+  public String getExternalURL(@NotNull EntityReference ref);
 
   @NotNull
-  public String getURL(@Nullable AttachmentReference docRef, @Nullable String action);
+  public String getExternalURL(@NotNull EntityReference ref, @Nullable String action);
 
   @NotNull
-  public String getURL(@Nullable AttachmentReference docRef, @Nullable String action,
+  public String getExternalURL(@NotNull EntityReference ref, @Nullable String action,
       @Nullable String queryString);
 
   @NotNull
-  public String getExternalURL(@Nullable DocumentReference docRef);
+  UriBuilder createURIBuilder(@NotNull EntityReference ref);
 
   @NotNull
-  public String getExternalURL(@Nullable DocumentReference docRef, @Nullable String action);
-
-  @NotNull
-  public String getExternalURL(@Nullable DocumentReference docRef, @Nullable String action,
-      @Nullable String queryString);
-
-  @NotNull
-  public String getExternalURL(@Nullable AttachmentReference attRef);
-
-  @NotNull
-  public String getExternalURL(@Nullable AttachmentReference attrRef, @Nullable String action);
-
-  @NotNull
-  public String getExternalURL(@Nullable AttachmentReference attrRef, @Nullable String action,
-      @Nullable String queryString);
+  UriBuilder createURIBuilder(@NotNull EntityReference ref, @Nullable String action);
 
 }
