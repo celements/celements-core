@@ -44,9 +44,6 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   private List<String> supportedAdminLangList;
 
   @Requirement
-  private UrlService urlService;
-
-  @Requirement
   private UserService userService;
 
   @Requirement
