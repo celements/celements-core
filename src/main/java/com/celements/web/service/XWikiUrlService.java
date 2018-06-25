@@ -86,7 +86,7 @@ public class XWikiUrlService implements UrlService {
     String docName = extractName(ref, EntityType.DOCUMENT);
     String fileName = extractName(ref, EntityType.ATTACHMENT);
     if (spaceName.isEmpty()) {
-      url = getServerUrl(wikiName, queryString);
+      url = createWikiURL(wikiName, queryString);
     } else if (fileName.isEmpty()) {
       action = firstNonNull(emptyToNull(action), "view");
       url = getUrlFactory().createURL(spaceName, docName, action, queryString, null, wikiName,
@@ -112,15 +112,22 @@ public class XWikiUrlService implements UrlService {
     }
   }
 
-  private URL getServerUrl(String wikiName, String queryString) {
+  private URL createWikiURL(String wikiName, String queryString) {
     try {
-      UriBuilder builder = UriBuilder.fromUri(context.getXWikiContext().getWiki().getServerURL(
-          wikiName, context.getXWikiContext()).toURI());
+      URL url = getXWikiServerURL(wikiName);
+      if (url == null) {
+        url = getXWikiServerURL(context.getWikiRef().getName());
+      }
+      UriBuilder builder = UriBuilder.fromUri(url.toURI());
       builder.replaceQuery(queryString);
       return builder.build().toURL();
     } catch (MalformedURLException | URISyntaxException exc) {
       throw new RuntimeException(exc);
     }
+  }
+
+  private URL getXWikiServerURL(String wikiName) throws MalformedURLException {
+    return context.getXWikiContext().getWiki().getServerURL(wikiName, context.getXWikiContext());
   }
 
   private XWikiURLFactory getUrlFactory() {
