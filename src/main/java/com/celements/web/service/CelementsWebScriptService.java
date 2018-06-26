@@ -1138,6 +1138,10 @@ public class CelementsWebScriptService implements ScriptService {
     return url;
   }
 
+  /**
+   * @deprecated since 3.1, only intended for internal usage
+   */
+  @Deprecated
   public String encodeUrlToUtf8(String urlStr) {
     return getCelementsWebService().encodeUrlToUtf8(urlStr);
   }
