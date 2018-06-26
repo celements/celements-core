@@ -1,6 +1,6 @@
 package com.celements.web.service;
 
-import static org.mutabilitydetector.internal.com.google.common.base.MoreObjects.*;
+import static com.google.common.base.MoreObjects.*;
 
 import javax.ws.rs.core.UriBuilder;
 
