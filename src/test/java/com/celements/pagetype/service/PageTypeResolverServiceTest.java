@@ -19,21 +19,22 @@
  */
 package com.celements.pagetype.service;
 
-import static junit.framework.Assert.*;
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.model.access.IModelAccessFacade;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.ModelAccessStrategy;
 import com.celements.pagetype.PageTypeClasses;
 import com.celements.pagetype.PageTypeReference;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,13 +43,14 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCase {
+public class PageTypeResolverServiceTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
   private XWikiRequest request;
   private PageTypeResolverService pageTypeResolver;
   private IPageTypeRole pageTypeServiceMock;
+  private ModelAccessStrategy modelStrategyMock;
   private PageTypeReference richTextPTref;
   private DocumentReference docRef;
   private XWikiDocument doc;
@@ -58,18 +60,18 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
   private XWikiDocument xwikiPrefDoc;
 
   @Before
-  public void setUp_PageTypeResolverServiceTest() throws Exception {
+  public void prepareTest() throws Exception {
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    request = createMock(XWikiRequest.class);
+    xwiki = getWikiMock();
+    request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    pageTypeResolver = (PageTypeResolverService) Utils.getComponent(IPageTypeResolverRole.class);
-    pageTypeServiceMock = createMock(IPageTypeRole.class);
-    pageTypeResolver.pageTypeService = pageTypeServiceMock;
+    modelStrategyMock = registerComponentMock(ModelAccessStrategy.class);
+    pageTypeServiceMock = registerComponentMock(IPageTypeRole.class);
     richTextPTref = new PageTypeReference("RichText", "xObjectProvider", Arrays.asList(""));
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq("RichText"))).andReturn(
         richTextPTref).anyTimes();
+    expect(pageTypeServiceMock.getPageTypeReference("")).andReturn(
+        Optional.<PageTypeReference>absent()).anyTimes();
     docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDocument");
     doc = new XWikiDocument(docRef);
     webPrefDocRef = new DocumentReference(context.getDatabase(),
@@ -80,43 +82,40 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
     expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(
         xwikiPrefDoc).anyTimes();
-  }
-
-  @After
-  public void tearDown_PageTypeResolverServiceTest() {
-    pageTypeResolver.pageTypeService = Utils.getComponent(IPageTypeRole.class);
+    pageTypeResolver = (PageTypeResolverService) Utils.getComponent(IPageTypeResolverRole.class);
   }
 
   @Test
   public void testGetPageTypeObject_NPEs_null_doc() throws XWikiException {
-    replayAll();
+    replayDefault();
     BaseObject resultPTObj = pageTypeResolver.getPageTypeObject(null);
-    verifyAll();
+    verifyDefault();
     assertNull(resultPTObj);
   }
 
   @Test
   public void testGetPageTypeObject_NewDocFromTemplate() throws XWikiException {
     doc.setNew(true);
+    getContext().setDoc(doc);
     DocumentReference templDocRef = new DocumentReference(context.getDatabase(), "Blog",
         "ArticleTemplate");
-    XWikiDocument templDoc = new XWikiDocument(templDocRef);
+    XWikiDocument templDoc = expectDoc(templDocRef);
     BaseObject pageTypeObj = new BaseObject();
     pageTypeObj.setXClassReference(getPageTypeClassRef(context.getDatabase()));
     templDoc.addXObject(pageTypeObj);
-    expect(xwiki.exists(eq(templDocRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(templDocRef), same(context))).andReturn(templDoc).atLeastOnce();
     expect(request.get(eq("template"))).andReturn("Blog.ArticleTemplate").anyTimes();
-    replayAll();
+    replayDefault();
     BaseObject resultPTObj = pageTypeResolver.getPageTypeObject(doc);
-    verifyAll();
+    verifyDefault();
     assertNotNull(resultPTObj);
-    assertSame(pageTypeObj, resultPTObj);
+    assertNotSame("clone should be returned", pageTypeObj, resultPTObj);
+    assertEquals(pageTypeObj, resultPTObj);
   }
 
   @Test
   public void testGetPageTypeObject_cellFromCentralDB() throws XWikiException {
     doc.setNew(true);
+    getContext().setDoc(doc);
     DocumentReference centralCellDocRef = new DocumentReference("celements2web", "SimpleLayout",
         "cell1");
     XWikiDocument centralCellDoc = new XWikiDocument(centralCellDocRef);
@@ -124,24 +123,26 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     pageTypeObj.setXClassReference(getPageTypeClassRef("celements2web"));
     centralCellDoc.addXObject(pageTypeObj);
     expect(request.get(eq("template"))).andReturn(null).anyTimes();
-    replayAll();
+    replayDefault();
     BaseObject resultPTObj = pageTypeResolver.getPageTypeObject(centralCellDoc);
-    verifyAll();
+    verifyDefault();
     assertNotNull("no page type object found. Maybe class ref has the wrong wiki" + " reference?",
         resultPTObj);
-    assertSame(pageTypeObj, resultPTObj);
+    assertNotSame("clone should be returned", pageTypeObj, resultPTObj);
+    assertEquals(pageTypeObj, resultPTObj);
   }
 
   @Test
   public void testGetPageTypeRefForCurrentDoc_Default() throws Exception {
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).anyTimes();
     context.setDoc(doc);
     expect(request.get(eq("template"))).andReturn(null).anyTimes();
-    replayAll();
+    replayDefault();
     // No PageType Object prepared -> Default PageType is RichText
     PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForCurrentDoc();
     assertEquals(richTextPTref, pageTypeRef);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -153,30 +154,25 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).anyTimes();
     context.setDoc(doc);
     expect(request.get(eq("template"))).andReturn(templateSpace + "." + templateName).anyTimes();
-    XWikiDocument templateDoc = new XWikiDocument(templateDocRef);
-    IModelAccessFacade modelAccessMock = registerComponentMock(IModelAccessFacade.class);
-    pageTypeResolver.modelAccess = modelAccessMock;
-    expect(modelAccessMock.getDocument(eq(templateDocRef))).andReturn(templateDoc);
+    XWikiDocument templateDoc = expectDoc(templateDocRef);
     BaseObject pageTypeObj = new BaseObject();
     pageTypeObj.setXClassReference(getPageTypeClassRef(context.getDatabase()));
     pageTypeObj.setStringValue("page_type", "MyPageType");
     templateDoc.addXObject(pageTypeObj);
     PageTypeReference myPTref = new PageTypeReference("MyPageType", "xObjectProvider",
         Arrays.asList(""));
-    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq("MyPageType"))).andReturn(
-        myPTref).anyTimes();
-    expect(xwiki.exists(eq(templateDocRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(templateDocRef), same(context))).andReturn(
-        templateDoc).atLeastOnce();
-    replayAll();
+    expect(pageTypeServiceMock.getPageTypeReference("MyPageType")).andReturn(Optional.of(
+        myPTref)).anyTimes();
+    replayDefault();
     PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForCurrentDoc();
     assertEquals(myPTref, pageTypeRef);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetPageTypeRefForDocWithDefault_docRef() throws Exception {
     expect(request.get(eq("template"))).andReturn(null).anyTimes();
+    expectDoc(doc);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).anyTimes();
     doc.setNew(false);
@@ -186,47 +182,46 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     doc.addXObject(pageTypeObj);
     PageTypeReference myPTref = new PageTypeReference("MyPageType", "xObjectProvider",
         Arrays.asList(""));
-    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq("MyPageType"))).andReturn(
-        myPTref).anyTimes();
-    replayAll();
+    expect(pageTypeServiceMock.getPageTypeReference(eq("MyPageType"))).andReturn(Optional.of(
+        myPTref)).anyTimes();
+    replayDefault();
     // No PageType Object prepared -> Default PageType is RichText
     PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDocWithDefault(docRef);
     assertEquals(myPTref, pageTypeRef);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetPageTypeRefForDocWithDefault_docRef_Exception() throws Exception {
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     expect(request.get(eq("template"))).andReturn(null).anyTimes();
+    expect(modelStrategyMock.exists(docRef, "")).andReturn(false).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException());
-    replayAll();
+    replayDefault();
     // No PageType Object prepared -> Default PageType is RichText
     PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDocWithDefault(docRef);
     assertEquals(richTextPTref, pageTypeRef);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetPageTypeRefForDocWithDefault_NPEs_null_doc() throws Exception {
-    replayAll();
+    replayDefault();
     // No PageType Object prepared -> Default PageType is RichText
     PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDocWithDefault(
         (XWikiDocument) null);
     assertNull(pageTypeRef);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetPageTypeRefForDocWithDefault_Default() throws Exception {
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).anyTimes();
     expect(request.get(eq("template"))).andReturn(null).anyTimes();
-    replayAll();
+    replayDefault();
     // No PageType Object prepared -> Default PageType is RichText
     PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDocWithDefault(doc);
     assertEquals(richTextPTref, pageTypeRef);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -238,14 +233,13 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     doc.addXObject(pageTypeObj);
     PageTypeReference myPTref = new PageTypeReference("MyPageType", "xObjectProvider",
         Arrays.asList(""));
-    ;
-    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq("MyPageType"))).andReturn(
-        myPTref).anyTimes();
-    replayAll();
+    expect(pageTypeServiceMock.getPageTypeReference("MyPageType")).andReturn(Optional.of(
+        myPTref)).anyTimes();
+    replayDefault();
     PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDocWithDefault(doc);
     assertNotNull(pageTypeRef);
     assertEquals(myPTref, pageTypeRef);
-    verifyAll();
+    verifyDefault();
   }
 
   private DocumentReference getPageTypeClassRef(String wikiName) {
@@ -256,38 +250,39 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
   @Test
   public void testGetPageTypeRefForDocWithDefault_NewDocFromTemplate() throws XWikiException {
     doc.setNew(true);
+    getContext().setDoc(doc);
     DocumentReference templDocRef = new DocumentReference(context.getDatabase(), "Blog",
         "ArticleTemplate");
-    XWikiDocument templDoc = new XWikiDocument(templDocRef);
+    XWikiDocument templDoc = expectDoc(templDocRef);
     BaseObject pageTypeObj = new BaseObject();
     pageTypeObj.setXClassReference(getPageTypeClassRef(context.getDatabase()));
     pageTypeObj.setStringValue("page_type", "Article");
     templDoc.addXObject(pageTypeObj);
-    expect(xwiki.exists(eq(templDocRef), same(context))).andReturn(true).anyTimes();
-    expect(xwiki.getDocument(eq(templDocRef), same(context))).andReturn(templDoc).anyTimes();
     expect(request.get(eq("template"))).andReturn("Blog.ArticleTemplate").anyTimes();
     PageTypeReference articlePTref = new PageTypeReference("Article", "xObjectProvider",
         Arrays.asList(""));
-    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq("Article"))).andReturn(
-        articlePTref).anyTimes();
-    replayAll();
+    expect(pageTypeServiceMock.getPageTypeReference("Article")).andReturn(Optional.of(
+        articlePTref)).anyTimes();
+    replayDefault();
     PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDocWithDefault(doc);
     assertEquals("Expecting 'Article' PageType.", articlePTref, pageTypeRef);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetPageTypeWithDefault_nullAsDefault() {
+    replayDefault();
     assertNull(pageTypeResolver.getPageTypeRefForDocWithDefault(doc, null));
+    verifyDefault();
   }
 
   @Test
   public void testGetDefaultPageTypeRefForDoc_RichText() throws Exception {
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).anyTimes();
-    replayAll();
+    replayDefault();
     PageTypeReference pageTypeRef = pageTypeResolver.getDefaultPageTypeRefForDoc(docRef);
     assertEquals("RichText", pageTypeRef.getConfigName());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -304,10 +299,10 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     xwikiPrefDoc.addXObject(xwikiPtObj);
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(webPrefPageTypeName))).andReturn(
         new PageTypeReference(webPrefPageTypeName, null, Collections.<String>emptyList()));
-    replayAll();
+    replayDefault();
     PageTypeReference pageTypeRef = pageTypeResolver.getDefaultPageTypeRefForDoc(docRef);
     assertEquals("myWebPrefDefPageType", pageTypeRef.getConfigName());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -320,19 +315,21 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     xwikiPrefDoc.addXObject(xwikiPtObj);
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(xwikiPrefPageTypeName))).andReturn(
         new PageTypeReference(xwikiPrefPageTypeName, null, Collections.<String>emptyList()));
-    replayAll();
+    replayDefault();
     PageTypeReference pageTypeRef = pageTypeResolver.getDefaultPageTypeRefForDoc(docRef);
     assertEquals("myXWikiPrefDefPageType", pageTypeRef.getConfigName());
-    verifyAll();
+    verifyDefault();
   }
 
-  private void replayAll(Object... mocks) {
-    replay(xwiki, request, pageTypeServiceMock);
-    replay(mocks);
+  private XWikiDocument expectDoc(DocumentReference docRef) {
+    XWikiDocument doc = new XWikiDocument(docRef);
+    return expectDoc(doc);
   }
 
-  private void verifyAll(Object... mocks) {
-    verify(xwiki, request, pageTypeServiceMock);
-    verify(mocks);
+  private XWikiDocument expectDoc(XWikiDocument doc) {
+    expect(modelStrategyMock.exists(doc.getDocumentReference(), "")).andReturn(true).atLeastOnce();
+    expect(modelStrategyMock.getDocument(doc.getDocumentReference(), "")).andReturn(doc);
+    return doc;
   }
+
 }

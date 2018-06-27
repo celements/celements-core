@@ -19,22 +19,26 @@
  */
 package com.celements.pagetype.service;
 
+import static com.google.common.base.MoreObjects.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.inheritor.FieldInheritor;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.context.ModelContext;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.web.service.IWebUtilsService;
-import com.google.common.base.Strings;
-import com.xpn.xwiki.XWikiContext;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -44,40 +48,23 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   private static Logger LOGGER = LoggerFactory.getLogger(PageTypeResolverService.class);
 
   @Requirement
-  IWebUtilsService webUtilsService;
+  private IWebUtilsService webUtilsService;
 
   @Requirement
-  IPageTypeRole pageTypeService;
+  private IPageTypeRole pageTypeService;
+
+  @Requirement(PageTypeClass.CLASS_DEF_HINT)
+  private ClassDefinition pageTypeClassDef;
 
   @Requirement
-  IPageTypeClassConfig pageTypeClassCfg;
+  private IModelAccessFacade modelAccess;
 
   @Requirement
-  IModelAccessFacade modelAccess;
-
-  @Requirement
-  Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-  }
+  private ModelContext context;
 
   @Override
   public PageTypeReference getPageTypeRefForCurrentDoc() {
-    XWikiDocument doc = getContext().getDoc();
-    if ((getContext().getRequest() != null) && ("inline".equals(getContext().getAction()))) {
-      String templName = getContext().getRequest().get("template");
-      if (!Strings.isNullOrEmpty(templName)) {
-        try {
-          DocumentReference docRef = webUtilsService.resolveDocumentReference(templName);
-          doc = modelAccess.getDocument(docRef);
-          LOGGER.debug("getPageTypeRefForCurrentDoc: creating new document, getting page type from "
-              + "template {}", docRef);
-        } catch (DocumentNotExistsException exp) {
-          LOGGER.warn("Exception while getting template doc '{}", templName, exp);
-        }
-      }
-    }
+    XWikiDocument doc = firstNonNull(webUtilsService.getWikiTemplateDoc(), context.getDoc());
     return getPageTypeRefForDocWithDefault(doc);
   }
 
@@ -120,7 +107,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   @Override
   public PageTypeReference getDefaultPageTypeRefForDoc(DocumentReference docRef) {
     FieldInheritor inheritor = new InheritorFactory().getConfigFieldInheritor(
-        pageTypeClassCfg.getPageTypeClassRef(docRef.getWikiReference()), docRef);
+        pageTypeClassDef.getClassReference().getDocRef(docRef.getWikiReference()), docRef);
     String defPageTypeName = inheritor.getStringValue(IPageTypeClassConfig.PAGE_TYPE_FIELD,
         "RichText");
     PageTypeReference pageTypeRef = pageTypeService.getPageTypeRefByConfigName(defPageTypeName);
@@ -131,41 +118,48 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   @Override
-  public PageTypeReference getPageTypeRefForDoc(XWikiDocument checkDoc) {
-    BaseObject pageTypeObj = getPageTypeObject(checkDoc);
-    if (pageTypeObj != null) {
-      String pageType = pageTypeObj.getStringValue(IPageTypeClassConfig.PAGE_TYPE_FIELD);
-      return pageTypeService.getPageTypeRefByConfigName(pageType);
+  public Optional<PageTypeReference> resolvePageTypeReference(XWikiDocument doc) {
+    return pageTypeService.getPageTypeReference(getPageTypeFetcher(doc).fetchField(
+        PageTypeClass.FIELD_PAGE_TYPE).first().or(""));
+  }
+
+  @Override
+  @Deprecated
+  public PageTypeReference getPageTypeRefForDoc(XWikiDocument doc) {
+    if (doc != null) {
+      return resolvePageTypeReference(doc).orNull();
     }
     return null;
   }
 
   @Override
-  public BaseObject getPageTypeObject(XWikiDocument checkDoc) {
-    if (checkDoc != null) {
-      if (checkDoc.isNew() && (webUtilsService.getWikiTemplateDocRef() != null)) {
-        checkDoc = webUtilsService.getWikiTemplateDoc();
-      }
-      DocumentReference pageTypeClassRef = pageTypeClassCfg.getPageTypeClassRef(
-          checkDoc.getDocumentReference().getWikiReference());
-      if ((checkDoc.getXObjects(pageTypeClassRef) != null) && (checkDoc.getXObjects(
-          pageTypeClassRef).size() > 0)) {
-        BaseObject pageTypeObj = checkDoc.getXObject(pageTypeClassRef);
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("getPageTypeObject: page type object for class [" + pageTypeClassRef
-              + "] found for [" + checkDoc + "] with object details: " + pageTypeObj.toXMLString());
-        } else {
-          LOGGER.debug("getPageTypeObject: page type object for class [" + pageTypeClassRef
-              + "] found for [" + checkDoc + "].");
-        }
-        return pageTypeObj;
-      }
-      LOGGER.debug("getPageTypeObject: no page type object for class [" + pageTypeClassRef
-          + "] found for [" + checkDoc + "].");
-    } else {
-      LOGGER.warn("getPageTypeObject: checkDoc parameter is null!");
+  @Deprecated
+  public BaseObject getPageTypeObject(XWikiDocument doc) {
+    BaseObject pageTypeObj = null;
+    if (doc != null) {
+      pageTypeObj = getPageTypeFetcher(doc).first().orNull();
     }
-    return null;
+    return pageTypeObj;
+  }
+
+  private XWikiObjectFetcher getPageTypeFetcher(XWikiDocument doc) {
+    if (useTemplateDoc(doc)) {
+      doc = webUtilsService.getWikiTemplateDoc();
+    }
+    XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(doc).filter(pageTypeClassDef);
+    if (LOGGER.isTraceEnabled() && fetcher.exists()) {
+      LOGGER.trace("getPageTypeFetcher - for [{}] with object [{}] details: {}", doc,
+          fetcher.first().get(), fetcher.first().get().toXMLString());
+    } else if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("getPageTypeFetcher - for [{}]: {}", doc, fetcher.first().orNull());
+    }
+    return fetcher;
+  }
+
+  private boolean useTemplateDoc(XWikiDocument doc) {
+    return doc.isNew() && (context.getDoc() != null) && doc.getDocumentReference().equals(
+        context.getDoc().getDocumentReference())
+        && (webUtilsService.getWikiTemplateDocRef() != null);
   }
 
 }

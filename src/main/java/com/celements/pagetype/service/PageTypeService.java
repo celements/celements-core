@@ -144,8 +144,14 @@ public class PageTypeService implements IPageTypeRole {
   }
 
   @Override
+  @Deprecated
   public PageTypeReference getPageTypeRefByConfigName(String pageTypeName) {
-    return getPageTypeRefsByConfigNames().get(pageTypeName);
+    return getPageTypeReference(pageTypeName).orNull();
+  }
+
+  @Override
+  public Optional<PageTypeReference> getPageTypeReference(String pageTypeName) {
+    return Optional.fromNullable(getPageTypeRefsByConfigNames().get(pageTypeName));
   }
 
   private IPageTypeProviderRole getProviderForPageTypeRef(PageTypeReference pageTypeRef) {
