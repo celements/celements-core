@@ -60,6 +60,7 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.EntityTypeUtil;
 import com.celements.model.util.ModelUtils;
@@ -1121,7 +1122,7 @@ public class WebUtilsService implements IWebUtilsService {
       String templateFN = getContext().getRequest().get("template");
       if ((templateFN != null) && !"".equals(templateFN.trim())) {
         DocumentReference templateDocRef = resolveDocumentReference(templateFN);
-        if (getContext().getWiki().exists(templateDocRef, getContext())) {
+        if (getModelAccess().exists(templateDocRef)) {
           return templateDocRef;
         }
       }
@@ -1134,9 +1135,9 @@ public class WebUtilsService implements IWebUtilsService {
     DocumentReference templateDocRef = getWikiTemplateDocRef();
     if (templateDocRef != null) {
       try {
-        return getContext().getWiki().getDocument(templateDocRef, getContext());
-      } catch (XWikiException exp) {
-        LOGGER.error("Exception while getting template doc '" + templateDocRef + "'", exp);
+        return getModelAccess().getDocument(templateDocRef);
+      } catch (DocumentNotExistsException exp) {
+        LOGGER.warn("requested template doc '{}' doesn't exists", templateDocRef, exp);
       }
     }
     return null;
@@ -1207,10 +1208,9 @@ public class WebUtilsService implements IWebUtilsService {
   public String getInheritedTemplatedPath(DocumentReference localTemplateRef) {
     if (localTemplateRef != null) {
       String templatePath = getRefDefaultSerializer().serialize(localTemplateRef);
-      if (!getContext().getWiki().exists(localTemplateRef, getContext())) {
+      if (!getModelAccess().exists(localTemplateRef)) {
         if (!"celements2web".equals(localTemplateRef.getLastSpaceReference().getParent().getName())
-            && getContext().getWiki().exists(getCentralTemplateRef(localTemplateRef),
-                getContext())) {
+            && getModelAccess().exists(getCentralTemplateRef(localTemplateRef))) {
           templatePath = "celements2web:" + templatePath;
         } else {
           templatePath = ":" + templatePath.replaceAll("celements2web:", "");
