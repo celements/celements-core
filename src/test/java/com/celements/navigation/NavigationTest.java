@@ -51,6 +51,7 @@ import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -263,8 +264,8 @@ public class NavigationTest extends AbstractComponentTest {
     expect(getWikiMock().getDocument(eq(currentDocRef), same(getContext()))).andReturn(
         currentDoc).once();
     String testPageType = "TestPageType";
-    expect(ptServiceMock.getPageTypeRefByConfigName(testPageType)).andReturn(new PageTypeReference(
-        testPageType, "myTestProvider", Collections.<String>emptyList()));
+    expect(ptServiceMock.getPageTypeReference(testPageType)).andReturn(Optional.of(
+        new PageTypeReference(testPageType, "myTestProvider", Collections.<String>emptyList())));
     replayDefault();
     assertEquals(testPageType, nav.getPageTypeConfigName(currentDocRef));
     verifyDefault();
