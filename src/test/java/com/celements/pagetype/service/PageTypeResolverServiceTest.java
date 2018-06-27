@@ -96,6 +96,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   @Test
   public void testGetPageTypeObject_NewDocFromTemplate() throws XWikiException {
     doc.setNew(true);
+    getContext().setDoc(doc);
     DocumentReference templDocRef = new DocumentReference(context.getDatabase(), "Blog",
         "ArticleTemplate");
     XWikiDocument templDoc = expectDoc(templDocRef);
@@ -114,6 +115,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   @Test
   public void testGetPageTypeObject_cellFromCentralDB() throws XWikiException {
     doc.setNew(true);
+    getContext().setDoc(doc);
     DocumentReference centralCellDocRef = new DocumentReference("celements2web", "SimpleLayout",
         "cell1");
     XWikiDocument centralCellDoc = new XWikiDocument(centralCellDocRef);
@@ -126,7 +128,8 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
     verifyDefault();
     assertNotNull("no page type object found. Maybe class ref has the wrong wiki" + " reference?",
         resultPTObj);
-    assertSame(pageTypeObj, resultPTObj);
+    assertNotSame("clone should be returned", pageTypeObj, resultPTObj);
+    assertEquals(pageTypeObj, resultPTObj);
   }
 
   @Test
@@ -247,6 +250,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   @Test
   public void testGetPageTypeRefForDocWithDefault_NewDocFromTemplate() throws XWikiException {
     doc.setNew(true);
+    getContext().setDoc(doc);
     DocumentReference templDocRef = new DocumentReference(context.getDatabase(), "Blog",
         "ArticleTemplate");
     XWikiDocument templDoc = expectDoc(templDocRef);
@@ -267,7 +271,6 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetPageTypeWithDefault_nullAsDefault() {
-    expect(request.get(eq("template"))).andReturn(null);
     replayDefault();
     assertNull(pageTypeResolver.getPageTypeRefForDocWithDefault(doc, null));
     verifyDefault();

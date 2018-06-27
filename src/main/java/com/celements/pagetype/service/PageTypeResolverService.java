@@ -33,7 +33,6 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.context.ModelContext;
-import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.PageTypeReference;
@@ -144,11 +143,10 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   private XWikiObjectFetcher getPageTypeFetcher(XWikiDocument doc) {
-    XWikiObjectFetcher fetcher = XWikiObjectEditor.on(doc).filter(pageTypeClassDef).fetch();
-    if (!fetcher.exists() && doc.isNew() && (webUtilsService.getWikiTemplateDocRef() != null)) {
-      fetcher = XWikiObjectFetcher.on(webUtilsService.getWikiTemplateDoc()).filter(
-          pageTypeClassDef);
+    if (useTemplateDoc(doc)) {
+      doc = webUtilsService.getWikiTemplateDoc();
     }
+    XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(doc).filter(pageTypeClassDef);
     if (LOGGER.isTraceEnabled() && fetcher.exists()) {
       LOGGER.trace("getPageTypeFetcher - for [{}] with object [{}] details: {}", doc,
           fetcher.first().get(), fetcher.first().get().toXMLString());
@@ -156,6 +154,12 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
       LOGGER.debug("getPageTypeFetcher - for [{}]: {}", doc, fetcher.first().orNull());
     }
     return fetcher;
+  }
+
+  private boolean useTemplateDoc(XWikiDocument doc) {
+    return doc.isNew() && (context.getDoc() != null) && doc.getDocumentReference().equals(
+        context.getDoc().getDocumentReference())
+        && (webUtilsService.getWikiTemplateDocRef() != null);
   }
 
 }
