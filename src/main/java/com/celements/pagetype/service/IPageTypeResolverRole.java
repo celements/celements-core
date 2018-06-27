@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.PageTypeReference;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -35,23 +36,33 @@ public interface IPageTypeResolverRole {
   public PageTypeReference getPageTypeRefForCurrentDoc();
 
   /**
-   * getPageTypeObject returns the page-type object attached to the given checkDoc. If the
-   * checkDoc isNew and thus has no objects it falls back to the wikiTemplateDoc in case
+   * getPageTypeObject returns the page-type object attached to the given doc. If the
+   * doc isNew and thus has no objects it falls back to the wikiTemplateDoc in case
    * one is defined in the request.
    *
-   * @param checkDocRef
+   * @deprecated since 3.1
+   * @param docRef
    * @return page-type object or null if non is present
    */
-  public BaseObject getPageTypeObject(XWikiDocument checkDocRef);
+  @Deprecated
+  public BaseObject getPageTypeObject(XWikiDocument docRef);
 
   /**
-   * getPageTypeRefForDoc gets the PageTypeRef defined by the PageType-xobject attached to
-   * the given document. It returns null if no valid PageType-xobject is found.
+   * @deprecated since 3.1, instead use {@link #resolvePageTypeReference(XWikiDocument)}
+   */
+  @Nullable
+  @Deprecated
+  public PageTypeReference getPageTypeRefForDoc(@Nullable XWikiDocument doc);
+
+  /**
+   * gets the {@link PageTypeReference} defined by the PageType-xobject attached to
+   * the given document.
    *
-   * @param checkDoc
+   * @param doc
    * @return
    */
-  public PageTypeReference getPageTypeRefForDoc(XWikiDocument checkDoc);
+  @NotNull
+  public Optional<PageTypeReference> resolvePageTypeReference(@NotNull XWikiDocument doc);
 
   /**
    * getDefaultPageTypeRefForDoc returns the PageTypeReference which is defined as default
