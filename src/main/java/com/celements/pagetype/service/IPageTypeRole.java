@@ -43,8 +43,15 @@ public interface IPageTypeRole {
   @Nullable
   public IPageTypeConfig getPageTypeConfigForPageTypeRef(@NotNull PageTypeReference pageTypeRef);
 
+  /**
+   * @deprecated since 3.1 instead use {@link #getPageTypeReference(String)}
+   */
   @Nullable
-  public PageTypeReference getPageTypeRefByConfigName(String pageTypeName);
+  @Deprecated
+  public PageTypeReference getPageTypeRefByConfigName(@Nullable String pageTypeName);
+
+  @NotNull
+  public Optional<PageTypeReference> getPageTypeReference(@Nullable String pageTypeName);
 
   public List<String> getPageTypesConfigNamesForCategories(Set<String> catList,
       boolean onlyVisible);
