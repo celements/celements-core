@@ -131,3 +131,5 @@ com.celements.auth.user.CelementsUser
 com.celements.auth.user.CelementsUserService
 com.celements.web.service.UrlScriptService
 com.celements.web.service.XWikiUrlService
+com.celements.auth.classes.AuthClassPackage
+com.celements.auth.classes.RemoteLoginClass
