@@ -19,6 +19,7 @@
  */
 package com.celements.inheritor;
 
+import static com.celements.common.MoreFunctions.*;
 import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
 
@@ -36,11 +37,14 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.IIteratorFactory;
 import com.celements.iterator.XObjectIterator;
-import com.celements.model.util.ModelUtils;
+import com.celements.model.util.ReferenceSerializationMode;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -49,17 +53,13 @@ public class InheritorFactory {
   private IWebUtils _injectedWebUtils;
   private PageLayoutCommand injectedPageLayoutCmd;
 
-  public FieldInheritor getFieldInheritor(ClassReference classRef, List<DocumentReference> docList,
-      XWikiContext context) {
-    ;
-    String className = getModelUtils().serializeRef(classRef);
-    List<String> fullNameList = new ArrayList<>();
-    for (DocumentReference docRef : docList) {
-      if (docRef != null) {
-        fullNameList.add(getModelUtils().serializeRef(docRef));
-      }
-    }
-    return getFieldInheritor(className, fullNameList, context);
+  private static final Function<EntityReference, String> SERIALIZE_FUNC = serializeRefFunction(
+      ReferenceSerializationMode.GLOBAL);
+
+  public FieldInheritor getFieldInheritor(ClassReference classRef,
+      Iterable<DocumentReference> docRefs, XWikiContext context) {
+    return getFieldInheritor(SERIALIZE_FUNC.apply(classRef), FluentIterable.from(docRefs).transform(
+        SERIALIZE_FUNC).toList(), context);
   }
 
   public FieldInheritor getFieldInheritor(final String className, final List<String> docList,
@@ -164,9 +164,10 @@ public class InheritorFactory {
   public FieldInheritor getConfigFieldInheritor(ClassReference classRef,
       EntityReference reference) {
     checkArgument(isAbsoluteRef(reference));
-    return getFieldInheritor(classRef, Arrays.asList(extractRef(reference,
+    Iterable<DocumentReference> docRefs = FluentIterable.of(extractRef(reference,
         DocumentReference.class).orNull(), getSpacePrefDocRef(reference), getXWikiPrefDocRef(
-            reference)), getContext());
+            reference)).filter(Predicates.notNull());
+    return getFieldInheritor(classRef, docRefs, getContext());
   }
 
   DocumentReference getSpacePrefDocRef(EntityReference reference) {
@@ -189,10 +190,6 @@ public class InheritorFactory {
   private XWikiContext getContext() {
     return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
         "xwikicontext");
-  }
-
-  ModelUtils getModelUtils() {
-    return Utils.getComponent(ModelUtils.class);
   }
 
 }
