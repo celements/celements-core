@@ -79,10 +79,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   @Override
   @Deprecated
   public PageTypeReference getPageTypeRefForDocWithDefault(XWikiDocument doc) {
-    if (doc != null) {
-      return resolvePageTypeReferenceWithDefault(doc);
-    }
-    return null;
+    return resolvePageTypeReferenceWithDefault(doc);
   }
 
   @Override

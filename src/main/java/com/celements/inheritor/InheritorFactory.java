@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -37,6 +36,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.IIteratorFactory;
 import com.celements.iterator.XObjectIterator;
+import com.celements.model.context.ModelContext;
 import com.celements.model.util.ReferenceSerializationMode;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.utils.IWebUtils;
@@ -57,20 +57,24 @@ public class InheritorFactory {
       ReferenceSerializationMode.GLOBAL);
 
   public FieldInheritor getFieldInheritor(ClassReference classRef,
-      Iterable<DocumentReference> docRefs, XWikiContext context) {
+      Iterable<DocumentReference> docRefs) {
     return getFieldInheritor(SERIALIZE_FUNC.apply(classRef), FluentIterable.from(docRefs).transform(
-        SERIALIZE_FUNC).toList(), context);
+        SERIALIZE_FUNC).toList(), getContext().getXWikiContext());
   }
 
+  /**
+   * @deprecated instead use {@link #getFieldInheritor(ClassReference, Iterable)}
+   * @since 3.2
+   */
+  @Deprecated
   public FieldInheritor getFieldInheritor(final String className, final List<String> docList,
-      XWikiContext context) {
-    final XWikiContext localContext = context;
+      final XWikiContext context) {
     FieldInheritor inheritor = new FieldInheritor();
     inheritor.setIteratorFactory(new IIteratorFactory<XObjectIterator>() {
 
       @Override
       public XObjectIterator createIterator() {
-        XObjectIterator iterator = new XObjectIterator(localContext);
+        XObjectIterator iterator = new XObjectIterator(context);
         iterator.setClassName(className);
         iterator.setDocList(docList);
         return iterator;
@@ -167,7 +171,7 @@ public class InheritorFactory {
     Iterable<DocumentReference> docRefs = FluentIterable.of(extractRef(reference,
         DocumentReference.class).orNull(), getSpacePrefDocRef(reference), getXWikiPrefDocRef(
             reference)).filter(Predicates.notNull());
-    return getFieldInheritor(classRef, docRefs, getContext());
+    return getFieldInheritor(classRef, docRefs);
   }
 
   DocumentReference getSpacePrefDocRef(EntityReference reference) {
@@ -187,9 +191,8 @@ public class InheritorFactory {
     return null;
   }
 
-  private XWikiContext getContext() {
-    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
+  private ModelContext getContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
 }
