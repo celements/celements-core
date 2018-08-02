@@ -19,6 +19,7 @@
  */
 package com.celements.inheritor;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -27,31 +28,30 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.XObjectIterator;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.utils.IWebUtils;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 
-public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
+public class InheritorFactoryTest extends AbstractComponentTest {
 
-  private InheritorFactory _factory;
-  private XWikiContext _context;
-  private IWebUtils _mockWebUtils;
-  private XWiki _xwiki;
+  private InheritorFactory factory;
+  private IWebUtils mockWebUtils;
+  private PageLayoutCommand mockPageLayoutCmd;
 
   @Before
   public void setUp_InheritorFactoryTest() throws Exception {
-    _context = getContext();
-    _xwiki = createMock(XWiki.class);
-    _context.setWiki(_xwiki);
-    _factory = new InheritorFactory();
-    _mockWebUtils = createMock(IWebUtils.class);
-    _factory.inject_TEST_WebUtils(_mockWebUtils);
+    factory = new InheritorFactory();
+    mockWebUtils = createMockAndAddToDefault(IWebUtils.class);
+    factory.inject_TEST_WebUtils(mockWebUtils);
+    mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    factory.injectPageLayoutCmd(mockPageLayoutCmd);
   }
 
   @Test
@@ -60,7 +60,7 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
     List<String> docList = new ArrayList<>();
     docList.add("my.Doc");
     docList.add("my.Doc2");
-    FieldInheritor inheritor = _factory.getFieldInheritor(className, docList, _context);
+    FieldInheritor inheritor = factory.getFieldInheritor(className, docList, getContext());
     XObjectIterator iterator = inheritor.getIteratorFactory().createIterator();
     assertEquals(className, iterator.getClassName());
     assertEquals(docList, iterator.getDocListCopy());
@@ -71,7 +71,7 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
     List<String> docList = new ArrayList<>();
     docList.add("my.Doc");
     docList.add("my.Doc2");
-    ContentInheritor inheritor = _factory.getContentInheritor(docList, _context);
+    ContentInheritor inheritor = factory.getContentInheritor(docList, getContext());
     DocumentIterator iterator = inheritor.getIteratorFactory().createIterator();
     assertEquals(docList, iterator.getDocListCopy());
   }
@@ -84,20 +84,21 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
     docList.add(fullName);
     docList.add("myparent.Doc");
     docList.add("myparent.Doc2");
-    expect(_mockWebUtils.getDocumentParentsList(eq(fullName), eq(true), same(_context))).andReturn(
-        docList);
-    replayAll();
-    FieldInheritor inheritor = _factory.getNavigationFieldInheritor(className, fullName, _context);
+    expect(mockWebUtils.getDocumentParentsList(eq(fullName), eq(true), same(
+        getContext()))).andReturn(docList);
+    replayDefault();
+    FieldInheritor inheritor = factory.getNavigationFieldInheritor(className, fullName,
+        getContext());
     XObjectIterator iterator = inheritor.getIteratorFactory().createIterator();
     assertEquals(className, iterator.getClassName());
     assertEquals(docList, iterator.getDocListCopy());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testgetSpacePreferencesFullName() {
     String fullName = "mySpace.myDoc";
-    assertEquals("mySpace.WebPreferences", _factory.getSpacePreferencesFullName(fullName));
+    assertEquals("mySpace.WebPreferences", factory.getSpacePreferencesFullName(fullName));
   }
 
   @Test
@@ -108,7 +109,7 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
     docList.add(fullName);
     docList.add("mySpace.WebPreferences");
     docList.add("XWiki.XWikiPreferences");
-    FieldInheritor inheritor = _factory.getPageLayoutInheritor(fullName, _context);
+    FieldInheritor inheritor = factory.getPageLayoutInheritor(fullName, getContext());
     XObjectIterator iterator = inheritor.getIteratorFactory().createIterator();
     assertEquals(className, iterator.getClassName());
     assertEquals(docList, iterator.getDocListCopy());
@@ -116,61 +117,77 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetConfigDocFieldInheritor_fullnames() throws Exception {
-    PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
-    _factory.injectPageLayoutCmd(mockPageLayoutCmd);
     String className = "mySpace.myClassName";
     String fullName = "mySpace.myDocName";
     List<String> docList = new ArrayList<>();
     docList.add("mySpace.WebPreferences");
     docList.add("XWiki.XWikiPreferences");
-    DocumentReference webHomeDocRef = new DocumentReference(_context.getDatabase(), "mySpace",
+    DocumentReference webHomeDocRef = new DocumentReference(getContext().getDatabase(), "mySpace",
         "WebHome");
-    expect(_xwiki.exists(eq(webHomeDocRef), same(_context))).andReturn(false).anyTimes();
-    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(fullName), same(_context))).andReturn(null);
-    expect(_xwiki.getSpacePreference(eq("skin"), same(_context))).andReturn(null);
-    replayAll(mockPageLayoutCmd);
-    FieldInheritor fieldInheritor = _factory.getConfigDocFieldInheritor(className, fullName,
-        _context);
+    expect(getWikiMock().exists(eq(webHomeDocRef), same(getContext()))).andReturn(false).anyTimes();
+    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(fullName), same(getContext()))).andReturn(null);
+    expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn(null);
+    replayDefault();
+    FieldInheritor fieldInheritor = factory.getConfigDocFieldInheritor(className, fullName,
+        getContext());
     XObjectIterator iterator = fieldInheritor.getIteratorFactory().createIterator();
-    verifyAll(mockPageLayoutCmd);
+    verifyDefault();
     assertEquals(className, iterator.getClassName());
     assertEquals(docList, iterator.getDocListCopy());
   }
 
   @Test
   public void testGetConfigFieldInheritor_docRef() throws Exception {
-    PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
-    _factory.injectPageLayoutCmd(mockPageLayoutCmd);
     String className = "mySpace.myClassName";
     String fullName = "mySpace.myDocName";
-    DocumentReference docRef = new DocumentReference(_context.getDatabase(), "mySpace",
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
         "myDocName");
-    DocumentReference classDocRef = new DocumentReference(_context.getDatabase(), "mySpace",
-        "myClassName");
+    ClassReference classRef = new ClassReference("mySpace", "myClassName");
     List<String> docList = new ArrayList<>();
     docList.add("xwikidb:" + fullName);
     docList.add("xwikidb:mySpace.WebPreferences");
     docList.add("xwikidb:XWiki.XWikiPreferences");
-    replayAll(mockPageLayoutCmd);
-    FieldInheritor fieldInheritor = _factory.getConfigFieldInheritor(classDocRef, docRef);
+    replayDefault();
+    FieldInheritor fieldInheritor = factory.getConfigFieldInheritor(classRef, docRef);
     XObjectIterator iterator = fieldInheritor.getIteratorFactory().createIterator();
-    verifyAll(mockPageLayoutCmd);
-    assertEquals("xwikidb:" + className, iterator.getClassName());
+    verifyDefault();
+    assertEquals(className, iterator.getClassName());
     assertEquals(docList, iterator.getDocListCopy());
   }
 
-  // *****************************************************************
-  // * H E L P E R - M E T H O D S *
-  // *****************************************************************/
-
-  private void replayAll(Object... mocks) {
-    replay(_xwiki, _mockWebUtils);
-    replay(mocks);
+  @Test
+  public void testGetConfigFieldInheritor_spaceRef() throws Exception {
+    String className = "mySpace.myClassName";
+    SpaceReference spaceRef = new SpaceReference("mySpace", getWikiRef());
+    ClassReference classRef = new ClassReference("mySpace", "myClassName");
+    List<String> docList = new ArrayList<>();
+    docList.add("xwikidb:mySpace.WebPreferences");
+    docList.add("xwikidb:XWiki.XWikiPreferences");
+    replayDefault();
+    FieldInheritor fieldInheritor = factory.getConfigFieldInheritor(classRef, spaceRef);
+    XObjectIterator iterator = fieldInheritor.getIteratorFactory().createIterator();
+    verifyDefault();
+    assertEquals(className, iterator.getClassName());
+    assertEquals(docList, iterator.getDocListCopy());
   }
 
-  private void verifyAll(Object... mocks) {
-    verify(_xwiki, _mockWebUtils);
-    verify(mocks);
+  @Test
+  public void testGetConfigFieldInheritor_wikiRef() throws Exception {
+    String className = "mySpace.myClassName";
+    WikiReference wikiRef = getWikiRef();
+    ClassReference classRef = new ClassReference("mySpace", "myClassName");
+    List<String> docList = new ArrayList<>();
+    docList.add("xwikidb:XWiki.XWikiPreferences");
+    replayDefault();
+    FieldInheritor fieldInheritor = factory.getConfigFieldInheritor(classRef, wikiRef);
+    XObjectIterator iterator = fieldInheritor.getIteratorFactory().createIterator();
+    verifyDefault();
+    assertEquals(className, iterator.getClassName());
+    assertEquals(docList, iterator.getDocListCopy());
+  }
+
+  private WikiReference getWikiRef() {
+    return new WikiReference(getContext().getDatabase());
   }
 
 }

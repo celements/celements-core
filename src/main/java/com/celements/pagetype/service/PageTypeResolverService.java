@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.inheritor.FieldInheritor;
 import com.celements.inheritor.InheritorFactory;
@@ -39,6 +40,7 @@ import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
+import com.google.common.base.Supplier;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -63,27 +65,51 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   private ModelContext context;
 
   @Override
+  @Deprecated
   public PageTypeReference getPageTypeRefForCurrentDoc() {
-    XWikiDocument doc = firstNonNull(webUtilsService.getWikiTemplateDoc(), context.getDoc());
-    return getPageTypeRefForDocWithDefault(doc);
+    return resolvePageTypeRefForCurrentDoc();
   }
 
   @Override
+  public PageTypeReference resolvePageTypeRefForCurrentDoc() {
+    XWikiDocument tmplDoc = webUtilsService.getWikiTemplateDoc();
+    return resolvePageTypeReferenceWithDefault(tmplDoc != null ? tmplDoc : context.getDoc());
+  }
+
+  @Override
+  @Deprecated
   public PageTypeReference getPageTypeRefForDocWithDefault(XWikiDocument doc) {
-    if (doc != null) {
-      PageTypeReference pageTypeRef = getPageTypeRefForDoc(doc);
-      if (pageTypeRef == null) {
-        pageTypeRef = getDefaultPageTypeRefForDoc(doc.getDocumentReference());
-      }
-      return pageTypeRef;
-    }
-    return null;
+    return resolvePageTypeReferenceWithDefault(doc);
   }
 
   @Override
+  public PageTypeReference resolvePageTypeReferenceWithDefault(XWikiDocument doc) {
+    Optional<PageTypeReference> pageTypeRef;
+    final EntityReference fallbackReference;
+    if (doc != null) {
+      pageTypeRef = resolvePageTypeReference(doc);
+      fallbackReference = doc.getDocumentReference();
+    } else {
+      pageTypeRef = Optional.absent();
+      fallbackReference = context.getWikiRef();
+    }
+    return pageTypeRef.or(new Supplier<PageTypeReference>() { // lazy evaluation
+
+      @Override
+      public PageTypeReference get() {
+        return resolveDefaultPageTypeReference(fallbackReference);
+      }
+    });
+  }
+
+  @Override
+  @Deprecated
   public PageTypeReference getPageTypeRefForDocWithDefault(XWikiDocument doc,
       PageTypeReference defaultPTRef) {
-    PageTypeReference pageTypeRef = getPageTypeRefForDoc(doc);
+    PageTypeReference pageTypeRef = null;
+    if (doc != null) {
+      pageTypeRef = resolvePageTypeReference(doc).orNull();
+    }
     if (pageTypeRef == null) {
       pageTypeRef = defaultPTRef;
     }
@@ -93,28 +119,42 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   @Override
+  @Deprecated
   public PageTypeReference getPageTypeRefForDocWithDefault(DocumentReference docRef) {
+    return resolvePageTypeReferenceWithDefault(docRef);
+  }
+
+  @Override
+  public PageTypeReference resolvePageTypeReferenceWithDefault(DocumentReference docRef) {
     PageTypeReference pageTypeRef;
     try {
-      XWikiDocument doc = modelAccess.getDocument(docRef);
-      pageTypeRef = getPageTypeRefForDocWithDefault(doc);
+      XWikiDocument doc = null;
+      if (docRef != null) {
+        doc = modelAccess.getDocument(docRef);
+      }
+      pageTypeRef = resolvePageTypeReferenceWithDefault(doc);
     } catch (DocumentNotExistsException notExistsExp) {
-      pageTypeRef = getDefaultPageTypeRefForDoc(docRef);
+      pageTypeRef = resolveDefaultPageTypeReference(docRef);
     }
     return pageTypeRef;
   }
 
   @Override
+  @Deprecated
   public PageTypeReference getDefaultPageTypeRefForDoc(DocumentReference docRef) {
+    return resolveDefaultPageTypeReference(docRef);
+  }
+
+  @Override
+  public PageTypeReference resolveDefaultPageTypeReference(EntityReference reference) {
     FieldInheritor inheritor = new InheritorFactory().getConfigFieldInheritor(
-        pageTypeClassDef.getClassReference().getDocRef(docRef.getWikiReference()), docRef);
-    String defPageTypeName = inheritor.getStringValue(IPageTypeClassConfig.PAGE_TYPE_FIELD,
-        "RichText");
-    PageTypeReference pageTypeRef = pageTypeService.getPageTypeRefByConfigName(defPageTypeName);
-    if (pageTypeRef != null) {
-      return pageTypeRef;
-    }
-    return pageTypeService.getPageTypeRefByConfigName("RichText");
+        pageTypeClassDef.getClassReference(), firstNonNull(reference, context.getWikiRef()));
+    String defPageTypeName = inheritor.getStringValue(IPageTypeClassConfig.PAGE_TYPE_FIELD);
+    return pageTypeService.getPageTypeReference(defPageTypeName).or(getDefaultPageTypeReference());
+  }
+
+  PageTypeReference getDefaultPageTypeReference() {
+    return pageTypeService.getPageTypeReference("RichText").get();
   }
 
   @Override

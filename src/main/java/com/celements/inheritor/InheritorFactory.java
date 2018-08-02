@@ -19,21 +19,32 @@
  */
 package com.celements.inheritor;
 
+import static com.celements.common.MoreFunctions.*;
+import static com.celements.model.util.References.*;
+import static com.google.common.base.Preconditions.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.xwiki.context.Execution;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.IIteratorFactory;
 import com.celements.iterator.XObjectIterator;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ReferenceSerializationMode;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -41,17 +52,29 @@ public class InheritorFactory {
 
   private IWebUtils _injectedWebUtils;
   private PageLayoutCommand injectedPageLayoutCmd;
-  IWebUtilsService _webUtilsService;
 
+  private static final Function<EntityReference, String> SERIALIZE_FUNC = serializeRefFunction(
+      ReferenceSerializationMode.GLOBAL);
+
+  public FieldInheritor getFieldInheritor(ClassReference classRef,
+      Iterable<DocumentReference> docRefs) {
+    return getFieldInheritor(SERIALIZE_FUNC.apply(classRef), FluentIterable.from(docRefs).transform(
+        SERIALIZE_FUNC).toList(), getContext().getXWikiContext());
+  }
+
+  /**
+   * @deprecated instead use {@link #getFieldInheritor(ClassReference, Iterable)}
+   * @since 3.2
+   */
+  @Deprecated
   public FieldInheritor getFieldInheritor(final String className, final List<String> docList,
-      XWikiContext context) {
-    final XWikiContext localContext = context;
+      final XWikiContext context) {
     FieldInheritor inheritor = new FieldInheritor();
     inheritor.setIteratorFactory(new IIteratorFactory<XObjectIterator>() {
 
       @Override
       public XObjectIterator createIterator() {
-        XObjectIterator iterator = new XObjectIterator(localContext);
+        XObjectIterator iterator = new XObjectIterator(context);
         iterator.setClassName(className);
         iterator.setDocList(docList);
         return iterator;
@@ -129,36 +152,47 @@ public class InheritorFactory {
         getSpacePreferencesFullName(fullName), "XWiki.XWikiPreferences"), context);
   }
 
+  /**
+   * @deprecated instead use {@link #getSpacePrefDocRef(EntityReference)}
+   */
+  @Deprecated
   String getSpacePreferencesFullName(String fullName) {
     return fullName.substring(0, fullName.indexOf('.')) + ".WebPreferences";
   }
 
   public FieldInheritor getConfigFieldInheritor(DocumentReference classDocRef,
-      DocumentReference docRef) {
-    String className = getRefSerializer().serialize(classDocRef);
-    String fullName = getRefSerializer().serialize(docRef);
-    return getFieldInheritor(className, Arrays.asList(fullName, getSpacePreferencesFullName(
-        fullName), getXWikiPreferencesFullName(fullName)), getContext());
+      EntityReference reference) {
+    return getConfigFieldInheritor(new ClassReference(classDocRef), reference);
   }
 
-  private String getXWikiPreferencesFullName(String fullName) {
-    return fullName.substring(0, fullName.indexOf(':')) + ":XWiki.XWikiPreferences";
+  public FieldInheritor getConfigFieldInheritor(ClassReference classRef,
+      EntityReference reference) {
+    checkArgument(isAbsoluteRef(reference));
+    Iterable<DocumentReference> docRefs = FluentIterable.of(extractRef(reference,
+        DocumentReference.class).orNull(), getSpacePrefDocRef(reference), getXWikiPrefDocRef(
+            reference)).filter(Predicates.notNull());
+    return getFieldInheritor(classRef, docRefs);
   }
 
-  private XWikiContext getContext() {
-    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
-  }
-
-  IWebUtilsService getWebUtilsService() {
-    if (_webUtilsService == null) {
-      _webUtilsService = Utils.getComponent(IWebUtilsService.class);
+  DocumentReference getSpacePrefDocRef(EntityReference reference) {
+    Optional<SpaceReference> spaceRef = extractRef(reference, SpaceReference.class);
+    if (spaceRef.isPresent()) {
+      return create(DocumentReference.class, "WebPreferences", spaceRef.get());
     }
-    return _webUtilsService;
+    return null;
   }
 
-  private EntityReferenceSerializer<String> getRefSerializer() {
-    return getWebUtilsService().getRefDefaultSerializer();
+  private DocumentReference getXWikiPrefDocRef(EntityReference reference) {
+    Optional<WikiReference> wikiRef = extractRef(reference, WikiReference.class);
+    if (wikiRef.isPresent()) {
+      return create(DocumentReference.class, "XWikiPreferences", create(SpaceReference.class,
+          "XWiki", wikiRef.get()));
+    }
+    return null;
+  }
+
+  private ModelContext getContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
 }
