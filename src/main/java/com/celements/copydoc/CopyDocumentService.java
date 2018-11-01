@@ -16,8 +16,8 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -32,7 +32,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
   private IModelAccessFacade modelAccess;
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  private ModelUtils modelUtils;
 
   @Override
   public boolean check(XWikiDocument doc1, XWikiDocument doc2) {
@@ -60,7 +60,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
       throws ClassDocumentLoadException, DocumentSaveException {
     boolean hasChanged = copy(srcDoc, trgDoc, toIgnore);
     if (hasChanged) {
-      modelAccess.saveDocument(trgDoc, "copy from " + srcDoc);
+      modelAccess.saveDocument(trgDoc, "copy from " + serialize(srcDoc));
     }
     return hasChanged;
   }
@@ -82,8 +82,11 @@ public class CopyDocumentService implements ICopyDocumentRole {
     boolean hasChanged = false;
     hasChanged |= copyDocFields(srcDoc, trgDoc, set);
     hasChanged |= copyObjects(srcDoc, trgDoc, toIgnore, set);
-    LOGGER.info("for source '{}', target '{}', set '{}' has changed: {}" + hasChanged, srcDoc,
-        trgDoc, set, hasChanged);
+    LOGGER.info("{} - source '{}', target '{}' has changed: {}", (set ? "copy" : "check"),
+        serialize(srcDoc), serialize(trgDoc), hasChanged);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.error("stacktrace", new Exception());
+    }
     return hasChanged;
   }
 
@@ -96,7 +99,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setLanguage(srcLang);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '{}' language changed from '{}' to '{}'", trgDoc, trgLang, srcLang);
+      LOGGER.trace("for doc '{}' language changed from '{}' to '{}'", serialize(trgDoc), trgLang,
+          srcLang);
     }
     int srcTransl = srcDoc.getTranslation();
     int trgTransl = trgDoc.getTranslation();
@@ -105,8 +109,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setTranslation(srcTransl);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '{}' translation changed from '{}' to '{}'", trgDoc, trgTransl,
-          srcTransl);
+      LOGGER.trace("for doc '{}' translation changed from '{}' to '{}'", serialize(trgDoc),
+          trgTransl, srcTransl);
     }
     String srcTitle = srcDoc.getTitle();
     String trgTitle = trgDoc.getTitle();
@@ -115,7 +119,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setTitle(srcTitle);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '{}' title changed from '{}' to '{}'", trgDoc, trgTitle, srcTitle);
+      LOGGER.trace("for doc '{}' title changed from '{}' to '{}'", serialize(trgDoc), trgTitle,
+          srcTitle);
     }
     String srcContent = srcDoc.getContent();
     String trgContent = trgDoc.getContent();
@@ -124,7 +129,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setContent(srcContent);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '{}' content changed from '{}' to '{}'", trgDoc, trgContent,
+      LOGGER.trace("for doc '{}' content changed from '{}' to '{}'", serialize(trgDoc), trgContent,
           srcContent);
     }
     return hasChanged;
@@ -176,7 +181,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
           trgObj = modelAccess.newXObject(doc, classRef);
         }
         hasChanged = true;
-        LOGGER.trace("for doc '{}' new object for '{}'", doc, classRef);
+        LOGGER.trace("for doc '{}' new object '{}'", serialize(doc), classRef);
       }
       if (trgObj != null) {
         hasChanged |= copyObject(srcObj, trgObj, set);
@@ -207,8 +212,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
           modelAccess.setProperty(trgObj, name, srcVal);
         }
         hasChanged = true;
-        LOGGER.trace("for doc '{}' field '{}' changed from '{}' to '{}'",
-            trgObj.getDocumentReference(), name, trgVal, srcVal);
+        LOGGER.trace("for doc '{}' field '{}' changed from '{}' to '{}'", serialize(trgObj), name,
+            trgVal, srcVal);
       }
       trgProps.remove(name);
     }
@@ -217,9 +222,21 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgObj.removeField(name);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '{}' field '{}' set to null", trgObj.getDocumentReference(), name);
+      LOGGER.trace("for doc '{}' field '{}' set to null", serialize(trgObj), name);
     }
     return hasChanged;
+  }
+
+  private String serialize(DocumentReference docRef) {
+    return (docRef != null) ? modelUtils.serializeRef(docRef) : "null";
+  }
+
+  private String serialize(XWikiDocument doc) {
+    return (doc != null) ? serialize(doc.getDocumentReference()) : "null";
+  }
+
+  private String serialize(BaseObject obj) {
+    return (obj != null) ? serialize(obj.getDocumentReference()) : "null";
   }
 
 }
