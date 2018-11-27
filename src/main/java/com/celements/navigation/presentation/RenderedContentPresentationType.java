@@ -11,7 +11,7 @@ import com.celements.rendering.RenderCommand;
 import com.xpn.xwiki.XWikiException;
 
 @Component("renderedContent")
-public class RenderedContentPresentationType implements IPresentationTypeRole {
+public class RenderedContentPresentationType implements IPresentationTypeRole<INavigation> {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       RenderedContentPresentationType.class);
@@ -19,6 +19,12 @@ public class RenderedContentPresentationType implements IPresentationTypeRole {
   private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 
   RenderCommand renderCmd;
+
+  @Override
+  public void writeNodeContent(StringBuilder outStream, DocumentReference docRef,
+      INavigation navigation) {
+    writeNodeContent(outStream, false, false, docRef, true, 0, navigation);
+  }
 
   @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,

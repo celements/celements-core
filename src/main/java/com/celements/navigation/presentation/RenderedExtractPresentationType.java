@@ -20,7 +20,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("renderedExtract")
-public class RenderedExtractPresentationType implements IPresentationTypeRole {
+public class RenderedExtractPresentationType implements IPresentationTypeRole<INavigation> {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       RenderedExtractPresentationType.class);
@@ -44,6 +44,12 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole {
 
   private DocumentDetailsClasses getDocDetailsClasses() {
     return (DocumentDetailsClasses) docDetailsClasses;
+  }
+
+  @Override
+  public void writeNodeContent(StringBuilder outStream, DocumentReference docRef,
+      INavigation navigation) {
+    writeNodeContent(outStream, false, false, docRef, true, 0, navigation);
   }
 
   @Override

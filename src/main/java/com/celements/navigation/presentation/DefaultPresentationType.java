@@ -15,7 +15,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 @Component
-public class DefaultPresentationType implements IPresentationTypeRole {
+public class DefaultPresentationType implements IPresentationTypeRole<INavigation> {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(DefaultPresentationType.class);
 
@@ -31,6 +31,12 @@ public class DefaultPresentationType implements IPresentationTypeRole {
 
   protected XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  }
+
+  @Override
+  public void writeNodeContent(StringBuilder outStream, DocumentReference docRef,
+      INavigation navigation) {
+    writeNodeContent(outStream, false, false, docRef, true, 0, navigation);
   }
 
   @Override

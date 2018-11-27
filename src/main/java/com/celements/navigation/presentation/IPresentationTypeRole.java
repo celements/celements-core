@@ -4,13 +4,13 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.navigation.INavigation;
-
 @ComponentRole
-public interface IPresentationTypeRole {
+public interface IPresentationTypeRole<T extends PresentationNodeData> {
+
+  public void writeNodeContent(StringBuilder outStream, DocumentReference docRef, T nodeData);
 
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
-      DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation);
+      DocumentReference docRef, boolean isLeaf, int numItem, T nodeData);
 
   public String getDefaultCssClass();
 
