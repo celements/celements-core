@@ -7,9 +7,9 @@ import org.xwiki.model.reference.SpaceReference;
 @ComponentRole
 public interface IPresentationTypeRole<T extends PresentationNodeData> {
 
-  public void writeNodeContent(StringBuilder outStream, DocumentReference docRef, T nodeData);
+  public void writeNodeContent(StringBuilder writer, DocumentReference docRef, T nodeData);
 
-  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
+  public void writeNodeContent(StringBuilder writer, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, T nodeData);
 
   public String getDefaultCssClass();
