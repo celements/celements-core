@@ -1,21 +1,26 @@
 package com.celements.navigation.presentation;
 
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.cells.ICellWriter;
+
 @ComponentRole
 public interface IPresentationTypeRole<T extends PresentationNodeData> {
 
-  public void writeNodeContent(StringBuilder writer, DocumentReference docRef, T nodeData);
+  void writeNodeContent(@NotNull ICellWriter writer, @NotNull DocumentReference docRef,
+      @NotNull T nodeData);
 
-  public void writeNodeContent(StringBuilder writer, boolean isFirstItem, boolean isLastItem,
-      DocumentReference docRef, boolean isLeaf, int numItem, T nodeData);
+  void writeNodeContent(@NotNull StringBuilder writer, boolean isFirstItem, boolean isLastItem,
+      @NotNull DocumentReference docRef, boolean isLeaf, int numItem, @NotNull T nodeData);
 
-  public String getDefaultCssClass();
+  String getDefaultCssClass();
 
-  public String getEmptyDictionaryKey();
+  String getEmptyDictionaryKey();
 
-  public SpaceReference getPageLayoutForDoc(DocumentReference docRef);
+  SpaceReference getPageLayoutForDoc(DocumentReference docRef);
 
 }
