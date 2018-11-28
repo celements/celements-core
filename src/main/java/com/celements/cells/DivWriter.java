@@ -129,4 +129,9 @@ public class DivWriter implements ICellWriter {
     return getOut();
   }
 
+  @Override
+  public String toString() {
+    return getAsString();
+  }
+
 }
