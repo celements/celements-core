@@ -22,6 +22,7 @@ package com.celements.sajson;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
@@ -117,12 +118,12 @@ public class Builder {
     onFirstElement = false;
   }
 
-  public void addStringProperty(String key, String value) {
+  public void addStringProperty(String key, Object value) {
     openProperty(key);
     addString(value);
   }
 
-  public void addString(String value) {
+  public void addString(Object value) {
     checkNoDictionary();
     addOpeningPart(toJSONString(value));
     implicitCloseProperty();
@@ -202,15 +203,15 @@ public class Builder {
     }
   }
 
-  String toJSONString(String outStr) {
-    if (outStr == null) {
-      return "null";
-    } else {
+  String toJSONString(Object value) {
+    String outStr = Objects.toString(value);
+    if (value != null) {
       for (Entry<Pattern, String> entry : JSON_REPLACEMENTS.entrySet()) {
         outStr = entry.getKey().matcher(outStr).replaceAll(entry.getValue());
       }
-      return new StringBuilder("\"").append(outStr).append("\"").toString();
+      outStr = new StringBuilder("\"").append(outStr).append("\"").toString();
     }
+    return outStr;
   }
 
   /**
