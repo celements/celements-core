@@ -32,29 +32,33 @@ public interface ICellWriter {
    * @deprecated since 2.82 instead use openLevel(String, List<CellAttribute>)
    */
   @Deprecated
-  public void openLevel(@Nullable String tagName, @Nullable String idname,
-      @Nullable String cssClasses, @Nullable String cssStyles);
+  void openLevel(@Nullable String tagName, @Nullable String idname, @Nullable String cssClasses,
+      @Nullable String cssStyles);
 
   /**
    * @deprecated since 2.82 instead use openLevel(List<CellAttribute>)
    */
   @Deprecated
-  public void openLevel(String idname, String cssClasses, String cssStyles);
+  void openLevel(String idname, String cssClasses, String cssStyles);
 
-  public void closeLevel();
+  void closeLevel();
 
-  public void clear();
+  void clear();
 
-  public String getAsString();
+  void appendContent(String content);
 
-  public void appendContent(String content);
+  void openLevel();
 
-  public void openLevel();
+  void openLevel(@NotNull List<CellAttribute> attributes);
 
-  public void openLevel(@NotNull List<CellAttribute> attributes);
+  void openLevel(@NotNull String tagName);
 
-  public void openLevel(@NotNull String tagName);
+  void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes);
 
-  public void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes);
+  @NotNull
+  String getAsString();
+
+  @NotNull
+  StringBuilder getAsStringBuilder();
 
 }
