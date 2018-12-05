@@ -39,13 +39,6 @@ public class DivWriter implements ICellWriter {
   private StringBuilder out;
   private Deque<String> openLevels = new LinkedList<>();
 
-  public DivWriter() {
-  }
-
-  public DivWriter(StringBuilder out) {
-    this.out = out;
-  }
-
   @Override
   public void closeLevel() {
     String tagName = openLevels.pop();
@@ -55,7 +48,6 @@ public class DivWriter implements ICellWriter {
   }
 
   @Override
-  @Deprecated
   public void openLevel(String tagName, String idname, String cssClasses, String cssStyles) {
     openLevel(tagName, new DefaultAttributeBuilder().addId(idname).addCssClasses(
         cssClasses).addStyles(cssStyles).build());
@@ -104,7 +96,6 @@ public class DivWriter implements ICellWriter {
   @Override
   public void clear() {
     out = null;
-    openLevels.clear();
   }
 
   StringBuilder getOut() {
@@ -115,23 +106,13 @@ public class DivWriter implements ICellWriter {
   }
 
   @Override
-  public void appendContent(String content) {
-    getOut().append(content);
-  }
-
-  @Override
   public String getAsString() {
     return getOut().toString();
   }
 
   @Override
-  public StringBuilder getAsStringBuilder() {
-    return getOut();
-  }
-
-  @Override
-  public String toString() {
-    return getAsString();
+  public void appendContent(String content) {
+    getOut().append(content);
   }
 
 }

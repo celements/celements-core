@@ -43,9 +43,6 @@ public interface AttributeBuilder {
   AttributeBuilder addCssClasses(@Nullable String cssClasses);
 
   @NotNull
-  AttributeBuilder addCssClasses(@NotNull Iterable<String> cssClasses);
-
-  @NotNull
   AttributeBuilder addStyles(@Nullable String cssStyles);
 
 }

@@ -1009,7 +1009,7 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testWriteMenuItemContent_PresentationType() throws Exception {
-    IPresentationTypeRole<INavigation> componentInstance = createMockAndAddToDefault(
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
         IPresentationTypeRole.class);
     nav.setPresentationType(componentInstance);
     StringBuilder outStream = new StringBuilder();

@@ -81,14 +81,9 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
   @Override
   public AttributeBuilder addCssClasses(String cssClasses) {
     if (cssClasses != null) {
-      addCssClasses(CSS_CLASS_SPLITTER.split(cssClasses));
+      addNonEmptyAttribute("class", CSS_CLASS_SPLITTER.split(cssClasses));
     }
     return this;
-  }
-
-  @Override
-  public AttributeBuilder addCssClasses(Iterable<String> cssClasses) {
-    return addNonEmptyAttribute("class", cssClasses);
   }
 
   @Override

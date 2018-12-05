@@ -1,15 +1,14 @@
 package com.celements.navigation.presentation;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.cells.ICellWriter;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
@@ -21,9 +20,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("renderedExtract")
-public class RenderedExtractPresentationType implements IPresentationTypeRole<INavigation> {
+public class RenderedExtractPresentationType implements IPresentationTypeRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(RenderedExtractPresentationType.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      RenderedExtractPresentationType.class);
 
   private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 
@@ -44,12 +44,6 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
 
   private DocumentDetailsClasses getDocDetailsClasses() {
     return (DocumentDetailsClasses) docDetailsClasses;
-  }
-
-  @Override
-  public void writeNodeContent(ICellWriter writer, DocumentReference docRef,
-      INavigation navigation) {
-    writeNodeContent(writer.getAsStringBuilder(), false, false, docRef, true, 0, navigation);
   }
 
   @Override
