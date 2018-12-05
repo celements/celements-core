@@ -1,13 +1,14 @@
 package com.celements.navigation.presentation;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.cells.ICellWriter;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -15,9 +16,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 @Component
-public class DefaultPresentationType implements IPresentationTypeRole {
+public class DefaultPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(DefaultPresentationType.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(DefaultPresentationType.class);
 
   private static final String _CEL_CM_NAV_MI_DEFAULT_CSSCLASS = "cel_cm_navigation_menuitem";
 
@@ -31,6 +32,12 @@ public class DefaultPresentationType implements IPresentationTypeRole {
 
   protected XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  }
+
+  @Override
+  public void writeNodeContent(ICellWriter writer, DocumentReference docRef,
+      INavigation navigation) {
+    writeNodeContent(writer.getAsStringBuilder(), false, false, docRef, true, 0, navigation);
   }
 
   @Override

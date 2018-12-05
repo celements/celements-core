@@ -28,10 +28,11 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
+import com.celements.navigation.presentation.PresentationNodeData;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
-public interface INavigation {
+public interface INavigation extends PresentationNodeData {
 
   /**
    * setFromHierarchyLevel
