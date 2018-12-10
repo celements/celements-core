@@ -118,9 +118,17 @@ public class Builder {
     onFirstElement = false;
   }
 
+  public void addStringProperty(String key, String value) {
+    addStringProperty(key, (Object) value);
+  }
+
   public void addStringProperty(String key, Object value) {
     openProperty(key);
     addString(value);
+  }
+
+  public void addString(String value) {
+    addString((Object) value);
   }
 
   public void addString(Object value) {
