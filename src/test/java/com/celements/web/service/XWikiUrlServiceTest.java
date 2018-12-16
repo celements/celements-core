@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -186,6 +187,19 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
         service.createURIBuilder(null);
       }
     }.evaluate();
+    verifyDefault();
+  }
+
+  @Test
+  public void test_createURLObject_notEmptyForContentWebHome() throws Exception {
+    EntityReference docRefContentWebHome = new DocumentReference(getContext().getDatabase(),
+        "Content", "WebHome");
+    expect(urlFactoryMock.createURL(eq("Content"), eq("WebHome"), eq("view"), eq(""),
+        (String) isNull(), eq(getContext().getDatabase()), same(getContext()))).andReturn(new URL(
+            "http", "myTest.domain", ""));
+    replayDefault();
+    String urlStr = ((XWikiUrlService) service).getURL(docRefContentWebHome, "view", "");
+    assertEquals("/", urlStr);
     verifyDefault();
   }
 

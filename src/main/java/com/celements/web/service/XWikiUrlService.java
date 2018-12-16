@@ -16,6 +16,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 import com.celements.model.context.ModelContext;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 @Component
@@ -39,7 +40,11 @@ public class XWikiUrlService implements UrlService {
     checkArgument(ref != null, "reference may not be null");
     checkArgument(ref.extractReference(EntityType.SPACE) != null,
         "reference [%s] must contain space for relative url", ref);
-    return createURLObject(ref, action, queryString).getFile();
+    String urlStr = createURLObject(ref, action, queryString).getFile();
+    if (Strings.isNullOrEmpty(urlStr)) {
+      urlStr = "/";
+    }
+    return urlStr;
   }
 
   @Override
