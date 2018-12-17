@@ -3,14 +3,16 @@ package com.celements.pagetype.java;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.attribute.AttributeBuilder;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.References;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
-import com.xpn.xwiki.XWikiContext;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -22,9 +24,8 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
 
   private IJavaPageTypeRole pageTypeImpl;
 
-  private XWikiContext getContext() {
-    Execution execution = Utils.getComponent(Execution.class);
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  private ModelContext getContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
   private IWebUtilsService getWebUtilsService() {
@@ -68,12 +69,21 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
   @Override
   public String getRenderTemplateForRenderMode(String renderMode) {
     DocumentReference localTemplateRef = getLocalTemplateRef(renderMode);
-    return getWebUtilsService().getInheritedTemplatedPath(localTemplateRef);
+    return Strings.nullToEmpty(getWebUtilsService().getInheritedTemplatedPath(localTemplateRef));
   }
 
   private DocumentReference getLocalTemplateRef(String renderMode) {
-    return new DocumentReference(getContext().getDatabase(), "Templates",
-        pageTypeImpl.getRenderTemplateForRenderMode(renderMode));
+    DocumentReference localTemplateRef = null;
+    String templateName = pageTypeImpl.getRenderTemplateForRenderMode(renderMode);
+    if (!Strings.isNullOrEmpty(templateName)) {
+      localTemplateRef = References.create(DocumentReference.class, templateName,
+          getTemplateSpaceRef());
+    }
+    return localTemplateRef;
+  }
+
+  private SpaceReference getTemplateSpaceRef() {
+    return References.create(SpaceReference.class, TEMPLATE_SPACE_NAME, getContext().getWikiRef());
   }
 
   @Override

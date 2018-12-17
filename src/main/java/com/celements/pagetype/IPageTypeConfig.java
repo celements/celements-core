@@ -33,6 +33,8 @@ import com.google.common.base.Optional;
  */
 public interface IPageTypeConfig {
 
+  public static final String TEMPLATE_SPACE_NAME = "Templates";
+
   @NotNull
   public String getName();
 
