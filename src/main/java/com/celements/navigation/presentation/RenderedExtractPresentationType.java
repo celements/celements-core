@@ -11,7 +11,10 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.ICellWriter;
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.References;
 import com.celements.navigation.INavigation;
+import com.celements.pagetype.IPageTypeConfig;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.classcollections.DocumentDetailsClasses;
 import com.celements.web.service.IWebUtilsService;
@@ -28,6 +31,9 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
   private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 
   RenderCommand renderCmd;
+
+  @Requirement
+  protected ModelContext context;
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -69,7 +75,7 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
   }
 
   String getRenderedExtract(DocumentReference docRef) throws XWikiException {
-    String templatePath = webUtilsService.getInheritedTemplatedPath(getImageGalleryOverviewRef());
+    String templatePath = webUtilsService.getInheritedTemplatedPath(getTemplateRef());
     try {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       vcontext.put("extractDocRef", docRef);
@@ -84,8 +90,10 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
     return "";
   }
 
-  private DocumentReference getImageGalleryOverviewRef() {
-    return new DocumentReference(getContext().getDatabase(), "Templates", "RenderedExtract");
+  private DocumentReference getTemplateRef() {
+    SpaceReference templateSpaceRef = References.create(SpaceReference.class,
+        IPageTypeConfig.TEMPLATE_SPACE_NAME, context.getWikiRef());
+    return References.create(DocumentReference.class, "RenderedExtract", templateSpaceRef);
   }
 
   private String getDocExtract(DocumentReference docRef) throws XWikiException {

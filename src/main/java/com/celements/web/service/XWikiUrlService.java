@@ -60,7 +60,7 @@ public class XWikiUrlService implements UrlService {
   @Override
   public String getExternalURL(EntityReference ref, String action, String queryString) {
     checkArgument(ref != null, "reference may not be null");
-    return createURLObject(ref, action, queryString).toString();
+    return createURLObject(ref, action, queryString).toExternalForm();
   }
 
   @Override
