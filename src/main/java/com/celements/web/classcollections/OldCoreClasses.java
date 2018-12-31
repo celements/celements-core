@@ -604,6 +604,7 @@ public class OldCoreClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
+    needsUpdate |= bclass.addTextField("formLayout", "Formular Layout Name", 30);
     needsUpdate |= bclass.addTextField("successfulpage", "successfulpage", 30);
     needsUpdate |= bclass.addTextField("failedpage", "failedpage", 30);
     needsUpdate |= bclass.addTextField("excludeFromIsFilledCheck", "Exclude fields from"
