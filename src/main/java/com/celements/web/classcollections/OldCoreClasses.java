@@ -225,7 +225,6 @@ public class OldCoreClasses extends AbstractClassCollection {
     getPhotoAlbumClass();
     getFilebaseTagClass();
     getFormActionClass();
-    getFormConfigClass();
     getActionTypeClass();
     getActionTypePropertiesClass();
     getFormStorageClass();
@@ -585,33 +584,12 @@ public class OldCoreClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  /**
+   * @deprecated since 3.8, instead use FormConfigClass.getDocRef(WikiReference wikiRef)
+   */
+  @Deprecated
   public DocumentReference getFormConfigClassRef(String wikiName) {
     return new DocumentReference(wikiName, FORM_CONFIG_CLASS_SPACE, FORM_CONFIG_CLASS_DOC);
-  }
-
-  private BaseClass getFormConfigClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = getFormConfigClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + FORM_CONFIG_CLASS + " class document. ", exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("formLayout", "Formular Layout Name", 30);
-    needsUpdate |= bclass.addTextField("successfulpage", "successfulpage", 30);
-    needsUpdate |= bclass.addTextField("failedpage", "failedpage", 30);
-    needsUpdate |= bclass.addTextField("excludeFromIsFilledCheck", "Exclude fields from"
-        + " 'isFilled' check. (separator: ',')", 30);
-
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
   }
 
   public DocumentReference getActionTypeClassRef(String wikiName) {

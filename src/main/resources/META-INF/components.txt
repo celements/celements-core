@@ -133,3 +133,5 @@ com.celements.web.service.UrlScriptService
 com.celements.web.service.XWikiUrlService
 com.celements.auth.classes.AuthClassPackage
 com.celements.auth.classes.RemoteLoginClass
+com.celements.form.classes.FormClassPackage
+com.celements.form.classes.FormConfigClass
