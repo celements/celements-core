@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.velocity.VelocityManager;
 
@@ -21,10 +22,13 @@ import com.xpn.xwiki.web.Utils;
 @Component
 public class ActionService implements IActionServiceRole {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(ActionService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(ActionService.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;
+
+  @Requirement
+  private ConfigurationSource configSource;
 
   @Requirement
   private Execution execution;
@@ -32,20 +36,21 @@ public class ActionService implements IActionServiceRole {
   @Override
   public boolean executeAction(Document actionDoc, Map<String, String[]> request,
       XWikiDocument includingDoc, XWikiContext context) {
-    _LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");
+    LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");
     VelocityContext vcontext = getVelocityManager().getVelocityContext();
     vcontext.put("theDoc", actionDoc);
-    Boolean debug = (Boolean) vcontext.get("debug");
-    vcontext.put("debug", true);
-    Boolean hasedit = (Boolean) vcontext.get("hasedit");
-    vcontext.put("hasedit", true);
+    Object vDebugBefore = vcontext.get("debug");
+    final Object configDebug = configSource.getProperty("actionScriptDebug");
+    if (configDebug != null) {
+      vcontext.put("debug", configDebug);
+    }
     Object req = vcontext.get("request");
     vcontext.put("request", getApiUsableMap(request));
     XWikiDocument execAct = null;
     try {
       execAct = context.getWiki().getDocument("celements2web:Macros.executeActions", context);
     } catch (XWikiException e) {
-      _LOGGER.error("Could not get action Macro", e);
+      LOGGER.error("Could not get action Macro", e);
     }
     String execContent = "";
     String actionContent = "";
@@ -59,19 +64,18 @@ public class ActionService implements IActionServiceRole {
     Object successfulObj = vcontext.get("successful");
     boolean successful = (successfulObj != null) && "true".equals(successfulObj.toString());
     if (!successful) {
-      _LOGGER.error("executeAction: Error executing action. Output:" + vcontext.get(
+      LOGGER.error("executeAction: Error executing action. Output:" + vcontext.get(
           "actionScriptOutput"));
-      _LOGGER.error("executeAction: Rendered Action Script: " + actionContent);
-      _LOGGER.error("executeAction: execAct == " + execAct);
-      _LOGGER.error("executeAction: includingDoc: " + includingDoc);
-      _LOGGER.error("executeAction: execContent length: " + execContent.length());
-      _LOGGER.error("executeAction: execContent length: " + actionContent.length());
-      _LOGGER.error("executeAction: vcontext (in variable) " + vcontext);
-      _LOGGER.error("executeAction: vcontext (in context) "
+      LOGGER.error("executeAction: Rendered Action Script: " + actionContent);
+      LOGGER.error("executeAction: execAct == " + execAct);
+      LOGGER.error("executeAction: includingDoc: " + includingDoc);
+      LOGGER.error("executeAction: execContent length: " + execContent.length());
+      LOGGER.error("executeAction: execContent length: " + actionContent.length());
+      LOGGER.error("executeAction: vcontext (in variable) " + vcontext);
+      LOGGER.error("executeAction: vcontext (in context) "
           + getVelocityManager().getVelocityContext());
     }
-    vcontext.put("debug", debug);
-    vcontext.put("hasedit", hasedit);
+    vcontext.put("debug", vDebugBefore);
     vcontext.put("request", req);
     return successful;
   }
