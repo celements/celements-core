@@ -67,16 +67,16 @@ public class ActionService implements IActionServiceRole {
     Object successfulObj = vcontext.get("successful");
     boolean successful = (successfulObj != null) && "true".equals(successfulObj.toString());
     if (!successful) {
-      LOGGER.error("executeAction: Error executing action. Output:" + vcontext.get(
+      LOGGER.error("executeAction: Error executing action. Output: {}", vcontext.get(
           "actionScriptOutput"));
-      LOGGER.error("executeAction: Rendered Action Script: " + actionContent);
-      LOGGER.error("executeAction: execAct == " + execAct);
-      LOGGER.error("executeAction: includingDoc: " + includingDoc);
-      LOGGER.error("executeAction: execContent length: " + execContent.length());
-      LOGGER.error("executeAction: execContent length: " + actionContent.length());
-      LOGGER.error("executeAction: vcontext (in variable) " + vcontext);
-      LOGGER.error("executeAction: vcontext (in context) "
-          + getVelocityManager().getVelocityContext());
+      LOGGER.error("executeAction: Rendered Action Script: {}", actionContent);
+      LOGGER.error("executeAction: execAct == {}", execAct);
+      LOGGER.error("executeAction: includingDoc: {}", includingDoc);
+      LOGGER.error("executeAction: execContent length: {}", execContent.length());
+      LOGGER.error("executeAction: execContent length: {}", actionContent.length());
+      LOGGER.error("executeAction: vcontext (in variable) {}", vcontext);
+      LOGGER.error("executeAction: vcontext (in context) {}",
+          getVelocityManager().getVelocityContext());
     }
     vcontext.put("debug", vDebugBefore);
     vcontext.put("request", req);
