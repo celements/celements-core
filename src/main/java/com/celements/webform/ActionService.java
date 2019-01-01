@@ -10,11 +10,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.velocity.VelocityManager;
 
-import com.celements.web.service.IWebUtilsService;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
@@ -25,7 +26,7 @@ public class ActionService implements IActionServiceRole {
   private static Logger LOGGER = LoggerFactory.getLogger(ActionService.class);
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  IModelAccessFacade modelAccess;
 
   @Requirement
   private ConfigurationSource configSource;
@@ -40,22 +41,24 @@ public class ActionService implements IActionServiceRole {
     VelocityContext vcontext = getVelocityManager().getVelocityContext();
     vcontext.put("theDoc", actionDoc);
     Object vDebugBefore = vcontext.get("debug");
-    final Object configDebug = configSource.getProperty("actionScriptDebug");
-    if (configDebug != null) {
-      vcontext.put("debug", configDebug);
+    final Object configScriptDebug = configSource.getProperty("actionScriptDebug");
+    if (configScriptDebug != null) {
+      vcontext.put("debug", configScriptDebug);
     }
     Object req = vcontext.get("request");
     vcontext.put("request", getApiUsableMap(request));
     XWikiDocument execAct = null;
     try {
-      execAct = context.getWiki().getDocument("celements2web:Macros.executeActions", context);
-    } catch (XWikiException e) {
-      LOGGER.error("Could not get action Macro", e);
+      execAct = modelAccess.getDocument(new DocumentReference("celements2web", "Macros",
+          "executeActions"));
+    } catch (DocumentNotExistsException notExistsExp) {
+      LOGGER.error("Could not get action Macro", notExistsExp);
     }
     String execContent = "";
     String actionContent = "";
     if (execAct != null) {
-      vcontext.put("javaDebug", true);
+      final Object configJavaDebug = configSource.getProperty("actionScriptDebug");
+      vcontext.put("javaDebug", configJavaDebug);
       execContent = execAct.getContent();
       execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
       actionContent = context.getWiki().getRenderingEngine().interpretText(execContent,
