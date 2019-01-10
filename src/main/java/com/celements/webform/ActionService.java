@@ -1,5 +1,7 @@
 package com.celements.webform;
 
+import static com.celements.model.util.References.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.velocity.VelocityManager;
 
@@ -41,31 +44,30 @@ public class ActionService implements IActionServiceRole {
     VelocityContext vcontext = getVelocityManager().getVelocityContext();
     vcontext.put("theDoc", actionDoc);
     Object vDebugBefore = vcontext.get("debug");
-    final Object configScriptDebug = configSource.getProperty("actionScriptDebug");
+    final Object configScriptDebug = configSource.getProperty("celements.action.scriptDebug");
     if (configScriptDebug != null) {
       vcontext.put("debug", configScriptDebug);
     }
     Object req = vcontext.get("request");
     vcontext.put("request", getApiUsableMap(request));
-    XWikiDocument execAct = null;
-    try {
-      execAct = modelAccess.getDocument(new DocumentReference("celements2web", "Macros",
-          "executeActions"));
-    } catch (DocumentNotExistsException notExistsExp) {
-      LOGGER.error("Could not get action Macro", notExistsExp);
-    }
     String execContent = "";
     String actionContent = "";
-    if (execAct != null) {
-      final Object configJavaDebug = configSource.getProperty("actionScriptDebug");
+    XWikiDocument execAct = null;
+    try {
+      // TODO reimplement the celements2web:Macros.executeActions in Java
+      execAct = modelAccess.getDocument(create(DocumentReference.class, "executeActions", create(
+          EntityType.SPACE, "Macros", create(EntityType.WIKI, "celements2web"))));
+      final Object configJavaDebug = configSource.getProperty("celements.action.javaDebug");
       vcontext.put("javaDebug", configJavaDebug);
       execContent = execAct.getContent();
       execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
       actionContent = context.getWiki().getRenderingEngine().interpretText(execContent,
           includingDoc, context);
+    } catch (DocumentNotExistsException notExistsExp) {
+      LOGGER.error("Could not get action Macro", notExistsExp);
     }
-    Object successfulObj = vcontext.get("successful");
-    boolean successful = (successfulObj != null) && "true".equals(successfulObj.toString());
+    final Object successfulObj = vcontext.get("successful");
+    final boolean successful = (successfulObj != null) && "true".equals(successfulObj.toString());
     if (!successful) {
       LOGGER.error("executeAction: Error executing action. Output: {}", vcontext.get(
           "actionScriptOutput"));
