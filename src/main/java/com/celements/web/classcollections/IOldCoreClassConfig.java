@@ -68,8 +68,20 @@ public interface IOldCoreClassConfig {
   public static final String FORM_ACTION_CLASS = FORM_ACTION_CLASS_SPACE + "."
       + FORM_ACTION_CLASS_DOC;
 
+  @Deprecated
+  /**
+   * @deprecated since 3.8, instead use com.celements.form.classes.FormConfigClass.CLASS_NAME
+   */
   public static final String FORM_CONFIG_CLASS_DOC = "FormConfigClass";
+  @Deprecated
+  /**
+   * @deprecated since 3.8, instead use com.celements.form.classes.FormClass.CLASS_SPACE
+   */
   public static final String FORM_CONFIG_CLASS_SPACE = "Celements2";
+  @Deprecated
+  /**
+   * @deprecated since 3.8, instead use com.celements.form.classes.FormConfigClass.CLASS_DEF_HINT
+   */
   public static final String FORM_CONFIG_CLASS = FORM_CONFIG_CLASS_SPACE + "."
       + FORM_CONFIG_CLASS_DOC;
 

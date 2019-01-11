@@ -1,5 +1,7 @@
 package com.celements.webform;
 
+import static com.celements.model.util.References.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,12 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.velocity.VelocityManager;
 
-import com.celements.web.service.IWebUtilsService;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
@@ -21,10 +26,13 @@ import com.xpn.xwiki.web.Utils;
 @Component
 public class ActionService implements IActionServiceRole {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(ActionService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(ActionService.class);
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  IModelAccessFacade modelAccess;
+
+  @Requirement
+  private ConfigurationSource configSource;
 
   @Requirement
   private Execution execution;
@@ -32,46 +40,47 @@ public class ActionService implements IActionServiceRole {
   @Override
   public boolean executeAction(Document actionDoc, Map<String, String[]> request,
       XWikiDocument includingDoc, XWikiContext context) {
-    _LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");
+    LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");
     VelocityContext vcontext = getVelocityManager().getVelocityContext();
     vcontext.put("theDoc", actionDoc);
-    Boolean debug = (Boolean) vcontext.get("debug");
-    vcontext.put("debug", true);
-    Boolean hasedit = (Boolean) vcontext.get("hasedit");
-    vcontext.put("hasedit", true);
+    Object vDebugBefore = vcontext.get("debug");
+    final Object configScriptDebug = configSource.getProperty("celements.action.scriptDebug");
+    if (configScriptDebug != null) {
+      vcontext.put("debug", configScriptDebug);
+    }
     Object req = vcontext.get("request");
     vcontext.put("request", getApiUsableMap(request));
-    XWikiDocument execAct = null;
-    try {
-      execAct = context.getWiki().getDocument("celements2web:Macros.executeActions", context);
-    } catch (XWikiException e) {
-      _LOGGER.error("Could not get action Macro", e);
-    }
     String execContent = "";
     String actionContent = "";
-    if (execAct != null) {
-      vcontext.put("javaDebug", true);
+    XWikiDocument execAct = null;
+    try {
+      // TODO reimplement the celements2web:Macros.executeActions in Java
+      execAct = modelAccess.getDocument(create(DocumentReference.class, "executeActions", create(
+          EntityType.SPACE, "Macros", create(EntityType.WIKI, "celements2web"))));
+      final Object configJavaDebug = configSource.getProperty("celements.action.javaDebug");
+      vcontext.put("javaDebug", configJavaDebug);
       execContent = execAct.getContent();
       execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
       actionContent = context.getWiki().getRenderingEngine().interpretText(execContent,
           includingDoc, context);
+    } catch (DocumentNotExistsException notExistsExp) {
+      LOGGER.error("Could not get action Macro", notExistsExp);
     }
-    Object successfulObj = vcontext.get("successful");
-    boolean successful = (successfulObj != null) && "true".equals(successfulObj.toString());
+    final Object successfulObj = vcontext.get("successful");
+    final boolean successful = (successfulObj != null) && "true".equals(successfulObj.toString());
     if (!successful) {
-      _LOGGER.error("executeAction: Error executing action. Output:" + vcontext.get(
+      LOGGER.error("executeAction: Error executing action. Output: {}", vcontext.get(
           "actionScriptOutput"));
-      _LOGGER.error("executeAction: Rendered Action Script: " + actionContent);
-      _LOGGER.error("executeAction: execAct == " + execAct);
-      _LOGGER.error("executeAction: includingDoc: " + includingDoc);
-      _LOGGER.error("executeAction: execContent length: " + execContent.length());
-      _LOGGER.error("executeAction: execContent length: " + actionContent.length());
-      _LOGGER.error("executeAction: vcontext (in variable) " + vcontext);
-      _LOGGER.error("executeAction: vcontext (in context) "
-          + getVelocityManager().getVelocityContext());
+      LOGGER.error("executeAction: Rendered Action Script: {}", actionContent);
+      LOGGER.error("executeAction: execAct == {}", execAct);
+      LOGGER.error("executeAction: includingDoc: {}", includingDoc);
+      LOGGER.error("executeAction: execContent length: {}", execContent.length());
+      LOGGER.error("executeAction: execContent length: {}", actionContent.length());
+      LOGGER.error("executeAction: vcontext (in variable) {}", vcontext);
+      LOGGER.error("executeAction: vcontext (in context) {}",
+          getVelocityManager().getVelocityContext());
     }
-    vcontext.put("debug", debug);
-    vcontext.put("hasedit", hasedit);
+    vcontext.put("debug", vDebugBefore);
     vcontext.put("request", req);
     return successful;
   }
