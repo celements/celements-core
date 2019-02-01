@@ -21,25 +21,26 @@ package com.celements.sajson;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Parser {
 
-  private ILexicalParser<? extends IGenericLiteral> lexParser;
+  private final ILexicalParser<? extends IGenericLiteral> lexParser;
   private JsonParser parser;
-  private static JsonFactory factory = new JsonFactory();
-  private Stack<ECommand> workerStack = new Stack<>();
+  private final static JsonFactory factory = new JsonFactory();
+  private final Deque<ECommand> workerStack = new ArrayDeque<>();
   private String lastKey = "";
   private String lastValue = "";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(Parser.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(Parser.class);
 
   public static <T extends IGenericLiteral> Parser createLexicalParser(T initLiteral,
       IEventHandler<T> eventHandler) {
