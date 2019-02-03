@@ -195,7 +195,7 @@ public class ContextMenuBuilder {
       jsonBuilder.closeArray();
       return jsonBuilder.getJSON();
     } finally {
-      LOGGER.error("getCMIjson: {} end {}s", time, (System.currentTimeMillis() - time) / 1000);
+      LOGGER.error("getCMIjson: {} end {}s", time, (System.currentTimeMillis() - time) / 1000d);
     }
   }
 
