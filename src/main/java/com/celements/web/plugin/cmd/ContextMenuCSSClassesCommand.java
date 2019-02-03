@@ -41,7 +41,7 @@ public class ContextMenuCSSClassesCommand {
   private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuCSSClassesCommand.class);
 
   public String getAllContextMenuCSSClassesAsJSON(XWikiContext context) {
-    LOGGER.error("getAllContextMenuCSSClassesAsJSON: start");
+    LOGGER.error("getAllContextMenuCSSClasses: start");
     long time = System.currentTimeMillis();
     try {
       Builder jsonBuilder = new Builder();
@@ -52,8 +52,7 @@ public class ContextMenuCSSClassesCommand {
       jsonBuilder.closeArray();
       return jsonBuilder.getJSON();
     } finally {
-      LOGGER.error("getAllContextMenuCSSClassesAsJSON: took {}s", (System.currentTimeMillis()
-          - time) / 1000d);
+      LOGGER.error("getAllContextMenuCSSClasses: took {}ms", (System.currentTimeMillis() - time));
     }
   }
 

@@ -154,7 +154,6 @@ public class ContextMenuBuilder {
   }
 
   private void addJSONforCM(String elemId, Builder jsonBuilder) {
-    LOGGER.error("addJSONforCM: '{}' start", elemId);
     long time = System.currentTimeMillis();
     jsonBuilder.openDictionary();
     jsonBuilder.addStringProperty("elemId", elemId);
@@ -165,13 +164,11 @@ public class ContextMenuBuilder {
     }
     jsonBuilder.closeArray();
     jsonBuilder.closeDictionary();
-    LOGGER.error("addJSONforCM: '{}' took {}ms", elemId, (System.currentTimeMillis() - time));
+    LOGGER.error("addJSONforCM: took {}ms for '{}'", (System.currentTimeMillis() - time), elemId);
   }
 
   public void addElementsCMforClassNames(String jsonDictionary, XWikiContext context) {
     if ((jsonDictionary != null) && !"".equals(jsonDictionary)) {
-      LOGGER.error("addElementsCMforClassNames: start");
-      long time = System.currentTimeMillis();
       CMRequestHandler requestHandler = new CMRequestHandler(contextMenus, context);
       Parser cmReqParser = Parser.createLexicalParser(ERequestLiteral.REQUEST_ARRAY,
           requestHandler);
@@ -181,9 +178,6 @@ public class ContextMenuBuilder {
         LOGGER.error("addElementsCMforClassNames: failed to parse [" + jsonDictionary + "].", exp);
       } catch (IOException exp) {
         LOGGER.error("Failed to parse json.", exp);
-      } finally {
-        LOGGER.error("addElementsCMforClassNames: took {}s", (System.currentTimeMillis() - time)
-            / 1000d);
       }
     }
   }
@@ -207,7 +201,7 @@ public class ContextMenuBuilder {
       jsonBuilder.closeArray();
       return jsonBuilder.getJSON();
     } finally {
-      LOGGER.error("getJson: took {}s", (System.currentTimeMillis() - time) / 1000d);
+      LOGGER.error("getJson: took {}ms", (System.currentTimeMillis() - time));
     }
   }
 

@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Stack;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Parser {
 
@@ -39,7 +39,7 @@ public class Parser {
   private String lastKey = "";
   private String lastValue = "";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(Parser.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(Parser.class);
 
   public static <T extends IGenericLiteral> Parser createLexicalParser(T initLiteral,
       IEventHandler<T> eventHandler) {
@@ -51,6 +51,8 @@ public class Parser {
   }
 
   public void parse(String jsonExpression) throws JsonParseException, IOException {
+    LOGGER.error("parse: start '{}'", jsonExpression);
+    long time = System.currentTimeMillis();
     StringReader jsonReader = new StringReader(jsonExpression);
     try {
       parser = factory.createJsonParser(jsonReader);
@@ -109,6 +111,7 @@ public class Parser {
       lexParser.finishEvent();
     } finally {
       jsonReader.close();
+      LOGGER.error("parse: took {}ms", (System.currentTimeMillis() - time));
     }
   }
 
