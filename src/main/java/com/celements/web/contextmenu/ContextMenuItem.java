@@ -23,9 +23,9 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 
 import com.celements.sajson.Builder;
@@ -37,7 +37,7 @@ public class ContextMenuItem {
 
   public static String CONTEXTMENUITEM_CLASSNAME = "Celements2.ContextMenuItemClass";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(ContextMenuItem.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
   private String cmiLink;
   private String cmiText;
@@ -140,6 +140,12 @@ public class ContextMenuItem {
 
   public String getShortcut() {
     return renderText(shortcut);
+  }
+
+  @Override
+  public String toString() {
+    return "ContextMenuItem [origElemId=" + origElemId + ", cmiLink=" + cmiLink + ", cmiText="
+        + cmiText + ", cmiIcon=" + cmiIcon + ", shortcut=" + shortcut + "]";
   }
 
 }

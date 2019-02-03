@@ -26,6 +26,9 @@ import java.util.Objects;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -37,25 +40,32 @@ import com.google.common.collect.ImmutableMap;
 
 public class Builder {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
+
   private static final Map<Pattern, String> JSON_REPLACEMENTS = ImmutableMap.of(Pattern.compile(
       "\\\\"), "\\\\\\\\", Pattern.compile("\""), "\\\\\"", Pattern.compile("\n"), "\\\\n",
       Pattern.compile("\r"), "\\\\r", Pattern.compile("\t"), "\\\\t");
 
+  private final long time;
   private Stack<ECommand> workerStack;
   private StringWriter jsonOutput;
   private boolean onFirstElement;
 
   public Builder() {
+    time = System.currentTimeMillis();
     workerStack = new Stack<>();
     jsonOutput = new StringWriter();
     onFirstElement = true;
+    LOGGER.error("JsonBuilder {} new", time);
   }
 
   public String getJSON() {
     if (!workerStack.isEmpty()) {
       throw new IllegalStateException(workerStack.peek() + " is still open.");
     }
-    return jsonOutput.toString();
+    String json = jsonOutput.toString();
+    LOGGER.error("JsonBuilder {} built in {}ms", time, (System.currentTimeMillis() - time));
+    return json;
   }
 
   public void openArray() {

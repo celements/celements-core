@@ -153,22 +153,19 @@ public class ContextMenuBuilder {
     return cmiObjects;
   }
 
-  private void addJSONforCM(String elemId, Builder jsonBuilder, XWikiContext context) {
+  private void addJSONforCM(String elemId, Builder jsonBuilder) {
     LOGGER.error("addJSONforCM: '{}' start", elemId);
     long time = System.currentTimeMillis();
     jsonBuilder.openDictionary();
     jsonBuilder.addStringProperty("elemId", elemId);
     jsonBuilder.openProperty("cmItems");
-    LOGGER.error("addJSONforCM: '{}' mid took {}s", elemId, (System.currentTimeMillis() - time)
-        / 1000d);
     jsonBuilder.openArray();
     for (ContextMenuItem cmi : contextMenus.get(elemId)) {
       cmi.generateJSON(jsonBuilder);
     }
     jsonBuilder.closeArray();
     jsonBuilder.closeDictionary();
-    LOGGER.error("addJSONforCM: '{}' took {}s", elemId, (System.currentTimeMillis() - time)
-        / 1000d);
+    LOGGER.error("addJSONforCM: '{}' took {}ms", elemId, (System.currentTimeMillis() - time));
   }
 
   public void addElementsCMforClassNames(String jsonDictionary, XWikiContext context) {
@@ -191,21 +188,27 @@ public class ContextMenuBuilder {
     }
   }
 
+  @Deprecated
   public String getCMIjson(XWikiContext context) {
-    LOGGER.error("getCMIjson: start");
+    return getJson();
+  }
+
+  public String getJson() {
+    LOGGER.error("getJson: start");
     long time = System.currentTimeMillis();
     try {
       Builder jsonBuilder = new Builder();
       jsonBuilder.openArray();
       for (String elemId : contextMenus.keySet()) {
         if (!"".equals(elemId)) {
-          addJSONforCM(elemId, jsonBuilder, context);
+          addJSONforCM(elemId, jsonBuilder);
         }
       }
       jsonBuilder.closeArray();
       return jsonBuilder.getJSON();
     } finally {
-      LOGGER.error("getCMIjson: took {}s", (System.currentTimeMillis() - time) / 1000d);
+      LOGGER.error("getJson: took {}s", (System.currentTimeMillis() - time) / 1000d);
+      LOGGER.error("{}", contextMenus);
     }
   }
 
