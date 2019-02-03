@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.sajson.AbstractEventHandler;
 import com.celements.sajson.Builder;
@@ -114,10 +114,7 @@ public class ContextMenuBuilder {
    * class ContextMenuBuilder
    */
 
-  /**
-   * internal LOGGER
-   */
-  private static Log LOGGER = LogFactory.getFactory().getInstance(ContextMenuBuilder.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuBuilder.class);
 
   private Map<String, List<ContextMenuItem>> contextMenus = new HashMap<>();
 
@@ -181,19 +178,24 @@ public class ContextMenuBuilder {
   }
 
   public String getCMIjson(XWikiContext context) {
-    Builder jsonBuilder = new Builder();
-    jsonBuilder.openArray();
-    for (String elemId : contextMenus.keySet()) {
-      if (!"".equals(elemId)) {
-        jsonBuilder.openDictionary();
-        jsonBuilder.addStringProperty("elemId", elemId);
-        jsonBuilder.openProperty("cmItems");
-        addJSONforCM(contextMenus.get(elemId), jsonBuilder, context);
-        jsonBuilder.closeDictionary();
+    LOGGER.error("getCMIjson: {} start: {}", System.currentTimeMillis(), contextMenus.keySet());
+    try {
+      Builder jsonBuilder = new Builder();
+      jsonBuilder.openArray();
+      for (String elemId : contextMenus.keySet()) {
+        if (!"".equals(elemId)) {
+          jsonBuilder.openDictionary();
+          jsonBuilder.addStringProperty("elemId", elemId);
+          jsonBuilder.openProperty("cmItems");
+          addJSONforCM(contextMenus.get(elemId), jsonBuilder, context);
+          jsonBuilder.closeDictionary();
+        }
       }
+      jsonBuilder.closeArray();
+      return jsonBuilder.getJSON();
+    } finally {
+      LOGGER.error("getCMIjson: {} end", System.currentTimeMillis());
     }
-    jsonBuilder.closeArray();
-    return jsonBuilder.getJSON();
   }
 
 }
