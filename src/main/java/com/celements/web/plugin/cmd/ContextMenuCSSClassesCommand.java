@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.sajson.Builder;
 import com.xpn.xwiki.XWikiContext;
@@ -38,17 +38,23 @@ import com.xpn.xwiki.XWikiException;
  */
 public class ContextMenuCSSClassesCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      ContextMenuCSSClassesCommand.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuCSSClassesCommand.class);
 
   public String getAllContextMenuCSSClassesAsJSON(XWikiContext context) {
-    Builder jsonBuilder = new Builder();
-    jsonBuilder.openArray();
-    for (String cssClass : getCM_CSSclasses(context)) {
-      jsonBuilder.addString(cssClass);
+    LOGGER.error("getAllContextMenuCSSClassesAsJSON: start");
+    long time = System.currentTimeMillis();
+    try {
+      Builder jsonBuilder = new Builder();
+      jsonBuilder.openArray();
+      for (String cssClass : getCM_CSSclasses(context)) {
+        jsonBuilder.addString(cssClass);
+      }
+      jsonBuilder.closeArray();
+      return jsonBuilder.getJSON();
+    } finally {
+      LOGGER.error("getAllContextMenuCSSClassesAsJSON: took {}s", (System.currentTimeMillis()
+          - time) / 1000d);
     }
-    jsonBuilder.closeArray();
-    return jsonBuilder.getJSON();
   }
 
   public List<String> getCM_CSSclasses(XWikiContext context) {
@@ -76,7 +82,7 @@ public class ContextMenuCSSClassesCommand {
         cmCSSclasses.add(classNameObject.toString());
       }
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get list of cm css class names.", exp);
+      LOGGER.error("Failed to get list of cm css class names.", exp);
     }
     return cmCSSclasses;
   }

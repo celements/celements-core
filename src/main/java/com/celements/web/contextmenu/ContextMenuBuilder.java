@@ -153,17 +153,28 @@ public class ContextMenuBuilder {
     return cmiObjects;
   }
 
-  private void addJSONforCM(List<ContextMenuItem> cmItemList, Builder jsonBuilder,
-      XWikiContext context) {
+  private void addJSONforCM(String elemId, Builder jsonBuilder, XWikiContext context) {
+    LOGGER.error("addJSONforCM: '{}' start", elemId);
+    long time = System.currentTimeMillis();
+    jsonBuilder.openDictionary();
+    jsonBuilder.addStringProperty("elemId", elemId);
+    jsonBuilder.openProperty("cmItems");
+    LOGGER.error("addJSONforCM: '{}' mid took {}s", elemId, (System.currentTimeMillis() - time)
+        / 1000d);
     jsonBuilder.openArray();
-    for (ContextMenuItem cmi : cmItemList) {
+    for (ContextMenuItem cmi : contextMenus.get(elemId)) {
       cmi.generateJSON(jsonBuilder);
     }
     jsonBuilder.closeArray();
+    jsonBuilder.closeDictionary();
+    LOGGER.error("addJSONforCM: '{}' took {}s", elemId, (System.currentTimeMillis() - time)
+        / 1000d);
   }
 
   public void addElementsCMforClassNames(String jsonDictionary, XWikiContext context) {
     if ((jsonDictionary != null) && !"".equals(jsonDictionary)) {
+      LOGGER.error("addElementsCMforClassNames: start");
+      long time = System.currentTimeMillis();
       CMRequestHandler requestHandler = new CMRequestHandler(contextMenus, context);
       Parser cmReqParser = Parser.createLexicalParser(ERequestLiteral.REQUEST_ARRAY,
           requestHandler);
@@ -173,29 +184,28 @@ public class ContextMenuBuilder {
         LOGGER.error("addElementsCMforClassNames: failed to parse [" + jsonDictionary + "].", exp);
       } catch (IOException exp) {
         LOGGER.error("Failed to parse json.", exp);
+      } finally {
+        LOGGER.error("addElementsCMforClassNames: took {}s", (System.currentTimeMillis() - time)
+            / 1000d);
       }
     }
   }
 
   public String getCMIjson(XWikiContext context) {
+    LOGGER.error("getCMIjson: start");
     long time = System.currentTimeMillis();
-    LOGGER.error("getCMIjson: {} start: {}", time, contextMenus.keySet());
     try {
       Builder jsonBuilder = new Builder();
       jsonBuilder.openArray();
       for (String elemId : contextMenus.keySet()) {
         if (!"".equals(elemId)) {
-          jsonBuilder.openDictionary();
-          jsonBuilder.addStringProperty("elemId", elemId);
-          jsonBuilder.openProperty("cmItems");
-          addJSONforCM(contextMenus.get(elemId), jsonBuilder, context);
-          jsonBuilder.closeDictionary();
+          addJSONforCM(elemId, jsonBuilder, context);
         }
       }
       jsonBuilder.closeArray();
       return jsonBuilder.getJSON();
     } finally {
-      LOGGER.error("getCMIjson: {} end {}s", time, (System.currentTimeMillis() - time) / 1000d);
+      LOGGER.error("getCMIjson: took {}s", (System.currentTimeMillis() - time) / 1000d);
     }
   }
 
