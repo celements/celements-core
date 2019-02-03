@@ -25,11 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-<<<<<<< HEAD
 import javax.annotation.concurrent.NotThreadSafe;
 
-=======
->>>>>>> refs/remotes/origin/CELDEV-752-timing
 import org.codehaus.jackson.JsonParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
