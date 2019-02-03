@@ -66,9 +66,7 @@ public class ContextMenuItem {
     cmiText = menuItem.getStringValue("cmi_text");
     cmiIcon = menuItem.getStringValue("cmi_icon");
     shortcut = menuItem.getStringValue("cmi_shortcut");
-    LOGGER.trace("ContextMenuItem created for [" + menuItem.getDocumentReference() + ","
-        + menuItem.getNumber() + "]: cmiLink = [" + cmiLink + "], cmiText = [" + cmiText
-        + "], cmiIcon = [" + cmiIcon + "], shortcut = [" + shortcut + "].");
+    LOGGER.error("ContextMenuItem created for [{}]: elemId = [{}]", menuItem, elemId);
   }
 
   private XWikiContext getContext() {

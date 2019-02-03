@@ -125,7 +125,7 @@ public class ContextMenuBuilder {
       for (Object theobj : getCMIobjects(className, context)) {
         if (theobj instanceof BaseObject) {
           BaseObject menuItem = (BaseObject) theobj;
-          ContextMenuItem cmItem = new ContextMenuItem(menuItem, elemId, context);
+          ContextMenuItem cmItem = new ContextMenuItem(menuItem, elemId);
           if (!"".equals(cmItem.getLink().trim()) && !"".equals(cmItem.getText().trim())) {
             contextMenuItemList.add(cmItem);
           }
@@ -208,7 +208,6 @@ public class ContextMenuBuilder {
       return jsonBuilder.getJSON();
     } finally {
       LOGGER.error("getJson: took {}s", (System.currentTimeMillis() - time) / 1000d);
-      LOGGER.error("{}", contextMenus);
     }
   }
 
