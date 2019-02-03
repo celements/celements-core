@@ -25,8 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+<<<<<<< HEAD
 import javax.annotation.concurrent.NotThreadSafe;
 
+=======
+>>>>>>> refs/remotes/origin/CELDEV-752-timing
 import org.codehaus.jackson.JsonParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,9 +119,6 @@ public class ContextMenuBuilder {
    * class ContextMenuBuilder
    */
 
-  /**
-   * internal LOGGER
-   */
   private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuBuilder.class);
 
   private final Map<String, List<ContextMenuItem>> contextMenus = new HashMap<>();
@@ -146,7 +146,7 @@ public class ContextMenuBuilder {
   private List<BaseObject> getCMIobjects(String className, XWikiContext context)
       throws XWikiException {
     String fullName = "CelementsContextMenu." + className;
-    List<BaseObject> cmiObjects = new ArrayList<BaseObject>();
+    List<BaseObject> cmiObjects = new ArrayList<>();
     if (context.getWiki().exists("celements2web:" + fullName, context)) {
       cmiObjects.addAll(context.getWiki().getDocument("celements2web:" + fullName,
           context).getObjects(ContextMenuItem.CONTEXTMENUITEM_CLASSNAME));
@@ -183,19 +183,25 @@ public class ContextMenuBuilder {
   }
 
   public String getCMIjson(XWikiContext context) {
-    Builder jsonBuilder = new Builder();
-    jsonBuilder.openArray();
-    for (String elemId : contextMenus.keySet()) {
-      if (!"".equals(elemId)) {
-        jsonBuilder.openDictionary();
-        jsonBuilder.addStringProperty("elemId", elemId);
-        jsonBuilder.openProperty("cmItems");
-        addJSONforCM(contextMenus.get(elemId), jsonBuilder, context);
-        jsonBuilder.closeDictionary();
+    long time = System.currentTimeMillis();
+    LOGGER.error("getCMIjson: {} start: {}", time, contextMenus.keySet());
+    try {
+      Builder jsonBuilder = new Builder();
+      jsonBuilder.openArray();
+      for (String elemId : contextMenus.keySet()) {
+        if (!"".equals(elemId)) {
+          jsonBuilder.openDictionary();
+          jsonBuilder.addStringProperty("elemId", elemId);
+          jsonBuilder.openProperty("cmItems");
+          addJSONforCM(contextMenus.get(elemId), jsonBuilder, context);
+          jsonBuilder.closeDictionary();
+        }
       }
+      jsonBuilder.closeArray();
+      return jsonBuilder.getJSON();
+    } finally {
+      LOGGER.error("getCMIjson: {} end {}s", time, (System.currentTimeMillis() - time) / 1000d);
     }
-    jsonBuilder.closeArray();
-    return jsonBuilder.getJSON();
   }
 
 }
