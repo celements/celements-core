@@ -178,7 +178,8 @@ public class ContextMenuBuilder {
   }
 
   public String getCMIjson(XWikiContext context) {
-    LOGGER.error("getCMIjson: {} start: {}", System.currentTimeMillis(), contextMenus.keySet());
+    long time = System.currentTimeMillis();
+    LOGGER.error("getCMIjson: {} start: {}", time, contextMenus.keySet());
     try {
       Builder jsonBuilder = new Builder();
       jsonBuilder.openArray();
@@ -194,7 +195,7 @@ public class ContextMenuBuilder {
       jsonBuilder.closeArray();
       return jsonBuilder.getJSON();
     } finally {
-      LOGGER.error("getCMIjson: {} end", System.currentTimeMillis());
+      LOGGER.error("getCMIjson: {} end {}s", time, (System.currentTimeMillis() - time) / 1000);
     }
   }
 
