@@ -40,7 +40,7 @@ public class Parser {
   private String lastKey = "";
   private String lastValue = "";
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(Parser.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Parser.class);
 
   public static <T extends IGenericLiteral> Parser createLexicalParser(T initLiteral,
       IEventHandler<T> eventHandler) {

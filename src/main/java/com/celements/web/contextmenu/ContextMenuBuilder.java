@@ -116,7 +116,7 @@ public class ContextMenuBuilder {
    * class ContextMenuBuilder
    */
 
-  private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuBuilder.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuBuilder.class);
 
   private final Map<String, List<ContextMenuItem>> contextMenus = new HashMap<>();
 
@@ -180,25 +180,19 @@ public class ContextMenuBuilder {
   }
 
   public String getCMIjson(XWikiContext context) {
-    long time = System.currentTimeMillis();
-    LOGGER.error("getCMIjson: {} start: {}", time, contextMenus.keySet());
-    try {
-      Builder jsonBuilder = new Builder();
-      jsonBuilder.openArray();
-      for (String elemId : contextMenus.keySet()) {
-        if (!"".equals(elemId)) {
-          jsonBuilder.openDictionary();
-          jsonBuilder.addStringProperty("elemId", elemId);
-          jsonBuilder.openProperty("cmItems");
-          addJSONforCM(contextMenus.get(elemId), jsonBuilder, context);
-          jsonBuilder.closeDictionary();
-        }
+    Builder jsonBuilder = new Builder();
+    jsonBuilder.openArray();
+    for (String elemId : contextMenus.keySet()) {
+      if (!"".equals(elemId)) {
+        jsonBuilder.openDictionary();
+        jsonBuilder.addStringProperty("elemId", elemId);
+        jsonBuilder.openProperty("cmItems");
+        addJSONforCM(contextMenus.get(elemId), jsonBuilder, context);
+        jsonBuilder.closeDictionary();
       }
-      jsonBuilder.closeArray();
-      return jsonBuilder.getJSON();
-    } finally {
-      LOGGER.error("getCMIjson: {} end {}s", time, (System.currentTimeMillis() - time) / 1000d);
     }
+    jsonBuilder.closeArray();
+    return jsonBuilder.getJSON();
   }
 
 }

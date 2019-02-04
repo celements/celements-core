@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 @NotThreadSafe
 public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<T> {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(LexicalParser.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LexicalParser.class);
 
   private final Deque<T> workerStack = new ArrayDeque<>();
   private final T startLiteral;
