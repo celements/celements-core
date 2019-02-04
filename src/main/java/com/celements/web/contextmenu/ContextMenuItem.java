@@ -33,6 +33,7 @@ import org.xwiki.velocity.XWikiVelocityException;
 import com.celements.sajson.Builder;
 import com.celements.velocity.VelocityContextModifier;
 import com.celements.velocity.VelocityService;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -51,10 +52,14 @@ public class ContextMenuItem {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
-  private String cmiLink;
-  private String cmiText;
-  private String cmiIcon;
+  private String link;
+  private String vLink;
+  private String text;
+  private String vText;
+  private String icon;
+  private String vIcon;
   private String shortcut;
+  private String vShortcut;
 
   private String elemId;
   private String origElemId;
@@ -74,10 +79,10 @@ public class ContextMenuItem {
     elemIdParts = elemId.split(":", -1);
     elemId = elemIdParts[elemIdParts.length - 1];
     this.elemId = elemId;
-    cmiLink = menuItem.getLargeStringValue("cmi_link");
-    cmiText = menuItem.getStringValue("cmi_text");
-    cmiIcon = menuItem.getStringValue("cmi_icon");
-    shortcut = menuItem.getStringValue("cmi_shortcut");
+    vLink = menuItem.getLargeStringValue("cmi_link");
+    vText = menuItem.getStringValue("cmi_text");
+    vIcon = menuItem.getStringValue("cmi_icon");
+    vShortcut = menuItem.getStringValue("cmi_shortcut");
     LOGGER.debug("ContextMenuItem created for [{}]: elemId = [{}]", menuItem, elemId);
   }
 
@@ -96,11 +101,12 @@ public class ContextMenuItem {
       rendered = getVelocityService().evaluateVelocityText(getContext().getDoc(), velocityText,
           getVelocityContextModifier());
       RENDER_TIME.get().addAndGet(System.currentTimeMillis() - time);
+      LOGGER.error("renderText: '{}' took {}ms", origElemId, (System.currentTimeMillis() - time));
     } catch (XWikiVelocityException exc) {
       LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
       rendered = velocityText;
     }
-    return rendered;
+    return Strings.nullToEmpty(rendered);
   }
 
   private VelocityContextModifier getVelocityContextModifier() {
@@ -150,28 +156,39 @@ public class ContextMenuItem {
   }
 
   public String getLink() {
-    return renderText(cmiLink);
+    if (link == null) {
+      link = renderText(vLink);
+    }
+    return link;
   }
 
   public String getText() {
-    return renderText(cmiText);
+    if (text == null) {
+      text = renderText(vText);
+    }
+    return text;
   }
 
   public String getCmiIcon() {
-    return renderText(cmiIcon);
+    if (icon == null) {
+      icon = renderText(vIcon);
+    }
+    return icon;
   }
 
   public String getShortcut() {
-    return renderText(shortcut);
+    if (shortcut == null) {
+      shortcut = renderText(vShortcut);
+    }
+    return shortcut;
   }
 
   @Override
   public String toString() {
-    return "ContextMenuItem [origElemId=" + origElemId + ", cmiLink=" + cmiLink + ", cmiText="
-        + cmiText + ", cmiIcon=" + cmiIcon + ", shortcut=" + shortcut + "]";
+    return "ContextMenuItem [" + origElemId + "]";
   }
 
-  private VelocityService getVelocityService() {
+  private static VelocityService getVelocityService() {
     return Utils.getComponent(VelocityService.class);
   }
 
