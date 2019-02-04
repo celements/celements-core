@@ -94,7 +94,7 @@ public class ContextMenuBuilder {
         case ELEMENT_ID:
           LOGGER.debug("before adding cmi for " + cssClassName + ", " + value + ": "
               + getCurrentMenu(value).size());
-          getCurrentMenu(value).addAll(getCMItemsForClassAndId(cssClassName, value));
+          getCurrentMenu(value).addAll(getCMItems(cssClassName, value));
           LOGGER.debug("after adding cmi for " + cssClassName + ", " + value + ": "
               + getCurrentMenu(value).size());
           break;
@@ -124,9 +124,9 @@ public class ContextMenuBuilder {
 
   private final Map<String, List<ContextMenuItem>> contextMenus = new HashMap<>();
 
-  List<ContextMenuItem> getCMItemsForClassAndId(String className, String elemId) {
+  List<ContextMenuItem> getCMItems(String className, String elemId) {
     ArrayList<ContextMenuItem> contextMenuItemList = new ArrayList<>();
-    for (BaseObject menuItem : getCMIobjects(className)) {
+    for (BaseObject menuItem : getCMObjects(className)) {
       ContextMenuItem cmItem = new ContextMenuItem(menuItem, elemId);
       if (!"".equals(cmItem.getLink().trim()) && !"".equals(cmItem.getText().trim())) {
         contextMenuItemList.add(cmItem);
@@ -135,14 +135,14 @@ public class ContextMenuBuilder {
     return contextMenuItemList;
   }
 
-  private FluentIterable<BaseObject> getCMIobjects(String className) {
-    FluentIterable<BaseObject> cmiObjects = FluentIterable.of();
-    RefBuilder builder = new RefBuilder().doc(className).space("CelementsContextMenu");
-    cmiObjects.append(getObjectFetcher(builder.wiki("celements2web").build(
+  private FluentIterable<BaseObject> getCMObjects(String className) {
+    FluentIterable<BaseObject> objs = FluentIterable.of();
+    RefBuilder refBuilder = new RefBuilder().doc(className).space("CelementsContextMenu");
+    objs = objs.append(getObjectFetcher(refBuilder.wiki("celements2web").build(
         DocumentReference.class)).iter());
-    cmiObjects.append(getObjectFetcher(builder.with(getContext().getWikiRef()).build(
+    objs = objs.append(getObjectFetcher(refBuilder.with(getContext().getWikiRef()).build(
         DocumentReference.class)).iter());
-    return cmiObjects;
+    return objs;
   }
 
   public void addElementsCMforClassNames(String jsonDictionary) {
@@ -188,10 +188,8 @@ public class ContextMenuBuilder {
   }
 
   private XWikiObjectFetcher getObjectFetcher(DocumentReference docRef) {
-    XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(getModelAccess().getOrCreateDocument(
-        docRef)).filter(OldCoreClasses.getContextMenuItemClassRef());
-    LOGGER.error("getCMIobjects: {} objects for '{}'", fetcher.count(), docRef);
-    return fetcher;
+    return XWikiObjectFetcher.on(getModelAccess().getOrCreateDocument(docRef)).filter(
+        OldCoreClasses.getContextMenuItemClassRef());
   }
 
   private IModelAccessFacade getModelAccess() {
