@@ -158,7 +158,7 @@ public class ContextMenuBuilder {
       } catch (IOException exp) {
         LOGGER.error("Failed to parse json.", exp);
       } finally {
-        LOGGER.debug("addElementsCMforClassNames: took {}ms", (System.currentTimeMillis() - time));
+        LOGGER.error("addElementsCMforClassNames: took {}ms", (System.currentTimeMillis() - time));
       }
     }
   }
@@ -184,7 +184,7 @@ public class ContextMenuBuilder {
       jsonBuilder.closeArray();
       return jsonBuilder.getJSON();
     } finally {
-      LOGGER.debug("getJson: took {}ms", (System.currentTimeMillis() - time));
+      LOGGER.error("getJson: took {}ms", (System.currentTimeMillis() - time));
     }
   }
 

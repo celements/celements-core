@@ -90,7 +90,7 @@ public class ContextMenuItem {
       rendered = getVelocityService().evaluateVelocityText(getContext().getDoc(), velocityText,
           getVelocityContextModifier());
       if ((System.currentTimeMillis() - time) > 1) {
-        LOGGER.debug("renderText: took {}ms for '{}'", (System.currentTimeMillis() - time),
+        LOGGER.error("renderText: took {}ms for '{}'", (System.currentTimeMillis() - time),
             origElemId);
       }
     } catch (XWikiVelocityException exc) {
