@@ -135,3 +135,4 @@ com.celements.auth.classes.AuthClassPackage
 com.celements.auth.classes.RemoteLoginClass
 com.celements.form.classes.FormClassPackage
 com.celements.form.classes.FormConfigClass
+com.celements.velocity.CelementsVelocityService
