@@ -52,8 +52,6 @@ public class Parser {
   }
 
   public void parse(String jsonExpression) throws JsonParseException, IOException {
-    LOGGER.error("parse: start '{}'", jsonExpression);
-    long time = System.currentTimeMillis();
     StringReader jsonReader = new StringReader(jsonExpression);
     try {
       parser = factory.createJsonParser(jsonReader);
@@ -112,7 +110,6 @@ public class Parser {
       lexParser.finishEvent();
     } finally {
       jsonReader.close();
-      LOGGER.error("parse: took {}ms", (System.currentTimeMillis() - time));
     }
   }
 

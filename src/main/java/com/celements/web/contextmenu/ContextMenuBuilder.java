@@ -146,6 +146,7 @@ public class ContextMenuBuilder {
   }
 
   public void addElementsCMforClassNames(String jsonDictionary) {
+    long time = System.currentTimeMillis();
     if ((jsonDictionary != null) && !"".equals(jsonDictionary)) {
       CMRequestHandler requestHandler = new CMRequestHandler(contextMenus);
       Parser cmReqParser = Parser.createLexicalParser(ERequestLiteral.REQUEST_ARRAY,
@@ -156,12 +157,13 @@ public class ContextMenuBuilder {
         LOGGER.error("addElementsCMforClassNames: failed to parse [" + jsonDictionary + "].", exp);
       } catch (IOException exp) {
         LOGGER.error("Failed to parse json.", exp);
+      } finally {
+        LOGGER.debug("addElementsCMforClassNames: took {}ms", (System.currentTimeMillis() - time));
       }
     }
   }
 
   public String getJson() {
-    LOGGER.error("getJson: start");
     long time = System.currentTimeMillis();
     try {
       Builder jsonBuilder = new Builder();
@@ -182,8 +184,7 @@ public class ContextMenuBuilder {
       jsonBuilder.closeArray();
       return jsonBuilder.getJSON();
     } finally {
-      LOGGER.error("getJson: took {}ms", (System.currentTimeMillis() - time));
-      LOGGER.error("getJson: render time {}ms", ContextMenuItem.RENDER_TIME.get().get());
+      LOGGER.debug("getJson: took {}ms", (System.currentTimeMillis() - time));
     }
   }
 

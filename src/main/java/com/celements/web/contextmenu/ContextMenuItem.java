@@ -22,7 +22,6 @@ package com.celements.web.contextmenu;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -40,17 +39,8 @@ import com.xpn.xwiki.web.Utils;
 
 public class ContextMenuItem {
 
-  public static final ThreadLocal<AtomicLong> RENDER_TIME = new ThreadLocal<AtomicLong>() {
-
-    @Override
-    protected AtomicLong initialValue() {
-      return new AtomicLong(0L);
-    }
-  };
-
   private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
-  private final String objId;
   private String link;
   private final String vLink;
   private String text;
@@ -78,7 +68,6 @@ public class ContextMenuItem {
     elemIdParts = Arrays.asList(elemId.split(":", -1));
     elemId = elemIdParts.get(elemIdParts.size() - 1);
     this.elemId = elemId;
-    objId = menuItem.toString();
     vLink = menuItem.getLargeStringValue("cmi_link");
     vText = menuItem.getStringValue("cmi_text");
     vIcon = menuItem.getStringValue("cmi_icon");
@@ -94,16 +83,14 @@ public class ContextMenuItem {
     return Utils.getComponent(Execution.class);
   }
 
-  private String renderText(String velocityText, String fieldName) {
+  private String renderText(String velocityText) {
     String rendered;
     try {
       long time = System.currentTimeMillis();
       rendered = getVelocityService().evaluateVelocityText(getContext().getDoc(), velocityText,
           getVelocityContextModifier());
-      time = System.currentTimeMillis() - time;
-      RENDER_TIME.get().addAndGet(time);
-      if (time > 1) {
-        LOGGER.error("renderText: took {}ms for '{}', '{}', '{}'", time, objId, fieldName,
+      if ((System.currentTimeMillis() - time) > 1) {
+        LOGGER.debug("renderText: took {}ms for '{}'", (System.currentTimeMillis() - time),
             origElemId);
       }
     } catch (XWikiVelocityException exc) {
@@ -161,28 +148,28 @@ public class ContextMenuItem {
 
   public String getLink() {
     if (link == null) {
-      link = renderText(vLink, "link");
+      link = renderText(vLink);
     }
     return link;
   }
 
   public String getText() {
     if (text == null) {
-      text = renderText(vText, "text");
+      text = renderText(vText);
     }
     return text;
   }
 
   public String getCmiIcon() {
     if (icon == null) {
-      icon = renderText(vIcon, "icon");
+      icon = renderText(vIcon);
     }
     return icon;
   }
 
   public String getShortcut() {
     if (shortcut == null) {
-      shortcut = renderText(vShortcut, "shortcut");
+      shortcut = renderText(vShortcut);
     }
     return shortcut;
   }

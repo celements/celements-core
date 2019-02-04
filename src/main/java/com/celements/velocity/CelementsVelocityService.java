@@ -53,10 +53,14 @@ public class CelementsVelocityService implements VelocityService {
 
   private String evaluateVelocityText(XWikiDocument templateDoc, String text,
       VelocityContext vContext) throws XWikiVelocityException {
-    StringWriter writer = new StringWriter();
-    velocityManager.getVelocityEngine().evaluate(vContext, writer, modelUtils.serializeRef(
-        checkNotNull(templateDoc).getDocumentReference()), Strings.nullToEmpty(text));
-    String result = writer.toString();
+    text = Strings.nullToEmpty(text).trim();
+    String result = "";
+    if (!text.isEmpty()) {
+      StringWriter writer = new StringWriter();
+      velocityManager.getVelocityEngine().evaluate(vContext, writer, modelUtils.serializeRef(
+          checkNotNull(templateDoc).getDocumentReference()), Strings.nullToEmpty(text));
+      result = writer.toString();
+    }
     LOGGER.debug("evaluateVelocityText - for [{}], [{}]: {}", templateDoc, text, result);
     return result;
   }

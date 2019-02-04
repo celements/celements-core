@@ -487,18 +487,15 @@ public class TreeNodeService implements ITreeNodeService {
     XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
     BaseObject menuItem = doc.getXObject(getRef("Celements2", "MenuItem"));
     if (menuItem != null) {
-      long time = System.currentTimeMillis();
       try {
         EntityReference parent = getParentEntityRef(docRef);
         List<TreeNode> subMenuItems = getSubNodesForParent(parent, menuItem.getStringValue(
             "part_name"));
-        LOGGER.error("getSiblingMenuItem: A took {}ms", (System.currentTimeMillis() - time));
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("getPrevMenuItem: {} subMenuItems found for parent '{}'. {}",
               subMenuItems.size(), parent, Arrays.deepToString(subMenuItems.toArray()));
         }
         int pos = getMenuItemPos(docRef, menuItem.getStringValue("part_name"));
-        LOGGER.error("getSiblingMenuItem: B took {}ms", (System.currentTimeMillis() - time));
         if (previous && (pos > 0)) {
           return subMenuItems.get(pos - 1);
         } else if (!previous && (pos < (subMenuItems.size() - 1))) {
@@ -508,8 +505,6 @@ public class TreeNodeService implements ITreeNodeService {
             true));
       } catch (XWikiException exp) {
         LOGGER.error("getSiblingMenuItem failed.", exp);
-      } finally {
-        LOGGER.error("getSiblingMenuItem: C took {}ms", (System.currentTimeMillis() - time));
       }
     } else {
       LOGGER.debug("getPrevMenuItem: no MenuItem Object found on doc {}", getParentKey(docRef,
