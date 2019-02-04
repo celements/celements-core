@@ -19,18 +19,22 @@
  */
 package com.celements.sajson;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.annotation.concurrent.NotThreadSafe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@NotThreadSafe
 public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<T> {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(LexicalParser.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LexicalParser.class);
 
-  private Stack<T> workerStack = new Stack<>();
-  private T startLiteral;
-  private IEventHandler<T> eventHandler;
+  private final Deque<T> workerStack = new ArrayDeque<>();
+  private final T startLiteral;
+  private final IEventHandler<T> eventHandler;
 
   public LexicalParser(T startLiteral, IEventHandler<T> eventHandler) {
     this.startLiteral = startLiteral;
@@ -41,7 +45,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
   final public void initEvent() {
     workerStack.clear();
     workerStack.push(startLiteral);
-    mLogger.debug("init " + startLiteral + " ; " + startLiteral.getCommand());
+    LOGGER.debug("init " + startLiteral + " ; " + startLiteral.getCommand());
   }
 
   @Override
@@ -54,7 +58,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
   final public void closeArrayEvent() {
     if (workerStack.peek().getCommand() != ECommand.ARRAY_COMMAND) {
       T lastLiteral = workerStack.pop();
-      mLogger.debug("close: " + lastLiteral + " ; " + lastLiteral.getCommand());
+      LOGGER.debug("close: " + lastLiteral + " ; " + lastLiteral.getCommand());
     }
     checkStackState(ECommand.ARRAY_COMMAND);
     closeLiteral();
@@ -86,7 +90,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
   @Override
   public void openPropertyEvent(String key) {
     checkStackState(ECommand.PROPERTY_COMMAND);
-    mLogger.debug("key: " + key + " ");
+    LOGGER.debug("key: " + key + " ");
     fixPropertyLiteralOnStack(key);
     checkStackState(ECommand.PROPERTY_COMMAND);
     openLiteral();
@@ -106,7 +110,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     T nextLiteral = (T) workerStack.peek().getPropertyLiteralForKey(key, placeholder);
     if (nextLiteral != null) {
       workerStack.push(nextLiteral);
-      mLogger.debug("fix property literal on stack: " + workerStack.peek() + " ; "
+      LOGGER.debug("fix property literal on stack: " + workerStack.peek() + " ; "
           + workerStack.peek().getCommand());
     } else {
       throw new IllegalStateException("illegal key value [" + key + "] in dictionary ["
@@ -119,7 +123,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     checkStackState(ECommand.VALUE_COMMAND);
     eventHandler.openEvent(workerStack.peek());
     eventHandler.stringEvent(value);
-    mLogger.debug("string-value: " + value + " ");
+    LOGGER.debug("string-value: " + value + " ");
     closeLiteral(); // close VALUE_COMMAND
   }
 
@@ -128,7 +132,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     checkStackState(ECommand.VALUE_COMMAND);
     eventHandler.openEvent(workerStack.peek());
     eventHandler.booleanEvent(value);
-    mLogger.debug("boolean-value: " + value + " ");
+    LOGGER.debug("boolean-value: " + value + " ");
     closeLiteral(); // close VALUE_COMMAND
   }
 
@@ -144,7 +148,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     if (!workerStack.isEmpty() && (workerStack.peek().getCommand() != expectedCommand)
         && (workerStack.peek().getCommand() == ECommand.ARRAY_COMMAND)) {
       openLiteral();
-      mLogger.debug("reopen " + workerStack.peek() + " ; " + workerStack.peek().getCommand());
+      LOGGER.debug("reopen " + workerStack.peek() + " ; " + workerStack.peek().getCommand());
     }
     if (workerStack.isEmpty() || (workerStack.peek().getCommand() != expectedCommand)) {
       throw new IllegalStateException("Expecting: " + workerStack.peek().getCommand() + " for "
@@ -158,8 +162,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     T nextLiteral = (T) workerStack.peek().getNextLiteral();
     if (nextLiteral != null) {
       workerStack.push(nextLiteral);
-      mLogger.debug("advance open: " + workerStack.peek() + " ; "
-          + workerStack.peek().getCommand());
+      LOGGER.debug("advance open: " + workerStack.peek() + " ; " + workerStack.peek().getCommand());
     }
   }
 
@@ -168,12 +171,12 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     T currentLiteral = workerStack.peek();
     workerStack.push((T) currentLiteral.getFirstLiteral());
     eventHandler.openEvent(currentLiteral);
-    mLogger.debug("open " + currentLiteral + " ; " + currentLiteral.getCommand());
+    LOGGER.debug("open " + currentLiteral + " ; " + currentLiteral.getCommand());
   }
 
   private void closeLiteral() {
     T lastLiteral = workerStack.pop();
-    mLogger.debug("close: " + lastLiteral + " ; " + lastLiteral.getCommand());
+    LOGGER.debug("close: " + lastLiteral + " ; " + lastLiteral.getCommand());
     eventHandler.closeEvent(lastLiteral);
   }
 

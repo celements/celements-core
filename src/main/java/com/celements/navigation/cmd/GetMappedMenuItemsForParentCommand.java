@@ -24,7 +24,6 @@ import static com.celements.navigation.cmd.MenuItemsUtils.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 import javax.validation.constraints.NotNull;
 
@@ -80,7 +79,7 @@ public class GetMappedMenuItemsForParentCommand {
       if (parentKey.indexOf(':') < 0) {
         parentKey = getContext().getDatabase() + ":" + parentKey;
       }
-      List<Object> parameterList = new Vector<>();
+      List<Object> parameterList = new ArrayList<>();
       parameterList.add(parentKey.split(":")[1]);
       String saveDatabase = getContext().getDatabase();
       getContext().setDatabase(parentKey.split(":")[0]);
