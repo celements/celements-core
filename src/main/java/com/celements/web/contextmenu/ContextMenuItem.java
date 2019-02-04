@@ -50,6 +50,7 @@ public class ContextMenuItem {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
+  private final String objId;
   private String link;
   private final String vLink;
   private String text;
@@ -64,8 +65,6 @@ public class ContextMenuItem {
 
   private final List<String> elemIdParts;
 
-  private final String objId;
-
   /**
    * @deprecated since 2.29 instead use new ContextmenuItem(BaseObject, String)
    */
@@ -79,11 +78,11 @@ public class ContextMenuItem {
     elemIdParts = Arrays.asList(elemId.split(":", -1));
     elemId = elemIdParts.get(elemIdParts.size() - 1);
     this.elemId = elemId;
+    objId = menuItem.toString();
     vLink = menuItem.getLargeStringValue("cmi_link");
     vText = menuItem.getStringValue("cmi_text");
     vIcon = menuItem.getStringValue("cmi_icon");
     vShortcut = menuItem.getStringValue("cmi_shortcut");
-    objId = menuItem.toString();
     LOGGER.debug("ContextMenuItem created for [{}]: elemId = [{}]", menuItem, elemId);
   }
 
