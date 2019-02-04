@@ -142,20 +142,7 @@ public class ContextMenuBuilder {
         DocumentReference.class)).iter());
     cmiObjects.append(getObjectFetcher(builder.with(getContext().getWikiRef()).build(
         DocumentReference.class)).iter());
-    LOGGER.error("getCMIobjects: {} objects for '{}'", cmiObjects.size(), className);
     return cmiObjects;
-  }
-
-  private void addJSONforCM(String elemId, Builder jsonBuilder) {
-    jsonBuilder.openDictionary();
-    jsonBuilder.addStringProperty("elemId", elemId);
-    jsonBuilder.openProperty("cmItems");
-    jsonBuilder.openArray();
-    for (ContextMenuItem cmi : contextMenus.get(elemId)) {
-      cmi.generateJSON(jsonBuilder);
-    }
-    jsonBuilder.closeArray();
-    jsonBuilder.closeDictionary();
   }
 
   public void addElementsCMforClassNames(String jsonDictionary) {
@@ -181,7 +168,15 @@ public class ContextMenuBuilder {
       jsonBuilder.openArray();
       for (String elemId : contextMenus.keySet()) {
         if (!"".equals(elemId)) {
-          addJSONforCM(elemId, jsonBuilder);
+          jsonBuilder.openDictionary();
+          jsonBuilder.addStringProperty("elemId", elemId);
+          jsonBuilder.openProperty("cmItems");
+          jsonBuilder.openArray();
+          for (ContextMenuItem cmi : contextMenus.get(elemId)) {
+            cmi.generateJSON(jsonBuilder);
+          }
+          jsonBuilder.closeArray();
+          jsonBuilder.closeDictionary();
         }
       }
       jsonBuilder.closeArray();
@@ -193,8 +188,10 @@ public class ContextMenuBuilder {
   }
 
   private XWikiObjectFetcher getObjectFetcher(DocumentReference docRef) {
-    return XWikiObjectFetcher.on(getModelAccess().getOrCreateDocument(docRef)).filter(
-        OldCoreClasses.getContextMenuItemClassRef());
+    XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(getModelAccess().getOrCreateDocument(
+        docRef)).filter(OldCoreClasses.getContextMenuItemClassRef());
+    LOGGER.error("getCMIobjects: {} objects for '{}'", fetcher.count(), docRef);
+    return fetcher;
   }
 
   private IModelAccessFacade getModelAccess() {
