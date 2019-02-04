@@ -48,8 +48,6 @@ public class ContextMenuItem {
     }
   };
 
-  public static final String CONTEXTMENUITEM_CLASSNAME = "Celements2.ContextMenuItemClass";
-
   private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
   private String link;
@@ -61,10 +59,12 @@ public class ContextMenuItem {
   private String shortcut;
   private String vShortcut;
 
-  private String elemId;
-  private String origElemId;
+  private final String elemId;
+  private final String origElemId;
 
-  private String[] elemIdParts;
+  private final List<String> elemIdParts;
+
+  private final String objId;
 
   /**
    * @deprecated since 2.29 instead use new ContextmenuItem(BaseObject, String)
@@ -76,13 +76,14 @@ public class ContextMenuItem {
 
   public ContextMenuItem(BaseObject menuItem, String elemId) {
     origElemId = elemId;
-    elemIdParts = elemId.split(":", -1);
-    elemId = elemIdParts[elemIdParts.length - 1];
+    elemIdParts = Arrays.asList(elemId.split(":", -1));
+    elemId = elemIdParts.get(elemIdParts.size() - 1);
     this.elemId = elemId;
     vLink = menuItem.getLargeStringValue("cmi_link");
     vText = menuItem.getStringValue("cmi_text");
     vIcon = menuItem.getStringValue("cmi_icon");
     vShortcut = menuItem.getStringValue("cmi_shortcut");
+    objId = menuItem.toString();
     LOGGER.debug("ContextMenuItem created for [{}]: elemId = [{}]", menuItem, elemId);
   }
 
@@ -103,7 +104,7 @@ public class ContextMenuItem {
       time = System.currentTimeMillis() - time;
       RENDER_TIME.get().addAndGet(time);
       if (time > 5) {
-        LOGGER.error("renderText: '{}' took {}ms", origElemId, time);
+        LOGGER.error("renderText: took {}ms for '{}' and '{}'", time, objId, origElemId);
       }
     } catch (XWikiVelocityException exc) {
       LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
@@ -119,7 +120,7 @@ public class ContextMenuItem {
       public VelocityContext apply(VelocityContext vContext) {
         vContext.put("elemId", elemId);
         vContext.put("origElemId", origElemId);
-        List<String> elemParams = Arrays.asList(elemIdParts).subList(0, elemIdParts.length - 1);
+        List<String> elemParams = elemIdParts.subList(0, elemIdParts.size() - 1);
         vContext.put("elemParams", elemParams);
         return vContext;
       }
