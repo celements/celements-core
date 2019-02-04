@@ -29,7 +29,9 @@ import java.util.Vector;
 import org.codehaus.jackson.JsonParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.reference.RefBuilder;
 import com.celements.sajson.AbstractEventHandler;
 import com.celements.sajson.Builder;
 import com.celements.sajson.Parser;
@@ -140,21 +142,24 @@ public class ContextMenuBuilder {
 
   @SuppressWarnings("unchecked")
   private List getCMIobjects(String className, XWikiContext context) throws XWikiException {
-    String fullName = "CelementsContextMenu." + className;
+    RefBuilder builder = new RefBuilder();
+    builder.space("CelementsContextMenu");
+    builder.doc(className);
+    DocumentReference docRef = builder.wiki("celements2web").build(DocumentReference.class);
     Vector cmiObjects = new Vector();
-    if (context.getWiki().exists("celements2web:" + fullName, context)) {
-      cmiObjects.addAll(context.getWiki().getDocument("celements2web:" + fullName,
-          context).getObjects(ContextMenuItem.CONTEXTMENUITEM_CLASSNAME));
+    if (context.getWiki().exists(docRef, context)) {
+      cmiObjects.addAll(context.getWiki().getDocument(docRef, context).getObjects(
+          ContextMenuItem.CONTEXTMENUITEM_CLASSNAME));
     }
-    if (context.getWiki().exists(fullName, context)) {
-      cmiObjects.addAll(context.getWiki().getDocument(fullName, context).getObjects(
+    docRef = builder.wiki(context.getDatabase()).build(DocumentReference.class);
+    if (context.getWiki().exists(docRef, context)) {
+      cmiObjects.addAll(context.getWiki().getDocument(docRef, context).getObjects(
           ContextMenuItem.CONTEXTMENUITEM_CLASSNAME));
     }
     return cmiObjects;
   }
 
   private void addJSONforCM(String elemId, Builder jsonBuilder) {
-    long time = System.currentTimeMillis();
     jsonBuilder.openDictionary();
     jsonBuilder.addStringProperty("elemId", elemId);
     jsonBuilder.openProperty("cmItems");
@@ -164,7 +169,6 @@ public class ContextMenuBuilder {
     }
     jsonBuilder.closeArray();
     jsonBuilder.closeDictionary();
-    LOGGER.error("addJSONforCM: took {}ms for '{}'", (System.currentTimeMillis() - time), elemId);
   }
 
   public void addElementsCMforClassNames(String jsonDictionary, XWikiContext context) {

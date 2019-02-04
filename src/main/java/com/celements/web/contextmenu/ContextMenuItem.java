@@ -22,18 +22,31 @@ package com.celements.web.contextmenu;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.celements.sajson.Builder;
+import com.celements.velocity.VelocityService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class ContextMenuItem {
+
+  public static ThreadLocal<AtomicLong> RENDER_TIME = ThreadLocal.withInitial(
+      new Supplier<AtomicLong>() {
+
+        @Override
+        public AtomicLong get() {
+          return new AtomicLong(0L);
+        }
+      });
 
   public static String CONTEXTMENUITEM_CLASSNAME = "Celements2.ContextMenuItemClass";
 
@@ -66,7 +79,7 @@ public class ContextMenuItem {
     cmiText = menuItem.getStringValue("cmi_text");
     cmiIcon = menuItem.getStringValue("cmi_icon");
     shortcut = menuItem.getStringValue("cmi_shortcut");
-    LOGGER.error("ContextMenuItem created for [{}]: elemId = [{}]", menuItem, elemId);
+    LOGGER.debug("ContextMenuItem created for [{}]: elemId = [{}]", menuItem, elemId);
   }
 
   private XWikiContext getContext() {
@@ -83,13 +96,19 @@ public class ContextMenuItem {
     vcontext.put("origElemId", origElemId);
     List<String> elemParams = Arrays.asList(elemIdParts).subList(0, elemIdParts.length - 1);
     vcontext.put("elemParams", elemParams);
+    String rendered;
     try {
       getContext().put("vcontext", vcontext.clone());
-      return getContext().getWiki().getRenderingEngine().interpretText(velocityText,
-          getContext().getDoc(), getContext());
+      long time = System.currentTimeMillis();
+      rendered = getVelocityService().evaluateVelocityText(velocityText);
+      RENDER_TIME.get().addAndGet(System.currentTimeMillis() - time);
+    } catch (XWikiVelocityException exc) {
+      LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
+      rendered = velocityText;
     } finally {
       getContext().put("vcontext", vcontext);
     }
+    return rendered;
   }
 
   public void generateJSON(Builder builder) {
@@ -144,6 +163,10 @@ public class ContextMenuItem {
   public String toString() {
     return "ContextMenuItem [origElemId=" + origElemId + ", cmiLink=" + cmiLink + ", cmiText="
         + cmiText + ", cmiIcon=" + cmiIcon + ", shortcut=" + shortcut + "]";
+  }
+
+  private VelocityService getVelocityService() {
+    return Utils.getComponent(VelocityService.class);
   }
 
 }
