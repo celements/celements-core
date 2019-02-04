@@ -478,8 +478,10 @@ public class TreeNodeService implements ITreeNodeService {
         EntityReference parent = getParentEntityRef(docRef);
         List<TreeNode> subMenuItems = getSubNodesForParent(parent, menuItem.getStringValue(
             "part_name"));
-        LOGGER.debug("getPrevMenuItem: {} subMenuItems found for parent '{}'. {}",
-            subMenuItems.size(), parent, Arrays.deepToString(subMenuItems.toArray()));
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("getPrevMenuItem: {} subMenuItems found for parent '{}'. {}",
+              subMenuItems.size(), parent, Arrays.deepToString(subMenuItems.toArray()));
+        }
         int pos = getMenuItemPos(docRef, menuItem.getStringValue("part_name"));
         if (previous && (pos > 0)) {
           return subMenuItems.get(pos - 1);
