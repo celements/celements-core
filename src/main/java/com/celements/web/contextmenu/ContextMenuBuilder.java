@@ -142,6 +142,7 @@ public class ContextMenuBuilder {
         DocumentReference.class)).iter());
     cmiObjects.append(getObjectFetcher(builder.with(getContext().getWikiRef()).build(
         DocumentReference.class)).iter());
+    LOGGER.error("getCMIobjects: {} objects for '{}'", cmiObjects.size(), className);
     return cmiObjects;
   }
 
@@ -187,6 +188,7 @@ public class ContextMenuBuilder {
       return jsonBuilder.getJSON();
     } finally {
       LOGGER.error("getJson: took {}ms", (System.currentTimeMillis() - time));
+      LOGGER.error("getJson: render time {}ms", ContextMenuItem.RENDER_TIME.get().get());
     }
   }
 
