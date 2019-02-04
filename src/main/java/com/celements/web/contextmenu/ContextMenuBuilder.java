@@ -32,13 +32,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.context.ModelContext;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.sajson.AbstractEventHandler;
 import com.celements.sajson.Builder;
 import com.celements.sajson.Parser;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import com.celements.web.classcollections.OldCoreClasses;
+import com.google.common.collect.FluentIterable;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 @NotThreadSafe
 public class ContextMenuBuilder {
@@ -48,10 +52,8 @@ public class ContextMenuBuilder {
     private String cssClassName;
     private ERequestLiteral currentLiteral;
     private final Map<String, List<ContextMenuItem>> contextMenus;
-    private final XWikiContext context;
 
-    public CMRequestHandler(Map<String, List<ContextMenuItem>> outputCMmap, XWikiContext context) {
-      this.context = context;
+    public CMRequestHandler(Map<String, List<ContextMenuItem>> outputCMmap) {
       this.contextMenus = outputCMmap;
     }
 
@@ -92,7 +94,7 @@ public class ContextMenuBuilder {
         case ELEMENT_ID:
           LOGGER.debug("before adding cmi for " + cssClassName + ", " + value + ": "
               + getCurrentMenu(value).size());
-          getCurrentMenu(value).addAll(getCMItemsForClassAndId(cssClassName, value, context));
+          getCurrentMenu(value).addAll(getCMItemsForClassAndId(cssClassName, value));
           LOGGER.debug("after adding cmi for " + cssClassName + ", " + value + ": "
               + getCurrentMenu(value).size());
           break;
@@ -122,42 +124,24 @@ public class ContextMenuBuilder {
 
   private final Map<String, List<ContextMenuItem>> contextMenus = new HashMap<>();
 
-  List<ContextMenuItem> getCMItemsForClassAndId(String className, String elemId,
-      XWikiContext context) {
+  List<ContextMenuItem> getCMItemsForClassAndId(String className, String elemId) {
     ArrayList<ContextMenuItem> contextMenuItemList = new ArrayList<>();
-    try {
-      for (Object theobj : getCMIobjects(className, context)) {
-        if (theobj instanceof BaseObject) {
-          BaseObject menuItem = (BaseObject) theobj;
-          ContextMenuItem cmItem = new ContextMenuItem(menuItem, elemId);
-          if (!"".equals(cmItem.getLink().trim()) && !"".equals(cmItem.getText().trim())) {
-            contextMenuItemList.add(cmItem);
-          }
-        }
+    for (BaseObject menuItem : getCMIobjects(className)) {
+      ContextMenuItem cmItem = new ContextMenuItem(menuItem, elemId);
+      if (!"".equals(cmItem.getLink().trim()) && !"".equals(cmItem.getText().trim())) {
+        contextMenuItemList.add(cmItem);
       }
-    } catch (XWikiException e) {
-      LOGGER.error("getCMItemsForClassAndId: failed to evaluate CMItems for className [" + className
-          + "] and elemId [" + elemId + "].", e);
     }
     return contextMenuItemList;
   }
 
-  private List<BaseObject> getCMIobjects(String className, XWikiContext context)
-      throws XWikiException {
-    RefBuilder builder = new RefBuilder();
-    builder.space("CelementsContextMenu");
-    builder.doc(className);
-    DocumentReference docRef = builder.wiki("celements2web").build(DocumentReference.class);
-    List<BaseObject> cmiObjects = new ArrayList<>();
-    if (context.getWiki().exists(docRef, context)) {
-      cmiObjects.addAll(context.getWiki().getDocument(docRef, context).getObjects(
-          ContextMenuItem.CONTEXTMENUITEM_CLASSNAME));
-    }
-    docRef = builder.wiki(context.getDatabase()).build(DocumentReference.class);
-    if (context.getWiki().exists(docRef, context)) {
-      cmiObjects.addAll(context.getWiki().getDocument(docRef, context).getObjects(
-          ContextMenuItem.CONTEXTMENUITEM_CLASSNAME));
-    }
+  private FluentIterable<BaseObject> getCMIobjects(String className) {
+    FluentIterable<BaseObject> cmiObjects = FluentIterable.of();
+    RefBuilder builder = new RefBuilder().doc(className).space("CelementsContextMenu");
+    cmiObjects.append(getObjectFetcher(builder.wiki("celements2web").build(
+        DocumentReference.class)).iter());
+    cmiObjects.append(getObjectFetcher(builder.with(getContext().getWikiRef()).build(
+        DocumentReference.class)).iter());
     return cmiObjects;
   }
 
@@ -173,9 +157,9 @@ public class ContextMenuBuilder {
     jsonBuilder.closeDictionary();
   }
 
-  public void addElementsCMforClassNames(String jsonDictionary, XWikiContext context) {
+  public void addElementsCMforClassNames(String jsonDictionary) {
     if ((jsonDictionary != null) && !"".equals(jsonDictionary)) {
-      CMRequestHandler requestHandler = new CMRequestHandler(contextMenus, context);
+      CMRequestHandler requestHandler = new CMRequestHandler(contextMenus);
       Parser cmReqParser = Parser.createLexicalParser(ERequestLiteral.REQUEST_ARRAY,
           requestHandler);
       try {
@@ -186,11 +170,6 @@ public class ContextMenuBuilder {
         LOGGER.error("Failed to parse json.", exp);
       }
     }
-  }
-
-  @Deprecated
-  public String getCMIjson(XWikiContext context) {
-    return getJson();
   }
 
   public String getJson() {
@@ -209,6 +188,19 @@ public class ContextMenuBuilder {
     } finally {
       LOGGER.error("getJson: took {}ms", (System.currentTimeMillis() - time));
     }
+  }
+
+  private XWikiObjectFetcher getObjectFetcher(DocumentReference docRef) {
+    return XWikiObjectFetcher.on(getModelAccess().getOrCreateDocument(docRef)).filter(
+        OldCoreClasses.getContextMenuItemClassRef());
+  }
+
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private ModelContext getContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
 }

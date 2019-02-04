@@ -22,7 +22,9 @@ package com.celements.web.classcollections;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.AbstractClassCollection;
 import com.celements.rteConfig.classes.RTEConfigClasses;
@@ -266,8 +268,12 @@ public class OldCoreClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  public static ClassReference getContextMenuItemClassRef() {
+    return new ClassReference("Celements2", "ContextMenuItemClass");
+  }
+
   public DocumentReference getContextMenuItemClassRef(String wikiName) {
-    return new DocumentReference(wikiName, "Celements2", "ContextMenuItemClass");
+    return getContextMenuItemClassRef().getDocRef(new WikiReference(wikiName));
   }
 
   private BaseClass getContextMenuItemClass() throws XWikiException {
