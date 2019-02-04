@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -40,12 +41,17 @@ import com.celements.sajson.AbstractEventHandler;
 import com.celements.sajson.Builder;
 import com.celements.sajson.Parser;
 import com.celements.web.classcollections.OldCoreClasses;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.FluentIterable;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 @NotThreadSafe
 public class ContextMenuBuilder {
+
+  private static final Cache<String, ContextMenuItem> CACHE = CacheBuilder.newBuilder().expireAfterWrite(
+      1, TimeUnit.HOURS).maximumSize(1000).build();
 
   public class CMRequestHandler extends AbstractEventHandler<ERequestLiteral> {
 
@@ -127,7 +133,11 @@ public class ContextMenuBuilder {
   List<ContextMenuItem> getCMItems(String className, String elemId) {
     ArrayList<ContextMenuItem> contextMenuItemList = new ArrayList<>();
     for (BaseObject menuItem : getCMObjects(className)) {
-      ContextMenuItem cmItem = new ContextMenuItem(menuItem, elemId);
+      String id = menuItem.getId() + "-" + elemId;
+      ContextMenuItem cmItem = CACHE.getIfPresent(id);
+      if (cmItem == null) {
+        CACHE.put(id, cmItem = new ContextMenuItem(menuItem, elemId));
+      }
       if (!"".equals(cmItem.getLink().trim()) && !"".equals(cmItem.getText().trim())) {
         contextMenuItemList.add(cmItem);
       }

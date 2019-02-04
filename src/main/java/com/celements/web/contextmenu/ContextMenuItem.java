@@ -51,13 +51,13 @@ public class ContextMenuItem {
   private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
   private String link;
-  private String vLink;
+  private final String vLink;
   private String text;
-  private String vText;
+  private final String vText;
   private String icon;
-  private String vIcon;
+  private final String vIcon;
   private String shortcut;
-  private String vShortcut;
+  private final String vShortcut;
 
   private final String elemId;
   private final String origElemId;
