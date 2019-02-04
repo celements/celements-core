@@ -32,6 +32,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import com.celements.sajson.Builder;
+import com.celements.velocity.VelocityContextModifier;
 import com.celements.velocity.VelocityService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -91,24 +92,31 @@ public class ContextMenuItem {
   }
 
   private String renderText(String velocityText) {
-    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-    vcontext.put("elemId", elemId);
-    vcontext.put("origElemId", origElemId);
-    List<String> elemParams = Arrays.asList(elemIdParts).subList(0, elemIdParts.length - 1);
-    vcontext.put("elemParams", elemParams);
     String rendered;
     try {
-      getContext().put("vcontext", vcontext.clone());
       long time = System.currentTimeMillis();
-      rendered = getVelocityService().evaluateVelocityText(velocityText);
+      rendered = getVelocityService().evaluateVelocityText(getContext().getDoc(), velocityText,
+          getVelocityContextModifier());
       RENDER_TIME.get().addAndGet(System.currentTimeMillis() - time);
     } catch (XWikiVelocityException exc) {
       LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
       rendered = velocityText;
-    } finally {
-      getContext().put("vcontext", vcontext);
     }
     return rendered;
+  }
+
+  private VelocityContextModifier getVelocityContextModifier() {
+    return new VelocityContextModifier() {
+
+      @Override
+      public VelocityContext apply(VelocityContext vContext) {
+        vContext.put("elemId", elemId);
+        vContext.put("origElemId", origElemId);
+        List<String> elemParams = Arrays.asList(elemIdParts).subList(0, elemIdParts.length - 1);
+        vContext.put("elemParams", elemParams);
+        return vContext;
+      }
+    };
   }
 
   public void generateJSON(Builder builder) {
