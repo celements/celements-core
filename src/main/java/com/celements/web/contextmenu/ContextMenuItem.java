@@ -39,7 +39,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class ContextMenuItem {
 
-  public static ThreadLocal<AtomicLong> RENDER_TIME = new ThreadLocal<AtomicLong>() {
+  public static final ThreadLocal<AtomicLong> RENDER_TIME = new ThreadLocal<AtomicLong>() {
 
     @Override
     protected AtomicLong initialValue() {
@@ -47,9 +47,9 @@ public class ContextMenuItem {
     }
   };
 
-  public static String CONTEXTMENUITEM_CLASSNAME = "Celements2.ContextMenuItemClass";
+  public static final String CONTEXTMENUITEM_CLASSNAME = "Celements2.ContextMenuItemClass";
 
-  private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
   private String cmiLink;
   private String cmiText;

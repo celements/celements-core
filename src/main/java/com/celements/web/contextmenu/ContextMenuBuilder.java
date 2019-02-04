@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+
+import javax.annotation.concurrent.NotThreadSafe;
 
 import org.codehaus.jackson.JsonParseException;
 import org.slf4j.Logger;
@@ -39,14 +40,15 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 
+@NotThreadSafe
 public class ContextMenuBuilder {
 
   public class CMRequestHandler extends AbstractEventHandler<ERequestLiteral> {
 
     private String cssClassName;
     private ERequestLiteral currentLiteral;
-    private Map<String, List<ContextMenuItem>> contextMenus;
-    private XWikiContext context;
+    private final Map<String, List<ContextMenuItem>> contextMenus;
+    private final XWikiContext context;
 
     public CMRequestHandler(Map<String, List<ContextMenuItem>> outputCMmap, XWikiContext context) {
       this.context = context;
@@ -116,9 +118,9 @@ public class ContextMenuBuilder {
    * class ContextMenuBuilder
    */
 
-  private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuBuilder.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuBuilder.class);
 
-  private Map<String, List<ContextMenuItem>> contextMenus = new HashMap<>();
+  private final Map<String, List<ContextMenuItem>> contextMenus = new HashMap<>();
 
   List<ContextMenuItem> getCMItemsForClassAndId(String className, String elemId,
       XWikiContext context) {
@@ -140,13 +142,13 @@ public class ContextMenuBuilder {
     return contextMenuItemList;
   }
 
-  @SuppressWarnings("unchecked")
-  private List getCMIobjects(String className, XWikiContext context) throws XWikiException {
+  private List<BaseObject> getCMIobjects(String className, XWikiContext context)
+      throws XWikiException {
     RefBuilder builder = new RefBuilder();
     builder.space("CelementsContextMenu");
     builder.doc(className);
     DocumentReference docRef = builder.wiki("celements2web").build(DocumentReference.class);
-    Vector cmiObjects = new Vector();
+    List<BaseObject> cmiObjects = new ArrayList<>();
     if (context.getWiki().exists(docRef, context)) {
       cmiObjects.addAll(context.getWiki().getDocument(docRef, context).getObjects(
           ContextMenuItem.CONTEXTMENUITEM_CLASSNAME));

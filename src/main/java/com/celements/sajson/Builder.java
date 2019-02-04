@@ -19,12 +19,14 @@
  */
 package com.celements.sajson;
 
-import java.io.StringWriter;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Stack;
 import java.util.regex.Pattern;
+
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -35,19 +37,20 @@ import com.google.common.collect.ImmutableMap;
  * @author fabian
  */
 
+@NotThreadSafe
 public class Builder {
 
   private static final Map<Pattern, String> JSON_REPLACEMENTS = ImmutableMap.of(Pattern.compile(
       "\\\\"), "\\\\\\\\", Pattern.compile("\""), "\\\\\"", Pattern.compile("\n"), "\\\\n",
       Pattern.compile("\r"), "\\\\r", Pattern.compile("\t"), "\\\\t");
 
-  private Stack<ECommand> workerStack;
-  private StringWriter jsonOutput;
+  private final Deque<ECommand> workerStack;
+  private final StringBuilder jsonOutput;
   private boolean onFirstElement;
 
   public Builder() {
-    workerStack = new Stack<>();
-    jsonOutput = new StringWriter();
+    workerStack = new ArrayDeque<>();
+    jsonOutput = new StringBuilder();
     onFirstElement = true;
   }
 
@@ -189,7 +192,7 @@ public class Builder {
   /**
    * for internal use only (ONLY TESTS!!!)
    */
-  Stack<ECommand> internal_getWorkerStack() {
+  Deque<ECommand> internal_getWorkerStack() {
     return workerStack;
   }
 

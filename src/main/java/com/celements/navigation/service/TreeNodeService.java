@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -389,7 +388,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   @Override
   public Integer getMaxConfiguredNavigationLevel() {
-    List<BaseObject> navConfigObjects = new Vector<>();
+    List<BaseObject> navConfigObjects = new ArrayList<>();
     List<BaseObject> navConfigDocsObjs = getNavObjectsOnConfigDocs();
     if (navConfigDocsObjs != null) {
       navConfigObjects.addAll(navConfigDocsObjs);
@@ -412,14 +411,14 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   List<BaseObject> getNavObjectsFromLayout() {
-    List<BaseObject> navObjects = new Vector<>();
+    List<BaseObject> navObjects = new ArrayList<>();
     SpaceReference layoutRef = getPageLayoutCmd().getPageLayoutForCurrentDoc();
     if (layoutRef != null) {
       XObjectIterator objectIterator = new XObjectIterator(getContext());
-      List<String> layoutCellList = new Vector<>();
+      List<String> layoutCellList = new ArrayList<>();
       List<TreeNode> subNodesForParent = getSubNodesForParent(layoutRef, "");
       while (!subNodesForParent.isEmpty()) {
-        List<TreeNode> newSubNodes = new Vector<>();
+        List<TreeNode> newSubNodes = new ArrayList<>();
         for (TreeNode node : subNodesForParent) {
           List<TreeNode> subNodes = getSubNodesForParent(node.getDocumentReference(), "");
           newSubNodes.addAll(subNodes);
@@ -585,8 +584,7 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   ArrayList<TreeNode> moveTreeNodeAfter(TreeNode moveTreeNode, TreeNode insertAfterTreeNode) {
-    List<TreeNode> treeNodes = new ArrayList<>(fetchNodesForParentKey(
-        moveTreeNode.getParentRef()));
+    List<TreeNode> treeNodes = new ArrayList<>(fetchNodesForParentKey(moveTreeNode.getParentRef()));
     treeNodes.remove(moveTreeNode);
     ArrayList<TreeNode> newTreeNodes = new ArrayList<>();
     int splitPos = 0;

@@ -1,8 +1,8 @@
 package com.celements.appScript;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -176,7 +176,7 @@ public class AppScriptService implements IAppScriptService {
   public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
     String overwriteAppDocs = getContext().getWiki().getXWikiPreference(
         APP_SCRIPT_XWPREF_OVERW_DOCS, APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext());
-    List<DocumentReference> overwAppDocList = new Vector<>();
+    List<DocumentReference> overwAppDocList = new ArrayList<>();
     if (!"-".equals(overwriteAppDocs)) {
       for (String overwAppDocFN : overwriteAppDocs.split("[, ]")) {
         try {
