@@ -94,7 +94,7 @@ public class ContextMenuItem {
     return Utils.getComponent(Execution.class);
   }
 
-  private String renderText(String velocityText) {
+  private String renderText(String velocityText, String fieldName) {
     String rendered;
     try {
       long time = System.currentTimeMillis();
@@ -102,9 +102,8 @@ public class ContextMenuItem {
           getVelocityContextModifier());
       time = System.currentTimeMillis() - time;
       RENDER_TIME.get().addAndGet(time);
-      if (time > 5) {
-        LOGGER.error("renderText: took {}ms for '{}' and '{}'", time, objId, origElemId);
-      }
+      LOGGER.error("renderText: took {}ms for '{}', '{}', '{}'", time, objId, fieldName,
+          origElemId);
     } catch (XWikiVelocityException exc) {
       LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
       rendered = velocityText;
@@ -160,28 +159,28 @@ public class ContextMenuItem {
 
   public String getLink() {
     if (link == null) {
-      link = renderText(vLink);
+      link = renderText(vLink, "link");
     }
     return link;
   }
 
   public String getText() {
     if (text == null) {
-      text = renderText(vText);
+      text = renderText(vText, "text");
     }
     return text;
   }
 
   public String getCmiIcon() {
     if (icon == null) {
-      icon = renderText(vIcon);
+      icon = renderText(vIcon, "icon");
     }
     return icon;
   }
 
   public String getShortcut() {
     if (shortcut == null) {
-      shortcut = renderText(vShortcut);
+      shortcut = renderText(vShortcut, "shortcut");
     }
     return shortcut;
   }
