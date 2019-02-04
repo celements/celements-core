@@ -41,19 +41,13 @@ public class ContextMenuCSSClassesCommand {
   private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuCSSClassesCommand.class);
 
   public String getAllContextMenuCSSClassesAsJSON(XWikiContext context) {
-    LOGGER.error("getAllContextMenuCSSClasses: start");
-    long time = System.currentTimeMillis();
-    try {
-      Builder jsonBuilder = new Builder();
-      jsonBuilder.openArray();
-      for (String cssClass : getCM_CSSclasses(context)) {
-        jsonBuilder.addString(cssClass);
-      }
-      jsonBuilder.closeArray();
-      return jsonBuilder.getJSON();
-    } finally {
-      LOGGER.error("getAllContextMenuCSSClasses: took {}ms", (System.currentTimeMillis() - time));
+    Builder jsonBuilder = new Builder();
+    jsonBuilder.openArray();
+    for (String cssClass : getCM_CSSclasses(context)) {
+      jsonBuilder.addString(cssClass);
     }
+    jsonBuilder.closeArray();
+    return jsonBuilder.getJSON();
   }
 
   public List<String> getCM_CSSclasses(XWikiContext context) {

@@ -24,6 +24,15 @@ public interface VelocityService {
    * within have a local scope.
    */
   @NotNull
+  String evaluateVelocityText(@Nullable String text,
+      @Nullable VelocityContextModifier contextModifier) throws XWikiVelocityException;
+
+  /**
+   * evaluates the given text as velocity script with contextModifier to manipulate the velocity
+   * context before evaluation. the velocity context is cloned beforehand, thus variable changes
+   * within have a local scope.
+   */
+  @NotNull
   String evaluateVelocityText(@NotNull XWikiDocument templateDoc, @Nullable String text,
       @Nullable VelocityContextModifier contextModifier) throws XWikiVelocityException;
 

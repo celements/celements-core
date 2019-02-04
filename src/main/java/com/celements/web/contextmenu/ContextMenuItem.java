@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.context.Execution;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import com.celements.sajson.Builder;
@@ -75,29 +74,20 @@ public class ContextMenuItem {
     LOGGER.debug("ContextMenuItem created for [{}]: elemId = [{}]", menuItem, elemId);
   }
 
-  private XWikiContext getContext() {
-    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
-  }
-
-  private Execution getExecution() {
-    return Utils.getComponent(Execution.class);
-  }
-
   private String renderText(String velocityText) {
-    String rendered;
+    String ret;
     try {
       long time = System.currentTimeMillis();
-      rendered = getVelocityService().evaluateVelocityText(getContext().getDoc(), velocityText,
-          getVelocityContextModifier());
+      ret = getVelocityService().evaluateVelocityText(velocityText, getVelocityContextModifier());
       if ((System.currentTimeMillis() - time) > 1) {
         LOGGER.error("renderText: took {}ms for '{}'", (System.currentTimeMillis() - time),
             origElemId);
       }
     } catch (XWikiVelocityException exc) {
       LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
-      rendered = velocityText;
+      ret = velocityText;
     }
-    return Strings.nullToEmpty(rendered);
+    return Strings.nullToEmpty(ret);
   }
 
   private VelocityContextModifier getVelocityContextModifier() {

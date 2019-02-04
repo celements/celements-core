@@ -102,13 +102,13 @@ public class ContextMenuItemTest extends AbstractComponentTest {
   }
 
   private void expectEvaluate() throws XWikiVelocityException {
-    expect(veloService.evaluateVelocityText(same(getContext().getDoc()), eq("link"), anyObject(
+    expect(veloService.evaluateVelocityText(eq("link"), anyObject(
         VelocityContextModifier.class))).andReturn("link");
-    expect(veloService.evaluateVelocityText(same(getContext().getDoc()), eq("Test Menu Item"),
-        anyObject(VelocityContextModifier.class))).andReturn("Test Menu Item");
-    expect(veloService.evaluateVelocityText(same(getContext().getDoc()), eq("shortcut"), anyObject(
+    expect(veloService.evaluateVelocityText(eq("Test Menu Item"), anyObject(
+        VelocityContextModifier.class))).andReturn("Test Menu Item");
+    expect(veloService.evaluateVelocityText(eq("shortcut"), anyObject(
         VelocityContextModifier.class))).andReturn("shortcut");
-    expect(veloService.evaluateVelocityText(same(getContext().getDoc()), eq(""), anyObject(
+    expect(veloService.evaluateVelocityText(eq(""), anyObject(
         VelocityContextModifier.class))).andReturn("");
   }
 
