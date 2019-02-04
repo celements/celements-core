@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Supplier;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -40,14 +39,13 @@ import com.xpn.xwiki.web.Utils;
 
 public class ContextMenuItem {
 
-  public static ThreadLocal<AtomicLong> RENDER_TIME = ThreadLocal.withInitial(
-      new Supplier<AtomicLong>() {
+  public static ThreadLocal<AtomicLong> RENDER_TIME = new ThreadLocal<AtomicLong>() {
 
-        @Override
-        public AtomicLong get() {
-          return new AtomicLong(0L);
-        }
-      });
+    @Override
+    protected AtomicLong initialValue() {
+      return new AtomicLong(0L);
+    }
+  };
 
   public static String CONTEXTMENUITEM_CLASSNAME = "Celements2.ContextMenuItemClass";
 
