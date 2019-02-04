@@ -102,8 +102,10 @@ public class ContextMenuItem {
           getVelocityContextModifier());
       time = System.currentTimeMillis() - time;
       RENDER_TIME.get().addAndGet(time);
-      LOGGER.error("renderText: took {}ms for '{}', '{}', '{}'", time, objId, fieldName,
-          origElemId);
+      if (time > 1) {
+        LOGGER.error("renderText: took {}ms for '{}', '{}', '{}'", time, objId, fieldName,
+            origElemId);
+      }
     } catch (XWikiVelocityException exc) {
       LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
       rendered = velocityText;
