@@ -22,8 +22,10 @@ package com.celements.navigation.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
@@ -38,6 +40,7 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.inheritor.InheritorFactory;
 import com.celements.iterator.XObjectIterator;
+import com.celements.model.util.References;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
@@ -46,6 +49,7 @@ import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -181,18 +185,13 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   @Override
-  public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef, INavFilter<T> filter) {
-    LOGGER.trace("getSubNodesForParent: entRef {}] filter class [{}].", entRef, filter.getClass());
-    ArrayList<TreeNode> menuArray = new ArrayList<>();
-    for (TreeNode node : fetchNodesForParentKey(entRef)) {
-      if ((node != null) && filter.includeTreeNode(node, getContext())) {
-        // show only Menuitems of pages accessible to the current user
-        menuArray.add(node);
-      } else {
-        LOGGER.debug("getSubNodesForParent: omit [{}].", node);
-      }
+  public <T> List<TreeNode> getSubNodesForParent(EntityReference ref, INavFilter<T> filter) {
+    SubNodeCacheKey key = new SubNodeCacheKey(ref, filter);
+    List<TreeNode> subNodes = getSubNodesCache().get(key);
+    if (subNodes == null) {
+      getSubNodesCache().put(key, subNodes = fetchNodesForParent(ref, filter));
     }
-    return menuArray;
+    return subNodes;
   }
 
   /**
@@ -217,6 +216,20 @@ public class TreeNodeService implements ITreeNodeService {
     return getSubNodesForParent(entRef, filter);
   }
 
+  private List<TreeNode> fetchNodesForParent(EntityReference ref, INavFilter<?> filter) {
+    LOGGER.trace("fetchNodesForParent: ref [{}], filter class [{}].", ref, filter.getClass());
+    ImmutableList.Builder<TreeNode> builder = new ImmutableList.Builder<>();
+    for (TreeNode node : fetchNodesForParent(ref)) {
+      if ((node != null) && filter.includeTreeNode(node, getContext())) {
+        // show only Menuitems of pages accessible to the current user
+        builder.add(node);
+      } else {
+        LOGGER.debug("fetchNodesForParent: omit [{}].", node);
+      }
+    }
+    return builder.build();
+  }
+
   /**
    * fetchNodesForParentKey
    *
@@ -224,7 +237,7 @@ public class TreeNodeService implements ITreeNodeService {
    * @param context
    * @return Collection keeps ordering of TreeNodes according to posId
    */
-  List<TreeNode> fetchNodesForParentKey(EntityReference parentRef) {
+  List<TreeNode> fetchNodesForParent(EntityReference parentRef) {
     String parentKey = getParentKey(parentRef, true);
     LOGGER.trace("fetchNodesForParentKey: parentRef [{}] parentKey [{}].", parentRef, parentKey);
     long starttotal = System.currentTimeMillis();
@@ -309,7 +322,7 @@ public class TreeNodeService implements ITreeNodeService {
     long starttotal = System.currentTimeMillis();
     List<BaseObject> menuItemList = new ArrayList<>();
     EntityReference refParent = resolveEntityReference(parentKey);
-    for (TreeNode node : fetchNodesForParentKey(refParent)) {
+    for (TreeNode node : fetchNodesForParent(refParent)) {
       try {
         XWikiDocument itemdoc = getContext().getWiki().getDocument(node.getDocumentReference(),
             getContext());
@@ -591,7 +604,7 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   ArrayList<TreeNode> moveTreeNodeAfter(TreeNode moveTreeNode, TreeNode insertAfterTreeNode) {
-    List<TreeNode> treeNodes = new ArrayList<>(fetchNodesForParentKey(moveTreeNode.getParentRef()));
+    List<TreeNode> treeNodes = new ArrayList<>(fetchNodesForParent(moveTreeNode.getParentRef()));
     treeNodes.remove(moveTreeNode);
     ArrayList<TreeNode> newTreeNodes = new ArrayList<>();
     int splitPos = 0;
@@ -664,6 +677,44 @@ public class TreeNodeService implements ITreeNodeService {
       } catch (XWikiException exp) {
         LOGGER.error("storeOrder: Failed to get document [{}].", theDocRef);
       }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<SubNodeCacheKey, List<TreeNode>> getSubNodesCache() {
+    Object cache = execution.getContext().getProperty("subNodeCache");
+    if (cache == null) {
+      execution.getContext().setProperty("subNodeCache",
+          cache = new HashMap<SubNodeCacheKey, List<TreeNode>>());
+    }
+    return (Map<SubNodeCacheKey, List<TreeNode>>) cache;
+  }
+
+  private class SubNodeCacheKey {
+
+    private final EntityReference ref;
+    private final String filterClass;
+    private final String menuPart;
+
+    SubNodeCacheKey(EntityReference ref, INavFilter<?> filter) {
+      this.ref = References.cloneRef(ref);
+      this.filterClass = filter.getClass().getSimpleName();
+      this.menuPart = filter.getMenuPart();
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(ref, filterClass, menuPart);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof SubNodeCacheKey) {
+        SubNodeCacheKey other = (SubNodeCacheKey) obj;
+        return Objects.equals(this.ref, other.ref) && Objects.equals(this.filterClass,
+            other.filterClass) && Objects.equals(this.menuPart, other.menuPart);
+      }
+      return false;
     }
   }
 
