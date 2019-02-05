@@ -67,4 +67,9 @@ public class ExternalUsageFilter implements INavFilter<com.xpn.xwiki.api.Object>
     return getRightsFilter().includeTreeNode(node, context);
   }
 
+  @Override
+  public String toString() {
+    return "ExternalUsageFilter [menuPart=" + rightsFilter.getMenuPart() + "]";
+  }
+
 }
