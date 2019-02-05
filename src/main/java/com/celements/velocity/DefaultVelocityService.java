@@ -18,9 +18,9 @@ import com.google.common.base.Strings;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
-public class CelementsVelocityService implements VelocityService {
+public class DefaultVelocityService implements VelocityService {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CelementsVelocityService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultVelocityService.class);
 
   @Requirement
   private ModelUtils modelUtils;
