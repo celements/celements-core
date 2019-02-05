@@ -189,7 +189,7 @@ public class TreeNodeService implements ITreeNodeService {
     SubNodeCacheKey key = new SubNodeCacheKey(ref, filter);
     List<TreeNode> subNodes = getSubNodesCache().get(key);
     if (subNodes == null) {
-      getSubNodesCache().put(key, subNodes = fetchNodesForParent(ref, filter));
+      getSubNodesCache().put(key, subNodes = fetchFilteredNodesForParent(ref, filter));
     }
     return subNodes;
   }
@@ -216,22 +216,22 @@ public class TreeNodeService implements ITreeNodeService {
     return getSubNodesForParent(entRef, filter);
   }
 
-  private List<TreeNode> fetchNodesForParent(EntityReference ref, INavFilter<?> filter) {
-    LOGGER.trace("fetchNodesForParent: ref [{}], filter class [{}].", ref, filter.getClass());
+  private List<TreeNode> fetchFilteredNodesForParent(EntityReference ref, INavFilter<?> filter) {
     ImmutableList.Builder<TreeNode> builder = new ImmutableList.Builder<>();
     for (TreeNode node : fetchNodesForParent(ref)) {
-      if ((node != null) && filter.includeTreeNode(node, getContext())) {
-        // show only Menuitems of pages accessible to the current user
+      if (filter.includeTreeNode(node, getContext())) {
         builder.add(node);
-      } else {
-        LOGGER.debug("fetchNodesForParent: omit [{}].", node);
       }
     }
-    return builder.build();
+    List<TreeNode> nodes = builder.build();
+    LOGGER.info("fetchFilteredNodesForParent: {} nodes for ref [{}], filter [{}]", nodes.size(),
+        ref, filter);
+    LOGGER.trace("fetchFilteredNodesForParent: ref [{}], filter [{}]: {}", ref, filter, nodes);
+    return nodes;
   }
 
   /**
-   * fetchNodesForParentKey
+   * fetchNodesForParent
    *
    * @param parentKey
    * @param context
@@ -239,10 +239,9 @@ public class TreeNodeService implements ITreeNodeService {
    */
   List<TreeNode> fetchNodesForParent(EntityReference parentRef) {
     String parentKey = getParentKey(parentRef, true);
-    LOGGER.trace("fetchNodesForParentKey: parentRef [{}] parentKey [{}].", parentRef, parentKey);
-    long starttotal = System.currentTimeMillis();
+    LOGGER.trace("fetchNodesForParent: parentRef [{}] parentKey [{}].", parentRef, parentKey);
     long start = System.currentTimeMillis();
-    List<TreeNode> nodes = fetchNodesForParentKey_internal(parentKey, starttotal, start);
+    List<TreeNode> nodes = fetchNodesForParentKey(parentKey);
     if ((nodeProviders != null) && (nodeProviders.values().size() > 0)) {
       TreeMap<Integer, TreeNode> treeNodesMergedMap = new TreeMap<>();
       for (TreeNode node : nodes) {
@@ -259,37 +258,32 @@ public class TreeNodeService implements ITreeNodeService {
         }
       }
       nodes = new ArrayList<>(treeNodesMergedMap.values());
-      long end = System.currentTimeMillis();
-      LOGGER.info("fetchNodesForParentKey: [{}] totaltime for list of [{}]: {}", parentKey,
-          nodes.size(), (end - starttotal));
+      LOGGER.info("fetchNodesForParent: [{}] totaltime for list of [{}]: {}", parentKey,
+          nodes.size(), (System.currentTimeMillis() - start));
     }
     return nodes;
   }
 
-  private List<TreeNode> fetchNodesForParentKey_internal(String parentKey, long starttotal,
-      long start) {
+  private List<TreeNode> fetchNodesForParentKey(String parentKey) {
+    long starttotal = System.currentTimeMillis();
+    long start = starttotal;
     List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd().getTreeNodesForParentKey(
         parentKey);
-    long end = System.currentTimeMillis();
-    LOGGER.debug("fetchNodesForParentKey_internal: time for getNotMappedMenuItemsFromDatabase: {}",
-        (end - start));
-    start = System.currentTimeMillis();
+    LOGGER.debug("fetchNodesForParentKey: time for getNotMappedMenuItemsFromDatabase: {}",
+        (System.currentTimeMillis() - start));
     List<TreeNode> mappedTreeNodes = treeNodeCache.getMappedMenuItemsForParentCmd().getTreeNodesForParentKey(
-        parentKey, getContext());
-    end = System.currentTimeMillis();
-    LOGGER.debug("fetchNodesForParentKey_internal: time for getMappedMenuItemsForParentCmd: {}",
-        (end - start));
+        parentKey);
+    LOGGER.debug("fetchNodesForParentKey: time for getMappedMenuItemsForParentCmd: {}",
+        (System.currentTimeMillis() - start));
     start = System.currentTimeMillis();
     TreeMap<Integer, TreeNode> menuItemsMergedMap = null;
     if ((notMappedmenuItems == null) || (notMappedmenuItems.size() == 0)) {
-      end = System.currentTimeMillis();
-      LOGGER.info("fetchNodesForParentKey_internal: [{}] totaltime for list of [{}]: {}", parentKey,
-          mappedTreeNodes.size(), (end - starttotal));
+      LOGGER.info("fetchNodesForParentKey: [{}] totaltime for list of [{}]: {}", parentKey,
+          mappedTreeNodes.size(), (System.currentTimeMillis() - starttotal));
       return mappedTreeNodes;
     } else if (mappedTreeNodes.size() == 0) {
-      end = System.currentTimeMillis();
-      LOGGER.info("fetchNodesForParentKey_internal: [{}] totaltime for list of [{}]: {}", parentKey,
-          notMappedmenuItems.size(), (end - starttotal));
+      LOGGER.info("fetchNodesForParentKey: [{}] totaltime for list of [{}]: {}", parentKey,
+          notMappedmenuItems.size(), (System.currentTimeMillis() - starttotal));
       return notMappedmenuItems;
     } else {
       // TODO refactor GetNotMappedMenuItemsForParentCommand and
@@ -301,12 +295,11 @@ public class TreeNodeService implements ITreeNodeService {
       for (TreeNode node : mappedTreeNodes) {
         menuItemsMergedMap.put(node.getPosition(), node);
       }
-      end = System.currentTimeMillis();
-      LOGGER.debug("fetchNodesForParentKey_internal: time for merging menu items: {}", (end
-          - start));
+      LOGGER.debug("fetchNodesForParentKey: time for merging menu items: {}",
+          (System.currentTimeMillis() - start));
       ArrayList<TreeNode> menuItems = new ArrayList<>(menuItemsMergedMap.values());
-      LOGGER.info("fetchNodesForParentKey_internal: [{}] totaltime for list of [{}]: {}", parentKey,
-          menuItems.size(), (end - starttotal));
+      LOGGER.info("fetchNodesForParentKey: [{}] totaltime for list of [{}]: {}", parentKey,
+          menuItems.size(), (System.currentTimeMillis() - starttotal));
       return menuItems;
     }
   }
@@ -315,7 +308,7 @@ public class TreeNodeService implements ITreeNodeService {
    * @param parentKey
    * @param context
    * @return Collection keeps ordering of menuItems according to posId
-   * @deprecated since 2.14.0 use new fetchNodesForParentKey instead
+   * @deprecated since 2.14.0 use new fetchNodesForParent instead
    */
   @Deprecated
   List<BaseObject> fetchMenuItemsForXWiki(String parentKey) {
