@@ -47,13 +47,13 @@ import com.xpn.xwiki.web.Utils;
 @NotThreadSafe
 public class ContextMenuBuilder {
 
-  public class CMRequestHandler extends AbstractEventHandler<ERequestLiteral> {
+  private class CMRequestHandler extends AbstractEventHandler<ERequestLiteral> {
 
     private String cssClassName;
     private ERequestLiteral currentLiteral;
     private final Map<String, List<ContextMenuItem>> contextMenus;
 
-    public CMRequestHandler(Map<String, List<ContextMenuItem>> outputCMmap) {
+    CMRequestHandler(Map<String, List<ContextMenuItem>> outputCMmap) {
       this.contextMenus = outputCMmap;
     }
 
@@ -109,11 +109,6 @@ public class ContextMenuBuilder {
       }
       return contextMenus.get(elemId);
     }
-
-    public Map<String, List<ContextMenuItem>> getContextMenus() {
-      return contextMenus;
-    }
-
   }
 
   /**
@@ -124,7 +119,7 @@ public class ContextMenuBuilder {
 
   private final Map<String, List<ContextMenuItem>> contextMenus = new HashMap<>();
 
-  List<ContextMenuItem> getCMItems(String className, String elemId) {
+  public List<ContextMenuItem> getCMItems(String className, String elemId) {
     ArrayList<ContextMenuItem> contextMenuItemList = new ArrayList<>();
     for (BaseObject menuItem : getCMObjects(className)) {
       ContextMenuItem cmItem = new ContextMenuItem(menuItem, elemId);
@@ -158,7 +153,7 @@ public class ContextMenuBuilder {
       } catch (IOException exp) {
         LOGGER.error("Failed to parse json.", exp);
       } finally {
-        LOGGER.error("addElementsCMforClassNames: took {}ms", (System.currentTimeMillis() - time));
+        LOGGER.debug("addElementsCMforClassNames: took {}ms", (System.currentTimeMillis() - time));
       }
     }
   }
@@ -184,7 +179,7 @@ public class ContextMenuBuilder {
       jsonBuilder.closeArray();
       return jsonBuilder.getJSON();
     } finally {
-      LOGGER.error("getJson: took {}ms", (System.currentTimeMillis() - time));
+      LOGGER.debug("getJson: took {}ms", (System.currentTimeMillis() - time));
     }
   }
 

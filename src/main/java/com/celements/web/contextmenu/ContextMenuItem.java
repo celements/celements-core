@@ -21,7 +21,9 @@ package com.celements.web.contextmenu;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -40,68 +42,28 @@ public class ContextMenuItem {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
-  private String link;
-  private final String vLink;
-  private String text;
-  private final String vText;
-  private String icon;
-  private final String vIcon;
-  private String shortcut;
-  private final String vShortcut;
+  private final BaseObject menuItemObj;
+  private final Map<String, String> renderCache;
 
   private final String elemId;
   private final String origElemId;
-
   private final List<String> elemIdParts;
 
   /**
    * @deprecated since 2.29 instead use new ContextmenuItem(BaseObject, String)
    */
   @Deprecated
-  public ContextMenuItem(BaseObject menuItem, String elemId, XWikiContext context) {
-    this(menuItem, elemId);
+  public ContextMenuItem(BaseObject menuItemObj, String elemId, XWikiContext context) {
+    this(menuItemObj, elemId);
   }
 
-  public ContextMenuItem(BaseObject menuItem, String elemId) {
-    origElemId = elemId;
-    elemIdParts = Arrays.asList(elemId.split(":", -1));
-    elemId = elemIdParts.get(elemIdParts.size() - 1);
-    this.elemId = elemId;
-    vLink = menuItem.getLargeStringValue("cmi_link");
-    vText = menuItem.getStringValue("cmi_text");
-    vIcon = menuItem.getStringValue("cmi_icon");
-    vShortcut = menuItem.getStringValue("cmi_shortcut");
-    LOGGER.debug("ContextMenuItem created for [{}]: elemId = [{}]", menuItem, elemId);
-  }
-
-  private String renderText(String velocityText) {
-    String ret;
-    try {
-      long time = System.currentTimeMillis();
-      ret = getVelocityService().evaluateVelocityText(velocityText, getVelocityContextModifier());
-      if ((System.currentTimeMillis() - time) > 1) {
-        LOGGER.error("renderText: took {}ms for '{}'", (System.currentTimeMillis() - time),
-            origElemId);
-      }
-    } catch (XWikiVelocityException exc) {
-      LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
-      ret = velocityText;
-    }
-    return Strings.nullToEmpty(ret);
-  }
-
-  private VelocityContextModifier getVelocityContextModifier() {
-    return new VelocityContextModifier() {
-
-      @Override
-      public VelocityContext apply(VelocityContext vContext) {
-        vContext.put("elemId", elemId);
-        vContext.put("origElemId", origElemId);
-        List<String> elemParams = elemIdParts.subList(0, elemIdParts.size() - 1);
-        vContext.put("elemParams", elemParams);
-        return vContext;
-      }
-    };
+  public ContextMenuItem(BaseObject menuItemObj, String elemId) {
+    this.menuItemObj = menuItemObj;
+    this.renderCache = new HashMap<>();
+    this.origElemId = elemId;
+    this.elemIdParts = Arrays.asList(elemId.split(":"));
+    this.elemId = elemIdParts.get(elemIdParts.size() - 1);
+    LOGGER.debug("ContextMenuItem created for [{}]: elemId = [{}]", menuItemObj, elemId);
   }
 
   public void generateJSON(Builder builder) {
@@ -137,31 +99,46 @@ public class ContextMenuItem {
   }
 
   public String getLink() {
-    if (link == null) {
-      link = renderText(vLink);
-    }
-    return link;
+    return renderVelocityTextFromObject("cmi_link");
   }
 
   public String getText() {
+    return renderVelocityTextFromObject("cmi_text");
+  }
+
+  public String getCmiIcon() {
+    return renderVelocityTextFromObject("cmi_icon");
+  }
+
+  public String getShortcut() {
+    return renderVelocityTextFromObject("cmi_shortcut");
+  }
+
+  private String renderVelocityTextFromObject(String name) {
+    String text = renderCache.get(name);
     if (text == null) {
-      text = renderText(vText);
+      text = menuItemObj.getStringValue(name);
+      try {
+        text = getVelocityService().evaluateVelocityText(text, getVelocityContextModifier());
+      } catch (XWikiVelocityException exc) {
+        LOGGER.warn("renderText: failed for '{}'", text, exc);
+      }
+      renderCache.put(name, text = Strings.nullToEmpty(text));
     }
     return text;
   }
 
-  public String getCmiIcon() {
-    if (icon == null) {
-      icon = renderText(vIcon);
-    }
-    return icon;
-  }
+  private VelocityContextModifier getVelocityContextModifier() {
+    return new VelocityContextModifier() {
 
-  public String getShortcut() {
-    if (shortcut == null) {
-      shortcut = renderText(vShortcut);
-    }
-    return shortcut;
+      @Override
+      public VelocityContext apply(VelocityContext vContext) {
+        vContext.put("elemId", elemId);
+        vContext.put("origElemId", origElemId);
+        vContext.put("elemParams", elemIdParts.subList(0, elemIdParts.size() - 1));
+        return vContext;
+      }
+    };
   }
 
   @Override
