@@ -27,7 +27,6 @@ import java.util.Map;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
-import org.codehaus.jackson.JsonParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -40,6 +39,7 @@ import com.celements.sajson.AbstractEventHandler;
 import com.celements.sajson.Builder;
 import com.celements.sajson.Parser;
 import com.celements.web.classcollections.OldCoreClasses;
+import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -140,18 +140,16 @@ public class ContextMenuBuilder {
     return objs;
   }
 
-  public void addElementsCMforClassNames(String jsonDictionary) {
-    long time = System.currentTimeMillis();
-    if ((jsonDictionary != null) && !"".equals(jsonDictionary)) {
+  public void addElementsCMforClassNames(String json) {
+    if (!Strings.isNullOrEmpty(json)) {
+      long time = System.currentTimeMillis();
       CMRequestHandler requestHandler = new CMRequestHandler(contextMenus);
       Parser cmReqParser = Parser.createLexicalParser(ERequestLiteral.REQUEST_ARRAY,
           requestHandler);
       try {
-        cmReqParser.parse(jsonDictionary);
-      } catch (JsonParseException exp) {
-        LOGGER.error("addElementsCMforClassNames: failed to parse [" + jsonDictionary + "].", exp);
+        cmReqParser.parse(json);
       } catch (IOException exp) {
-        LOGGER.error("Failed to parse json.", exp);
+        LOGGER.error("addElementsCMforClassNames: failed to parse json [{}]", json, exp);
       } finally {
         LOGGER.debug("addElementsCMforClassNames: took {}ms", (System.currentTimeMillis() - time));
       }

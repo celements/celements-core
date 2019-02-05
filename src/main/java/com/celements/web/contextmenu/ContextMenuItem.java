@@ -58,7 +58,7 @@ public class ContextMenuItem {
   }
 
   public ContextMenuItem(BaseObject menuItemObj, String elemId) {
-    this.menuItemObj = menuItemObj;
+    this.menuItemObj = (BaseObject) menuItemObj.clone();
     this.renderCache = new HashMap<>();
     this.origElemId = elemId;
     this.elemIdParts = Arrays.asList(elemId.split(":"));
