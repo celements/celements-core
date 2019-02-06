@@ -151,14 +151,14 @@ public abstract class AbstractJob implements Job {
     scontext.setWiki(xwiki);
     scontext.getWiki().getStore().cleanUp(scontext);
 
-    scontext.setDoc(getModelAccess().getDocument(xwikiContext.getDoc().getDocumentReference()));
     scontext.flushClassCache();
     scontext.flushArchiveCache();
     return scontext;
   }
 
   void setupServerUrlAndFactory(XWikiContext scontext, XWikiContext xwikiContext)
-      throws MalformedURLException {
+      throws MalformedURLException, DocumentNotExistsException {
+    scontext.setDoc(getModelAccess().getDocument(xwikiContext.getDoc().getDocumentReference()));
     final XWiki xwiki = xwikiContext.getWiki();
     final String database = xwikiContext.getDatabase();
     final URL url = xwiki.getServerURL(database, scontext);
