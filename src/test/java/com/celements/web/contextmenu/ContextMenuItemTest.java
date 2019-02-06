@@ -33,7 +33,6 @@ import com.celements.sajson.Builder;
 import com.celements.velocity.VelocityContextModifier;
 import com.celements.velocity.VelocityService;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 
 public class ContextMenuItemTest extends AbstractComponentTest {
 
@@ -93,12 +92,7 @@ public class ContextMenuItemTest extends AbstractComponentTest {
   // *****************************************************************/
 
   private ContextMenuItem createCMI(String elementId) {
-    BaseObject menuItem = new BaseObject();
-    menuItem.setLargeStringValue("cmi_link", "link");
-    menuItem.setStringValue("cmi_text", "Test Menu Item");
-    menuItem.setStringValue("cmi_icon", null);
-    menuItem.setStringValue("cmi_shortcut", "shortcut");
-    return new ContextMenuItem(menuItem, elementId);
+    return new ContextMenuItem(elementId, "link", "Test Menu Item", "", "shortcut");
   }
 
   private void expectEvaluate() throws XWikiVelocityException {

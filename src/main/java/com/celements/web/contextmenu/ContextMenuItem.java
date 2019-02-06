@@ -21,9 +21,7 @@ package com.celements.web.contextmenu;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -40,17 +38,27 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * NOTE: the current state of ContextMenuItem is only suitable for request based caching. It cannot
+ * be used in system wide caches due to it's renderedX' fields.
+ */
 @Immutable
 public class ContextMenuItem {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
-  private final BaseObject menuItemObj;
-  private final Map<String, String> renderCache;
-
   private final String elemId;
   private final String origElemId;
   private final List<String> elemIdParts;
+
+  private final String link;
+  private final String text;
+  private final String icon;
+  private final String shortcut;
+  private String renderedLink;
+  private String renderedText;
+  private String renderedIcon;
+  private String renderedShortcut;
 
   /**
    * @deprecated since 2.29 instead use new ContextmenuItem(BaseObject, String)
@@ -60,13 +68,24 @@ public class ContextMenuItem {
     this(menuItemObj, elemId);
   }
 
+  /**
+   * @deprecated since 3.5
+   */
+  @Deprecated
   public ContextMenuItem(BaseObject menuItemObj, String elemId) {
-    this.menuItemObj = (BaseObject) menuItemObj.clone();
-    this.renderCache = new HashMap<>();
+    this(elemId, menuItemObj.getStringValue("cmi_link"), menuItemObj.getStringValue("cmi_text"),
+        menuItemObj.getStringValue("cmi_icon"), menuItemObj.getStringValue("cmi_shortcut"));
+  }
+
+  public ContextMenuItem(String elemId, String link, String text, String icon, String shortcut) {
     this.origElemId = elemId;
-    this.elemIdParts = Arrays.asList(elemId.split(":"));
+    this.elemIdParts = Arrays.asList(elemId.split(":", -1));
     this.elemId = elemIdParts.get(elemIdParts.size() - 1);
-    LOGGER.debug("ContextMenuItem created for [{}]: elemId = [{}]", menuItemObj, elemId);
+    this.link = link;
+    this.text = text;
+    this.icon = icon;
+    this.shortcut = shortcut;
+    LOGGER.debug("ContextMenuItem created for elemId [{}]", elemId);
   }
 
   public void generateJSON(Builder builder) {
@@ -102,33 +121,42 @@ public class ContextMenuItem {
   }
 
   public String getLink() {
-    return renderVelocityTextFromObject("cmi_link");
+    if (renderedLink == null) {
+      renderedLink = renderVelocityText(link);
+    }
+    return renderedLink;
   }
 
   public String getText() {
-    return renderVelocityTextFromObject("cmi_text");
+    if (renderedText == null) {
+      renderedText = renderVelocityText(text);
+    }
+    return renderedText;
   }
 
   public String getCmiIcon() {
-    return renderVelocityTextFromObject("cmi_icon");
+    if (renderedIcon == null) {
+      renderedIcon = renderVelocityText(icon);
+    }
+    return renderedIcon;
   }
 
   public String getShortcut() {
-    return renderVelocityTextFromObject("cmi_shortcut");
+    if (renderedShortcut == null) {
+      renderedShortcut = renderVelocityText(shortcut);
+    }
+    return renderedShortcut;
   }
 
-  private String renderVelocityTextFromObject(String name) {
-    String text = renderCache.get(name);
-    if (text == null) {
-      text = menuItemObj.getStringValue(name);
-      try {
-        text = getVelocityService().evaluateVelocityText(text, getVelocityContextModifier());
-      } catch (XWikiVelocityException exc) {
-        LOGGER.warn("renderText: failed for '{}'", text, exc);
-      }
-      renderCache.put(name, text = Strings.nullToEmpty(text));
+  private String renderVelocityText(String velocityText) {
+    String text;
+    try {
+      text = getVelocityService().evaluateVelocityText(velocityText, getVelocityContextModifier());
+    } catch (XWikiVelocityException exc) {
+      LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
+      text = velocityText;
     }
-    return text;
+    return Strings.nullToEmpty(text);
   }
 
   private VelocityContextModifier getVelocityContextModifier() {
