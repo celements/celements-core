@@ -68,10 +68,6 @@ public class ContextMenuItem {
     this(menuItemObj, elemId);
   }
 
-  /**
-   * @deprecated since 3.5
-   */
-  @Deprecated
   public ContextMenuItem(BaseObject menuItemObj, String elemId) {
     this(elemId, menuItemObj.getStringValue("cmi_link"), menuItemObj.getStringValue("cmi_text"),
         menuItemObj.getStringValue("cmi_icon"), menuItemObj.getStringValue("cmi_shortcut"));
