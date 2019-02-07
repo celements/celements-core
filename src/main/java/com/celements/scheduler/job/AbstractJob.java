@@ -159,9 +159,8 @@ public abstract class AbstractJob implements Job {
   void setupServerUrlAndFactory(XWikiContext scontext, XWikiContext xwikiContext)
       throws MalformedURLException, DocumentNotExistsException {
     scontext.setDoc(getModelAccess().getDocument(xwikiContext.getDoc().getDocumentReference()));
-    final XWiki xwiki = xwikiContext.getWiki();
-    final String database = xwikiContext.getDatabase();
-    final URL url = xwiki.getServerURL(database, scontext);
+
+    final URL url = xwikiContext.getWiki().getServerURL(xwikiContext.getDatabase(), scontext);
     // Push the URL into the slf4j MDC context so that we can display it in the generated logs
     // using the %X{url} syntax.
     MDC.put("url", url.toString());
