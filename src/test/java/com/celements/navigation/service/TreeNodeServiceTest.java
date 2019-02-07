@@ -96,7 +96,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     List<TreeNode> mockTreeNodeList = Arrays.asList(treeNode, null);
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         mockTreeNodeList);
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         Collections.<TreeNode>emptyList());
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(wikiName + ":"
         + spaceName + "." + docName), same(context))).andReturn(true);
@@ -119,8 +119,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         mockTreeNodeList);
     List<TreeNode> emptyList = Collections.emptyList();
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
-        emptyList);
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(emptyList);
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(wikiName + ":"
         + spaceName + "." + docName), same(context))).andReturn(true);
     replayDefault();
@@ -147,7 +146,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
         menuItem2, menuItem3), expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3,
             menuItem5);
 
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         mappedList).once();
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         notMappedList).once();
@@ -187,7 +186,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     List<TreeNode> notMappedList = Arrays.asList(menuItem2, menuItem3);
     List<TreeNode> expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3, menuItem5);
 
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         mappedList).once();
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         notMappedList).once();
@@ -267,7 +266,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     TreeNode menuItem3 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 3);
     List<TreeNode> oldNotMappedList = Arrays.asList(menuItem2, menuItem3);
     List<TreeNode> mappedList = Collections.emptyList();
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         mappedList).once();
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         oldNotMappedList).once();
@@ -290,7 +289,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     TreeNode menuItem1 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 1);
     TreeNode menuItem5 = createTreeNode(spaceName, "myDoc5", spaceName, docName, 5);
     List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5);
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         mappedList).once();
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         oldMenuItems).once();
@@ -309,7 +308,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     context.setDatabase(wikiName);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, docName);
     List<TreeNode> mappedList = Collections.emptyList();
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         mappedList).once();
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         null).once();
@@ -375,8 +374,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
         "xwikidb:MyLayout.NavigationCell1"))).andReturn(Collections.<TreeNode>emptyList());
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(
         "xwikidb:MyLayout.NavigationCell2"))).andReturn(Collections.<TreeNode>emptyList());
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(isA(String.class), same(
-        context))).andReturn(Collections.<TreeNode>emptyList()).anyTimes();
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(isA(String.class))).andReturn(
+        Collections.<TreeNode>emptyList()).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
         context))).andReturn(true).anyTimes();
     BaseObject navConfigObj1 = new BaseObject();
@@ -580,8 +579,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
         myLayoutMenuItems);
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(
         "xwikidb:MyLayout.NavigationCell"))).andReturn(Collections.<TreeNode>emptyList());
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(isA(String.class), same(
-        context))).andReturn(Collections.<TreeNode>emptyList()).anyTimes();
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(isA(String.class))).andReturn(
+        Collections.<TreeNode>emptyList()).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
         context))).andReturn(true).anyTimes();
     BaseObject navConfigObj = new BaseObject();
@@ -614,7 +613,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         nodes).once();
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         new ArrayList<TreeNode>()).once();
 
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
@@ -677,7 +676,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         nodes).once();
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         new ArrayList<TreeNode>()).once();
 
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
@@ -745,7 +744,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         nodes).once();
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         new ArrayList<TreeNode>()).once();
 
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
@@ -801,7 +800,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         nodes).once();
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         new ArrayList<TreeNode>()).once();
 
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
@@ -857,7 +856,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         nodes).once();
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         new ArrayList<TreeNode>()).once();
 
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
@@ -919,7 +918,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         nodes).once();
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName))).andReturn(
         new ArrayList<TreeNode>()).once();
 
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
@@ -1067,7 +1066,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     String parentKey = wikiName + ":" + spaceName + ".myParent";
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         expectedTreeNodes);
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         Collections.<TreeNode>emptyList());
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), isA(String.class),
         same(context))).andReturn(true).atLeastOnce();
@@ -1100,7 +1099,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     List<TreeNode> expectedTreeNodes = Arrays.asList(treeNode1, moveTreeNode, treeNode2, treeNode3);
     String parentKey = wikiName + ":" + spaceName + ".myParent";
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(treeNodes);
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         Collections.<TreeNode>emptyList());
     replayDefault();
     assertEquals(expectedTreeNodes, treeNodeService.moveTreeNodeAfter(moveTreeNode, treeNode1));
@@ -1131,7 +1130,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     List<TreeNode> expectedTreeNodes = Arrays.asList(moveTreeNode, treeNode1, treeNode2, treeNode3);
     String parentKey = wikiName + ":" + spaceName + ".myParent";
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(treeNodes);
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         Collections.<TreeNode>emptyList());
     replayDefault();
     assertEquals(expectedTreeNodes, treeNodeService.moveTreeNodeAfter(moveTreeNode, null));
@@ -1162,7 +1161,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     List<TreeNode> expectedTreeNodes = Arrays.asList(moveTreeNode, treeNode2, treeNode3);
     String parentKey = wikiName + ":" + spaceName + ".myParent";
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(treeNodes);
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         Collections.<TreeNode>emptyList());
     replayDefault();
     assertEquals(expectedTreeNodes, treeNodeService.moveTreeNodeAfter(moveTreeNode, treeNode1));
@@ -1452,7 +1451,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     List<TreeNode> expectedTreeNodes = Arrays.asList(treeNode1, moveTreeNode, treeNode2);
     String parentKey = wikiName + ":" + spaceName + ".myParent";
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(treeNodes);
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         Collections.<TreeNode>emptyList());
     // expecting correct savings
     Capture<XWikiDocument> capDoc2 = new Capture<>();
@@ -1504,7 +1503,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     List<TreeNode> expectedTreeNodes = Arrays.asList(moveTreeNode, treeNode1, treeNode2);
     String parentKey = wikiName + ":" + spaceName + ".myParent";
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(treeNodes);
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         Collections.<TreeNode>emptyList());
     // expecting correct savings
     Capture<XWikiDocument> capDoc1 = new Capture<>();
