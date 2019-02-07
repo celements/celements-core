@@ -219,7 +219,7 @@ public class TreeNodeService implements ITreeNodeService {
   private List<TreeNode> fetchFilteredNodesForParent(EntityReference ref, INavFilter<?> filter) {
     ImmutableList.Builder<TreeNode> builder = new ImmutableList.Builder<>();
     for (TreeNode node : fetchNodesForParent(ref)) {
-      if (filter.includeTreeNode(node, getContext())) {
+      if ((node != null) && filter.includeTreeNode(node, getContext())) {
         builder.add(node);
       }
     }
