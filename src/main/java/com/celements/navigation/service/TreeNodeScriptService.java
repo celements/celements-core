@@ -27,7 +27,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("treeNode")
 public class TreeNodeScriptService implements ScriptService {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(TreeNodeScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TreeNodeScriptService.class);
 
   @Requirement
   ITreeNodeService treeNodeService;
@@ -109,6 +109,30 @@ public class TreeNodeScriptService implements ScriptService {
     return treeNodeService.getSubNodesForParent(parentRef, menuPart);
   }
 
+  public TreeNode getPrevMenuItem(DocumentReference docRef) {
+    TreeNode node = null;
+    if (docRef != null) {
+      try {
+        node = treeNodeService.getPrevMenuItem(docRef);
+      } catch (XWikiException xwe) {
+        LOGGER.error("getPrevMenuItem: failed for '{}'", docRef, xwe);
+      }
+    }
+    return node;
+  }
+
+  public TreeNode getNextMenuItem(DocumentReference docRef) {
+    TreeNode node = null;
+    if (docRef != null) {
+      try {
+        node = treeNodeService.getNextMenuItem(docRef);
+      } catch (XWikiException xwe) {
+        LOGGER.error("getNextMenuItem: failed for '{}'", docRef, xwe);
+      }
+    }
+    return node;
+  }
+
   public int queryCount() {
     return treeNodeCache.queryCount();
   }
@@ -135,7 +159,7 @@ public class TreeNodeScriptService implements ScriptService {
     try {
       treeNodeService.moveTreeDocAfter(moveDocRef, insertAfterDocRef);
     } catch (XWikiException exp) {
-      _LOGGER.error("Failed to get moveDoc [" + moveDocRef + "]", exp);
+      LOGGER.error("Failed to get moveDoc [" + moveDocRef + "]", exp);
     }
   }
 
