@@ -17,7 +17,6 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.scheduler.job.AbstractJob;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -57,6 +56,7 @@ public class AbstractJobTest extends AbstractComponentTest {
     expect(modelAccess.getDocument(eq(testDocRef))).andReturn(new XWikiDocument(testDocRef));
     replayDefault();
     XWikiContext newContext = testJob.createJobContext(getContext());
+    testJob.setupServerUrlAndFactory(newContext, getContext());
     assertNotSame(newContext, getContext());
     XWikiContext testContext = scontextCapture.getValue();
     assertSame(newContext, testContext);
@@ -81,6 +81,7 @@ public class AbstractJobTest extends AbstractComponentTest {
         "WebHome").atLeastOnce();
     replayDefault();
     XWikiContext newContext = testJob.createJobContext(getContext());
+    testJob.setupServerUrlAndFactory(newContext, getContext());
     assertNotSame(newContext, getContext());
     URL testURL = newContext.getURLFactory().createAttachmentURL("filename", "testSpace",
         "testDocument", "download", "", newContext);

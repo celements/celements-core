@@ -96,11 +96,14 @@ public abstract class AbstractJob implements Job {
     Execution execution = Utils.getComponent(Execution.class);
 
     ExecutionContext ec = new ExecutionContext();
+    XWikiContext scontext = createJobContext(xwikiContext);
     // Bridge with old XWiki Context, required for old code.
-    ec.setProperty("xwikicontext", createJobContext(xwikiContext));
+    ec.setProperty("xwikicontext", scontext);
 
     ecim.initialize(ec);
     execution.setContext(ec);
+
+    setupServerUrlAndFactory(scontext, xwikiContext);
     return execution;
   }
 
@@ -147,7 +150,17 @@ public abstract class AbstractJob implements Job {
 
     scontext.setWiki(xwiki);
     scontext.getWiki().getStore().cleanUp(scontext);
-    final URL url = xwiki.getServerURL(database, scontext);
+
+    scontext.flushClassCache();
+    scontext.flushArchiveCache();
+    return scontext;
+  }
+
+  void setupServerUrlAndFactory(XWikiContext scontext, XWikiContext xwikiContext)
+      throws MalformedURLException, DocumentNotExistsException {
+    scontext.setDoc(getModelAccess().getDocument(xwikiContext.getDoc().getDocumentReference()));
+
+    final URL url = xwikiContext.getWiki().getServerURL(xwikiContext.getDatabase(), scontext);
     // Push the URL into the slf4j MDC context so that we can display it in the generated logs
     // using the %X{url} syntax.
     MDC.put("url", url.toString());
@@ -159,11 +172,6 @@ public abstract class AbstractJob implements Job {
           scontext);
     }
     scontext.setURLFactory(xurf);
-
-    scontext.setDoc(getModelAccess().getDocument(xwikiContext.getDoc().getDocumentReference()));
-    scontext.flushClassCache();
-    scontext.flushArchiveCache();
-    return scontext;
   }
 
   private IModelAccessFacade getModelAccess() {
