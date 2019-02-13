@@ -161,9 +161,8 @@ public final class TreeNode {
   @Override
   @NotNull
   public String toString() {
-    return new StringBuilder().append("TreeNode [docRef=").append(docRef).append(
-        ", parentRef=").append(parentRef).append(", position=").append(position).append(
-            ", partName=").append(partName).append("]").toString();
+    return "TreeNode [docRef=" + getDocumentReference() + ", parentRef=" + getParentRef()
+        + ", position=" + getPosition() + ", partName=" + getPartName() + "]";
   }
 
   private static ModelUtils getModelUtils() {

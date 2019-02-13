@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.sajson.Builder;
 import com.xpn.xwiki.XWikiContext;
@@ -38,8 +38,7 @@ import com.xpn.xwiki.XWikiException;
  */
 public class ContextMenuCSSClassesCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      ContextMenuCSSClassesCommand.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuCSSClassesCommand.class);
 
   public String getAllContextMenuCSSClassesAsJSON(XWikiContext context) {
     Builder jsonBuilder = new Builder();
@@ -76,7 +75,7 @@ public class ContextMenuCSSClassesCommand {
         cmCSSclasses.add(classNameObject.toString());
       }
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get list of cm css class names.", exp);
+      LOGGER.error("Failed to get list of cm css class names.", exp);
     }
     return cmCSSclasses;
   }

@@ -85,4 +85,9 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
     return Utils.getComponent(IRightsAccessFacadeRole.class);
   }
 
+  @Override
+  public String toString() {
+    return "InternalRightsFilter [menuPart=" + menuPart + "]";
+  }
+
 }

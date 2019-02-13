@@ -22,8 +22,10 @@ package com.celements.navigation.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
@@ -38,6 +40,7 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.inheritor.InheritorFactory;
 import com.celements.iterator.XObjectIterator;
+import com.celements.model.util.References;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
@@ -46,6 +49,7 @@ import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -181,18 +185,13 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   @Override
-  public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef, INavFilter<T> filter) {
-    LOGGER.trace("getSubNodesForParent: entRef {}] filter class [{}].", entRef, filter.getClass());
-    ArrayList<TreeNode> menuArray = new ArrayList<>();
-    for (TreeNode node : fetchNodesForParentKey(entRef)) {
-      if ((node != null) && filter.includeTreeNode(node, getContext())) {
-        // show only Menuitems of pages accessible to the current user
-        menuArray.add(node);
-      } else {
-        LOGGER.debug("getSubNodesForParent: omit [{}].", node);
-      }
+  public <T> List<TreeNode> getSubNodesForParent(EntityReference ref, INavFilter<T> filter) {
+    SubNodeCacheKey key = new SubNodeCacheKey(ref, filter);
+    List<TreeNode> subNodes = getSubNodesCache().get(key);
+    if (subNodes == null) {
+      getSubNodesCache().put(key, subNodes = fetchFilteredNodesForParent(ref, filter));
     }
-    return menuArray;
+    return subNodes;
   }
 
   /**
@@ -217,19 +216,32 @@ public class TreeNodeService implements ITreeNodeService {
     return getSubNodesForParent(entRef, filter);
   }
 
+  private List<TreeNode> fetchFilteredNodesForParent(EntityReference ref, INavFilter<?> filter) {
+    ImmutableList.Builder<TreeNode> builder = new ImmutableList.Builder<>();
+    for (TreeNode node : fetchNodesForParent(ref)) {
+      if ((node != null) && filter.includeTreeNode(node, getContext())) {
+        builder.add(node);
+      }
+    }
+    List<TreeNode> nodes = builder.build();
+    LOGGER.info("fetchFilteredNodesForParent: {} nodes for ref [{}], filter [{}]", nodes.size(),
+        ref, filter);
+    LOGGER.trace("fetchFilteredNodesForParent: ref [{}], filter [{}]: {}", ref, filter, nodes);
+    return nodes;
+  }
+
   /**
-   * fetchNodesForParentKey
+   * fetchNodesForParent
    *
    * @param parentKey
    * @param context
    * @return Collection keeps ordering of TreeNodes according to posId
    */
-  List<TreeNode> fetchNodesForParentKey(EntityReference parentRef) {
+  List<TreeNode> fetchNodesForParent(EntityReference parentRef) {
     String parentKey = getParentKey(parentRef, true);
-    LOGGER.trace("fetchNodesForParentKey: parentRef [{}] parentKey [{}].", parentRef, parentKey);
-    long starttotal = System.currentTimeMillis();
+    LOGGER.trace("fetchNodesForParent: parentRef [{}] parentKey [{}].", parentRef, parentKey);
     long start = System.currentTimeMillis();
-    List<TreeNode> nodes = fetchNodesForParentKey_internal(parentKey, starttotal, start);
+    List<TreeNode> nodes = fetchNodesForParentKey(parentKey);
     if ((nodeProviders != null) && (nodeProviders.values().size() > 0)) {
       TreeMap<Integer, TreeNode> treeNodesMergedMap = new TreeMap<>();
       for (TreeNode node : nodes) {
@@ -246,37 +258,32 @@ public class TreeNodeService implements ITreeNodeService {
         }
       }
       nodes = new ArrayList<>(treeNodesMergedMap.values());
-      long end = System.currentTimeMillis();
-      LOGGER.info("fetchNodesForParentKey: [{}] totaltime for list of [{}]: {}", parentKey,
-          nodes.size(), (end - starttotal));
+      LOGGER.info("fetchNodesForParent: [{}] totaltime for list of [{}]: {}", parentKey,
+          nodes.size(), (System.currentTimeMillis() - start));
     }
     return nodes;
   }
 
-  private List<TreeNode> fetchNodesForParentKey_internal(String parentKey, long starttotal,
-      long start) {
+  private List<TreeNode> fetchNodesForParentKey(String parentKey) {
+    long starttotal = System.currentTimeMillis();
+    long start = starttotal;
     List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd().getTreeNodesForParentKey(
         parentKey);
-    long end = System.currentTimeMillis();
-    LOGGER.debug("fetchNodesForParentKey_internal: time for getNotMappedMenuItemsFromDatabase: {}",
-        (end - start));
-    start = System.currentTimeMillis();
+    LOGGER.debug("fetchNodesForParentKey: time for getNotMappedMenuItemsFromDatabase: {}",
+        (System.currentTimeMillis() - start));
     List<TreeNode> mappedTreeNodes = treeNodeCache.getMappedMenuItemsForParentCmd().getTreeNodesForParentKey(
-        parentKey, getContext());
-    end = System.currentTimeMillis();
-    LOGGER.debug("fetchNodesForParentKey_internal: time for getMappedMenuItemsForParentCmd: {}",
-        (end - start));
+        parentKey);
+    LOGGER.debug("fetchNodesForParentKey: time for getMappedMenuItemsForParentCmd: {}",
+        (System.currentTimeMillis() - start));
     start = System.currentTimeMillis();
     TreeMap<Integer, TreeNode> menuItemsMergedMap = null;
     if ((notMappedmenuItems == null) || (notMappedmenuItems.size() == 0)) {
-      end = System.currentTimeMillis();
-      LOGGER.info("fetchNodesForParentKey_internal: [{}] totaltime for list of [{}]: {}", parentKey,
-          mappedTreeNodes.size(), (end - starttotal));
+      LOGGER.info("fetchNodesForParentKey: [{}] totaltime for list of [{}]: {}", parentKey,
+          mappedTreeNodes.size(), (System.currentTimeMillis() - starttotal));
       return mappedTreeNodes;
     } else if (mappedTreeNodes.size() == 0) {
-      end = System.currentTimeMillis();
-      LOGGER.info("fetchNodesForParentKey_internal: [{}] totaltime for list of [{}]: {}", parentKey,
-          notMappedmenuItems.size(), (end - starttotal));
+      LOGGER.info("fetchNodesForParentKey: [{}] totaltime for list of [{}]: {}", parentKey,
+          notMappedmenuItems.size(), (System.currentTimeMillis() - starttotal));
       return notMappedmenuItems;
     } else {
       // TODO refactor GetNotMappedMenuItemsForParentCommand and
@@ -288,12 +295,11 @@ public class TreeNodeService implements ITreeNodeService {
       for (TreeNode node : mappedTreeNodes) {
         menuItemsMergedMap.put(node.getPosition(), node);
       }
-      end = System.currentTimeMillis();
-      LOGGER.debug("fetchNodesForParentKey_internal: time for merging menu items: {}", (end
-          - start));
+      LOGGER.debug("fetchNodesForParentKey: time for merging menu items: {}",
+          (System.currentTimeMillis() - start));
       ArrayList<TreeNode> menuItems = new ArrayList<>(menuItemsMergedMap.values());
-      LOGGER.info("fetchNodesForParentKey_internal: [{}] totaltime for list of [{}]: {}", parentKey,
-          menuItems.size(), (end - starttotal));
+      LOGGER.info("fetchNodesForParentKey: [{}] totaltime for list of [{}]: {}", parentKey,
+          menuItems.size(), (System.currentTimeMillis() - starttotal));
       return menuItems;
     }
   }
@@ -302,14 +308,14 @@ public class TreeNodeService implements ITreeNodeService {
    * @param parentKey
    * @param context
    * @return Collection keeps ordering of menuItems according to posId
-   * @deprecated since 2.14.0 use new fetchNodesForParentKey instead
+   * @deprecated since 2.14.0 use new fetchNodesForParent instead
    */
   @Deprecated
   List<BaseObject> fetchMenuItemsForXWiki(String parentKey) {
     long starttotal = System.currentTimeMillis();
     List<BaseObject> menuItemList = new ArrayList<>();
     EntityReference refParent = resolveEntityReference(parentKey);
-    for (TreeNode node : fetchNodesForParentKey(refParent)) {
+    for (TreeNode node : fetchNodesForParent(refParent)) {
       try {
         XWikiDocument itemdoc = getContext().getWiki().getDocument(node.getDocumentReference(),
             getContext());
@@ -478,8 +484,10 @@ public class TreeNodeService implements ITreeNodeService {
         EntityReference parent = getParentEntityRef(docRef);
         List<TreeNode> subMenuItems = getSubNodesForParent(parent, menuItem.getStringValue(
             "part_name"));
-        LOGGER.debug("getPrevMenuItem: {} subMenuItems found for parent '{}'. {}",
-            subMenuItems.size(), parent, Arrays.deepToString(subMenuItems.toArray()));
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("getPrevMenuItem: {} subMenuItems found for parent '{}'. {}",
+              subMenuItems.size(), parent, Arrays.deepToString(subMenuItems.toArray()));
+        }
         int pos = getMenuItemPos(docRef, menuItem.getStringValue("part_name"));
         if (previous && (pos > 0)) {
           return subMenuItems.get(pos - 1);
@@ -584,7 +592,7 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   ArrayList<TreeNode> moveTreeNodeAfter(TreeNode moveTreeNode, TreeNode insertAfterTreeNode) {
-    List<TreeNode> treeNodes = new ArrayList<>(fetchNodesForParentKey(moveTreeNode.getParentRef()));
+    List<TreeNode> treeNodes = new ArrayList<>(fetchNodesForParent(moveTreeNode.getParentRef()));
     treeNodes.remove(moveTreeNode);
     ArrayList<TreeNode> newTreeNodes = new ArrayList<>();
     int splitPos = 0;
@@ -657,6 +665,44 @@ public class TreeNodeService implements ITreeNodeService {
       } catch (XWikiException exp) {
         LOGGER.error("storeOrder: Failed to get document [{}].", theDocRef);
       }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<SubNodeCacheKey, List<TreeNode>> getSubNodesCache() {
+    Object cache = execution.getContext().getProperty("subNodeCache");
+    if (cache == null) {
+      execution.getContext().setProperty("subNodeCache",
+          cache = new HashMap<SubNodeCacheKey, List<TreeNode>>());
+    }
+    return (Map<SubNodeCacheKey, List<TreeNode>>) cache;
+  }
+
+  private class SubNodeCacheKey {
+
+    private final EntityReference ref;
+    private final String filterClass;
+    private final String menuPart;
+
+    SubNodeCacheKey(EntityReference ref, INavFilter<?> filter) {
+      this.ref = References.cloneRef(ref);
+      this.filterClass = filter.getClass().getSimpleName();
+      this.menuPart = filter.getMenuPart();
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(ref, filterClass, menuPart);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof SubNodeCacheKey) {
+        SubNodeCacheKey other = (SubNodeCacheKey) obj;
+        return Objects.equals(this.ref, other.ref) && Objects.equals(this.filterClass,
+            other.filterClass) && Objects.equals(this.menuPart, other.menuPart);
+      }
+      return false;
     }
   }
 

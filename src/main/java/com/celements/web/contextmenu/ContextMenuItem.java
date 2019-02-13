@@ -23,75 +23,65 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.concurrent.Immutable;
+
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.context.Execution;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.celements.sajson.Builder;
+import com.celements.velocity.VelocityContextModifier;
+import com.celements.velocity.VelocityService;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * NOTE: the current state of ContextMenuItem is only suitable for request based caching. It cannot
+ * be used in system wide caches due to it's renderedX' fields.
+ */
+@Immutable
 public class ContextMenuItem {
-
-  public static final String CONTEXTMENUITEM_CLASSNAME = "Celements2.ContextMenuItemClass";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuItem.class);
 
-  private String cmiLink;
-  private String cmiText;
-  private String cmiIcon;
-  private String shortcut;
+  private final String elemId;
+  private final String origElemId;
+  private final List<String> elemIdParts;
 
-  private String elemId;
-  private String origElemId;
-
-  private String[] elemIdParts;
+  private final String link;
+  private final String text;
+  private final String icon;
+  private final String shortcut;
+  private String renderedLink;
+  private String renderedText;
+  private String renderedIcon;
+  private String renderedShortcut;
 
   /**
    * @deprecated since 2.29 instead use new ContextmenuItem(BaseObject, String)
    */
   @Deprecated
-  public ContextMenuItem(BaseObject menuItem, String elemId, XWikiContext context) {
-    this(menuItem, elemId);
+  public ContextMenuItem(BaseObject menuItemObj, String elemId, XWikiContext context) {
+    this(menuItemObj, elemId);
   }
 
-  public ContextMenuItem(BaseObject menuItem, String elemId) {
-    origElemId = elemId;
-    elemIdParts = elemId.split(":", -1);
-    elemId = elemIdParts[elemIdParts.length - 1];
-    this.elemId = elemId;
-    cmiLink = menuItem.getLargeStringValue("cmi_link");
-    cmiText = menuItem.getStringValue("cmi_text");
-    cmiIcon = menuItem.getStringValue("cmi_icon");
-    shortcut = menuItem.getStringValue("cmi_shortcut");
-    LOGGER.trace("ContextMenuItem created for [" + menuItem.getDocumentReference() + ","
-        + menuItem.getNumber() + "]: cmiLink = [" + cmiLink + "], cmiText = [" + cmiText
-        + "], cmiIcon = [" + cmiIcon + "], shortcut = [" + shortcut + "].");
+  public ContextMenuItem(BaseObject menuItemObj, String elemId) {
+    this(elemId, menuItemObj.getStringValue("cmi_link"), menuItemObj.getStringValue("cmi_text"),
+        menuItemObj.getStringValue("cmi_icon"), menuItemObj.getStringValue("cmi_shortcut"));
   }
 
-  private XWikiContext getContext() {
-    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
-  }
-
-  private Execution getExecution() {
-    return Utils.getComponent(Execution.class);
-  }
-
-  private String renderText(String velocityText) {
-    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-    vcontext.put("elemId", elemId);
-    vcontext.put("origElemId", origElemId);
-    List<String> elemParams = Arrays.asList(elemIdParts).subList(0, elemIdParts.length - 1);
-    vcontext.put("elemParams", elemParams);
-    try {
-      getContext().put("vcontext", vcontext.clone());
-      return getContext().getWiki().getRenderingEngine().interpretText(velocityText,
-          getContext().getDoc(), getContext());
-    } finally {
-      getContext().put("vcontext", vcontext);
-    }
+  public ContextMenuItem(String elemId, String link, String text, String icon, String shortcut) {
+    this.origElemId = elemId;
+    this.elemIdParts = Arrays.asList(elemId.split(":", -1));
+    this.elemId = elemIdParts.get(elemIdParts.size() - 1);
+    this.link = link;
+    this.text = text;
+    this.icon = icon;
+    this.shortcut = shortcut;
+    LOGGER.debug("ContextMenuItem created for elemId [{}]", elemId);
   }
 
   public void generateJSON(Builder builder) {
@@ -127,19 +117,64 @@ public class ContextMenuItem {
   }
 
   public String getLink() {
-    return renderText(cmiLink);
+    if (renderedLink == null) {
+      renderedLink = renderVelocityText(link);
+    }
+    return renderedLink;
   }
 
   public String getText() {
-    return renderText(cmiText);
+    if (renderedText == null) {
+      renderedText = renderVelocityText(text);
+    }
+    return renderedText;
   }
 
   public String getCmiIcon() {
-    return renderText(cmiIcon);
+    if (renderedIcon == null) {
+      renderedIcon = renderVelocityText(icon);
+    }
+    return renderedIcon;
   }
 
   public String getShortcut() {
-    return renderText(shortcut);
+    if (renderedShortcut == null) {
+      renderedShortcut = renderVelocityText(shortcut);
+    }
+    return renderedShortcut;
+  }
+
+  private String renderVelocityText(String velocityText) {
+    String text;
+    try {
+      text = getVelocityService().evaluateVelocityText(velocityText, getVelocityContextModifier());
+    } catch (XWikiVelocityException exc) {
+      LOGGER.warn("renderText: failed for '{}'", velocityText, exc);
+      text = velocityText;
+    }
+    return Strings.nullToEmpty(text);
+  }
+
+  private VelocityContextModifier getVelocityContextModifier() {
+    return new VelocityContextModifier() {
+
+      @Override
+      public VelocityContext apply(VelocityContext vContext) {
+        vContext.put("elemId", elemId);
+        vContext.put("origElemId", origElemId);
+        vContext.put("elemParams", elemIdParts.subList(0, elemIdParts.size() - 1));
+        return vContext;
+      }
+    };
+  }
+
+  @Override
+  public String toString() {
+    return "ContextMenuItem [" + origElemId + "]";
+  }
+
+  private static VelocityService getVelocityService() {
+    return Utils.getComponent(VelocityService.class);
   }
 
 }
