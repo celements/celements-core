@@ -4,6 +4,8 @@ com.celements.common.classes.listener.DocumentUpdatedEventListener
 com.celements.web.classcollections.RemoteUserValidationClasses
 com.celements.web.classcollections.ImageMapClasses
 com.celements.web.classcollections.MetaTagClasses
+com.celements.web.classes.CelementsClassPackage
+com.celements.web.classes.FormMailClass
 com.celements.cells.CellsClasses
 com.celements.navigation.NavigationClasses
 com.celements.navigation.service.TreeNodeCache
