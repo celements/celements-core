@@ -221,7 +221,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     // old core celements
     getExtended_XWikiPreferencesClass();
     getXWikiUsersClass();
-    getFormMailClass();
+    // getFormMailClass();
     getUserCSSClass();
     getImportClass();
     getPhotoAlbumClass();
@@ -411,6 +411,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  @Deprecated
   public DocumentReference getFormMailClassRef(String wikiName) {
     return new DocumentReference(wikiName, FORM_MAIL_CLASS_SPACE, FORM_MAIL_CLASS_DOC);
   }
