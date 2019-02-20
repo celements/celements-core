@@ -32,6 +32,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.velocity.VelocityManager;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
@@ -104,6 +105,8 @@ public abstract class AbstractJob implements Job {
     execution.setContext(ec);
 
     setupServerUrlAndFactory(scontext, xwikiContext);
+    VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+    velocityManager.getVelocityContext();
     return execution;
   }
 
