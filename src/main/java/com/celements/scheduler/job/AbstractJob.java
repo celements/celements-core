@@ -90,8 +90,8 @@ public abstract class AbstractJob implements Job {
     }
   }
 
-  private Execution initExecutionContext(XWikiContext xwikiContext)
-      throws ExecutionContextException, DocumentNotExistsException, MalformedURLException {
+  Execution initExecutionContext(XWikiContext xwikiContext) throws ExecutionContextException,
+      DocumentNotExistsException, MalformedURLException {
     // Init execution context
     ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
     Execution execution = Utils.getComponent(Execution.class);
