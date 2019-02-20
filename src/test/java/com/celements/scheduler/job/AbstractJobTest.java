@@ -48,6 +48,20 @@ public class AbstractJobTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testInitExecutionContext() throws Exception {
+    assertNull(getContext().get("vcontext"));
+    Capture<XWikiContext> scontextCapture = new Capture<>();
+    expectStoreCleanup(scontextCapture);
+    expect(getWikiMock().Param(eq("xwiki.url.protocol"), (String) isNull())).andReturn(
+        "http").atLeastOnce();
+    expect(modelAccess.getDocument(eq(testDocRef))).andReturn(new XWikiDocument(testDocRef));
+    replayDefault();
+    testJob.initExecutionContext(getContext());
+    verifyDefault();
+    assertNotNull(getContext().get("vcontext"));
+  }
+
+  @Test
   public void testCreateJobContext_notSame() throws Exception {
     Capture<XWikiContext> scontextCapture = new Capture<>();
     expectStoreCleanup(scontextCapture);
