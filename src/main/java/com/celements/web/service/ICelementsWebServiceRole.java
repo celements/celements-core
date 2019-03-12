@@ -6,6 +6,7 @@ import java.util.Map;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.auth.user.User;
 import com.celements.auth.user.UserCreateException;
 import com.celements.auth.user.UserService;
 import com.xpn.xwiki.XWikiException;
@@ -15,7 +16,8 @@ import com.xpn.xwiki.user.api.XWikiUser;
 public interface ICelementsWebServiceRole {
 
   /**
-   * @deprecated since 3.0 instead use {@link UserService#getEmailForUser(DocumentReference)}
+   * @deprecated since 3.0 instead use {@link UserService#getUser(DocumentReference)} and
+   *             {@link User#getEmail()}
    */
   @Deprecated
   public String getEmailAdressForUser(DocumentReference userDocRef);
