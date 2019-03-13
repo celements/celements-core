@@ -20,6 +20,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.util.ModelUtils;
 import com.celements.pagetype.PageType;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.PageTypeCommand;
@@ -54,6 +55,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
   @Requirement
   Execution execution;
+
+  @Requirement
+  ModelUtils modelUtils;
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -174,9 +178,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       if (!vcontext.containsKey("skin_doc")) {
         try {
           String skinDocName = getContext().getWiki().getSkin(getContext());
-          Document skinDoc = getContext().getWiki().getDocument(
-              webUtilsService.resolveDocumentReference(skinDocName), getContext()).newDocument(
-                  getContext());
+          Document skinDoc = getContext().getWiki().getDocument(modelUtils.resolveRef(skinDocName,
+              DocumentReference.class), getContext()).newDocument(getContext());
           vcontext.put("skin_doc", skinDoc);
         } catch (XWikiException e) {
           _LOGGER.error("Failed to get skin_doc");
@@ -470,11 +473,11 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     _LOGGER.debug("getLanguagePreference: start " + context.getLanguage());
     String language = context.getLanguage();
 
-    _LOGGER.debug("getLanguagePreference: isMultiLingual [" + context.getWiki().isMultiLingual(
-        context) + "] defaultLanguage [" + webUtilsService.getDefaultLanguage() + "].");
     // If the wiki is non multilingual then the language is the default
     // language.
     if (!context.getWiki().isMultiLingual(context)) {
+      _LOGGER.debug("getLanguagePreference: isMultiLingual [" + context.getWiki().isMultiLingual(
+          context) + "] defaultLanguage [" + webUtilsService.getDefaultLanguage() + "].");
       return webUtilsService.getDefaultLanguage();
     }
 
@@ -589,8 +592,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     String language = null;
     String userFN = getContext().getUser();
     XWikiDocument userdoc = null;
-    userdoc = getContext().getWiki().getDocument(webUtilsService.resolveDocumentReference(userFN),
-        getContext());
+    userdoc = getContext().getWiki().getDocument(modelUtils.resolveRef(userFN,
+        DocumentReference.class), getContext());
     if (userdoc != null) {
       language = Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers",
           "default_language"));

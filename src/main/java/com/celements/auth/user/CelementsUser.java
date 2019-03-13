@@ -17,6 +17,7 @@ import com.celements.model.classes.fields.ClassField;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
+import com.celements.web.classes.oldcore.XWikiUsersClass.Type;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -92,6 +93,11 @@ public class CelementsUser implements User {
   public Optional<String> getPrettyName() {
     String prettyName = getFirstName().or("") + " " + getLastName().or("");
     return Optional.fromNullable(Strings.emptyToNull(prettyName.trim()));
+  }
+
+  @Override
+  public Type getType() {
+    return getUserFieldValue(XWikiUsersClass.FIELD_TYPE).or(Type.Simple);
   }
 
   @Override
