@@ -571,7 +571,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   @Deprecated
   public boolean isAdminUser() {
-    return getRightsAccess().isAdminUser();
+    return getRightsAccess().isAdmin();
   }
 
   @Override
@@ -583,7 +583,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   @Deprecated
   public boolean isSuperAdminUser() {
-    return getRightsAccess().isSuperAdminUser();
+    return getRightsAccess().isSuperAdmin();
   }
 
   @Override

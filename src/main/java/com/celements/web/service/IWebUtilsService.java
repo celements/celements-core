@@ -225,7 +225,7 @@ public interface IWebUtilsService {
       @NotNull Class<T> token, @Nullable EntityReference baseRef);
 
   /**
-   * @deprecated instead use {@link IRightsAccessFacadeRole#isAdminUser()}
+   * @deprecated instead use {@link IRightsAccessFacadeRole#isAdmin()}
    */
   @Deprecated
   public boolean isAdminUser();
@@ -237,7 +237,7 @@ public interface IWebUtilsService {
   public boolean isAdvancedAdmin();
 
   /**
-   * @deprecated instead use {@link IRightsAccessFacadeRole#isSuperAdminUser()}
+   * @deprecated instead use {@link IRightsAccessFacadeRole#isSuperAdmin()}
    */
   @Deprecated
   public boolean isSuperAdminUser();
