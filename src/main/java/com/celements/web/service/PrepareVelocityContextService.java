@@ -178,8 +178,10 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       if (!vcontext.containsKey("skin_doc")) {
         try {
           String skinDocName = getContext().getWiki().getSkin(getContext());
-          Document skinDoc = getContext().getWiki().getDocument(modelUtils.resolveRef(skinDocName,
-              DocumentReference.class), getContext()).newDocument(getContext());
+          DocumentReference skinDocRef = modelUtils.resolveRef(skinDocName, DocumentReference.class,
+              getContext().getDoc().getDocumentReference().getLastSpaceReference());
+          Document skinDoc = getContext().getWiki().getDocument(skinDocRef,
+              getContext()).newDocument(getContext());
           vcontext.put("skin_doc", skinDoc);
         } catch (XWikiException e) {
           _LOGGER.error("Failed to get skin_doc");
