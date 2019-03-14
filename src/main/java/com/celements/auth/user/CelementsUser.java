@@ -17,7 +17,9 @@ import com.celements.model.classes.fields.ClassField;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
+import com.celements.web.classes.oldcore.XWikiUsersClass.Type;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -63,13 +65,39 @@ public class CelementsUser implements User {
   }
 
   @Override
+  public boolean isGlobal() {
+    return getDocRef().getWikiReference().equals(modelUtils.getMainWikiRef());
+  }
+
+  @Override
   public XWikiUser asXWikiUser() {
-    return new XWikiUser(modelUtils.serializeRefLocal(getDocRef()));
+    return new XWikiUser(modelUtils.serializeRefLocal(getDocRef()), isGlobal());
   }
 
   @Override
   public Optional<String> getEmail() {
     return getUserFieldValue(XWikiUsersClass.FIELD_EMAIL);
+  }
+
+  @Override
+  public Optional<String> getFirstName() {
+    return getUserFieldValue(XWikiUsersClass.FIELD_FIRST_NAME);
+  }
+
+  @Override
+  public Optional<String> getLastName() {
+    return getUserFieldValue(XWikiUsersClass.FIELD_LAST_NAME);
+  }
+
+  @Override
+  public Optional<String> getPrettyName() {
+    String prettyName = getFirstName().or("") + " " + getLastName().or("");
+    return Optional.fromNullable(Strings.emptyToNull(prettyName.trim()));
+  }
+
+  @Override
+  public Type getType() {
+    return getUserFieldValue(XWikiUsersClass.FIELD_TYPE).or(Type.Simple);
   }
 
   @Override

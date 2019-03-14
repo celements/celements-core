@@ -19,6 +19,8 @@
  */
 package com.celements.web.service;
 
+import static com.google.common.base.Strings.*;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -56,6 +58,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserInstantiationException;
+import com.celements.auth.user.UserService;
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
@@ -79,7 +84,7 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -98,7 +103,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   private static final WikiReference CENTRAL_WIKI_REF = new WikiReference("celements2web");
 
-  private static Logger LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
 
   @Requirement
   ComponentManager componentManager;
@@ -116,10 +121,13 @@ public class WebUtilsService implements IWebUtilsService {
   EntityReferenceResolver<String> relativeRefResolver;
 
   @Requirement
-  ModelContext context;
+  private IRightsAccessFacadeRole rightsAccess;
 
   @Requirement
-  ModelUtils modelUtils;
+  private ModelContext context;
+
+  @Requirement
+  private ModelUtils modelUtils;
 
   /**
    * Used to get the template path mapping information.
@@ -142,7 +150,7 @@ public class WebUtilsService implements IWebUtilsService {
    */
 
   @Requirement
-  IDefaultEmptyDocStrategyRole emptyChecker;
+  private IDefaultEmptyDocStrategyRole emptyChecker;
 
   @Requirement
   private ConfigurationSource defaultConfigSrc;
@@ -150,15 +158,30 @@ public class WebUtilsService implements IWebUtilsService {
   /*
    * not loaded as requirement due to cyclic dependency
    */
-  IDocumentParentsListerRole docParentsLister;
+  private IDocumentParentsListerRole docParentsLister;
 
   @Requirement
-  Execution execution;
+  private Execution execution;
 
   XWikiRenderingEngine injectedRenderingEngine;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    return context.getXWikiContext();
+  }
+
+  // not as requirement due to cyclic dependency
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  // not as requirement due to cyclic dependency
+  private IRightsAccessFacadeRole getRightsAccess() {
+    return Utils.getComponent(IRightsAccessFacadeRole.class);
+  }
+
+  // not as requirement due to cyclic dependency
+  private UserService getUserService() {
+    return Utils.getComponent(UserService.class);
   }
 
   @Override
@@ -349,47 +372,45 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public String getAdminLanguage() {
-    return getAdminLanguage(getContext().getUser());
+    return getAdminLanguage(context.getCurrentUser().orNull());
   }
 
   @Deprecated
   @Override
-  public String getAdminLanguage(String userFullName) {
-    return getAdminLanguage(resolveDocumentReference(userFullName));
+  public String getAdminLanguage(String accountName) {
+    return getAdminLanguage(getUserService().resolveUserDocRef(accountName));
   }
 
   @Override
-  public String getAdminLanguage(DocumentReference userRef) {
-    String adminLanguage = null;
-    try {
-      DocumentReference xwikiUsersClassRef = new DocumentReference(
-          userRef.getWikiReference().getName(), "XWiki", "XWikiUsers");
-      BaseObject userObj = getContext().getWiki().getDocument(userRef, getContext()).getXObject(
-          xwikiUsersClassRef);
-      if (userObj != null) {
-        adminLanguage = userObj.getStringValue("admin_language");
+  public String getAdminLanguage(DocumentReference userDocRef) {
+    User user = null;
+    if (userDocRef != null) {
+      try {
+        user = getUserService().getUser(userDocRef);
+      } catch (UserInstantiationException exc) {
+        LOGGER.warn("failed loading user '{}'", userDocRef, exc);
       }
-    } catch (XWikiException e) {
-      LOGGER.error("failed to get UserObject for " + getContext().getUser());
     }
-    if ((adminLanguage == null) || ("".equals(adminLanguage))) {
-      adminLanguage = getDefaultAdminLanguage();
+    return getAdminLanguage(user);
+  }
+
+  @Override
+  public String getAdminLanguage(User user) {
+    Optional<String> adminLanguage = Optional.absent();
+    if (user != null) {
+      adminLanguage = user.getAdminLanguage();
     }
-    return adminLanguage;
+    return adminLanguage.or(getDefaultAdminLanguage());
   }
 
   @Override
   public String getDefaultAdminLanguage() {
-    String adminLanguage;
-    adminLanguage = getContext().getWiki().getSpacePreference("admin_language",
-        getContext().getLanguage(), getContext());
-    if ((adminLanguage == null) || ("".equals(adminLanguage))) {
-      adminLanguage = getContext().getWiki().Param("celements.admin_language");
-      if ((adminLanguage == null) || ("".equals(adminLanguage))) {
-        adminLanguage = "en";
-      }
+    String adminLanguage = nullToEmpty(getContext().getWiki().getSpacePreference("admin_language",
+        getContext().getLanguage(), getContext()));
+    if (adminLanguage.isEmpty()) {
+      adminLanguage = nullToEmpty(getContext().getWiki().Param("celements.admin_language"));
     }
-    return adminLanguage;
+    return !adminLanguage.isEmpty() ? adminLanguage : "en";
   }
 
   @Deprecated
@@ -417,15 +438,13 @@ public class WebUtilsService implements IWebUtilsService {
     try {
       if (spaceRef != null) {
         DocumentReference docRef = new DocumentReference("WebPreferences", spaceRef);
-        if (getContext().getWiki().exists(docRef, getContext())) {
+        if (getModelAccess().exists(docRef)) {
           getContext().setDatabase(spaceRef.getParent().getName());
-          getContext().setDoc(getContext().getWiki().getDocument(docRef, getContext()));
+          getContext().setDoc(getModelAccess().getOrCreateDocument(docRef));
         }
       }
       // IMPORTANT: in unstable-2.0 defaultLanguage may never be empty
       defaultLang = defaultConfigSrc.getProperty("default_language", "en");
-    } catch (XWikiException xwe) {
-      LOGGER.error("failed getting WebPreferences for space '{}'", spaceRef, xwe);
     } finally {
       getContext().setDatabase(dbbackup);
       getContext().setDoc(docBackup);
@@ -487,7 +506,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   private WikiReference resolveWikiReference(String wikiName, WikiReference defaultWikiRef) {
     WikiReference wikiRef = null;
-    if (!Strings.isNullOrEmpty(wikiName)) {
+    if (!isNullOrEmpty(wikiName)) {
       wikiRef = new WikiReference(wikiName);
     }
     return MoreObjects.firstNonNull(wikiRef, defaultWikiRef);
@@ -550,82 +569,27 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public boolean isAdminUser() {
-    try {
-      if ((getContext() != null) && (getContext().getXWikiUser() != null)
-          && (getContext().getWiki().getRightService() != null)
-          && (getContext().getDoc() != null)) {
-        return (getContext().getWiki().getRightService().hasAdminRights(getContext())
-            || getContext().getXWikiUser().isUserInGroup("XWiki.XWikiAdminGroup", getContext()));
-      } else {
-        return false;
-      }
-    } catch (XWikiException e) {
-      LOGGER.error("Cannot determin if user has Admin Rights therefore guess" + " no (false).", e);
-      return false;
-    }
-  }
-
-  @Override
-  public boolean isSuperAdminUser() {
-    if (getContext() == null) {
-      return false;
-    }
-    String user = getContext().getUser();
-    LOGGER.trace("isSuperAdminUser: user [" + user + "] db [" + getContext().getDatabase() + "].");
-    return (isAdminUser() && (user.startsWith("xwiki:") || getContext().isMainWiki()));
-  }
-
-  @Override
-  public boolean isLayoutEditor() {
-    if ((getContext() == null) || (getContext().getXWikiUser() == null)) {
-      return false;
-    }
-    String user = getContext().getUser();
-    LOGGER.trace("isLayoutEditor: user [" + user + "] db [" + getContext().getDatabase() + "].");
-    try {
-      boolean isLayoutEditor = isAdvancedAdmin() || getContext().getXWikiUser().isUserInGroup(
-          "XWiki.LayoutEditorsGroup", getContext());
-      LOGGER.debug("isLayoutEditor: admin [" + isAdminUser() + "] global user [" + user.startsWith(
-          "xwiki:") + "] returning [" + isLayoutEditor + "] db [" + getContext().getDatabase()
-          + "].");
-      return isLayoutEditor;
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get user document for [" + user + "].", exp);
-    }
-    return false;
-  }
-
-  @Override
-  public boolean isAdvancedAdmin() {
-    if (getContext() == null) {
-      return false;
-    }
-    String user = getContext().getUser();
-    LOGGER.trace("isAdvancedAdmin: user [" + user + "] db [" + getContext().getDatabase() + "].");
-    try {
-      XWikiDocument userDoc = getContext().getWiki().getDocument(resolveDocumentReference(user),
-          getContext());
-      BaseObject userObj = userDoc.getXObject(resolveDocumentReference("XWiki.XWikiUsers"));
-      boolean isAdvancedAdmin = isAdminUser() && (user.startsWith("xwiki:") || ((userObj != null)
-          && "Advanced".equals(userObj.getStringValue("usertype"))));
-      LOGGER.debug("isAdvancedAdmin: admin [" + isAdminUser() + "] global user [" + user.startsWith(
-          "xwiki:") + "] usertype [" + ((userObj != null) ? userObj.getStringValue("usertype")
-              : "null") + "] returning [" + isAdvancedAdmin + "] db [" + getContext().getDatabase()
-          + "].");
-      return isAdvancedAdmin;
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get user document for [" + user + "].", exp);
-    }
-    return false;
-  }
-
-  /**
-   * CAUTION: cyclic dependency with IRightsAccessFacadeRole
-   */
   @Deprecated
-  private IRightsAccessFacadeRole getRightsAccess() {
-    return Utils.getComponent(IRightsAccessFacadeRole.class);
+  public boolean isAdminUser() {
+    return getRightsAccess().isAdmin();
+  }
+
+  @Override
+  @Deprecated
+  public boolean isAdvancedAdmin() {
+    return getRightsAccess().isAdvancedAdmin();
+  }
+
+  @Override
+  @Deprecated
+  public boolean isSuperAdminUser() {
+    return getRightsAccess().isSuperAdmin();
+  }
+
+  @Override
+  @Deprecated
+  public boolean isLayoutEditor() {
+    return getRightsAccess().isLayoutEditor();
   }
 
   @Override
@@ -1012,14 +976,16 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException {
-    XWikiDocument authDoc = getContext().getWiki().getDocument(authDocRef, getContext());
-    BaseObject authObj = authDoc.getXObject(getRef("XWiki", "XWikiUsers"));
-    if (authObj != null) {
-      return authObj.getStringValue("last_name") + ", " + authObj.getStringValue("first_name");
-    } else {
-      return getAdminMessageTool().get("cel_ml_unknown_author");
+  @Deprecated
+  public String getUserNameForDocRef(DocumentReference userDocRef) throws XWikiException {
+    Optional<String> prettyName;
+    try {
+      prettyName = getUserService().getUser(userDocRef).getPrettyName();
+    } catch (UserInstantiationException exc) {
+      LOGGER.warn("failed loading user '{}'", userDocRef, exc);
+      prettyName = Optional.absent();
     }
+    return prettyName.or(getAdminMessageTool().get("cel_ml_unknown_author"));
   }
 
   @Override
@@ -1032,10 +998,6 @@ public class WebUtilsService implements IWebUtilsService {
       }
     }
     return revision;
-  }
-
-  private DocumentReference getRef(String spaceName, String pageName) {
-    return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
   }
 
   @Override
@@ -1245,11 +1207,6 @@ public class WebUtilsService implements IWebUtilsService {
     } catch (DocumentDeleteException exc) {
       throw (XWikiException) exc.getCause();
     }
-  }
-
-  private IModelAccessFacade getModelAccess() {
-    // not as requirement due to cyclic dependency
-    return Utils.getComponent(IModelAccessFacade.class);
   }
 
   @Override
@@ -1541,6 +1498,7 @@ public class WebUtilsService implements IWebUtilsService {
     return modelUtils.adjustRef(docRef, DocumentReference.class, wikiRef);
   }
 
+  @Deprecated
   @Override
   public void setUser(DocumentReference userReference, boolean main) {
     getContext().setUser("XWiki." + userReference.getName(), main);

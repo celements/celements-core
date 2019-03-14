@@ -37,10 +37,13 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserService;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
@@ -100,17 +103,23 @@ public interface IWebUtilsService {
 
   public XWikiMessageTool getAdminMessageTool();
 
+  @NotNull
   public String getDefaultAdminLanguage();
 
+  @NotNull
   public String getAdminLanguage();
 
   /**
-   * @deprecated since 2.34.0 instead use getAdminLanguage(DocumentReference userRef)
+   * @deprecated since 2.34.0 instead use getAdminLanguage(User user)
    */
   @Deprecated
   public String getAdminLanguage(String userFullName);
 
-  public String getAdminLanguage(DocumentReference userRef);
+  @NotNull
+  public String getAdminLanguage(@Nullable DocumentReference userDocRef);
+
+  @NotNull
+  public String getAdminLanguage(@Nullable User user);
 
   /**
    * @deprecated instead use {@link ModelContext#getDefaultLanguage()}
@@ -215,11 +224,29 @@ public interface IWebUtilsService {
   public <T extends EntityReference> T resolveReference(@NotNull String name,
       @NotNull Class<T> token, @Nullable EntityReference baseRef);
 
+  /**
+   * @deprecated instead use {@link IRightsAccessFacadeRole#isAdmin()}
+   */
+  @Deprecated
   public boolean isAdminUser();
 
+  /**
+   * @deprecated instead use {@link IRightsAccessFacadeRole#isAdvancedAdmin()}
+   */
+  @Deprecated
   public boolean isAdvancedAdmin();
 
+  /**
+   * @deprecated instead use {@link IRightsAccessFacadeRole#isSuperAdmin()}
+   */
+  @Deprecated
   public boolean isSuperAdminUser();
+
+  /**
+   * @deprecated instead use {@link IRightsAccessFacadeRole#isLayoutEditor()}
+   */
+  @Deprecated
+  public boolean isLayoutEditor();
 
   /**
    * instead use IRightsAccessFacadeRole.hasAccessLevel(EntityReference, EAccessLevel)
@@ -313,7 +340,12 @@ public interface IWebUtilsService {
 
   public String getJSONContent(DocumentReference docRef);
 
-  public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
+  /**
+   * @deprecated instead use {@link UserService#getUser(DocumentReference)} with
+   *             {@link User#getPrettyName()}
+   */
+  @Deprecated
+  public String getUserNameForDocRef(DocumentReference userDocRef) throws XWikiException;
 
   public String getMajorVersion(XWikiDocument doc);
 
@@ -396,8 +428,6 @@ public interface IWebUtilsService {
 
   public String renderInheritableDocument(DocumentReference docRef, String lang, String defLang)
       throws XWikiException;
-
-  public boolean isLayoutEditor();
 
   @Deprecated
   public String cleanupXHTMLtoHTML5(String xhtml);
@@ -500,6 +530,10 @@ public interface IWebUtilsService {
   @Deprecated
   public DocumentReference setWikiReference(DocumentReference docRef, WikiReference wikiRef);
 
+  /**
+   * @deprecated instead use {@link ModelContext#setUser}
+   */
+  @Deprecated
   public void setUser(DocumentReference userReference, boolean main);
 
 }

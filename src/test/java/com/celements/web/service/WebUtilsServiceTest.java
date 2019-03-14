@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
@@ -23,14 +22,18 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserService;
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
 import com.celements.parents.IDocumentParentsListerRole;
-import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.web.comparators.XWikiAttachmentAscendingChangeDateComparator;
 import com.celements.web.comparators.XWikiAttachmentAscendingNameComparator;
 import com.celements.web.comparators.XWikiAttachmentDescendingChangeDateComparator;
 import com.celements.web.comparators.XWikiAttachmentDescendingNameComparator;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,9 +42,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -49,28 +49,26 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
+  private IModelAccessFacade modelAccessMock;
   private WebUtilsService webUtilsService;
 
   @Before
-  public void setUp_WebUtilsServiceTest() throws Exception {
+  public void prepareTest() throws Exception {
+    registerComponentMocks(IDocumentParentsListerRole.class, IRightsAccessFacadeRole.class,
+        UserService.class);
+    modelAccessMock = registerComponentMock(IModelAccessFacade.class);
     context = getContext();
     xwiki = getWikiMock();
     webUtilsService = (WebUtilsService) Utils.getComponent(IWebUtilsService.class);
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    webUtilsService.docParentsLister = createMockAndAddToDefault(IDocumentParentsListerRole.class);
-  }
-
-  @After
-  public void tearDown_WebUtilsServiceTest() throws Exception {
-    webUtilsService.docParentsLister = null;
   }
 
   @Test
   public void testGetParentForLevel_1() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(true))).andReturn(
-        Collections.<DocumentReference>emptyList()).once();
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
+        true))).andReturn(Collections.<DocumentReference>emptyList()).once();
 
     replayDefault();
     context.setDoc(doc);
@@ -79,13 +77,13 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetParentForLevel_2() throws XWikiException {
+  public void testGetParentForLevel_2() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(true))).andReturn(
-        Arrays.asList(docRef, parentRef)).once();
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
+        true))).andReturn(Arrays.asList(docRef, parentRef)).once();
     replayDefault();
     context.setDoc(doc);
     assertEquals(parentRef, webUtilsService.getParentForLevel(2));
@@ -93,13 +91,13 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetParentForLevel_3() throws XWikiException {
+  public void testGetParentForLevel_3() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(true))).andReturn(
-        Arrays.asList(docRef, parentRef)).once();
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
+        true))).andReturn(Arrays.asList(docRef, parentRef)).once();
     replayDefault();
     context.setDoc(doc);
     assertEquals(docRef, webUtilsService.getParentForLevel(3));
@@ -107,13 +105,13 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetParentForLevel_IndexOutOfBounds() throws XWikiException {
+  public void testGetParentForLevel_IndexOutOfBounds() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(true))).andReturn(
-        Arrays.asList(docRef, parentRef)).times(3);
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
+        true))).andReturn(Arrays.asList(docRef, parentRef)).times(3);
     replayDefault();
     context.setDoc(doc);
     assertNull(webUtilsService.getParentForLevel(4));
@@ -124,13 +122,13 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   @Deprecated
-  public void testGetDocumentParentsList() throws XWikiException {
+  public void testGetDocumentParentsList() throws Exception {
     boolean includeDoc = false;
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     List<DocumentReference> docParentsList = Arrays.asList(parentRef);
-    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
         includeDoc))).andReturn(docParentsList).once();
     replayDefault();
     assertSame(docParentsList, webUtilsService.getDocumentParentsList(docRef, includeDoc));
@@ -139,13 +137,13 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   @Deprecated
-  public void testGetDocumentParentsList_includeDoc() throws XWikiException {
+  public void testGetDocumentParentsList_includeDoc() throws Exception {
     boolean includeDoc = true;
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     List<DocumentReference> docParentsList = Arrays.asList(parentRef);
-    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
         includeDoc))).andReturn(docParentsList).once();
     replayDefault();
     assertSame(docParentsList, webUtilsService.getDocumentParentsList(docRef, includeDoc));
@@ -153,7 +151,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetDocSectionAsJSON() throws XWikiException {
+  public void testGetDocSectionAsJSON() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -175,7 +173,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetDocSection_empty() throws XWikiException {
+  public void testGetDocSection_empty() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -190,7 +188,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetDocSection_first() throws XWikiException {
+  public void testGetDocSection_first() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -210,7 +208,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetDocSection_firstEmptyRTE() throws XWikiException {
+  public void testGetDocSection_firstEmptyRTE() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -230,7 +228,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetDocSection_middle() throws XWikiException {
+  public void testGetDocSection_middle() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -250,7 +248,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetDocSection_last() throws XWikiException {
+  public void testGetDocSection_last() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -270,7 +268,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCountSections_empty() throws XWikiException {
+  public void testCountSections_empty() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -284,7 +282,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCountSections_one() throws XWikiException {
+  public void testCountSections_one() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -299,7 +297,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCountSections_emptyRTEStart() throws XWikiException {
+  public void testCountSections_emptyRTEStart() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -314,7 +312,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCountSections_several() throws XWikiException {
+  public void testCountSections_several() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
         transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -349,288 +347,42 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAdminLanguage_defaultToDocLanguage() throws XWikiException {
+  public void test_getAdminLanguage_fromUser() throws Exception {
     context.setLanguage("de");
-    String userName = "XWiki.MyUser";
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki", "MyUser");
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))).andReturn("de");
+    User user = createMockAndAddToDefault(User.class);
+    expect(user.getAdminLanguage()).andReturn(Optional.of("fr"));
+    expect(xwiki.getSpacePreference("admin_language", "de", context)).andReturn("");
+    expect(xwiki.Param("celements.admin_language")).andReturn("");
+
     replayDefault();
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser(userName);
-    assertEquals("de", webUtilsService.getAdminLanguage());
+    assertEquals("fr", webUtilsService.getAdminLanguage(user));
     verifyDefault();
   }
 
   @Test
-  public void testGetAdminLanguage_contextUser() throws XWikiException {
+  public void test_getAdminLanguage_defaultPreferences() throws Exception {
     context.setLanguage("de");
-    String userName = "XWiki.MyUser";
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki", "MyUser");
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "XWikiUsers");
-    BaseObject userObj = new BaseObject();
-    userObj.setXClassReference(xwikiUserClassRef);
-    userObj.setStringValue("admin_language", "fr");
-    userDoc.setXObject(0, userObj);
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
+    User user = createMockAndAddToDefault(User.class);
+    expect(user.getAdminLanguage()).andReturn(Optional.<String>absent());
+    expect(xwiki.getSpacePreference("admin_language", "de", context)).andReturn("es");
+
     replayDefault();
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser(userName);
-    assertEquals("fr", webUtilsService.getAdminLanguage());
+    assertEquals("es", webUtilsService.getAdminLanguage(user));
     verifyDefault();
   }
 
   @Test
-  @Deprecated
-  public void testGetAdminLanguage_notContextUser() throws XWikiException {
-    context.setLanguage("de");
-    String userName = "XWiki.MyUser";
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki", "MyUser");
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "XWikiUsers");
-    BaseObject userObj = new BaseObject();
-    userObj.setXClassReference(xwikiUserClassRef);
-    userObj.setStringValue("admin_language", "fr");
-    userDoc.setXObject(0, userObj);
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    replayDefault();
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser("XWiki.NotMyUser");
-    assertEquals("fr", webUtilsService.getAdminLanguage(userName));
-    verifyDefault();
-  }
-
-  @Test
-  @Deprecated
-  public void testGetAdminLanguage_defaultToWebPreferences() throws XWikiException {
-    context.setLanguage("de");
-    String userName = "XWiki.MyUser";
-    expect(xwiki.getSpacePreference(eq("admin_language"), isA(String.class), same(
-        context))).andReturn("en");
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki", "MyUser");
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "XWikiUsers");
-    BaseObject userObj = new BaseObject();
-    userObj.setXClassReference(xwikiUserClassRef);
-    userObj.setStringValue("admin_language", "");
-    userDoc.setXObject(0, userObj);
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    replayDefault();
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser("XWiki.NotMyUser");
-    assertEquals("en", webUtilsService.getAdminLanguage(userName));
-    verifyDefault();
-  }
-
-  @Test
-  public void testGetAdminLanguage_emptySpaceLanguage() throws Exception {
+  public void test_getAdminLanguage_defaultSystem() throws Exception {
     String systemDefaultAdminLang = "en";
     context.setLanguage("de");
-    String userName = "XWiki.MyUser";
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki", "MyUser");
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "XWikiUsers");
-    BaseObject userObj = new BaseObject();
-    userObj.setXClassReference(xwikiUserClassRef);
-    userObj.setStringValue("admin_language", "");
-    userDoc.setXObject(0, userObj);
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))).andReturn("");
-    expect(xwiki.Param(eq("celements.admin_language"))).andReturn("");
-    replayDefault();
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser(userName);
-    assertEquals(systemDefaultAdminLang, webUtilsService.getAdminLanguage());
-    verifyDefault();
-  }
-
-  @Test
-  public void testIsAdminUser_noAdminRights_noRightsService() {
-    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDocument");
-    context.setDoc(new XWikiDocument(currentDocRef));
-    expect(xwiki.getRightService()).andReturn(null).anyTimes();
+    User user = createMockAndAddToDefault(User.class);
+    expect(user.getAdminLanguage()).andReturn(Optional.<String>absent());
+    expect(xwiki.getSpacePreference("admin_language", "de", context)).andReturn("");
+    expect(xwiki.Param("celements.admin_language")).andReturn("");
 
     replayDefault();
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser("XWiki.TestUser");
-    assertFalse(webUtilsService.isAdminUser());
+    assertEquals(systemDefaultAdminLang, webUtilsService.getAdminLanguage(user));
     verifyDefault();
-  }
-
-  @Test
-  public void testIsAdminUser_noContextDoc() {
-    context.setDoc(null);
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    // hasAdminRights must not be called it will fail with an NPE
-
-    replayDefault(mockRightsService);
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser("XWiki.TestUser");
-    assertFalse(webUtilsService.isAdminUser());
-    verifyDefault(mockRightsService);
-  }
-
-  @Test
-  public void testIsAdminUser_noAdminRights_notInAdminGroup() throws Exception {
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "TestUser");
-    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDocument");
-    context.setDoc(new XWikiDocument(currentDocRef));
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAdminRights(same(context))).andReturn(false).anyTimes();
-    XWikiGroupService groupServiceMock = createMock(XWikiGroupService.class);
-    expect(xwiki.getGroupService(same(context))).andReturn(groupServiceMock);
-    List<DocumentReference> emptyGroupList = Collections.emptyList();
-    expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0), same(
-        context))).andReturn(emptyGroupList).atLeastOnce();
-    replayDefault(mockRightsService, groupServiceMock);
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser("XWiki.TestUser");
-    assertFalse(webUtilsService.isAdminUser());
-    verifyDefault(mockRightsService, groupServiceMock);
-  }
-
-  @Test
-  public void testIsAdminUser_noAdminRights_isInAdminGroup() throws Exception {
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "TestUser");
-    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDocument");
-    context.setDoc(new XWikiDocument(currentDocRef));
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAdminRights(same(context))).andReturn(false).anyTimes();
-    XWikiGroupService groupServiceMock = createMock(XWikiGroupService.class);
-    expect(xwiki.getGroupService(same(context))).andReturn(groupServiceMock);
-    DocumentReference adminGroupDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "XWikiAdminGroup");
-    expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0), same(
-        context))).andReturn(Arrays.asList(adminGroupDocRef)).atLeastOnce();
-    replayDefault(mockRightsService, groupServiceMock);
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser("XWiki.TestUser");
-    assertTrue(webUtilsService.isAdminUser());
-    verifyDefault(mockRightsService, groupServiceMock);
-  }
-
-  @Test
-  public void testIsAdminUser_adminRights_notInAdminGroup() {
-    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDocument");
-    context.setDoc(new XWikiDocument(currentDocRef));
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).anyTimes();
-
-    replayDefault(mockRightsService);
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser("XWiki.TestUser");
-    assertNotNull(context.getXWikiUser());
-    assertNotNull(context.getDoc());
-    assertTrue(webUtilsService.isAdminUser());
-    verifyDefault(mockRightsService);
-  }
-
-  @Test
-  public void testIsAdvancedAdmin_NPE_noUserObj() throws Exception {
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "XWikiGuest");
-    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDocument");
-    context.setDoc(new XWikiDocument(currentDocRef));
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).anyTimes();
-    XWikiDocument guestUserDoc = new XWikiDocument(userDocRef);
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(guestUserDoc).anyTimes();
-    replayDefault(mockRightsService);
-    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
-    // set after calling replay
-    context.setUser("XWiki.XWikiGuest");
-    assertNotNull(context.getXWikiUser());
-    assertNotNull(context.getDoc());
-    assertFalse(webUtilsService.isAdvancedAdmin());
-    verifyDefault(mockRightsService);
-  }
-
-  @Test
-  @Deprecated
-  public void testHasAccessLevel_docRef() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDocument");
-    EAccessLevel level = EAccessLevel.EDIT;
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext().getUser()),
-        eq(webUtilsService.serializeRef(docRef)), same(context))).andReturn(true).once();
-
-    replayDefault(mockRightsService);
-    assertTrue(webUtilsService.hasAccessLevel(docRef, level));
-    verifyDefault(mockRightsService);
-  }
-
-  @Test
-  @Deprecated
-  public void testHasAccessLevel_attRef() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDocument");
-    AttachmentReference attRef = new AttachmentReference("file", docRef);
-    EAccessLevel level = EAccessLevel.EDIT;
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext().getUser()),
-        eq(webUtilsService.serializeRef(docRef)), same(context))).andReturn(true).once();
-
-    replayDefault(mockRightsService);
-    assertTrue(webUtilsService.hasAccessLevel(attRef, level));
-    verifyDefault(mockRightsService);
-  }
-
-  @Test
-  @Deprecated
-  public void testHasAccessLevel_wikiRefRef() throws Exception {
-    EAccessLevel level = EAccessLevel.EDIT;
-
-    replayDefault();
-    assertFalse(webUtilsService.hasAccessLevel(webUtilsService.getWikiRef(), level));
-    verifyDefault();
-  }
-
-  @Test
-  @Deprecated
-  public void testHasAccessLevel_user() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDocument");
-    EAccessLevel level = EAccessLevel.VIEW;
-    XWikiUser user = new XWikiUser("MySpace.MyUser");
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(user.getUser()), eq(
-        webUtilsService.serializeRef(docRef)), same(context))).andReturn(false).once();
-
-    replayDefault(mockRightsService);
-    assertFalse(webUtilsService.hasAccessLevel(docRef, level, user));
-    verifyDefault(mockRightsService);
   }
 
   @Test
@@ -1208,7 +960,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testGetInheritedTemplatedPath_local_exists() {
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
-    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
+    expect(modelAccessMock.exists(localTemplateRef)).andReturn(true);
     replayDefault();
     assertEquals("Templates.myView", webUtilsService.getInheritedTemplatedPath(localTemplateRef));
     verifyDefault();
@@ -1218,10 +970,10 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testGetInheritedTemplatedPath_central_exists() {
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
-    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(localTemplateRef)).andReturn(false);
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
-    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(true).once();
+    expect(modelAccessMock.exists(centralTemplateRef)).andReturn(true);
     replayDefault();
     assertEquals("celements2web:Templates.myView", webUtilsService.getInheritedTemplatedPath(
         localTemplateRef));
@@ -1232,7 +984,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testGetInheritedTemplatedPath_inital_central_exists() {
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
-    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(true).once();
+    expect(modelAccessMock.exists(centralTemplateRef)).andReturn(true);
     replayDefault();
     assertEquals("celements2web:Templates.myView", webUtilsService.getInheritedTemplatedPath(
         centralTemplateRef));
@@ -1243,7 +995,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testGetInheritedTemplatedPath_inital_central_notExists() {
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
-    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
     replayDefault();
     assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
         centralTemplateRef));
@@ -1254,10 +1006,10 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testGetInheritedTemplatedPath_disk_no_local_no_central() {
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
-    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(localTemplateRef)).andReturn(false);
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
-    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
     replayDefault();
     assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(localTemplateRef));
     verifyDefault();
@@ -1267,7 +1019,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testGetInheritedTemplatedPath_disk_inital_central() {
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
-    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
     replayDefault();
     assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
         centralTemplateRef));
@@ -1290,7 +1042,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testRenderInheritableDocument_local_exists() throws Exception {
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
-    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
+    expect(modelAccessMock.exists(localTemplateRef)).andReturn(true);
     XWikiDocument localTemplateDocDef = createMockAndAddToDefault(XWikiDocument.class);
     expect(localTemplateDocDef.getDocumentReference()).andReturn(localTemplateRef).anyTimes();
     expect(xwiki.getDocument(eq(localTemplateRef), same(context))).andReturn(
@@ -1316,10 +1068,10 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testRenderInheritableDocument_central_exists() throws Exception {
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
-    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(localTemplateRef)).andReturn(false);
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
-    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(true).once();
+    expect(modelAccessMock.exists(centralTemplateRef)).andReturn(true);
     XWikiDocument centralTemplateDocDef = createMockAndAddToDefault(XWikiDocument.class);
     expect(centralTemplateDocDef.getDocumentReference()).andReturn(centralTemplateRef).anyTimes();
     expect(xwiki.getDocument(eq(centralTemplateRef), same(context))).andReturn(
@@ -1348,10 +1100,10 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         XWikiRenderingEngine.class);
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
-    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(localTemplateRef)).andReturn(false);
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
-    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
     String diskScriptText = "my expected disk script fr";
     expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andReturn(
         diskScriptText).once();
@@ -1372,10 +1124,10 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         XWikiRenderingEngine.class);
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
-    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(localTemplateRef)).andReturn(false);
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
-    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
     expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andThrow(
         new IOException()).once();
     String diskScriptText = "my expected disk script";
@@ -1397,10 +1149,10 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         XWikiRenderingEngine.class);
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
-    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(localTemplateRef)).andReturn(false);
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
-    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
     expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andThrow(
         new IOException()).once();
     String diskScriptText = "my expected disk script";
@@ -1413,29 +1165,6 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     webUtilsService.injectedRenderingEngine = mockRenderingEngine;
     assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(localTemplateRef,
         "fr", "en"));
-    verifyDefault();
-  }
-
-  @Test
-  public void testIsSuperAdminUser() throws Exception {
-    context.setMainXWiki("main");
-    context.setDatabase("main");
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    XWikiDocument doc = new XWikiDocument(docRef);
-    doc.setParentReference((EntityReference) null);
-    context.setDoc(doc);
-    XWikiRightService mockRightsService = createMockAndAddToDefault(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).atLeastOnce();
-    replayDefault();
-    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
-    // calls xwiki.isVirtualMode
-    context.setUser("XWiki.MyAdmin");
-    assertNotNull("check precondition", context.getXWikiUser());
-    assertNotNull("check precondition", context.getDoc());
-    assertTrue("check precondition", context.isMainWiki());
-    assertTrue("isSuperAdminUser must be true for admins in Main Wiki.",
-        webUtilsService.isSuperAdminUser());
     verifyDefault();
   }
 
@@ -1476,7 +1205,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testFilterAttachmentsByTag_filterHasNoTagLists() throws XWikiException {
+  public void testFilterAttachmentsByTag_filterHasNoTagLists() throws Exception {
     String tagName = "Tag.Tags";
     List<Attachment> attachments = new ArrayList<>();
     attachments.add(new Attachment(null, null, getContext()));
@@ -1495,7 +1224,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testFilterAttachmentsByTag() throws XWikiException {
+  public void testFilterAttachmentsByTag() throws Exception {
     String tagName = "Tag.Tags";
     String docName = "Content_attachments.Filebase";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
@@ -1884,9 +1613,9 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     final SpaceReference spaceRef = new SpaceReference("space", wikiRef);
     DocumentReference webPrefDocRef = new DocumentReference("WebPreferences", spaceRef);
 
-    expect(xwiki.exists(eq(webPrefDocRef), same(context))).andReturn(true).once();
-    expect(xwiki.getDocument(eq(webPrefDocRef), same(context))).andReturn(new XWikiDocument(
-        webPrefDocRef)).once();
+    expect(modelAccessMock.exists(webPrefDocRef)).andReturn(true);
+    expect(modelAccessMock.getOrCreateDocument(webPrefDocRef)).andReturn(new XWikiDocument(
+        webPrefDocRef));
 
     assertEquals("xwikidb", getContext().getDatabase());
     assertNull(getContext().getDoc());

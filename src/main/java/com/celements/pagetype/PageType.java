@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.service.IWebUtilsService;
+import com.celements.model.util.ModelUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -59,16 +59,17 @@ public class PageType {
   @Deprecated
   public PageType(String pageTypeFN) {
     this.pageTypeFN = pageTypeFN;
-    this.pageTypeDocRef = getWebUtilsService().resolveDocumentReference(pageTypeFN);
+    this.pageTypeDocRef = getModelUtils().resolveRef(pageTypeFN, DocumentReference.class);
   }
 
   public PageType(DocumentReference pageTypeDocRef) {
     this.pageTypeDocRef = pageTypeDocRef;
-    this.pageTypeFN = getWebUtilsService().getRefLocalSerializer().serialize(pageTypeDocRef);
+    this.pageTypeFN = getModelUtils().serializeRefLocal(pageTypeDocRef);
   }
 
   public String getConfigName(XWikiContext context) {
-    DocumentReference pageTypeDocRef = getWebUtilsService().resolveDocumentReference(getFullName());
+    DocumentReference pageTypeDocRef = getModelUtils().resolveRef(getFullName(),
+        DocumentReference.class);
     return pageTypeDocRef.getName();
   }
 
@@ -168,8 +169,8 @@ public class PageType {
     return "";
   }
 
-  IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
+  ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }
