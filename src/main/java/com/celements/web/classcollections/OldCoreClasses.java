@@ -222,7 +222,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     getExtended_XWikiPreferencesClass();
     getXWikiUsersClass();
     // getFormMailClass();
-    getUserCSSClass();
+    // getUserCSSClass();
     getImportClass();
     getPhotoAlbumClass();
     getFilebaseTagClass();

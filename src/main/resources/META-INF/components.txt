@@ -6,6 +6,7 @@ com.celements.web.classcollections.ImageMapClasses
 com.celements.web.classcollections.MetaTagClasses
 com.celements.web.classes.CelementsClassPackage
 com.celements.web.classes.FormMailClass
+com.celements.web.classes.UserCssClass
 com.celements.cells.CellsClasses
 com.celements.navigation.NavigationClasses
 com.celements.navigation.service.TreeNodeCache
