@@ -5,6 +5,13 @@ import static com.google.common.base.Strings.*;
 
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.auth.classes.RemoteLoginClass;
+import com.celements.convert.bean.XDocBeanLoader;
+import com.celements.convert.bean.XObjectBeanConverter;
+
+/**
+ * JavaBean for {@link RemoteLoginClass}.
+ */
 public class RemoteLogin {
 
   private DocumentReference documentReference;
@@ -12,6 +19,13 @@ public class RemoteLogin {
   private Integer timeout = 0;
   private String username = "";
   private String password = "";
+
+  /**
+   * use {@link XDocBeanLoader} or {@link XObjectBeanConverter} for instantiation.
+   */
+  @Deprecated
+  public RemoteLogin() {
+  }
 
   public DocumentReference getDocumentReference() {
     return documentReference;
