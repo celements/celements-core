@@ -29,6 +29,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+@Deprecated
 @Component("celements.metaTag.classes")
 public class MetaTagClasses extends AbstractClassCollection {
 
