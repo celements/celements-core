@@ -37,65 +37,65 @@ public class BuilderTest {
   }
 
   @Test
-  public void testOnFirstElement() {
+  public void test_OnFirstElement() {
     assertTrue("firstElement must be initialized to true.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testOpenArray() {
+  public void test_OpenArray() {
     builder.openArray();
     assertEquals("Expecting after openArray topmost element on stack" + " must be openArray.",
-        ECommand.ARRAY_COMMAND, builder.internal_getWorkerStack().peek());
+        ECommand.ARRAY_COMMAND, builder.getCommandStack().peek());
     assertTrue("openArray must add '[' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith("["));
+        builder.getJSONWithoutCheck().endsWith("["));
     assertFalse("openArray may not add ',' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", ["));
+        builder.getJSONWithoutCheck().endsWith(", ["));
     assertTrue("After openArray firstElement must be true.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testOpenArray_notFirstElement() {
+  public void test_OpenArray_notFirstElement() {
     builder.setOnFirstElement(false);
     builder.openArray();
     assertEquals("Expecting after openArray topmost element on stack" + " must be openArray.",
-        ECommand.ARRAY_COMMAND, builder.internal_getWorkerStack().peek());
+        ECommand.ARRAY_COMMAND, builder.getCommandStack().peek());
     assertTrue("openArray must add ', [' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", ["));
+        builder.getJSONWithoutCheck().endsWith(", ["));
     assertTrue("After openArray firstElement must be true.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testOpenDictionary() {
+  public void test_OpenDictionary() {
     builder.openDictionary();
     assertEquals("Expecting after openDictionary topmost element on stack"
         + " must be openDictionary.", ECommand.DICTIONARY_COMMAND,
-        builder.internal_getWorkerStack().peek());
+        builder.getCommandStack().peek());
     assertTrue("openArray must add '{' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith("{"));
+        builder.getJSONWithoutCheck().endsWith("{"));
     assertFalse("openArray may not add ',' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", {"));
+        builder.getJSONWithoutCheck().endsWith(", {"));
     assertTrue("After openDictionary firstElement must be true.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testOpenDictionary_notFirstElement() {
+  public void test_OpenDictionary_notFirstElement() {
     builder.setOnFirstElement(false);
     builder.openDictionary();
     assertEquals("Expecting after openDictionary topmost element on stack"
         + " must be openDictionary.", ECommand.DICTIONARY_COMMAND,
-        builder.internal_getWorkerStack().peek());
+        builder.getCommandStack().peek());
     assertTrue("openArray must add ', {' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", {"));
+        builder.getJSONWithoutCheck().endsWith(", {"));
     assertTrue("After openDictionary firstElement must be true.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testOpenProperty() {
+  public void test_OpenProperty() {
     builder.openDictionary();
     builder.openProperty("key");
     assertEquals("Expecting after openProperty topmost element on stack" + " must be openProperty.",
-        ECommand.PROPERTY_COMMAND, builder.internal_getWorkerStack().peek());
-    String unfinishedJson = builder.internal_getUnfinishedJSON();
+        ECommand.PROPERTY_COMMAND, builder.getCommandStack().peek());
+    String unfinishedJson = builder.getJSONWithoutCheck();
     assertTrue("openProperty must add the key with a colon-separator to" + " the json expression. '"
         + unfinishedJson + "'", unfinishedJson.endsWith("\"key\" : "));
     assertFalse("openProperty may not add a leading ','.", unfinishedJson.endsWith(", \"key\" : "));
@@ -103,13 +103,13 @@ public class BuilderTest {
   }
 
   @Test
-  public void testOpenProperty_notFirstElement() {
+  public void test_OpenProperty_notFirstElement() {
     builder.openDictionary();
     builder.setOnFirstElement(false);
     builder.openProperty("key");
     assertEquals("Expecting after openProperty topmost element on stack" + " must be openProperty.",
-        ECommand.PROPERTY_COMMAND, builder.internal_getWorkerStack().peek());
-    String unfinishedJson = builder.internal_getUnfinishedJSON();
+        ECommand.PROPERTY_COMMAND, builder.getCommandStack().peek());
+    String unfinishedJson = builder.getJSONWithoutCheck();
     assertTrue("openProperty must add a leading ',' and the key with"
         + " a colon-separator to the json expression. '" + unfinishedJson + "'",
         unfinishedJson.endsWith(", \"key\" : "));
@@ -117,64 +117,64 @@ public class BuilderTest {
   }
 
   @Test
-  public void testCloseArray() {
+  public void test_CloseArray() {
     builder.openArray();
     builder.closeArray();
     assertTrue("closeArray must add ']' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith("]"));
+        builder.getJSONWithoutCheck().endsWith("]"));
     assertTrue("closeArray must remove the ARRAY_COMMAND from stack.",
-        builder.internal_getWorkerStack().isEmpty());
+        builder.getCommandStack().isEmpty());
     assertFalse("After closeArray firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testCloseArray_implicitOpenPropertyClosing() {
+  public void test_CloseArray_implicitOpenPropertyClosing() {
     builder.openDictionary();
     builder.openProperty("myKey");
     builder.openArray();
     builder.closeArray();
     assertTrue("closeArray must remove the PROPERTY_COMMAND from stack.",
-        builder.internal_getWorkerStack().peek() == ECommand.DICTIONARY_COMMAND);
+        builder.getCommandStack().peek() == ECommand.DICTIONARY_COMMAND);
     assertFalse("After closeArray firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testCloseDictionary() {
+  public void test_CloseDictionary() {
     builder.openDictionary();
     builder.closeDictionary();
     assertTrue("closeDictionary must add '}' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith("}"));
+        builder.getJSONWithoutCheck().endsWith("}"));
     assertTrue("closeDictionary must remove the DICTIONARY_COMMAND from stack.",
-        builder.internal_getWorkerStack().isEmpty());
+        builder.getCommandStack().isEmpty());
     assertFalse("After closeDictionary firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testCloseDictionary_implicitOpenPropertyClosing() {
+  public void test_CloseDictionary_implicitOpenPropertyClosing() {
     builder.openDictionary();
     builder.openProperty("myKey");
     builder.openDictionary();
     builder.closeDictionary();
     assertTrue("closeDictionary must remove the PROPERTY_COMMAND from stack.",
-        builder.internal_getWorkerStack().peek() == ECommand.DICTIONARY_COMMAND);
+        builder.getCommandStack().peek() == ECommand.DICTIONARY_COMMAND);
     assertFalse("After closeDictionary firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testCloseProperty() {
+  public void test_CloseProperty() {
     builder.openDictionary();
     builder.openProperty("myKey");
     builder.closeProperty();
-    builder.internal_getWorkerStack().pop(); // remove Dictonary command
+    builder.getCommandStack().pop(); // remove Dictonary command
     assertTrue("closeProperty must add 'null' for an empty property" + " to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(" null"));
+        builder.getJSONWithoutCheck().endsWith(" null"));
     assertTrue("closeProperty must remove the PROPERTY_COMMAND from stack.",
-        builder.internal_getWorkerStack().isEmpty());
+        builder.getCommandStack().isEmpty());
     assertFalse("After closeProperty firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testOpenProperty_illegalInArray() {
+  public void test_OpenProperty_illegalInArray() {
     builder.openArray();
     try {
       builder.openProperty("key");
@@ -185,7 +185,7 @@ public class BuilderTest {
   }
 
   @Test
-  public void testOpenDictionary_illegalInDictionary() {
+  public void test_OpenDictionary_illegalInDictionary() {
     builder.openDictionary();
     try {
       builder.openDictionary();
@@ -196,7 +196,7 @@ public class BuilderTest {
   }
 
   @Test
-  public void testOpenArray_illegalInDictionary() {
+  public void test_OpenArray_illegalInDictionary() {
     builder.openDictionary();
     try {
       builder.openArray();
@@ -207,7 +207,7 @@ public class BuilderTest {
   }
 
   @Test
-  public void testAddString_illegalInDictionary() {
+  public void test_AddString_illegalInDictionary() {
     builder.openDictionary();
     try {
       builder.addString("asdf");
@@ -218,7 +218,7 @@ public class BuilderTest {
   }
 
   @Test
-  public void testAddBoolean_illegalInDictionary() {
+  public void test_AddBoolean_illegalInDictionary() {
     builder.openDictionary();
     try {
       builder.addBoolean(false);
@@ -229,7 +229,7 @@ public class BuilderTest {
   }
 
   @Test
-  public void testAddNumber_illegalInDictionary() {
+  public void test_AddNumber_illegalInDictionary() {
     builder.openDictionary();
     try {
       builder.addNumber(5L);
@@ -240,7 +240,7 @@ public class BuilderTest {
   }
 
   @Test
-  public void testAddInteger_illegalInDictionary() {
+  public void test_AddInteger_illegalInDictionary() {
     builder.openDictionary();
     try {
       builder.addInteger(2);
@@ -251,7 +251,7 @@ public class BuilderTest {
   }
 
   @Test
-  public void testAddNull_illegalInDictionary() {
+  public void test_AddNull_illegalInDictionary() {
     builder.openDictionary();
     try {
       builder.addNull();
@@ -262,10 +262,10 @@ public class BuilderTest {
   }
 
   @Test
-  public void testCloseArray_onlyAfterOpenArray() {
+  public void test_CloseArray_onlyAfterOpenArray() {
     for (ECommand jsonCmd : ECommand.values()) {
       if (jsonCmd != ECommand.ARRAY_COMMAND) {
-        builder.internal_getWorkerStack().push(jsonCmd);
+        builder.getCommandStack().push(jsonCmd);
         try {
           builder.closeArray();
           fail("Expecting IllegalStateException. CloseArray cannot" + "follow to " + jsonCmd);
@@ -277,10 +277,10 @@ public class BuilderTest {
   }
 
   @Test
-  public void testCloseDictionary_onlyAfterOpenDictionary() {
+  public void test_CloseDictionary_onlyAfterOpenDictionary() {
     for (ECommand jsonCmd : ECommand.values()) {
       if (jsonCmd != ECommand.DICTIONARY_COMMAND) {
-        builder.internal_getWorkerStack().push(jsonCmd);
+        builder.getCommandStack().push(jsonCmd);
         try {
           builder.closeDictionary();
           fail("Expecting IllegalStateException. CloseArray cannot" + "follow to " + jsonCmd);
@@ -292,10 +292,10 @@ public class BuilderTest {
   }
 
   @Test
-  public void testCloseProperty_onlyAfterOpenProperty() {
+  public void test_CloseProperty_onlyAfterOpenProperty() {
     for (ECommand jsonCmd : ECommand.values()) {
       if (jsonCmd != ECommand.PROPERTY_COMMAND) {
-        builder.internal_getWorkerStack().push(jsonCmd);
+        builder.getCommandStack().push(jsonCmd);
         try {
           builder.closeProperty();
           fail("Expecting IllegalStateException. CloseArray cannot" + "follow to " + jsonCmd);
@@ -307,8 +307,8 @@ public class BuilderTest {
   }
 
   @Test
-  public void testGetJSON_NotEmptyStack() {
-    builder.internal_getWorkerStack().push(ECommand.ARRAY_COMMAND);
+  public void test_GetJSON_NotEmptyStack() {
+    builder.getCommandStack().push(ECommand.ARRAY_COMMAND);
     try {
       builder.getJSON();
       fail("Expecting IllegalStateException. getJSON "
@@ -319,225 +319,225 @@ public class BuilderTest {
   }
 
   @Test
-  public void testToJSONString_null() {
-    assertEquals("Null value must be 'null'.", "null", builder.toJSONString(null));
+  public void test_toJsonString_null() {
+    assertEquals("Null value must be 'null'.", "null", builder.toJsonString(null));
   }
 
   @Test
-  public void testToJSONString_EscapeQuotes() {
-    assertEquals("String must be capselled in Quotes.", "\"aasdf38z6 ljb\"", builder.toJSONString(
+  public void test_toJsonString_EscapeQuotes() {
+    assertEquals("String must be capselled in Quotes.", "\"aasdf38z6 ljb\"", builder.toJsonString(
         "aasdf38z6 ljb"));
-    assertEquals("Double Quotes must be escaped.", "\"a\\\"b\"", builder.toJSONString("a\"b"));
+    assertEquals("Double Quotes must be escaped.", "\"a\\\"b\"", builder.toJsonString("a\"b"));
   }
 
   @Test
-  public void testToJSONString_EscapeLineBreaks() {
+  public void test_toJsonString_EscapeLineBreaks() {
     assertEquals("LineBreaks must be escaped with \\n.", "\"aasdf38z6\\n ljb\"",
-        builder.toJSONString("aasdf38z6\n ljb"));
+        builder.toJsonString("aasdf38z6\n ljb"));
   }
 
   @Test
-  public void testToJSONString_EscapeCarriageReturn() {
+  public void test_toJsonString_EscapeCarriageReturn() {
     assertEquals("CarriageReturn must be escaped with \\r.", "\"aasdf38z6\\r ljb\"",
-        builder.toJSONString("aasdf38z6\r ljb"));
+        builder.toJsonString("aasdf38z6\r ljb"));
   }
 
   @Test
-  public void testToJSONString_EscapeTabs() {
-    assertEquals("Tabs must be escaped with \\t.", "\"aasdf38z6\\t ljb\"", builder.toJSONString(
+  public void test_toJsonString_EscapeTabs() {
+    assertEquals("Tabs must be escaped with \\t.", "\"aasdf38z6\\t ljb\"", builder.toJsonString(
         "aasdf38z6\t ljb"));
   }
 
   @Test
-  public void testToJSONString_EscapeBackslashes() {
-    assertEquals("Backslashes must be escaped.", "\"a\\\\b\"", builder.toJSONString("a\\b"));
+  public void test_toJsonString_EscapeBackslashes() {
+    assertEquals("Backslashes must be escaped.", "\"a\\\\b\"", builder.toJsonString("a\\b"));
     assertEquals("\"{\\\"...\\\" : \\\"<a href=\\\\\\\"...\\\\\\\">...\\\"}\"",
-        builder.toJSONString("{\"...\" : \"<a href=\\\"...\\\">...\"}"));
+        builder.toJsonString("{\"...\" : \"<a href=\\\"...\\\">...\"}"));
   }
 
   @Test
-  public void testAddString() {
+  public void test_AddString() {
     builder.addString("testValue");
     assertTrue("addString must add '\"testValue\"' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith("\"testValue\""));
+        builder.getJSONWithoutCheck().endsWith("\"testValue\""));
     assertFalse("After addString firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddString_implicitOpenPropertyClosing() {
+  public void test_AddString_implicitOpenPropertyClosing() {
     builder.openDictionary();
     builder.openProperty("myKey");
     builder.addString("testValue");
     assertTrue("addString must remove the PROPERTY_COMMAND from stack.",
-        builder.internal_getWorkerStack().peek() == ECommand.DICTIONARY_COMMAND);
+        builder.getCommandStack().peek() == ECommand.DICTIONARY_COMMAND);
     assertFalse("After addString firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddString_notFirstElement() {
+  public void test_AddString_notFirstElement() {
     builder.setOnFirstElement(false);
     builder.addString("testValue");
     assertTrue("addString must add ', \"testValue\"' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", \"testValue\""));
+        builder.getJSONWithoutCheck().endsWith(", \"testValue\""));
     assertFalse("After addString firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddBoolean() {
+  public void test_AddBoolean() {
     builder.addBoolean(true);
     assertTrue("addBoolean must add '\"testValue\"' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith("true"));
+        builder.getJSONWithoutCheck().endsWith("true"));
     assertFalse("After addBoolean firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddBoolean_implicitOpenPropertyClosing() {
+  public void test_AddBoolean_implicitOpenPropertyClosing() {
     builder.openDictionary();
     builder.openProperty("myKey");
     builder.addBoolean(true);
     assertTrue("addBoolean must remove the PROPERTY_COMMAND from stack.",
-        builder.internal_getWorkerStack().peek() == ECommand.DICTIONARY_COMMAND);
+        builder.getCommandStack().peek() == ECommand.DICTIONARY_COMMAND);
     assertFalse("After addBoolean firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddBoolean_null() {
+  public void test_AddBoolean_null() {
     builder.addBoolean(null);
     assertTrue("addBoolean must add '\"testValue\"' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith("null"));
+        builder.getJSONWithoutCheck().endsWith("null"));
     assertFalse("After addBoolean firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddBoolean_notFirstElement() {
+  public void test_AddBoolean_notFirstElement() {
     builder.setOnFirstElement(false);
     builder.addBoolean(true);
     assertTrue("addBoolean must add ', true' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", true"));
+        builder.getJSONWithoutCheck().endsWith(", true"));
     assertFalse("After addBoolean firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNull() {
+  public void test_AddNull() {
     builder.addNull();
     assertTrue("addNull must add 'null' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith("null"));
+        builder.getJSONWithoutCheck().endsWith("null"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNull_implicitOpenPropertyClosing() {
+  public void test_AddNull_implicitOpenPropertyClosing() {
     builder.openDictionary();
     builder.openProperty("myKey");
     builder.addNull();
     assertTrue("addNull must remove the PROPERTY_COMMAND from stack.",
-        builder.internal_getWorkerStack().peek() == ECommand.DICTIONARY_COMMAND);
+        builder.getCommandStack().peek() == ECommand.DICTIONARY_COMMAND);
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNull_notFirstElement() {
+  public void test_AddNull_notFirstElement() {
     builder.setOnFirstElement(false);
     builder.addNull();
     assertTrue("addNull must add ', null' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", null"));
+        builder.getJSONWithoutCheck().endsWith(", null"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNumber() {
+  public void test_AddNumber() {
     builder.addNumber(23409876);
-    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    String unfinishedJSON = builder.getJSONWithoutCheck();
     assertTrue("addNumber must add '23409876' to the json expression. '" + unfinishedJSON + "'",
         unfinishedJSON.endsWith("23409876"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNumberl_implicitOpenPropertyClosing() {
+  public void test_AddNumberl_implicitOpenPropertyClosing() {
     builder.openDictionary();
     builder.openProperty("myKey");
     builder.addNumber(23409876);
     assertTrue("addNumber must remove the PROPERTY_COMMAND from stack.",
-        builder.internal_getWorkerStack().peek() == ECommand.DICTIONARY_COMMAND);
+        builder.getCommandStack().peek() == ECommand.DICTIONARY_COMMAND);
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNumber_notFirstElement() {
+  public void test_AddNumber_notFirstElement() {
     builder.setOnFirstElement(false);
     builder.addNumber(23409876);
     assertTrue("addNumber must add ', 23409876' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", 23409876"));
+        builder.getJSONWithoutCheck().endsWith(", 23409876"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNumber_Long() {
+  public void test_AddNumber_Long() {
     builder.addNumber(234098763455237134L);
-    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    String unfinishedJSON = builder.getJSONWithoutCheck();
     assertTrue("addNumber must add '234098763455237134L' to the json expression. '" + unfinishedJSON
         + "'", unfinishedJSON.endsWith("234098763455237134"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNumber_Float() {
+  public void test_AddNumber_Float() {
     builder.addNumber(4.3f);
-    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    String unfinishedJSON = builder.getJSONWithoutCheck();
     assertTrue("addNumber must add '4.3' to the json expression. '" + unfinishedJSON + "'",
         unfinishedJSON.endsWith("4.3"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNumber_Double() {
+  public void test_AddNumber_Double() {
     builder.addNumber(341.431d);
-    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    String unfinishedJSON = builder.getJSONWithoutCheck();
     assertTrue("addNumber must add '341.431' to the json expression. '" + unfinishedJSON + "'",
         unfinishedJSON.endsWith("341.431"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddNumber_BigDecimal() {
+  public void test_AddNumber_BigDecimal() {
     builder.addNumber(new BigDecimal(BigInteger.valueOf(23409876), 5));
-    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    String unfinishedJSON = builder.getJSONWithoutCheck();
     assertTrue("addNumber must add '234.09876' to the json expression. '" + unfinishedJSON + "'",
         unfinishedJSON.endsWith("234.09876"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddInteger() {
+  public void test_AddInteger() {
     builder.addInteger(23409876);
-    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    String unfinishedJSON = builder.getJSONWithoutCheck();
     assertTrue("addInteger must add '23409876' to the json expression. '" + unfinishedJSON + "'",
         unfinishedJSON.endsWith("23409876"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddInteger_implicitOpenPropertyClosing() {
+  public void test_AddInteger_implicitOpenPropertyClosing() {
     builder.openDictionary();
     builder.openProperty("myKey");
     builder.addInteger(23409876);
     assertTrue("addInteger must remove the PROPERTY_COMMAND from stack.",
-        builder.internal_getWorkerStack().peek() == ECommand.DICTIONARY_COMMAND);
+        builder.getCommandStack().peek() == ECommand.DICTIONARY_COMMAND);
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddInteger_notFirstElement() {
+  public void test_AddInteger_notFirstElement() {
     builder.setOnFirstElement(false);
     builder.addInteger(23409876);
     assertTrue("addInteger must add ', 23409876' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", 23409876"));
+        builder.getJSONWithoutCheck().endsWith(", 23409876"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testGetJSON() {
+  public void test_GetJSON() {
     builder.openDictionary();
     builder.openProperty("theId");
     builder.addString("myString");
@@ -547,12 +547,22 @@ public class BuilderTest {
   }
 
   @Test
-  public void testGetJSON_addStringProperty() {
+  public void test_GetJSON_addStringProperty() {
     builder.openDictionary();
     builder.addStringProperty("theKey", "TheValue");
     builder.closeDictionary();
     Object jsonTest = "{\"theKey\" : \"TheValue\"}";
     assertEquals("Expecting " + jsonTest, jsonTest, builder.getJSON());
+  }
+
+  @Test
+  public void test_addProperty_otherBuilder() {
+    builder.openDictionary();
+    builder.addProperty("other", new JsonBuilder().openDictionary().addProperty("a", "b")
+        .addProperty("c", "d").closeDictionary());
+    builder.closeDictionary();
+    String expected = "{\"other\" : {\"a\" : \"b\", \"c\" : \"d\"}}";
+    assertEquals(expected, builder.getJSON());
   }
 
 }
