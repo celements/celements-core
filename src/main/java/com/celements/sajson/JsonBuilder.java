@@ -57,6 +57,12 @@ public class JsonBuilder {
     onFirstElement = true;
   }
 
+  public JsonBuilder(JsonBuilder other) {
+    commandStack = new ArrayDeque<>(other.commandStack);
+    json = new StringBuilder(other.json);
+    onFirstElement = other.onFirstElement;
+  }
+
   Deque<ECommand> getCommandStack() {
     return commandStack;
   }
@@ -133,6 +139,13 @@ public class JsonBuilder {
   public JsonBuilder addProperty(String key, Object value) {
     openProperty(key);
     return addValue(value);
+  }
+
+  public JsonBuilder addPropertyNonEmpty(String key, Object value) {
+    if ((value != null) && !Objects.toString(value).trim().isEmpty()) {
+      return addProperty(key, value);
+    }
+    return this;
   }
 
   public JsonBuilder addValue(Object value) {
