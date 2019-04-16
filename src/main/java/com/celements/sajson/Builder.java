@@ -36,6 +36,71 @@ public class Builder extends JsonBuilder {
     super();
   }
 
+  @Override
+  public String getJSON() {
+    return super.getJSON();
+  }
+
+  @Override
+  public boolean isOnFirstElement() {
+    return super.isOnFirstElement();
+  }
+
+  @Override
+  public JsonBuilder openArray() {
+    return super.openArray();
+  }
+
+  @Override
+  public JsonBuilder openArray(String key) {
+    return super.openArray(key);
+  }
+
+  @Override
+  public JsonBuilder closeArray() {
+    return super.closeArray();
+  }
+
+  @Override
+  public JsonBuilder openDictionary() {
+    return super.openDictionary();
+  }
+
+  @Override
+  public JsonBuilder openDictionary(String key) {
+    return super.openDictionary(key);
+  }
+
+  @Override
+  public JsonBuilder closeDictionary() {
+    return super.closeDictionary();
+  }
+
+  @Override
+  public JsonBuilder openProperty(String key) {
+    return super.openProperty(key);
+  }
+
+  @Override
+  public JsonBuilder addProperty(String key, Object value) {
+    return super.addProperty(key, value);
+  }
+
+  @Override
+  public JsonBuilder addPropertyNonEmpty(String key, Object value) {
+    return super.addPropertyNonEmpty(key, value);
+  }
+
+  @Override
+  public JsonBuilder addValue(Object value) {
+    return super.addValue(value);
+  }
+
+  @Override
+  public JsonBuilder closeProperty() {
+    return super.closeProperty();
+  }
+
   public void addStringProperty(String key, String value) {
     addProperty(key, value);
   }
