@@ -67,8 +67,16 @@ public class JsonBuilder {
     return commandStack;
   }
 
+  public int getOpenCommandCount() {
+    return commandStack.size();
+  }
+
+  public boolean isComplete() {
+    return commandStack.isEmpty();
+  }
+
   public String getJSON() {
-    checkState(commandStack.isEmpty(), format("{0} is still open", commandStack.peek()));
+    checkState(isComplete(), format("{0} is still open", commandStack.peek()));
     return json.toString();
   }
 
@@ -80,17 +88,16 @@ public class JsonBuilder {
     return onFirstElement;
   }
 
-  public JsonBuilder openArray() {
+  public void openArray() {
     checkState(commandStack.peek() != DICTIONARY_COMMAND, "cannot open array on dictionary");
     commandStack.push(ARRAY_COMMAND);
     addOpeningPart("[");
     onFirstElement = true;
-    return this;
   }
 
-  public JsonBuilder openArray(String key) {
+  public void openArray(String key) {
     openProperty(key);
-    return openArray();
+    openArray();
   }
 
   private void addOpeningPart(String openingPart) {
@@ -100,58 +107,55 @@ public class JsonBuilder {
     json.append(openingPart);
   }
 
-  public JsonBuilder closeArray() {
+  public void closeArray() {
     checkForOpenCommand(ARRAY_COMMAND);
     json.append("]");
     commandStack.pop();
-    return implicitCloseProperty();
+    implicitCloseProperty();
   }
 
-  public JsonBuilder openDictionary() {
+  public void openDictionary() {
     checkState(commandStack.peek() != DICTIONARY_COMMAND, "dictionary is already open");
     commandStack.push(DICTIONARY_COMMAND);
     addOpeningPart("{");
     onFirstElement = true;
-    return this;
   }
 
-  public JsonBuilder openDictionary(String key) {
+  public void openDictionary(String key) {
     openProperty(key);
-    return openDictionary();
+    openDictionary();
   }
 
-  public JsonBuilder closeDictionary() {
+  public void closeDictionary() {
     checkForOpenCommand(DICTIONARY_COMMAND);
     json.append("}");
     commandStack.pop();
-    return implicitCloseProperty();
+    implicitCloseProperty();
   }
 
-  public JsonBuilder openProperty(String key) {
-    checkState(commandStack.peek() == DICTIONARY_COMMAND,
-        format("cannot open property on {0}", commandStack.peek()));
+  public void openProperty(String key) {
+    checkState(commandStack.peek() == DICTIONARY_COMMAND, format("cannot open property on {0}",
+        commandStack.peek()));
     commandStack.push(PROPERTY_COMMAND);
     addOpeningPart(toJsonString(key) + " : ");
     onFirstElement = true;
-    return this;
   }
 
-  public JsonBuilder addProperty(String key, Object value) {
+  public void addProperty(String key, Object value) {
     openProperty(key);
-    return addValue(value);
+    addValue(value);
   }
 
-  public JsonBuilder addPropertyNonEmpty(String key, Object value) {
+  public void addPropertyNonEmpty(String key, Object value) {
     if ((value != null) && !Objects.toString(value).trim().isEmpty()) {
-      return addProperty(key, value);
+      addProperty(key, value);
     }
-    return this;
   }
 
-  public JsonBuilder addValue(Object value) {
+  public void addValue(Object value) {
     checkState(commandStack.peek() != DICTIONARY_COMMAND, "cannot add a value on dictionary");
     addOpeningPart(toJsonString(value));
-    return implicitCloseProperty();
+    implicitCloseProperty();
   }
 
   private JsonBuilder implicitCloseProperty() {
@@ -162,14 +166,13 @@ public class JsonBuilder {
     return this;
   }
 
-  public JsonBuilder closeProperty() {
+  public void closeProperty() {
     checkForOpenCommand(PROPERTY_COMMAND);
     if (json.toString().endsWith(" : ")) {
       json.append(toJsonString(null));
     }
     commandStack.pop();
     onFirstElement = false;
-    return this;
   }
 
   String toJsonString(Object value) {
@@ -207,14 +210,9 @@ public class JsonBuilder {
     this.onFirstElement = onFirstElement;
   }
 
-  /**
-   * note: use {@link #getJSON()} for json output.
-   * 
-   * @return empty string for velocity compatibiilty
-   */
   @Override
   public String toString() {
-    return "";
+    return "JsonBuilder [commandStack=" + commandStack + ", onFirstElement=" + onFirstElement + "]";
   }
 
 }
