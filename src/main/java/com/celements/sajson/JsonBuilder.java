@@ -207,6 +207,11 @@ public class JsonBuilder {
     this.onFirstElement = onFirstElement;
   }
 
+  /**
+   * note: use {@link #getJSON()} for json output.
+   * 
+   * @return empty string for velocity compatibiilty
+   */
   @Override
   public String toString() {
     return "";
