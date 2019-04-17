@@ -47,58 +47,58 @@ public class Builder extends JsonBuilder {
   }
 
   @Override
-  public JsonBuilder openArray() {
-    return super.openArray();
+  public void openArray() {
+    super.openArray();
   }
 
   @Override
-  public JsonBuilder openArray(String key) {
-    return super.openArray(key);
+  public void openArray(String key) {
+    super.openArray(key);
   }
 
   @Override
-  public JsonBuilder closeArray() {
-    return super.closeArray();
+  public void closeArray() {
+    super.closeArray();
   }
 
   @Override
-  public JsonBuilder openDictionary() {
-    return super.openDictionary();
+  public void openDictionary() {
+    super.openDictionary();
   }
 
   @Override
-  public JsonBuilder openDictionary(String key) {
-    return super.openDictionary(key);
+  public void openDictionary(String key) {
+    super.openDictionary(key);
   }
 
   @Override
-  public JsonBuilder closeDictionary() {
-    return super.closeDictionary();
+  public void closeDictionary() {
+    super.closeDictionary();
   }
 
   @Override
-  public JsonBuilder openProperty(String key) {
-    return super.openProperty(key);
+  public void openProperty(String key) {
+    super.openProperty(key);
   }
 
   @Override
-  public JsonBuilder addProperty(String key, Object value) {
-    return super.addProperty(key, value);
+  public void addProperty(String key, Object value) {
+    super.addProperty(key, value);
   }
 
   @Override
-  public JsonBuilder addPropertyNonEmpty(String key, Object value) {
-    return super.addPropertyNonEmpty(key, value);
+  public void addPropertyNonEmpty(String key, Object value) {
+    super.addPropertyNonEmpty(key, value);
   }
 
   @Override
-  public JsonBuilder addValue(Object value) {
-    return super.addValue(value);
+  public void addValue(Object value) {
+    super.addValue(value);
   }
 
   @Override
-  public JsonBuilder closeProperty() {
-    return super.closeProperty();
+  public void closeProperty() {
+    super.closeProperty();
   }
 
   public void addStringProperty(String key, String value) {

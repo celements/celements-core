@@ -47,7 +47,8 @@ public class JsonBuilderTest {
 
   @Test
   public void test_create_clone() {
-    builder.openDictionary().openProperty("k");
+    builder.openDictionary();
+    builder.openProperty("k");
     JsonBuilder clone = new JsonBuilder(builder);
     assertNotSame(builder.getCommandStack(), clone.getCommandStack());
     assertEquals(new ArrayList<>(builder.getCommandStack()), new ArrayList<>(
@@ -56,7 +57,8 @@ public class JsonBuilderTest {
     assertEquals(builder.isOnFirstElement(), clone.isOnFirstElement());
 
     // modify original
-    builder.addValue("v").closeDictionary();
+    builder.addValue("v");
+    builder.closeDictionary();
     assertNotEquals(builder.getJSONWithoutCheck(), clone.getJSONWithoutCheck());
     assertNotEquals(builder.isOnFirstElement(), clone.isOnFirstElement());
   }
@@ -582,9 +584,13 @@ public class JsonBuilderTest {
 
   @Test
   public void test_addProperty_otherBuilder() {
+    JsonBuilder other = new JsonBuilder();
+    other.openDictionary();
+    other.addProperty("a", "b");
+    other.addProperty("c", "d");
+    other.closeDictionary();
     builder.openDictionary();
-    builder.addProperty("other", new JsonBuilder().openDictionary().addProperty("a",
-        "b").addProperty("c", "d").closeDictionary());
+    builder.addProperty("other", other);
     builder.closeDictionary();
     String expected = "{\"other\" : {\"a\" : \"b\", \"c\" : \"d\"}}";
     assertEquals(expected, builder.getJSON());
