@@ -206,4 +206,10 @@ public class JsonBuilder {
   void setOnFirstElement(boolean onFirstElement) {
     this.onFirstElement = onFirstElement;
   }
+
+  @Override
+  public String toString() {
+    return "";
+  }
+
 }
