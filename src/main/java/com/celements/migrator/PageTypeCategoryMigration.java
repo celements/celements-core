@@ -36,7 +36,7 @@ public class PageTypeCategoryMigration extends AbstractCelementsHibernateMigrato
   @Requirement
   private IQueryExecutionServiceRole queryExecutor;
 
-  @Requirement(PageTypePropertiesClass.CLASS_DEF_HINT)
+  @Requirement
   private IPageTypeCategoryRole ptDefaultCategory;
 
   @Requirement
