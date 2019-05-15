@@ -28,7 +28,7 @@ public class PageTypeCategoryMigration extends AbstractCelementsHibernateMigrato
 
   public static final String NAME = "PageTypeCategoryMigration";
 
-  private static final ClassField<String> FIELD = PageTypePropertiesClass.PAGETYPE_PROP_CATEGORY;
+  static final ClassField<String> FIELD = PageTypePropertiesClass.PAGETYPE_PROP_CATEGORY;
 
   @Requirement
   private QueryManager queryManager;
@@ -58,7 +58,7 @@ public class PageTypeCategoryMigration extends AbstractCelementsHibernateMigrato
    */
   @Override
   public XWikiDBVersion getVersion() {
-    return new XWikiDBVersion(3420);
+    return new XWikiDBVersion(3421);
   }
 
   @Override
@@ -69,22 +69,22 @@ public class PageTypeCategoryMigration extends AbstractCelementsHibernateMigrato
     try {
       Query query = queryManager.createQuery(getXwql(), Query.XWQL);
       for (DocumentReference docRef : queryExecutor.executeAndGetDocRefs(query)) {
-        setCategory(docRef);
+        setCategoryIfAbsent(docRef);
       }
     } catch (Exception exc) {
-      LOGGER.error("[{}] migrate empty page type categories", database, exc);
+      LOGGER.error("[{}] failed migrating empty page type categories", database, exc);
       throw new XWikiException(0, 0, "migration failed", exc);
     }
   }
 
   String getXwql() {
-    return "from doc.object(" + FIELD.getClassDef().getName() + ") prop "
-        + "where prop." + FIELD.getName() + " = ''";
+    return "from doc.object(" + FIELD.getClassDef().getName() + ") prop";
   }
 
-  private void setCategory(DocumentReference docRef) throws DocumentAccessException {
+  private void setCategoryIfAbsent(DocumentReference docRef) throws DocumentAccessException {
     XWikiDocument doc = modelAccess.getDocument(docRef);
-    if (XWikiObjectEditor.on(doc).editField(FIELD).first(ptDefaultCategory.getTypeName())) {
+    XWikiObjectEditor editor = XWikiObjectEditor.on(doc).filterAbsent(FIELD);
+    if (editor.editField(FIELD).first(ptDefaultCategory.getTypeName())) {
       modelAccess.saveDocument(doc, getName());
       LOGGER.info("migrated [{}]", docRef);
     } else {
