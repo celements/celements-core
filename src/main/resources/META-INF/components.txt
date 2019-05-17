@@ -141,4 +141,4 @@ com.celements.form.classes.FormConfigClass
 com.celements.velocity.DefaultVelocityService
 com.celements.web.classes.DocumentExtractClass
 com.celements.migrator.PageTypeCategoryMigration
-
+com.celements.sajson.JsonScriptService
