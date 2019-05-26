@@ -23,7 +23,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.classes.AbstractClassDefinition;
+import com.celements.model.classes.fields.BooleanField;
 import com.celements.model.classes.fields.ClassField;
+import com.celements.model.classes.fields.LargeStringField;
 import com.celements.model.classes.fields.StringField;
 
 @Component(MetaTagClass.CLASS_DEF_HINT)
@@ -37,11 +39,14 @@ public class MetaTagClass extends AbstractClassDefinition implements CelementsCl
   public static final ClassField<String> FIELD_KEY = new StringField.Builder(CLASS_DEF_HINT,
       "key").size(30).build();
 
-  public static final ClassField<String> FIELD_VALUE = new StringField.Builder(CLASS_DEF_HINT,
-      "value").size(30).build();
+  public static final ClassField<String> FIELD_VALUE = new LargeStringField.Builder(CLASS_DEF_HINT,
+      "value").rows(15).size(80).build();
 
   public static final ClassField<String> FIELD_LANGUAGE = new StringField.Builder(CLASS_DEF_HINT,
       "lang").size(30).build();
+
+  public static final ClassField<Boolean> FIELD_OVERRIDABLE = new BooleanField.Builder(
+      CLASS_DEF_HINT, "overridable").displayType("yesno").defaultValue(0).build();
 
   @Override
   public String getName() {

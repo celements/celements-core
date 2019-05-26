@@ -19,8 +19,15 @@ import com.google.common.collect.ImmutableMap;
 
 public final class MetaTag {
 
-  private final Map<String, String> attribs;
-  private final Optional<String> content;
+  private Map<String, String> attribs;
+  private Optional<String> content;
+  private String key;
+  private String language;
+  private boolean overridable;
+
+  public MetaTag() {
+    // Bean needs default constructor
+  }
 
   public MetaTag(@NotNull String attrib, @NotNull String attribValue, @NotNull String content) {
     this.attribs = ImmutableMap.of(attrib, attribValue);
@@ -79,16 +86,64 @@ public final class MetaTag {
     this(ETwitter.TWITTER_CARD, twitterCardType.getIdentifier());
   }
 
+  public boolean getOverridable() {
+    return overridable;
+  }
+
+  public void setOverridable(boolean overridable) {
+    this.overridable = overridable;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String attributeKey) {
+    this.key = attributeKey;
+  }
+
+  public String getValue() {
+    return content.orNull();
+  }
+
+  public void setValue(String content) {
+    this.content = Optional.fromNullable(content);
+  }
+
+  public String getLang() {
+    return language;
+  }
+
+  public void setLang(String language) {
+    this.language = language;
+  }
+
   public @NotNull String display() {
     StringBuilder sb = new StringBuilder();
     sb.append("<meta ");
-    for (String attrib : attribs.keySet()) {
-      sb.append(attrib).append("=\"").append(attribs.get(attrib)).append("\" ");
+    if (attribs != null) {
+      for (String attrib : attribs.keySet()) {
+        sb.append(attrib).append("=\"").append(attribs.get(attrib)).append("\" ");
+      }
+    }
+    if (key != null) {
+      sb.append(ENameStandard.ATTRIB_NAME).append("=\"").append(key).append("\" ");
     }
     if (content.isPresent()) {
       sb.append("content=\"").append(content.get()).append("\" ");
     }
     sb.append("/>");
     return sb.toString();
+  }
+
+  @Override
+  public boolean equals(Object tag) {
+    return (tag instanceof MetaTag) && equalsLang((MetaTag) tag) && display().equals(
+        ((MetaTag) tag)
+            .display());
+  }
+
+  private boolean equalsLang(MetaTag tag) {
+    return (getLang() == tag.getLang()) || ((getLang() != null) && getLang().equals(tag.getLang()));
   }
 }
