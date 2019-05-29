@@ -51,7 +51,7 @@ public class MetaTagClasses extends AbstractClassCollection {
 
   @Override
   protected void initClasses() throws XWikiException {
-    getMetaTagClass();
+    // getMetaTagClass();
   }
 
   public DocumentReference getMetaTagClassRef(String wikiName) {

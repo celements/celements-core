@@ -138,9 +138,8 @@ public final class MetaTag {
 
   @Override
   public boolean equals(Object tag) {
-    return (tag instanceof MetaTag) && equalsLang((MetaTag) tag) && display().equals(
-        ((MetaTag) tag)
-            .display());
+    return (tag instanceof MetaTag) && equalsLang((MetaTag) tag) && display().equals(((MetaTag) tag)
+        .display());
   }
 
   private boolean equalsLang(MetaTag tag) {
