@@ -65,6 +65,7 @@ import com.celements.pagetype.service.PageTypeScriptService;
 import com.celements.rendering.RenderCommand;
 import com.celements.rteConfig.IRTEConfigTemplateRole;
 import com.celements.sajson.Builder;
+import com.celements.sajson.JsonScriptService;
 import com.celements.validation.ValidationType;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
@@ -243,6 +244,10 @@ public class CelementsWebScriptService implements ScriptService {
     return new PlainTextCommand().convertToPlainText(htmlContent);
   }
 
+  /**
+   * @deprecated since 4.0, instead use {@link JsonScriptService#newBuilder()}
+   */
+  @Deprecated
   public Builder getNewJSONBuilder() {
     return new Builder();
   }

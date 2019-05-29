@@ -89,7 +89,11 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
 
   @Override
   public String getPrettyName() {
-    return pageType.getPrettyName(getContext());
+    String prettyName = Strings.nullToEmpty(pageType.getPrettyName(getContext())).trim();
+    if (prettyName.isEmpty()) {
+      prettyName = getName();
+    }
+    return prettyName;
   }
 
   @Override

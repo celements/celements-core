@@ -2,6 +2,7 @@ package com.celements.pagetype.java;
 
 import java.util.Set;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -18,14 +19,14 @@ public interface IJavaPageTypeRole {
    * must be a unique name accross an installation. Two implementations with identical
    * names will randomly overwrite each other.
    */
-  @NotNull
+  @NotEmpty
   public String getName();
 
-  @NotNull
-  public Set<IPageTypeCategoryRole> getCategories();
+  @NotEmpty
+  public Set<@NotNull IPageTypeCategoryRole> getCategories();
 
-  @NotNull
-  public Set<String> getCategoryNames();
+  @NotEmpty
+  public Set<@NotNull String> getCategoryNames();
 
   public boolean hasPageTitle();
 
