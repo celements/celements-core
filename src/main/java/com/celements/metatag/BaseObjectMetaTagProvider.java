@@ -1,9 +1,13 @@
 package com.celements.metatag;
 
+import static com.google.common.base.Strings.*;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -46,24 +50,53 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
 
   @Override
   public List<MetaTag> getHeaderMetaTags() {
-    SortedMap<String, MetaTag> tags = new TreeMap<>();
+    SortedMap<String, List<MetaTag>> tags = new TreeMap<>();
     addMetaTagsFromList(getMetaTagsForDoc(context.getOrCreateXWikiPreferenceDoc()), tags);
     addMetaTagsFromList(getMetaTagsForDoc(context.getOrCreateSpacePreferenceDoc()), tags);
     Optional<XWikiDocument> doc = context.getCurrentDoc();
     if (doc.isPresent()) {
       addMetaTagsFromList(getMetaTagsForDoc(doc.get()), tags);
     }
-    return ImmutableList.copyOf(tags.values());
+    return ImmutableList.copyOf(tags.values().parallelStream().map(applyOverride()).collect(
+        Collectors.<MetaTag>toList()));
   }
 
-  void addMetaTagsFromList(List<MetaTag> newTags, SortedMap<String, MetaTag> finalTags) {
-    String lang = context.getXWikiContext().getLanguage();
-    String defaultLang = context.getDefaultLanguage();
+  Function<List<MetaTag>, MetaTag> applyOverride() {
+    return new Function<List<MetaTag>, MetaTag>() {
+
+      @Override
+      public MetaTag apply(List<MetaTag> tags) {
+        MetaTag tag = null;
+        tags.stream().sequential().reduce(tag, applyOverrideLogic());
+        return tag;
+      }
+
+      BinaryOperator<MetaTag> applyOverrideLogic() {
+        return new BinaryOperator<MetaTag>() {
+
+          @Override
+          public MetaTag apply(MetaTag reduction, MetaTag tag) {
+            if ((reduction != null) && !reduction.getOverridable()) {
+              reduction.setValue(reduction.getValue() + ", " + tag.getValue());
+              return reduction;
+            }
+            return tag;
+          }
+        };
+      }
+    };
+  }
+
+  void addMetaTagsFromList(List<MetaTag> newTags, SortedMap<String, List<MetaTag>> finalTags) {
     for (MetaTag tag : newTags) {
-      // spaeter gefundene ueberschreiben vorher gefundene - dabei ist das overridable und das
-      // sprachfeld zu beachten
-      // nicht ueberschreibbare werden comma separated gemerged
-      // TODO
+      String lang = tag.getLang();
+      if (isNullOrEmpty(lang) || lang.equals(context.getXWikiContext().getLanguage()) || lang
+          .equals(context.getDefaultLanguage())) {
+        if (!finalTags.containsKey(tag.getKey())) {
+          finalTags.put(tag.getKey(), new ArrayList<MetaTag>());
+        }
+        finalTags.get(tag.getKey()).add(tag);
+      }
     }
   }
 

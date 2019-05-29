@@ -23,14 +23,14 @@ public class MetaTagApiTest extends AbstractComponentTest {
 
   @Test
   public void testDisplay_oneAttribute() {
-    MetaTagRole tag = new MetaTag(ETwitterCardType.SUMMARY);
+    MetaTag tag = new MetaTag(ETwitterCardType.SUMMARY);
     assertEquals("<meta name=\"twitter:card\" content=\"summary\" />", tag.display());
   }
 
   @Test
   public void testDisplay_multipleAttributes() {
     String keywords = "test,junit,keyword";
-    MetaTagRole tag = new MetaTag(ENameStandard.KEYWORDS, keywords);
+    MetaTag tag = new MetaTag(ENameStandard.KEYWORDS, keywords);
     assertEquals("<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />",
         tag.display());
   }
