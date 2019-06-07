@@ -56,6 +56,7 @@ import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.filebase.FileBaseScriptService;
 import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
+import com.celements.metatag.BaseObjectMetaTagProvider;
 import com.celements.model.access.ModelAccessScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
@@ -694,6 +695,10 @@ public class CelementsWebScriptService implements ScriptService {
     return lastStartupTimeStamp.getLastStartupTimeStamp();
   }
 
+  /**
+   * @deprecated since 4.0 {@link BaseObjectMetaTagProvider} collects all the tags on its own
+   */
+  @Deprecated
   public Map<String, String> getDocMetaTags(String language, String defaultLanguage) {
     return new DocMetaTagsCmd().getDocMetaTags(language, defaultLanguage, getContext());
   }

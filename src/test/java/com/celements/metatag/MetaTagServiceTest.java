@@ -9,20 +9,25 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.metatag.enums.ECharset;
 import com.celements.metatag.enums.ENameStandard;
 import com.celements.metatag.enums.twitter.ETwitterCardType;
+import com.celements.model.access.IModelAccessFacade;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class MetaTagServiceTest extends AbstractComponentTest {
 
+  private IModelAccessFacade modelAccess;
   private MetaTagServiceRole metaTag;
   private MetaTagProviderRole headerTag;
 
   @Before
   public void prepareTest() throws Exception {
+    modelAccess = registerComponentMock(IModelAccessFacade.class);
     headerTag = registerComponentMock(MetaTagProviderRole.class);
     metaTag = Utils.getComponent(MetaTagServiceRole.class);
   }
@@ -56,11 +61,16 @@ public class MetaTagServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCollectHeaderTags() {
+  public void testCollectHeaderTags() throws Exception {
     String keywords = "test,junit,keyword";
     List<MetaTag> tags = Arrays.asList(new MetaTag(ENameStandard.KEYWORDS, keywords), new MetaTag(
         ETwitterCardType.SUMMARY));
     expect(headerTag.getHeaderMetaTags()).andReturn(tags);
+    expect(getWikiMock().exists((DocumentReference) anyObject(), same(getContext()))).andReturn(
+        false).anyTimes();
+    expect(modelAccess.getOrCreateDocument((DocumentReference) anyObject())).andReturn(
+        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Any", "Any")))
+        .anyTimes();
     replayDefault();
     metaTag.collectHeaderTags();
     verifyDefault();

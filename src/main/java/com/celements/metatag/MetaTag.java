@@ -4,6 +4,10 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+
 import com.celements.metatag.enums.ECharset;
 import com.celements.metatag.enums.EHttpEquiv;
 import com.celements.metatag.enums.ENameNonStandard;
@@ -17,13 +21,16 @@ import com.celements.metatag.enums.twitter.ETwitterCardType;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-public final class MetaTag {
+/* ComponentInstanceSupplier in BaseObjectMetaTagProvider needs this to be a component */
+@Component
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class MetaTag implements MetaTagRole {
 
   private Map<String, String> attribs;
-  private Optional<String> content;
+  private Optional<String> content = Optional.absent();
   private String key;
   private String language;
-  private boolean overridable;
+  private Boolean overridable;
 
   public MetaTag() {
     // Bean needs default constructor
@@ -86,38 +93,47 @@ public final class MetaTag {
     this(ETwitter.TWITTER_CARD, twitterCardType.getIdentifier());
   }
 
+  @Override
   public boolean getOverridable() {
-    return overridable;
+    return (overridable != null) ? overridable : false;
   }
 
-  public void setOverridable(boolean overridable) {
+  @Override
+  public void setOverridable(Boolean overridable) {
     this.overridable = overridable;
   }
 
+  @Override
   public String getKey() {
     return key;
   }
 
+  @Override
   public void setKey(String attributeKey) {
     this.key = attributeKey;
   }
 
+  @Override
   public String getValue() {
     return content.orNull();
   }
 
+  @Override
   public void setValue(String content) {
     this.content = Optional.fromNullable(content);
   }
 
+  @Override
   public String getLang() {
     return language;
   }
 
+  @Override
   public void setLang(String language) {
     this.language = language;
   }
 
+  @Override
   public @NotNull String display() {
     StringBuilder sb = new StringBuilder();
     sb.append("<meta ");

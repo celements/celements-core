@@ -124,6 +124,7 @@ com.celements.navigation.factories.JavaNavigationFactory
 com.celements.navigation.factories.PageTypeNavigationFactory
 com.celements.navigation.factories.DefaultNavigationFactory
 com.celements.metatag.BaseObjectMetaTagProvider
+com.celements.metatag.MetaTag
 com.celements.metatag.MetaTagService
 com.celements.metatag.MetaTagScriptService
 com.celements.pagetype.classes.PageTypeClass

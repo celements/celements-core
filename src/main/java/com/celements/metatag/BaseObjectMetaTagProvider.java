@@ -3,13 +3,20 @@ package com.celements.metatag;
 import static com.google.common.base.Strings.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -34,7 +41,7 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
   public static final String COMPONENT_NAME = "BaseObjectMetaTagProvider";
 
   @Requirement(XObjectBeanConverter.NAME)
-  private BeanClassDefConverter<BaseObject, MetaTag> metaTagConverter;
+  private BeanClassDefConverter<BaseObject, MetaTagRole> metaTagConverter;
 
   @Requirement(MetaTagClass.CLASS_DEF_HINT)
   private ClassDefinition metaTagClass;
@@ -45,7 +52,7 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
   @Override
   public void initialize() throws InitializationException {
     metaTagConverter.initialize(metaTagClass);
-    metaTagConverter.initialize(new ComponentInstanceSupplier<>(MetaTag.class));
+    metaTagConverter.initialize(new ComponentInstanceSupplier<>(MetaTagRole.class));
   }
 
   @Override
@@ -57,30 +64,80 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
     if (doc.isPresent()) {
       addMetaTagsFromList(getMetaTagsForDoc(doc.get()), tags);
     }
-    return ImmutableList.copyOf(tags.values().parallelStream().map(applyOverride()).collect(
-        Collectors.<MetaTag>toList()));
+    return ImmutableList.copyOf(tags.values().parallelStream()
+        .flatMap(applyOverride())
+        .filter(Objects::nonNull)
+        .collect(Collectors.<MetaTag>toList()));
   }
 
-  Function<List<MetaTag>, MetaTag> applyOverride() {
-    return new Function<List<MetaTag>, MetaTag>() {
+  Function<List<MetaTag>, Stream<MetaTag>> applyOverride() {
+    return new Function<List<MetaTag>, Stream<MetaTag>>() {
 
       @Override
-      public MetaTag apply(List<MetaTag> tags) {
-        MetaTag tag = null;
-        tags.stream().sequential().reduce(tag, applyOverrideLogic());
-        return tag;
+      public Stream<MetaTag> apply(List<MetaTag> tags) {
+        return tags.stream().sequential().collect(applyOverrideLogic());// reduce(applyOverrideLogic());
       }
 
-      BinaryOperator<MetaTag> applyOverrideLogic() {
-        return new BinaryOperator<MetaTag>() {
+      Collector<MetaTag, List<MetaTag>, Stream<MetaTag>> applyOverrideLogic() {
+        return new Collector<MetaTag, List<MetaTag>, Stream<MetaTag>>() {
 
           @Override
-          public MetaTag apply(MetaTag reduction, MetaTag tag) {
-            if ((reduction != null) && !reduction.getOverridable()) {
-              reduction.setValue(reduction.getValue() + ", " + tag.getValue());
-              return reduction;
-            }
-            return tag;
+          public Supplier<List<MetaTag>> supplier() {
+            return new Supplier<List<MetaTag>>() {
+
+              @Override
+              public List<MetaTag> get() {
+                return new ArrayList<>();
+              }
+            };
+          }
+
+          @Override
+          public BiConsumer<List<MetaTag>, MetaTag> accumulator() {
+
+            return new BiConsumer<List<MetaTag>, MetaTag>() {
+
+              @Override
+              public void accept(List<MetaTag> accu, MetaTag tag) {
+                MetaTag reductor = (accu.size() > 0) ? accu.get(accu.size() - 1) : null;
+                if (reductor == null) {
+                  accu.add(tag);
+                } else if (reductor.getOverridable()) {
+                  Collections.replaceAll(accu, reductor, tag);
+                } else {
+                  reductor.setValue(reductor.getValue() + "," + tag.getValue());
+                }
+              }
+            };
+          }
+
+          @Override
+          public BinaryOperator<List<MetaTag>> combiner() {
+            return new BinaryOperator<List<MetaTag>>() {
+
+              @Override
+              public List<MetaTag> apply(List<MetaTag> list1, List<MetaTag> list2) {
+                return Stream.of(list1, list2).flatMap(Collection::stream).collect(Collectors
+                    .toList());
+              }
+            };
+          }
+
+          @Override
+          public Function<List<MetaTag>, Stream<MetaTag>> finisher() {
+            return new Function<List<MetaTag>, Stream<MetaTag>>() {
+
+              @Override
+              public Stream<MetaTag> apply(List<MetaTag> tags) {
+                return tags.stream();
+              }
+
+            };
+          }
+
+          @Override
+          public Set<Characteristics> characteristics() {
+            return Collections.emptySet();
           }
         };
       }
@@ -90,7 +147,7 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
   void addMetaTagsFromList(List<MetaTag> newTags, SortedMap<String, List<MetaTag>> finalTags) {
     for (MetaTag tag : newTags) {
       String lang = tag.getLang();
-      if (isNullOrEmpty(lang) || lang.equals(context.getXWikiContext().getLanguage()) || lang
+      if (isNullOrEmpty(lang) || lang.equals(context.getLanguage()) || lang
           .equals(context.getDefaultLanguage())) {
         if (!finalTags.containsKey(tag.getKey())) {
           finalTags.put(tag.getKey(), new ArrayList<MetaTag>());
@@ -100,11 +157,6 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
     }
   }
 
-  @Override
-  public List<MetaTag> getBodyMetaTags() {
-    return Collections.emptyList();
-  }
-
   List<MetaTag> getMetaTagsForDoc(XWikiDocument doc) {
     return XWikiObjectFetcher.on(doc).filter(metaTagClass).list().stream()
         .parallel().map(
@@ -112,10 +164,15 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
 
               @Override
               public MetaTag apply(BaseObject obj) {
-                return metaTagConverter.apply(obj);
+                return (MetaTag) metaTagConverter.apply(obj);
               }
 
             }).collect(Collectors.<MetaTag>toList());
+  }
+
+  @Override
+  public List<MetaTag> getBodyMetaTags() {
+    return Collections.emptyList();
   }
 
 }
