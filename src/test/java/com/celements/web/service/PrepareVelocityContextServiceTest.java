@@ -16,6 +16,7 @@ import javax.servlet.http.Cookie;
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -46,10 +47,13 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   private XWikiDocument currentDoc;
   private IPageTypeRole ptServiceMock;
   private IPageTypeResolverRole ptResolverMock;
+  private ConfigurationSource configSourceMock;
 
   @Before
   public void prepareTest() throws Exception {
     registerComponentMock(IWebUtilsService.class);
+    configSourceMock = registerComponentMock(ConfigurationSource.class, "all");
+    ptResolverMock = registerComponentMock(IPageTypeResolverRole.class);
     context = getContext();
     xwiki = getWikiMock();
     rightServiceMock = createMockAndAddToDefault(XWikiRightService.class);
@@ -67,8 +71,6 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
         skinDoc).anyTimes();
     expect(xwiki.getDocument(eq(new DocumentReference("celements2web", "XWiki", "Celements2Skin")),
         same(context))).andReturn(skinDoc).anyTimes();
-    ptResolverMock = createMockAndAddToDefault(IPageTypeResolverRole.class);
-    prepVeloContextService.pageTypeResolver = ptResolverMock;
     ptServiceMock = createMockAndAddToDefault(IPageTypeRole.class);
     prepVeloContextService.pageTypeService = ptServiceMock;
     curDocRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
@@ -127,6 +129,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
         new XWikiDocument()).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn(
         "123").anyTimes();
+    expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(null).atLeastOnce();
+    expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("432").anyTimes();
     expect(xwiki.getSpacePreference(eq("showRightPanels"), same(context))).andReturn(
         null).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("showLeftPanels"), same(context))).andReturn(
@@ -401,11 +405,13 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))).andReturn(
         "").anyTimes();
     expect(skinDoc.getURL(eq("view"), same(context))).andReturn("").anyTimes();
-    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn(
-        "123").anyTimes();
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
         new XWikiDocument()).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn(
+        "123").anyTimes();
+    expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(null).atLeastOnce();
+    expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("432").anyTimes();
     expect(xwiki.getSkin(same(context))).andReturn("celements2web:Skins.CellSkin").anyTimes();
     DocumentReference cellSkinDoc = new DocumentReference("celements2web", "Skins", "CellSkin");
     expect(xwiki.getDocument(eq(cellSkinDoc), same(context))).andReturn(new XWikiDocument(
@@ -452,6 +458,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
         new XWikiDocument()).atLeastOnce();
+    expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(null).atLeastOnce();
+    expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("432").anyTimes();
     expect(xwiki.getSkin(same(context))).andReturn("celements2web:Skins.CellSkin").anyTimes();
     DocumentReference cellSkinDoc = new DocumentReference("celements2web", "Skins", "CellSkin");
     expect(xwiki.getDocument(eq(cellSkinDoc), same(context))).andReturn(new XWikiDocument(
@@ -541,6 +549,53 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     pageTypeDoc.setXObjects(pageTypePropClassRef, Arrays.asList(pageTypePropObj));
     replayDefault();
     assertEquals("700", prepVeloContextService.getRTEwidth(context));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetRTEheight_default() throws Exception {
+    expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("");
+    expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(null).atLeastOnce();
+    replayDefault();
+    assertEquals("500", prepVeloContextService.getRTEheight());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetRTEheight_preferences() throws Exception {
+    expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("543");
+    expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(null).atLeastOnce();
+    replayDefault();
+    assertEquals("543", prepVeloContextService.getRTEheight());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetRTEheight_pageType() throws Exception {
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    context.setRequest(request);
+    expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("543").anyTimes();
+    XWikiDocument theDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"));
+    BaseObject pageTypeObj = new BaseObject();
+    pageTypeObj.setStringValue("page_type", "SpecialRichText");
+    DocumentReference pagTypeClassRef = new DocumentReference(context.getDatabase(), "Celements2",
+        "PageType");
+    pageTypeObj.setXClassReference(pagTypeClassRef);
+    theDoc.setXObjects(pagTypeClassRef, Arrays.asList(pageTypeObj));
+    context.setDoc(theDoc);
+    expect(request.get(eq("template"))).andReturn(null).anyTimes();
+    DocumentReference specialPTRef = new DocumentReference(context.getDatabase(), "PageTypes",
+        "SpecialRichText");
+    BaseObject pageTypePropObj = new BaseObject();
+    pageTypePropObj.setIntValue("rte_height", 700);
+    DocumentReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
+        "Celements2", "PageTypeProperties");
+    pageTypePropObj.setXClassReference(pageTypePropClassRef);
+    expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(
+        pageTypePropObj).atLeastOnce();
+    replayDefault();
+    assertEquals("700", prepVeloContextService.getRTEheight());
     verifyDefault();
   }
 
