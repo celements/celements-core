@@ -10,26 +10,22 @@ public interface MetaTagRole {
 
   boolean getOverridable();
 
-  @Nullable
-  void setOverridable(Boolean overridable);
+  void setOverridable(@Nullable Boolean overridable);
 
   @Nullable
   String getKey();
 
-  @Nullable
-  void setKey(String attributeKey);
+  void setKey(@Nullable String attributeKey);
 
   @Nullable
   String getValue();
 
-  @Nullable
-  void setValue(String content);
+  void setValue(@Nullable String content);
 
   @Nullable
   String getLang();
 
-  @Nullable
-  void setLang(String language);
+  void setLang(@Nullable String language);
 
   @NotNull
   String display();
