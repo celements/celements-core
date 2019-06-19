@@ -18,11 +18,14 @@ public class RTEConfigScriptService implements ScriptService {
   @Requirement
   IDefaultEmptyDocStrategyRole defaultEmptyDocStrategyRole;
 
+  @Requirement
+  RteConfigRole rteConfig;
+
   private static Logger _LOGGER = LoggerFactory.getLogger(RTEConfigScriptService.class);
 
   public String getRTEConfigField(String name) {
     try {
-      return new RTEConfig().getRTEConfigField(name);
+      return rteConfig.getRTEConfigField(name);
     } catch (XWikiException exp) {
       _LOGGER.error("getRTEConfigField for name [" + name + "] failed.", exp);
     }
@@ -34,6 +37,6 @@ public class RTEConfigScriptService implements ScriptService {
   }
 
   public List<DocumentReference> getRTEConfigsList() {
-    return new RTEConfig().getRTEConfigsList();
+    return rteConfig.getRTEConfigsList();
   }
 }

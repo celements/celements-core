@@ -19,44 +19,52 @@
  */
 package com.celements.rteConfig;
 
-import static junit.framework.Assert.*;
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.reference.RefBuilder;
+import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
-public class RTEConfigTest extends AbstractBridgedComponentTestCase {
+public class RTEConfigTest extends AbstractComponentTest {
 
   XWikiContext context;
   RTEConfig config;
-  PageTypeCommand pagetype;
   private XWiki wiki;
+  private DocumentReference curDocRef;
+  private IModelAccessFacade modelAccessMock;
 
   @Before
   public void setUp_RTEConfigTest() throws Exception {
-    pagetype = createMock(PageTypeCommand.class);
+    registerComponentMock(IPageTypeResolverRole.class);
+    modelAccessMock = registerComponentMock(IModelAccessFacade.class);
     context = getContext();
-    wiki = createMock(XWiki.class);
-    context.setWiki(wiki);
-    config = new RTEConfig();
-    config.injectPageTypeInstance(pagetype);
+    wiki = getWikiMock();
+    config = (RTEConfig) Utils.getComponent(RteConfigRole.class);
+    curDocRef = new RefBuilder().wiki(context.getDatabase()).space("TestSpace").doc(
+        "TestDoc").build(DocumentReference.class);
   }
 
   @Test
   public void testGetRTEConfigField_page() throws XWikiException {
     String objValue = "style=test";
     BaseObject obj = new BaseObject();
+    obj.setXClassReference(config.getPropClassRef());
     obj.setStringValue("styles", objValue);
-    XWikiDocument doc = new XWikiDocument();
-    doc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
+    XWikiDocument doc = new XWikiDocument(curDocRef);
+    doc.addXObject(obj);
     context.setDoc(doc);
     assertEquals(objValue, config.getRTEConfigField("styles"));
   }
@@ -67,7 +75,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     String pageTypeName = "testspace.testpagetype";
     BaseObject pageTypeObj = new BaseObject();
     pageTypeObj.setStringValue("page_type", pageTypeName);
-    XWikiDocument doc = new XWikiDocument();
+    XWikiDocument doc = new XWikiDocument(curDocRef);
     doc.addObject("Celements2.PageTypeClass", pageTypeObj);
     context.setDoc(doc);
     // PageType
@@ -81,9 +89,9 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getDocument(eq(pageTypeName), same(context))).andReturn(pageTypeXWikiDoc).once();
     expect(wiki.exists(eq(pageTypeName), same(context))).andReturn(true);
     expect(pagetype.getPageTypeDocFN(same(doc), same(context))).andReturn(pageTypeName);
-    replay(wiki, pagetype);
+    replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
-    verify(wiki, pagetype);
+    verifyDefault();
   }
 
   @Test
@@ -98,9 +106,9 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     XWikiDocument prefDoc = new XWikiDocument("Test", "WebPreferences");
     prefDoc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
     expect(wiki.getDocument(eq("Test.WebPreferences"), same(context))).andReturn(prefDoc).once();
-    replay(wiki);
+    replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
@@ -126,9 +134,9 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     prefDoc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
     expect(wiki.getDocument(eq("TestSpace.WebPreferences"), same(context))).andReturn(
         prefDoc).once();
-    replay(wiki, pagetype);
+    replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
-    verify(wiki, pagetype);
+    verifyDefault();
   }
 
   @Test
@@ -143,9 +151,9 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     XWikiDocument prefDoc = new XWikiDocument("Test", "WebPreferences");
     prefDoc.addObject("XWiki.XWikiPreferences", obj);
     expect(wiki.getDocument(eq("Test.WebPreferences"), same(context))).andReturn(prefDoc).once();
-    replay(wiki);
+    replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
@@ -163,9 +171,9 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     XWikiDocument prefDoc = new XWikiDocument("XWiki", "XWikiPreferences");
     prefDoc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
     expect(wiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(prefDoc).once();
-    replay(wiki);
+    replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
@@ -183,9 +191,9 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     XWikiDocument prefDoc = new XWikiDocument("XWiki", "XWikiPreferences");
     prefDoc.addObject("XWiki.XWikiPreferences", obj);
     expect(wiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(prefDoc).once();
-    replay(wiki);
+    replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
@@ -201,14 +209,14 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     XWikiDocument confDoc = new XWikiDocument();
     confDoc.addObject(RTEConfig.PROP_CLASS_NAME, confObj);
     expect(wiki.getDocument(eq(confDocName), same(context))).andReturn(confDoc).once();
-    replay(wiki);
+    replayDefault();
     assertEquals("testvalue", config.getPreferenceFromConfigObject("testprop", doc));
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
   public void testGetPreferenceFromPreferenceObject_noObj() {
-    XWikiDocument doc = new XWikiDocument();
+    XWikiDocument doc = new XWikiDocument(curDocRef);
     assertEquals("", config.getPreferenceFromPreferenceObject("testprop", "Classes.ClassName",
         doc));
   }
@@ -217,10 +225,10 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
   public void testGetPreferenceFromPreferenceObject() {
     BaseObject obj = new BaseObject();
     obj.setStringValue("testprop", "testvalue");
-    XWikiDocument doc = new XWikiDocument();
-    doc.addObject("Classes.ClassName", obj);
+    XWikiDocument prefDoc = new XWikiDocument("Test", "WebPreferences");
+    prefDoc.addObject("Classes.ClassName", obj);
     assertEquals("testvalue", config.getPreferenceFromPreferenceObject("testprop",
-        "Classes.ClassName", doc));
+        "Classes.ClassName", prefDoc));
   }
 
 }

@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
@@ -52,7 +51,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.Utils;
 
 @Component
 public class RTEConfig implements RteConfigRole {
@@ -112,11 +110,7 @@ public class RTEConfig implements RteConfigRole {
   private ModelContext context;
 
   private XWikiContext getContext() {
-    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
-  }
-
-  private Execution getExecution() {
-    return Utils.getComponent(Execution.class);
+    return context.getXWikiContext();
   }
 
   /**
@@ -128,15 +122,18 @@ public class RTEConfig implements RteConfigRole {
         RTE_CONFIG_TYPE_PROP_CLASS_NAME);
   }
 
+  @Override
   public String getRTEConfigField(String name) throws XWikiException {
-    XWikiDocument doc = getContext().getDoc();
+    Optional<XWikiDocument> doc = context.getCurrentDoc();
     Optional<SpaceReference> currentSpaceRef = context.getCurrentSpaceRef();
     String resultConfig = "";
 
     // Doc
-    resultConfig = getPreferenceFromConfigObject(name, doc);
-    if (Strings.isNullOrEmpty(resultConfig.trim())) {
-      resultConfig = getPreferenceFromPreferenceObject(name, getPropClassRef(), doc);
+    if (doc.isPresent()) {
+      resultConfig = getPreferenceFromConfigObject(name, doc.get());
+      if (Strings.isNullOrEmpty(resultConfig.trim())) {
+        resultConfig = getPreferenceFromPreferenceObject(name, getPropClassRef(), doc.get());
+      }
     }
 
     // PageType
@@ -183,15 +180,20 @@ public class RTEConfig implements RteConfigRole {
 
   private String getRTEConfigFieldFromPreferenceDoc(String name, DocumentReference docRef)
       throws XWikiException {
-    XWikiDocument prefDoc = getContext().getWiki().getDocument(docRef, getContext());
     String resultConfig = "";
-    resultConfig = getPreferenceFromConfigObject(name, prefDoc);
-    if (Strings.isNullOrEmpty(resultConfig.trim())) {
-      resultConfig = getPreferenceFromPreferenceObject(name, getPropClassRef(), prefDoc);
+    try {
+      XWikiDocument prefDoc = modelAccess.getDocument(docRef);
+      resultConfig = getPreferenceFromConfigObject(name, prefDoc);
       if (Strings.isNullOrEmpty(resultConfig.trim())) {
-        resultConfig = getPreferenceFromPreferenceObject("rte_" + name,
-            getXWikiPreferencesClassRef(), prefDoc);
+        resultConfig = getPreferenceFromPreferenceObject(name, getPropClassRef(), prefDoc);
+        if (Strings.isNullOrEmpty(resultConfig.trim())) {
+          resultConfig = getPreferenceFromPreferenceObject("rte_" + name,
+              getXWikiPreferencesClassRef(), prefDoc);
+        }
       }
+    } catch (DocumentNotExistsException exp) {
+      LOGGER.info("Cannot read rte config for '{}'. Preference doc '{}' does not exist.", name,
+          docRef);
     }
     return resultConfig;
   }
@@ -220,6 +222,7 @@ public class RTEConfig implements RteConfigRole {
     return "";
   }
 
+  @Override
   public List<DocumentReference> getRTEConfigsList() {
     List<DocumentReference> rteConfigsList = new ArrayList<>();
     try {
@@ -242,7 +245,7 @@ public class RTEConfig implements RteConfigRole {
         RTE_CONFIG_TYPE_CLASS_NAME).build(DocumentReference.class);
   }
 
-  private DocumentReference getPropClassRef() {
+  DocumentReference getPropClassRef() {
     return rteConfigClassConfig.getRTEConfigTypePropertiesClassRef(context.getWikiRef());
   }
 
