@@ -24,25 +24,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
-import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.context.ModelContext;
+import com.celements.model.reference.RefBuilder;
+import com.celements.model.util.ModelUtils;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
+import com.celements.rteConfig.classes.IRTEConfigClassConfig;
+import com.celements.web.classcollections.IOldCoreClassConfig;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class RTEConfig {
+@Component
+public class RTEConfig implements RteConfigRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(RTEConfig.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RTEConfig.class);
 
   /**
    * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC
@@ -72,7 +87,29 @@ public class RTEConfig {
     rteConfigFieldDefaults.put("blockformats", "rte_heading1=h1,rte_text=p");
   };
 
-  private PageTypeCommand injectedPageTypeInstance;
+  @Requirement
+  IRTEConfigClassConfig rteConfigClassConfig;
+
+  @Requirement
+  private IPageTypeResolverRole pageTypeResolver;
+
+  @Requirement
+  XObjectPageTypeUtilsRole xobjectPageTypeUtils;
+
+  @Requirement
+  private QueryManager queryManager;
+
+  @Requirement
+  private ModelUtils modelUtils;
+
+  @Requirement
+  private IWebUtilsService webUtilsService;
+
+  @Requirement
+  private IModelAccessFacade modelAccess;
+
+  @Requirement
+  private ModelContext context;
 
   private XWikiContext getContext() {
     return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
@@ -93,32 +130,35 @@ public class RTEConfig {
 
   public String getRTEConfigField(String name) throws XWikiException {
     XWikiDocument doc = getContext().getDoc();
+    Optional<SpaceReference> currentSpaceRef = context.getCurrentSpaceRef();
     String resultConfig = "";
 
     // Doc
     resultConfig = getPreferenceFromConfigObject(name, doc);
-    if ("".equals(resultConfig.trim())) {
-      resultConfig = getPreferenceFromPreferenceObject(name, PROP_CLASS_NAME, doc);
+    if (Strings.isNullOrEmpty(resultConfig.trim())) {
+      resultConfig = getPreferenceFromPreferenceObject(name, getPropClassRef(), doc);
     }
 
     // PageType
-    if ("".equals(resultConfig.trim())) {
+    if (Strings.isNullOrEmpty(resultConfig.trim())) {
       resultConfig = getRTEConfigFieldFromPageType(name);
     }
 
     // WebPreferences
-    if ("".equals(resultConfig.trim())) {
-      String space = getContext().getDoc().getSpace();
-      resultConfig = getRTEConfigFieldFromPreferenceDoc(name, space + ".WebPreferences");
+    if (Strings.isNullOrEmpty(resultConfig.trim()) && currentSpaceRef.isPresent()) {
+      resultConfig = getRTEConfigFieldFromPreferenceDoc(name, new RefBuilder().with(
+          currentSpaceRef.get()).doc("WebPreferences").build(DocumentReference.class));
     }
 
     // XWikiPreferences
-    if ("".equals(resultConfig.trim())) {
-      resultConfig = getRTEConfigFieldFromPreferenceDoc(name, "XWiki.XWikiPreferences");
+    if (Strings.isNullOrEmpty(resultConfig.trim())) {
+      resultConfig = getRTEConfigFieldFromPreferenceDoc(name, new RefBuilder().with(
+          context.getWikiRef()).space("XWiki").doc("XWikiPreferences").build(
+              DocumentReference.class));
     }
 
     // xwiki.cfg
-    if ("".equals(resultConfig.trim())) {
+    if (Strings.isNullOrEmpty(resultConfig.trim())) {
       resultConfig = getContext().getWiki().Param("celements.rteconfig." + name,
           rteConfigFieldDefaults.get(name));
     }
@@ -127,73 +167,65 @@ public class RTEConfig {
 
   private String getRTEConfigFieldFromPageType(String name) throws XWikiException {
     String resultConfig = "";
-    String pageTypeDocFN = getPageType().getPageTypeDocFN(getContext().getDoc(), getContext());
-    if ((pageTypeDocFN != null) && getContext().getWiki().exists(pageTypeDocFN, getContext())) {
-      XWikiDocument pageTypeDoc = getContext().getWiki().getDocument(pageTypeDocFN, getContext());
+    PageTypeReference pageTypeRef = pageTypeResolver.resolvePageTypeRefForCurrentDoc();
+    DocumentReference pageTypeDocRef = xobjectPageTypeUtils.getDocRefForPageType(pageTypeRef);
+    try {
+      XWikiDocument pageTypeDoc = modelAccess.getDocument(pageTypeDocRef);
       resultConfig = getPreferenceFromConfigObject(name, pageTypeDoc);
       if ("".equals(resultConfig.trim())) {
-        resultConfig = getPreferenceFromPreferenceObject(name, PROP_CLASS_NAME, pageTypeDoc);
+        resultConfig = getPreferenceFromPreferenceObject(name, getPropClassRef(), pageTypeDoc);
       }
+    } catch (DocumentNotExistsException dneExp) {
+      LOGGER.debug("Can't get RTEConfig because PageType doc does not exist. {}", pageTypeDocRef);
     }
     return resultConfig;
   }
 
-  private String getRTEConfigFieldFromPreferenceDoc(String name, String docName)
+  private String getRTEConfigFieldFromPreferenceDoc(String name, DocumentReference docRef)
       throws XWikiException {
-    XWikiDocument prefDoc = getContext().getWiki().getDocument(docName, getContext());
+    XWikiDocument prefDoc = getContext().getWiki().getDocument(docRef, getContext());
     String resultConfig = "";
     resultConfig = getPreferenceFromConfigObject(name, prefDoc);
-    if ("".equals(resultConfig.trim())) {
-      resultConfig = getPreferenceFromPreferenceObject(name, PROP_CLASS_NAME, prefDoc);
-      if ("".equals(resultConfig.trim())) {
-        resultConfig = getPreferenceFromPreferenceObject("rte_" + name, "XWiki.XWikiPreferences",
-            prefDoc);
+    if (Strings.isNullOrEmpty(resultConfig.trim())) {
+      resultConfig = getPreferenceFromPreferenceObject(name, getPropClassRef(), prefDoc);
+      if (Strings.isNullOrEmpty(resultConfig.trim())) {
+        resultConfig = getPreferenceFromPreferenceObject("rte_" + name,
+            getXWikiPreferencesClassRef(), prefDoc);
       }
     }
     return resultConfig;
   }
 
   String getPreferenceFromConfigObject(String name, XWikiDocument doc) throws XWikiException {
-    String configDocName = getPreferenceFromPreferenceObject(CONFIG_PROP_NAME, CONFIG_CLASS_NAME,
-        doc);
-    if (!"".equals(configDocName.trim())) {
-      XWikiDocument configDoc = getContext().getWiki().getDocument(configDocName, getContext());
-      return getPreferenceFromPreferenceObject(name, PROP_CLASS_NAME, configDoc);
+    String configDocFN = getPreferenceFromPreferenceObject(CONFIG_PROP_NAME,
+        getRteConfigTypeClass(), doc);
+    if (!Strings.isNullOrEmpty(configDocFN.trim())) {
+      DocumentReference configDocRef = modelUtils.resolveRef(configDocFN, DocumentReference.class);
+      try {
+        XWikiDocument configDoc = modelAccess.getDocument(configDocRef);
+        return getPreferenceFromPreferenceObject(name, getPropClassRef(), configDoc);
+      } catch (DocumentNotExistsException e) {
+        LOGGER.info("config doc '{}' does not exist.", configDocFN);
+      }
     }
     return "";
   }
 
-  String getPreferenceFromPreferenceObject(String name, String className, XWikiDocument doc) {
-    BaseObject prefObj = doc.getObject(className);
+  String getPreferenceFromPreferenceObject(String name, DocumentReference classRef,
+      XWikiDocument doc) {
+    BaseObject prefObj = doc.getXObject(classRef);
     if (prefObj != null) {
       return prefObj.getStringValue(name);
     }
     return "";
   }
 
-  /**
-   * FOR TESTS ONLY!!!
-   *
-   * @param test_Instance
-   */
-  public void injectPageTypeInstance(PageTypeCommand test_Instance) {
-    injectedPageTypeInstance = test_Instance;
-  }
-
-  PageTypeCommand getPageType() throws XWikiException {
-    if (injectedPageTypeInstance == null) {
-      injectedPageTypeInstance = PageTypeCommand.getInstance();
-    }
-    return injectedPageTypeInstance;
-  }
-
   public List<DocumentReference> getRTEConfigsList() {
     List<DocumentReference> rteConfigsList = new ArrayList<>();
     try {
-      List<String> resultList = getQueryManager().createQuery(getRteConfigsXWQL(),
-          Query.XWQL).execute();
+      List<String> resultList = queryManager.createQuery(getRteConfigsXWQL(), Query.XWQL).execute();
       for (String result : resultList) {
-        rteConfigsList.add(getWebUtilsService().resolveDocumentReference(result));
+        rteConfigsList.add(modelUtils.resolveRef(result, DocumentReference.class));
       }
     } catch (QueryException exp) {
       LOGGER.error("Failed to get RTE-Configs list.", exp);
@@ -202,15 +234,22 @@ public class RTEConfig {
   }
 
   private String getRteConfigsXWQL() {
-    return "from doc.object(" + PROP_CLASS_NAME + ") as rteConfig" + " where doc.translation = 0";
+    return "from doc.object(" + getPropClassRef() + ") as rteConfig" + " where doc.translation = 0";
   }
 
-  private QueryManager getQueryManager() {
-    return Utils.getComponent(QueryManager.class);
+  private DocumentReference getRteConfigTypeClass() {
+    return new RefBuilder().with(context.getWikiRef()).space(RTE_CONFIG_TYPE_CLASS_SPACE).doc(
+        RTE_CONFIG_TYPE_CLASS_NAME).build(DocumentReference.class);
   }
 
-  private IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
+  private DocumentReference getPropClassRef() {
+    return rteConfigClassConfig.getRTEConfigTypePropertiesClassRef(context.getWikiRef());
+  }
+
+  private DocumentReference getXWikiPreferencesClassRef() {
+    return new RefBuilder().with(context.getWikiRef()).space(
+        IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_SPACE).doc(
+            IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_DOC).build(DocumentReference.class);
   }
 
 }
