@@ -26,209 +26,239 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.reference.RefBuilder;
+import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
-import com.xpn.xwiki.XWiki;
+import com.celements.rteConfig.classes.IRTEConfigClassConfig;
+import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class RTEConfigTest extends AbstractComponentTest {
 
+  private static final String RICH_TEXT_PT_NAME = "RichText";
   XWikiContext context;
   RTEConfig config;
-  private XWiki wiki;
   private DocumentReference curDocRef;
   private IModelAccessFacade modelAccessMock;
+  private XWikiDocument curDoc;
+  private IPageTypeResolverRole pageTypeResvMock;
+  private DocumentReference richTextPageTypeDocRef;
+  private XWikiDocument richTextPageTypeDoc;
 
   @Before
   public void setUp_RTEConfigTest() throws Exception {
-    registerComponentMock(IPageTypeResolverRole.class);
+    pageTypeResvMock = registerComponentMock(IPageTypeResolverRole.class);
     modelAccessMock = registerComponentMock(IModelAccessFacade.class);
     context = getContext();
-    wiki = getWikiMock();
     config = (RTEConfig) Utils.getComponent(RteConfigRole.class);
     curDocRef = new RefBuilder().wiki(context.getDatabase()).space("TestSpace").doc(
         "TestDoc").build(DocumentReference.class);
+    curDoc = new XWikiDocument(curDocRef);
+    PageTypeReference pageTypeRef = new PageTypeReference(RICH_TEXT_PT_NAME, "xobject",
+        ImmutableList.of("pagetype"));
+    expect(pageTypeResvMock.resolvePageTypeRefForCurrentDoc()).andReturn(pageTypeRef).anyTimes();
+    richTextPageTypeDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "PageTypes").doc(RICH_TEXT_PT_NAME).build(DocumentReference.class);
+    richTextPageTypeDoc = new XWikiDocument(richTextPageTypeDocRef);
+    expect(modelAccessMock.getDocument(richTextPageTypeDocRef)).andReturn(
+        richTextPageTypeDoc).anyTimes();
+    expect(modelAccessMock.exists(eq(richTextPageTypeDocRef))).andReturn(true).anyTimes();
   }
 
   @Test
-  public void testGetRTEConfigField_page() throws XWikiException {
+  public void test_getPropClassRef() {
+    DocumentReference rtePropClassRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE).doc(
+            IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC).build(DocumentReference.class);
+    replayDefault();
+    assertEquals(rtePropClassRef, config.getPropClassRef());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetRTEConfigField_page() throws Exception {
     String objValue = "style=test";
     BaseObject obj = new BaseObject();
     obj.setXClassReference(config.getPropClassRef());
     obj.setStringValue("styles", objValue);
-    XWikiDocument doc = new XWikiDocument(curDocRef);
-    doc.addXObject(obj);
-    context.setDoc(doc);
+    curDoc.addXObject(obj);
+    context.setDoc(curDoc);
+    replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
+    verifyDefault();
   }
 
   @Test
-  public void testGetRTEConfigField_pageType() throws XWikiException {
+  public void testGetRTEConfigField_pageType() throws Exception {
     // Doc
-    String pageTypeName = "testspace.testpagetype";
-    BaseObject pageTypeObj = new BaseObject();
-    pageTypeObj.setStringValue("page_type", pageTypeName);
-    XWikiDocument doc = new XWikiDocument(curDocRef);
-    doc.addObject("Celements2.PageTypeClass", pageTypeObj);
-    context.setDoc(doc);
+    context.setDoc(curDoc);
     // PageType
     String objValue = "style=pagetypetest";
     BaseObject obj = new BaseObject();
+    obj.setXClassReference(config.getPropClassRef());
     obj.setStringValue("styles", objValue);
-    XWikiDocument pageTypeXWikiDoc = new XWikiDocument();
-    pageTypeXWikiDoc.setFullName(pageTypeName);
-    pageTypeXWikiDoc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
-    context.put("pageTypeApi", pagetype);
-    expect(wiki.getDocument(eq(pageTypeName), same(context))).andReturn(pageTypeXWikiDoc).once();
-    expect(wiki.exists(eq(pageTypeName), same(context))).andReturn(true);
-    expect(pagetype.getPageTypeDocFN(same(doc), same(context))).andReturn(pageTypeName);
+    richTextPageTypeDoc.addXObject(obj);
     replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
     verifyDefault();
   }
 
   @Test
-  public void testGetRTEConfigField_webPreference_noPagetype_obj() throws XWikiException {
+  public void testGetRTEConfigField_webPreference_noPagetype_obj() throws Exception {
+    DocumentReference testPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "TestSpace").doc("WebPreferences").build(DocumentReference.class);
     // Doc
-    XWikiDocument doc = new XWikiDocument("Test", "ExDoc");
-    context.setDoc(doc);
+    context.setDoc(curDoc);
     // WebPreferences
     String objValue = "style=webPrefObjTest";
     BaseObject obj = new BaseObject();
+    obj.setXClassReference(config.getPropClassRef());
     obj.setStringValue("styles", objValue);
-    XWikiDocument prefDoc = new XWikiDocument("Test", "WebPreferences");
-    prefDoc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
-    expect(wiki.getDocument(eq("Test.WebPreferences"), same(context))).andReturn(prefDoc).once();
+    XWikiDocument prefDoc = new XWikiDocument(testPrefDocRef);
+    prefDoc.addXObject(obj);
+    expect(modelAccessMock.getDocument(eq(testPrefDocRef))).andReturn(prefDoc).once();
     replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
     verifyDefault();
   }
 
   @Test
-  public void testGetRTEConfigField_webPreference_hasPagetype_obj() throws XWikiException {
+  public void testGetRTEConfigField_webPreference_hasPagetype_obj() throws Exception {
+    DocumentReference testPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "TestSpace").doc("WebPreferences").build(DocumentReference.class);
     // Doc
-    String pageTypeName = "testpagetype";
-    BaseObject pageTypeObj = new BaseObject();
-    pageTypeObj.setStringValue("page_type", pageTypeName);
-    XWikiDocument doc = new XWikiDocument("TestSpace", "TestDoc");
-    doc.addObject("Celements2.PageTypeClass", pageTypeObj);
-    context.setDoc(doc);
-    XWikiDocument pageTypeXWikiDoc = new XWikiDocument();
-    String pageTypeFN = "PageTypes." + pageTypeName;
-    pageTypeXWikiDoc.setFullName(pageTypeFN);
-    expect(wiki.getDocument(eq(pageTypeFN), same(context))).andReturn(pageTypeXWikiDoc).once();
-    expect(wiki.exists(eq(pageTypeFN), same(context))).andReturn(true);
-    expect(pagetype.getPageTypeDocFN(same(doc), same(context))).andReturn(pageTypeFN);
+    context.setDoc(curDoc);
     // WebPreferences
     String objValue = "style=webPrefObjEmptyPageTypeTest";
     BaseObject obj = new BaseObject();
+    obj.setXClassReference(config.getPropClassRef());
     obj.setStringValue("styles", objValue);
-    XWikiDocument prefDoc = new XWikiDocument("TestSpace", "WebPreferences");
-    prefDoc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
-    expect(wiki.getDocument(eq("TestSpace.WebPreferences"), same(context))).andReturn(
-        prefDoc).once();
+    XWikiDocument prefDoc = new XWikiDocument(testPrefDocRef);
+    prefDoc.addXObject(obj);
+    expect(modelAccessMock.getDocument(eq(testPrefDocRef))).andReturn(prefDoc).once();
     replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
     verifyDefault();
   }
 
   @Test
-  public void testGetRTEConfigField_webPreferenceObj() throws XWikiException {
+  public void testGetRTEConfigField_webPreferenceObj() throws Exception {
+    DocumentReference testPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "TestSpace").doc("WebPreferences").build(DocumentReference.class);
     // Doc
-    XWikiDocument doc = new XWikiDocument("Test", "Document");
-    context.setDoc(doc);
+    context.setDoc(curDoc);
     // WebPreferences
     String objValue = "style=webPref_PrefObjTest";
     BaseObject obj = new BaseObject();
+    obj.setXClassReference(new RefBuilder().space("XWiki").doc("XWikiPreferences").build(
+        EntityReference.class));
     obj.setStringValue("rte_styles", objValue);
-    XWikiDocument prefDoc = new XWikiDocument("Test", "WebPreferences");
-    prefDoc.addObject("XWiki.XWikiPreferences", obj);
-    expect(wiki.getDocument(eq("Test.WebPreferences"), same(context))).andReturn(prefDoc).once();
+    XWikiDocument prefDoc = new XWikiDocument(testPrefDocRef);
+    prefDoc.addXObject(obj);
+    expect(modelAccessMock.getDocument(eq(testPrefDocRef))).andReturn(prefDoc).once();
     replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
     verifyDefault();
   }
 
   @Test
-  public void testGetRTEConfigField_xwikiPreference_obj() throws XWikiException {
+  public void testGetRTEConfigField_xwikiPreference_obj() throws Exception {
+    DocumentReference testPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "TestSpace").doc("WebPreferences").build(DocumentReference.class);
+    DocumentReference xwikiPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "XWiki").doc("XWikiPreferences").build(DocumentReference.class);
     // Doc
-    XWikiDocument doc = new XWikiDocument("Test", "Document");
-    context.setDoc(doc);
+    context.setDoc(curDoc);
     // WebPreferences
-    XWikiDocument webPrefDoc = new XWikiDocument("Test", "WebPreferences");
-    expect(wiki.getDocument(eq("Test.WebPreferences"), same(context))).andReturn(webPrefDoc).once();
+    XWikiDocument webPrefDoc = new XWikiDocument(testPrefDocRef);
+    expect(modelAccessMock.getDocument(eq(testPrefDocRef))).andReturn(webPrefDoc).once();
     // XWikiPreferences
     String objValue = "style=xwikiPrefObjTest";
     BaseObject obj = new BaseObject();
+    obj.setXClassReference(config.getPropClassRef());
     obj.setStringValue("styles", objValue);
-    XWikiDocument prefDoc = new XWikiDocument("XWiki", "XWikiPreferences");
-    prefDoc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
-    expect(wiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(prefDoc).once();
+    XWikiDocument prefDoc = new XWikiDocument(xwikiPrefDocRef);
+    prefDoc.addXObject(obj);
+    expect(modelAccessMock.getDocument(eq(xwikiPrefDocRef))).andReturn(prefDoc).once();
     replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
     verifyDefault();
   }
 
   @Test
-  public void testGetRTEConfigField_xwikiPreferenceObj() throws XWikiException {
+  public void testGetRTEConfigField_xwikiPreferenceObj() throws Exception {
+    DocumentReference testPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "TestSpace").doc("WebPreferences").build(DocumentReference.class);
+    DocumentReference xwikiPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "XWiki").doc("XWikiPreferences").build(DocumentReference.class);
     // Doc
-    XWikiDocument doc = new XWikiDocument("Test", "Document");
-    context.setDoc(doc);
+    context.setDoc(curDoc);
     // WebPreferences
-    XWikiDocument webPrefDoc = new XWikiDocument("Test", "WebPreferences");
-    expect(wiki.getDocument(eq("Test.WebPreferences"), same(context))).andReturn(webPrefDoc).once();
+    XWikiDocument webPrefDoc = new XWikiDocument(testPrefDocRef);
+    expect(modelAccessMock.getDocument(eq(testPrefDocRef))).andReturn(webPrefDoc).once();
     // XWikiPreferences
     String objValue = "style=xwikiPref_PrefObjTest";
     BaseObject obj = new BaseObject();
+    obj.setXClassReference(new RefBuilder().space("XWiki").doc("XWikiPreferences").build(
+        EntityReference.class));
     obj.setStringValue("rte_styles", objValue);
-    XWikiDocument prefDoc = new XWikiDocument("XWiki", "XWikiPreferences");
-    prefDoc.addObject("XWiki.XWikiPreferences", obj);
-    expect(wiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(prefDoc).once();
+    XWikiDocument prefDoc = new XWikiDocument(xwikiPrefDocRef);
+    prefDoc.addXObject(obj);
+    expect(modelAccessMock.getDocument(eq(xwikiPrefDocRef))).andReturn(prefDoc).once();
     replayDefault();
     assertEquals(objValue, config.getRTEConfigField("styles"));
     verifyDefault();
   }
 
   @Test
-  public void testGetPreferenceFromConfigObject() throws XWikiException {
+  public void testGetPreferenceFromConfigObject() throws Exception {
     String confDocName = "confdocname";
+    DocumentReference confDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "RteConfSpace").doc(confDocName).build(DocumentReference.class);
     BaseObject obj = new BaseObject();
-    obj.setStringValue(RTEConfig.CONFIG_PROP_NAME, confDocName);
-    XWikiDocument doc = new XWikiDocument();
-    doc.addObject(RTEConfig.CONFIG_CLASS_NAME, obj);
+    obj.setXClassReference(new RefBuilder().space(RTEConfig.RTE_CONFIG_TYPE_CLASS_SPACE).doc(
+        RTEConfig.RTE_CONFIG_TYPE_CLASS_NAME).build(EntityReference.class));
+    obj.setStringValue(RTEConfig.CONFIG_PROP_NAME, "RteConfSpace." + confDocName);
+    curDoc.addXObject(obj);
 
     BaseObject confObj = new BaseObject();
+    confObj.setXClassReference(config.getPropClassRef());
     confObj.setStringValue("testprop", "testvalue");
-    XWikiDocument confDoc = new XWikiDocument();
-    confDoc.addObject(RTEConfig.PROP_CLASS_NAME, confObj);
-    expect(wiki.getDocument(eq(confDocName), same(context))).andReturn(confDoc).once();
+    XWikiDocument confDoc = new XWikiDocument(confDocRef);
+    confDoc.addXObject(confObj);
+    expect(modelAccessMock.getDocument(eq(confDocRef))).andReturn(confDoc).once();
     replayDefault();
-    assertEquals("testvalue", config.getPreferenceFromConfigObject("testprop", doc));
+    assertEquals("testvalue", config.getPreferenceFromConfigObject("testprop", curDoc));
     verifyDefault();
   }
 
   @Test
   public void testGetPreferenceFromPreferenceObject_noObj() {
-    XWikiDocument doc = new XWikiDocument(curDocRef);
-    assertEquals("", config.getPreferenceFromPreferenceObject("testprop", "Classes.ClassName",
-        doc));
+    DocumentReference classDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "Classes").doc("ClassName").build(DocumentReference.class);
+    assertEquals("", config.getPreferenceFromPreferenceObject("testprop", classDocRef, curDoc));
   }
 
   @Test
   public void testGetPreferenceFromPreferenceObject() {
+    DocumentReference testPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "Test").doc("WebPreferences").build(DocumentReference.class);
+    DocumentReference classDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "Classes").doc("ClassName").build(DocumentReference.class);
     BaseObject obj = new BaseObject();
+    obj.setXClassReference(classDocRef);
     obj.setStringValue("testprop", "testvalue");
-    XWikiDocument prefDoc = new XWikiDocument("Test", "WebPreferences");
-    prefDoc.addObject("Classes.ClassName", obj);
-    assertEquals("testvalue", config.getPreferenceFromPreferenceObject("testprop",
-        "Classes.ClassName", prefDoc));
+    XWikiDocument prefDoc = new XWikiDocument(testPrefDocRef);
+    prefDoc.addXObject(obj);
+    assertEquals("testvalue", config.getPreferenceFromPreferenceObject("testprop", classDocRef,
+        prefDoc));
   }
 
 }
