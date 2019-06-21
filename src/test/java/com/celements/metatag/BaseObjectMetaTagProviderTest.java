@@ -73,7 +73,7 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
     list2.add(createMetaTag("keywords", "alle,schluessel", "de", null));
     list2.add(createMetaTag("keywords", "all,keys", "en", null));
     tags.put("keywords", list2);
-    expect(modelContext.getLanguage()).andReturn("en").anyTimes();
+    expect(modelContext.getLanguage()).andReturn(Optional.of("en")).anyTimes();
     List<MetaTag> addList = new ArrayList<>();
     addList.add(createMetaTag("keywords", "tutti,chiavi", "it", null));
     addList.add(createMetaTag("description", "tutta la informazione", "it", null));
