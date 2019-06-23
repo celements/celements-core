@@ -19,6 +19,7 @@
  */
 package com.celements.rteConfig;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -29,7 +30,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
-import com.xpn.xwiki.XWikiException;
 
 @Component("rteconfig")
 public class RTEConfigScriptService implements ScriptService {
@@ -40,13 +40,13 @@ public class RTEConfigScriptService implements ScriptService {
   @Requirement
   RteConfigRole rteConfig;
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(RTEConfigScriptService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(RTEConfigScriptService.class);
 
   public String getRTEConfigField(String name) {
     try {
       return rteConfig.getRTEConfigField(name);
-    } catch (XWikiException exp) {
-      _LOGGER.error("getRTEConfigField for name [" + name + "] failed.", exp);
+    } catch (Exception exp) {
+      LOGGER.error("getRTEConfigField for name [" + name + "] failed.", exp);
     }
     return "";
   }
@@ -56,6 +56,11 @@ public class RTEConfigScriptService implements ScriptService {
   }
 
   public List<DocumentReference> getRTEConfigsList() {
-    return rteConfig.getRTEConfigsList();
+    try {
+      return rteConfig.getRTEConfigsList();
+    } catch (Exception exp) {
+      LOGGER.error("getRTEConfigsList failed.", exp);
+    }
+    return Collections.emptyList();
   }
 }
