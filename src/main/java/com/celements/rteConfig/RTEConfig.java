@@ -48,7 +48,6 @@ import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -127,7 +126,7 @@ public class RTEConfig implements RteConfigRole {
   }
 
   @Override
-  public String getRTEConfigField(String name) throws XWikiException {
+  public String getRTEConfigField(String name) {
     Optional<XWikiDocument> doc = context.getCurrentDoc();
     Optional<SpaceReference> currentSpaceRef = context.getCurrentSpaceRef();
     String resultConfig = "";
@@ -166,7 +165,7 @@ public class RTEConfig implements RteConfigRole {
     return resultConfig;
   }
 
-  private String getRTEConfigFieldFromPageType(String name) throws XWikiException {
+  private String getRTEConfigFieldFromPageType(String name) {
     String resultConfig = "";
     PageTypeReference pageTypeRef = pageTypeResolver.resolvePageTypeRefForCurrentDoc();
     DocumentReference pageTypeDocRef = xobjectPageTypeUtils.getDocRefForPageType(pageTypeRef);
@@ -182,8 +181,7 @@ public class RTEConfig implements RteConfigRole {
     return resultConfig;
   }
 
-  private String getRTEConfigFieldFromPreferenceDoc(String name, DocumentReference docRef)
-      throws XWikiException {
+  private String getRTEConfigFieldFromPreferenceDoc(String name, DocumentReference docRef) {
     String resultConfig = "";
     try {
       XWikiDocument prefDoc = modelAccess.getDocument(docRef);
@@ -202,7 +200,7 @@ public class RTEConfig implements RteConfigRole {
     return resultConfig;
   }
 
-  String getPreferenceFromConfigObject(String name, XWikiDocument doc) throws XWikiException {
+  String getPreferenceFromConfigObject(String name, XWikiDocument doc) {
     String configDocFN = getPreferenceFromPreferenceObject(CONFIG_PROP_NAME,
         getRteConfigTypeClass(), doc);
     if (!Strings.isNullOrEmpty(configDocFN.trim())) {
