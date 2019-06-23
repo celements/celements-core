@@ -58,11 +58,13 @@ public class RTEConfig implements RteConfigRole {
   private static final Logger LOGGER = LoggerFactory.getLogger(RTEConfig.class);
 
   /**
+   * @deprecated since celements-core-1.104
    * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC
    **/
   @Deprecated
   private static final String RTE_CONFIG_TYPE_PROP_CLASS_NAME = "RTEConfigTypePropertiesClass";
   /**
+   * @deprecated since celements-core-1.104
    * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE
    **/
   @Deprecated
@@ -73,6 +75,7 @@ public class RTEConfig implements RteConfigRole {
       + RTE_CONFIG_TYPE_CLASS_NAME;
   public static final String CONFIG_PROP_NAME = "rteconfig";
   /**
+   * @deprecated since celements-core-1.104
    * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS
    **/
   @Deprecated
@@ -114,6 +117,7 @@ public class RTEConfig implements RteConfigRole {
   }
 
   /**
+   * @deprecated since celements-core-1.104
    * @deprecated use instead IRTEConfigClassConfig.getRTEConfigTypePropertiesClassRef
    */
   @Deprecated
