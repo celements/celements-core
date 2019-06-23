@@ -34,6 +34,9 @@ public class TinyMce4Config implements RteConfigRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TinyMce4Config.class);
 
+  /**
+   * CAUTION: do not change the HINT it will be used from the vm-scripts
+   */
   public static final String HINT = "tinymce4";
 
   @Requirement
