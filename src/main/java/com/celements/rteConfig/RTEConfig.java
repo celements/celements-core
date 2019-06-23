@@ -19,6 +19,8 @@
  */
 package com.celements.rteConfig;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,6 +100,7 @@ public class RTEConfig implements RteConfigRole {
 
   @Override
   public String getRTEConfigField(String name) {
+    checkNotNull(name);
     Optional<XWikiDocument> doc = context.getCurrentDoc();
     Optional<SpaceReference> currentSpaceRef = context.getCurrentSpaceRef();
     String resultConfig = "";

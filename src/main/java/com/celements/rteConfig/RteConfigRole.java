@@ -21,14 +21,18 @@ package com.celements.rteConfig;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
 @ComponentRole
 public interface RteConfigRole {
 
+  @NotNull
   List<DocumentReference> getRTEConfigsList();
 
-  String getRTEConfigField(String name);
+  @NotNull
+  String getRTEConfigField(@NotNull String name);
 
 }
