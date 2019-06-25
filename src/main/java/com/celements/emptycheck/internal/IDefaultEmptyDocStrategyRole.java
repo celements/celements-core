@@ -1,5 +1,7 @@
 package com.celements.emptycheck.internal;
 
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -14,7 +16,7 @@ public interface IDefaultEmptyDocStrategyRole {
 
   public boolean isEmptyRTEDocument(XWikiDocument localdoc);
 
-  public boolean isEmptyRTEString(String rteContent);
+  public boolean isEmptyRTEString(@NotNull String rteContent);
 
   public boolean isEmptyDocumentTranslated(DocumentReference docRef);
 
