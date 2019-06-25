@@ -58,30 +58,11 @@ public class RTEConfig implements RteConfigRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RTEConfig.class);
 
-  /**
-   * @deprecated since celements-core-1.104
-   * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC
-   **/
-  @Deprecated
-  private static final String RTE_CONFIG_TYPE_PROP_CLASS_NAME = "RTEConfigTypePropertiesClass";
-  /**
-   * @deprecated since celements-core-1.104
-   * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE
-   **/
-  @Deprecated
-  public static final String RTE_CONFIG_TYPE_PROP_CLASS_SPACE = "Classes";
   public static final String RTE_CONFIG_TYPE_CLASS_SPACE = "Classes";
   public static final String RTE_CONFIG_TYPE_CLASS_NAME = "RTEConfigTypeClass";
   public static final String CONFIG_CLASS_NAME = RTE_CONFIG_TYPE_CLASS_SPACE + "."
       + RTE_CONFIG_TYPE_CLASS_NAME;
   public static final String CONFIG_PROP_NAME = "rteconfig";
-  /**
-   * @deprecated since celements-core-1.104
-   * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS
-   **/
-  @Deprecated
-  public static final String PROP_CLASS_NAME = RTE_CONFIG_TYPE_PROP_CLASS_SPACE + "."
-      + RTE_CONFIG_TYPE_PROP_CLASS_NAME;
 
   private final static Map<String, String> rteConfigFieldDefaults = new HashMap<>();
 
@@ -115,16 +96,6 @@ public class RTEConfig implements RteConfigRole {
 
   private XWikiContext getContext() {
     return context.getXWikiContext();
-  }
-
-  /**
-   * @deprecated since celements-core-1.104
-   * @deprecated use instead IRTEConfigClassConfig.getRTEConfigTypePropertiesClassRef
-   */
-  @Deprecated
-  public DocumentReference getRTEConfigTypePropClassRef(String wikiName) {
-    return new DocumentReference(wikiName, RTE_CONFIG_TYPE_PROP_CLASS_SPACE,
-        RTE_CONFIG_TYPE_PROP_CLASS_NAME);
   }
 
   @Override
