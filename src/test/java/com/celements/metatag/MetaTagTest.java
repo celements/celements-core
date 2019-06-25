@@ -23,31 +23,31 @@ public class MetaTagTest extends AbstractComponentTest {
   @Test
   public void testGetSetKey() {
     MetaTag tag = new MetaTag();
-    assertNull(tag.getKey());
+    assertTrue(tag.getKeyOpt().isEmpty());
     tag.setKey("tagname");
-    assertEquals("tagname", tag.getKey());
+    assertEquals("tagname", tag.getKeyOpt().get());
     tag.setKey("other");
-    assertEquals("other", tag.getKey());
+    assertEquals("other", tag.getKeyOpt().get());
   }
 
   @Test
   public void testGetSetValue() {
     MetaTag tag = new MetaTag();
-    assertNull(tag.getValue());
+    assertFalse(tag.getValueOpt().isPresent());
     tag.setValue("value1");
-    assertEquals("value1", tag.getValue());
+    assertEquals("value1", tag.getValueOpt().get());
     tag.setValue("value2");
-    assertEquals("value2", tag.getValue());
+    assertEquals("value2", tag.getValueOpt().get());
   }
 
   @Test
   public void testGetSetLang() {
     MetaTag tag = new MetaTag();
-    assertNull(tag.getLang());
+    assertTrue(tag.getLangOpt().isEmpty());
     tag.setLang("fr");
-    assertEquals("fr", tag.getLang());
+    assertEquals("fr", tag.getLangOpt().get());
     tag.setLang("de");
-    assertEquals("de", tag.getLang());
+    assertEquals("de", tag.getLangOpt().get());
   }
 
   @Test

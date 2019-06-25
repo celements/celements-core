@@ -59,8 +59,8 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
     List<MetaTag> tags = bomtProvider.getMetaTagsForDoc(doc);
     verifyDefault();
     assertEquals(2, tags.size());
-    assertEquals("de", tags.get(0).getLang());
-    assertEquals("en", tags.get(1).getLang());
+    assertEquals("de", tags.get(0).getLangOpt().get());
+    assertEquals("en", tags.get(1).getLangOpt().get());
   }
 
   @Test
@@ -86,17 +86,17 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
     assertEquals(3, tags.size());
     List<List<MetaTag>> resultLists = ImmutableList.copyOf(tags.values());
     assertEquals(2, resultLists.get(0).size());
-    assertEquals("description", resultLists.get(0).get(0).getKey());
-    assertEquals("en", resultLists.get(0).get(0).getLang());
-    assertEquals("de", resultLists.get(0).get(1).getLang());
+    assertEquals("description", resultLists.get(0).get(0).getKeyOpt().get());
+    assertEquals("en", resultLists.get(0).get(0).getLangOpt().get());
+    assertEquals("de", resultLists.get(0).get(1).getLangOpt().get());
     assertEquals(2, resultLists.get(1).size());
-    assertEquals("keywords", resultLists.get(1).get(0).getKey());
-    assertEquals("de", resultLists.get(1).get(0).getLang());
-    assertEquals("en", resultLists.get(1).get(1).getLang());
+    assertEquals("keywords", resultLists.get(1).get(0).getKeyOpt().get());
+    assertEquals("de", resultLists.get(1).get(0).getLangOpt().get());
+    assertEquals("en", resultLists.get(1).get(1).getLangOpt().get());
     assertEquals(2, resultLists.get(2).size());
-    assertEquals("newkey", resultLists.get(2).get(0).getKey());
-    assertEquals("en", resultLists.get(2).get(0).getLang());
-    assertEquals("", resultLists.get(2).get(1).getLang());
+    assertEquals("newkey", resultLists.get(2).get(0).getKeyOpt().get());
+    assertEquals("en", resultLists.get(2).get(0).getLangOpt().get());
+    assertTrue("", resultLists.get(2).get(1).getLangOpt().isEmpty());
   }
 
   @Test
@@ -120,8 +120,8 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
         .filter(Objects::nonNull).findFirst().get().findFirst();
     verifyDefault();
     assertTrue(tag.isPresent());
-    assertEquals(key, tag.get().getKey());
-    assertEquals(value, tag.get().getValue());
+    assertEquals(key, tag.get().getKeyOpt().get());
+    assertEquals(value, tag.get().getValueOpt().get());
   }
 
   @Test
@@ -139,8 +139,8 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
         .filter(Objects::nonNull).findFirst().get().findFirst();
     verifyDefault();
     assertTrue(tag.isPresent());
-    assertEquals(key, tag.get().getKey());
-    assertEquals(value1 + "," + value2 + "," + value3, tag.get().getValue());
+    assertEquals(key, tag.get().getKeyOpt().get());
+    assertEquals(value1 + "," + value2 + "," + value3, tag.get().getValueOpt().get());
   }
 
   @Test
@@ -156,8 +156,8 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
         .filter(Objects::nonNull).findFirst().get().findFirst();
     verifyDefault();
     assertTrue(tag.isPresent());
-    assertEquals(key, tag.get().getKey());
-    assertEquals(value, tag.get().getValue());
+    assertEquals(key, tag.get().getKeyOpt().get());
+    assertEquals(value, tag.get().getValueOpt().get());
   }
 
   @Test
@@ -174,8 +174,8 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
         .filter(Objects::nonNull).findFirst().get().findFirst();
     verifyDefault();
     assertTrue(tag.isPresent());
-    assertEquals(key, tag.get().getKey());
-    assertEquals(value1 + "," + value2, tag.get().getValue());
+    assertEquals(key, tag.get().getKeyOpt().get());
+    assertEquals(value1 + "," + value2, tag.get().getValueOpt().get());
     assertFalse(tag.get().getOverridable());
   }
 
@@ -200,9 +200,9 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
     verifyDefault();
     List<MetaTag> resultList = resultTags.get().collect(Collectors.toList());
     assertTrue(1 <= resultList.size());
-    assertEquals(key, resultList.get(0).getKey());
+    assertEquals(key, resultList.get(0).getKeyOpt().get());
     assertEquals(tag1value1 + "," + tag1value2 + "," + tag2value1 + "," + tag2value2, resultList
-        .get(0).getValue());
+        .get(0).getValueOpt().get());
   }
 
   // HELPER METHODS

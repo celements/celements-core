@@ -1,12 +1,30 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.celements.metatag;
-
-import static com.google.common.base.Strings.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -30,7 +48,6 @@ import com.celements.model.classes.ClassDefinition;
 import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.web.classes.MetaTagClass;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -61,7 +78,7 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
     addMetaTagsFromList(getMetaTagsForDoc(context.getOrCreateXWikiPreferenceDoc()), tags);
     addMetaTagsFromList(getMetaTagsForDoc(context.getOrCreateSpacePreferenceDoc(context
         .getCurrentSpaceRefOrDefault())), tags);
-    Optional<XWikiDocument> doc = context.getCurrentDoc();
+    Optional<XWikiDocument> doc = context.getCurrentDoc().toJavaUtil();
     if (doc.isPresent()) {
       addMetaTagsFromList(getMetaTagsForDoc(doc.get()), tags);
     }
@@ -76,7 +93,7 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
 
       @Override
       public Stream<MetaTag> apply(List<MetaTag> tags) {
-        return tags.stream().sequential().collect(applyOverrideLogic());// reduce(applyOverrideLogic());
+        return tags.stream().sequential().collect(applyOverrideLogic());
       }
 
       Collector<MetaTag, List<MetaTag>, Stream<MetaTag>> applyOverrideLogic() {
@@ -106,7 +123,9 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
                 } else if (reductor.getOverridable()) {
                   Collections.replaceAll(accu, reductor, tag);
                 } else {
-                  reductor.setValue(reductor.getValue() + "," + tag.getValue());
+                  reductor.setValue(reductor.getValueOpt().orElse("") + "," + tag.getValueOpt()
+                      .orElse(
+                          ""));
                 }
               }
             };
@@ -147,13 +166,14 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
 
   void addMetaTagsFromList(List<MetaTag> newTags, SortedMap<String, List<MetaTag>> finalTags) {
     for (MetaTag tag : newTags) {
-      String lang = tag.getLang();
-      if (isNullOrEmpty(lang) || lang.equals(context.getLanguage().orElse(null)) || lang
+      Optional<String> lang = tag.getLangOpt();
+      if (lang.isEmpty() || lang.get().equals(context.getLanguage().orElse(null)) || lang.get()
           .equals(context.getDefaultLanguage())) {
-        if (!finalTags.containsKey(tag.getKey())) {
-          finalTags.put(tag.getKey(), new ArrayList<MetaTag>());
+        String key = tag.getKeyOpt().orElse(null);
+        if (!finalTags.containsKey(key)) {
+          finalTags.put(key, new ArrayList<MetaTag>());
         }
-        finalTags.get(tag.getKey()).add(tag);
+        finalTags.get(key).add(tag);
       }
     }
   }
