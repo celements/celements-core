@@ -21,14 +21,18 @@ package com.celements.rteConfig;
 
 import java.util.List;
 
-import org.xwiki.component.annotation.ComponentRole;
+import javax.validation.constraints.NotNull;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
+import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.DocumentReference;
 
 @ComponentRole
-public interface IRTEConfigTemplateRole {
+public interface RteConfigRole {
 
-  public List<BaseObject> getRTETemplateList() throws XWikiException;
+  @NotNull
+  List<DocumentReference> getRTEConfigsList();
+
+  @NotNull
+  String getRTEConfigField(@NotNull String name);
 
 }
