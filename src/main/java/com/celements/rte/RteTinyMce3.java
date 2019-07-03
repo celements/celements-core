@@ -1,9 +1,10 @@
 package com.celements.rte;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
+
+import com.google.common.collect.ImmutableList;
 
 @Component(RteTinyMce3.NAME)
 public class RteTinyMce3 implements RteImplementation {
@@ -17,14 +18,14 @@ public class RteTinyMce3 implements RteImplementation {
 
   @Override
   public List<String> getJavaScriptFiles() {
-    // TODO Auto-generated method stub
-    return Arrays.asList();
+    return ImmutableList.of(
+        ":celRTE/tiny_mce_src.js",
+        ":celJS/celTabMenu/loadTinyMCE-async.js");
   }
 
   @Override
   public List<String> getCssFiles() {
-    // TODO Auto-generated method stub
-    return Arrays.asList();
+    return ImmutableList.of(); // TODO
   }
 
 }
