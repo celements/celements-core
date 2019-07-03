@@ -23,9 +23,4 @@ public class RteTinyMce3 implements RteImplementation {
         ":celJS/celTabMenu/loadTinyMCE-async.js");
   }
 
-  @Override
-  public List<String> getCssFiles() {
-    return ImmutableList.of(); // TODO
-  }
-
 }

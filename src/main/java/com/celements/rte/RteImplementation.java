@@ -15,7 +15,4 @@ public interface RteImplementation {
   @NotNull
   List<String> getJavaScriptFiles();
 
-  @NotNull
-  List<String> getCssFiles();
-
 }

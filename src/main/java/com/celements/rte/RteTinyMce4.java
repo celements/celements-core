@@ -24,9 +24,4 @@ public class RteTinyMce4 implements RteImplementation {
         ":structEditJS/tinyMCE4/loadTinyMCE-async.js");
   }
 
-  @Override
-  public List<String> getCssFiles() {
-    return ImmutableList.of(); // TODO
-  }
-
 }
