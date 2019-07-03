@@ -19,6 +19,8 @@
  */
 package com.celements.rteConfig;
 
+import static com.google.common.base.MoreObjects.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,6 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.marshalling.ComponentMarshaller;
 import com.celements.marshalling.Marshaller;
 import com.celements.rte.RteImplementation;
-import com.google.common.base.MoreObjects;
 
 @Component("rteconfig")
 public class RTEConfigScriptService implements ScriptService {
@@ -96,13 +97,13 @@ public class RTEConfigScriptService implements ScriptService {
 
   @NotNull
   public String getRteConfigHint() {
-    return (String) MoreObjects.firstNonNull(execution.getContext().getProperty(
-        RTE_CONFIG_ACTIV_HINT), "default");
+    return (String) firstNonNull(execution.getContext().getProperty(RTE_CONFIG_ACTIV_HINT),
+        "default");
   }
 
-  @Nullable // TODO callers might throw NPE ?!
-  private RteConfigRole getActiveRteConfig() {
-    return rteConfigMap.get(getRteConfigHint());
+  @NotNull
+  RteConfigRole getActiveRteConfig() {
+    return firstNonNull(rteConfigMap.get(getRteConfigHint()), rteConfigMap.get("default"));
   }
 
   public RteImplementation getRteImplementation() {
