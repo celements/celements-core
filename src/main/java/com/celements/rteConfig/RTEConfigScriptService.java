@@ -19,6 +19,8 @@
  */
 package com.celements.rteConfig;
 
+import static com.google.common.base.MoreObjects.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,17 +32,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
-import com.google.common.base.MoreObjects;
+import com.celements.marshalling.ComponentMarshaller;
+import com.celements.marshalling.Marshaller;
+import com.celements.rte.RteImplementation;
 
 @Component("rteconfig")
 public class RTEConfigScriptService implements ScriptService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(RTEConfigScriptService.class);
+
   private static final String RTE_CONFIG_ACTIV_HINT = "RTE_CONFIG_ACTIV_HINT";
+
+  private final Marshaller<RteImplementation> rteImplMarshaller = new ComponentMarshaller<>(
+      RteImplementation.class);
 
   @Requirement
   private IDefaultEmptyDocStrategyRole defaultEmptyDocStrategyRole;
@@ -49,9 +59,13 @@ public class RTEConfigScriptService implements ScriptService {
   private Map<String, RteConfigRole> rteConfigMap;
 
   @Requirement
-  private Execution execution;
+  private RteImplementation defaultRteImpl;
 
-  private static Logger LOGGER = LoggerFactory.getLogger(RTEConfigScriptService.class);
+  @Requirement
+  private ConfigurationSource cfgSrc;
+
+  @Requirement
+  private Execution execution;
 
   @NotNull
   public String getRTEConfigField(@NotNull String name) {
@@ -83,13 +97,18 @@ public class RTEConfigScriptService implements ScriptService {
 
   @NotNull
   public String getRteConfigHint() {
-    return (String) MoreObjects.firstNonNull(execution.getContext().getProperty(
-        RTE_CONFIG_ACTIV_HINT), "default");
+    return (String) firstNonNull(execution.getContext().getProperty(RTE_CONFIG_ACTIV_HINT),
+        "default");
   }
 
-  @Nullable
-  private RteConfigRole getActiveRteConfig() {
-    return rteConfigMap.get(getRteConfigHint());
+  @NotNull
+  RteConfigRole getActiveRteConfig() {
+    return firstNonNull(rteConfigMap.get(getRteConfigHint()), rteConfigMap.get("default"));
+  }
+
+  public RteImplementation getRteImplementation() {
+    String rteImplHint = cfgSrc.getProperty("celements.rte.impl", "").toLowerCase();
+    return rteImplMarshaller.resolve(rteImplHint).or(defaultRteImpl);
   }
 
 }
