@@ -30,17 +30,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
+import com.celements.marshalling.ComponentMarshaller;
+import com.celements.marshalling.Marshaller;
+import com.celements.rte.RteImplementation;
 import com.google.common.base.MoreObjects;
 
 @Component("rteconfig")
 public class RTEConfigScriptService implements ScriptService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(RTEConfigScriptService.class);
+
   private static final String RTE_CONFIG_ACTIV_HINT = "RTE_CONFIG_ACTIV_HINT";
+
+  private final Marshaller<RteImplementation> rteImplMarshaller = new ComponentMarshaller<>(
+      RteImplementation.class);
 
   @Requirement
   private IDefaultEmptyDocStrategyRole defaultEmptyDocStrategyRole;
@@ -49,9 +58,13 @@ public class RTEConfigScriptService implements ScriptService {
   private Map<String, RteConfigRole> rteConfigMap;
 
   @Requirement
-  private Execution execution;
+  private RteImplementation defaultRteImpl;
 
-  private static Logger LOGGER = LoggerFactory.getLogger(RTEConfigScriptService.class);
+  @Requirement
+  private ConfigurationSource cfgSrc;
+
+  @Requirement
+  private Execution execution;
 
   @NotNull
   public String getRTEConfigField(@NotNull String name) {
@@ -87,9 +100,14 @@ public class RTEConfigScriptService implements ScriptService {
         RTE_CONFIG_ACTIV_HINT), "default");
   }
 
-  @Nullable
+  @Nullable // TODO callers might throw NPE ?!
   private RteConfigRole getActiveRteConfig() {
     return rteConfigMap.get(getRteConfigHint());
+  }
+
+  public RteImplementation getRteImplementation() {
+    String rteImplHint = cfgSrc.getProperty("celements.rte.impl", "").toLowerCase();
+    return rteImplMarshaller.resolve(rteImplHint).or(defaultRteImpl);
   }
 
 }
