@@ -145,5 +145,3 @@ com.celements.sajson.JsonScriptService
 com.celements.rteConfig.RTEConfig
 com.celements.rte.RteDefaultImplementation
 com.celements.rte.RteTinyMce3
-com.celements.rte.RteTinyMce4
-
