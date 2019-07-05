@@ -19,21 +19,54 @@
  */
 package com.celements.metatag;
 
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
-public interface MetaTagServiceRole {
+public interface MetaTagRole {
 
-  public static final String META_CONTEXT_KEY = "celements_meta_tags";
+  boolean getOverridable();
 
-  public void addMetaTagToCollector(@NotNull MetaTag tag);
+  void setOverridable(@Nullable Boolean overridable);
 
-  public @NotNull String displayCollectedMetaTags();
+  /**
+   * Use discouraged, but Needed for BeanClassDefConverter to work. Please use {@link getKeyOpt()}
+   */
+  @Nullable
+  String getKey();
 
-  public void collectHeaderTags();
+  @NotNull
+  Optional<String> getKeyOpt();
 
-  public void collectBodyTags();
+  void setKey(@Nullable String attributeKey);
+
+  /**
+   * Use discouraged, but Needed for BeanClassDefConverter to work. Please use {@link getValueOpt()}
+   */
+  @Nullable
+  String getValue();
+
+  @NotNull
+  Optional<String> getValueOpt();
+
+  void setValue(@Nullable String content);
+
+  /**
+   * Use discouraged, but Needed for BeanClassDefConverter to work. Please use {@link getLangOpt()}
+   */
+  @Nullable
+  String getLang();
+
+  @NotNull
+  Optional<String> getLangOpt();
+
+  void setLang(@Nullable String language);
+
+  @NotNull
+  String display();
 
 }

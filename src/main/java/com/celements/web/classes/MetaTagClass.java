@@ -23,25 +23,30 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.classes.AbstractClassDefinition;
+import com.celements.model.classes.fields.BooleanField;
 import com.celements.model.classes.fields.ClassField;
+import com.celements.model.classes.fields.LargeStringField;
 import com.celements.model.classes.fields.StringField;
 
-@Component(FormMailClass.CLASS_DEF_HINT)
-public class FormMailClass extends AbstractClassDefinition implements CelementsClassDefinition {
+@Component(MetaTagClass.CLASS_DEF_HINT)
+public class MetaTagClass extends AbstractClassDefinition implements CelementsClassDefinition {
 
-  public static final String SPACE_NAME = "Celements2";
-  public static final String DOC_NAME = "FormMailClass";
+  public static final String SPACE_NAME = "Classes";
+  public static final String DOC_NAME = "MetaTagClass";
   public static final String CLASS_DEF_HINT = SPACE_NAME + "." + DOC_NAME;
   public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 
-  public static final ClassField<String> FIELD_NAME = new StringField.Builder(CLASS_DEF_HINT,
-      "name").size(30).build();
-  public static final ClassField<String> FIELD_EMAIL_FROM = new StringField.Builder(CLASS_DEF_HINT,
-      "emailFrom").size(30).build();
-  public static final ClassField<String> FIELD_EMAIL_FIELDS = new StringField.Builder(
-      CLASS_DEF_HINT, "emailFields").size(30).build();
-  public static final ClassField<String> FIELD_USER_EMAIL_FIELDS = new StringField.Builder(
-      CLASS_DEF_HINT, "userEmailFields").size(30).build();
+  public static final ClassField<String> FIELD_KEY = new StringField.Builder(CLASS_DEF_HINT,
+      "key").size(30).build();
+
+  public static final ClassField<String> FIELD_VALUE = new LargeStringField.Builder(CLASS_DEF_HINT,
+      "value").rows(15).size(80).build();
+
+  public static final ClassField<String> FIELD_LANGUAGE = new StringField.Builder(CLASS_DEF_HINT,
+      "lang").size(30).build();
+
+  public static final ClassField<Boolean> FIELD_OVERRIDABLE = new BooleanField.Builder(
+      CLASS_DEF_HINT, "overridable").displayType("yesno").defaultValue(0).build();
 
   @Override
   public String getName() {
@@ -50,7 +55,7 @@ public class FormMailClass extends AbstractClassDefinition implements CelementsC
 
   @Override
   public boolean isInternalMapping() {
-    return false;
+    return true;
   }
 
   @Override

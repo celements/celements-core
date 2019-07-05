@@ -1,8 +1,34 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.celements.metatag;
 
+import static com.google.common.base.Strings.*;
+
 import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 import com.celements.metatag.enums.ECharset;
 import com.celements.metatag.enums.EHttpEquiv;
@@ -14,27 +40,35 @@ import com.celements.metatag.enums.EViewport;
 import com.celements.metatag.enums.opengraph.EOpenGraph;
 import com.celements.metatag.enums.twitter.ETwitter;
 import com.celements.metatag.enums.twitter.ETwitterCardType;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-public final class MetaTag {
+/* ComponentInstanceSupplier in BaseObjectMetaTagProvider needs this to be a component */
+@Component
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class MetaTag implements MetaTagRole {
 
-  private final Map<String, String> attribs;
-  private final Optional<String> content;
+  private Map<String, String> attribs;
+  private String content;
+  private String key;
+  private String language;
+  private Boolean overridable;
+
+  public MetaTag() {
+    // Bean needs default constructor
+  }
 
   public MetaTag(@NotNull String attrib, @NotNull String attribValue, @NotNull String content) {
     this.attribs = ImmutableMap.of(attrib, attribValue);
-    this.content = Optional.of(content);
+    this.content = content;
   }
 
   public MetaTag(@NotNull Map<String, String> attribs, @NotNull String content) {
     this.attribs = ImmutableMap.copyOf(attribs);
-    this.content = Optional.of(content);
+    this.content = content;
   }
 
   public MetaTag(@NotNull ECharset charset) {
     this.attribs = ImmutableMap.of(ECharset.ATTRIB_NAME, charset.getIdentifier());
-    this.content = Optional.absent();
   }
 
   public MetaTag(@NotNull EHttpEquiv httpEquiv, @NotNull String content) {
@@ -79,16 +113,90 @@ public final class MetaTag {
     this(ETwitter.TWITTER_CARD, twitterCardType.getIdentifier());
   }
 
+  @Override
+  public boolean getOverridable() {
+    return (overridable != null) ? overridable : false;
+  }
+
+  @Override
+  public void setOverridable(Boolean overridable) {
+    this.overridable = overridable;
+  }
+
+  @Override
+  public String getKey() {
+    return key;
+  }
+
+  @Override
+  public @NotNull Optional<String> getKeyOpt() {
+    return Optional.ofNullable(getKey());
+  }
+
+  @Override
+  public void setKey(String attributeKey) {
+    this.key = attributeKey;
+  }
+
+  @Override
+  public String getValue() {
+    return content;
+  }
+
+  @Override
+  public Optional<String> getValueOpt() {
+    return Optional.ofNullable(getValue());
+  }
+
+  @Override
+  public void setValue(String content) {
+    this.content = content;
+  }
+
+  @Override
+  public String getLang() {
+    return language;
+  }
+
+  @Override
+  public @NotNull Optional<String> getLangOpt() {
+    return Optional.ofNullable(emptyToNull(getLang()));
+  }
+
+  @Override
+  public void setLang(String language) {
+    this.language = language;
+  }
+
+  @Override
   public @NotNull String display() {
     StringBuilder sb = new StringBuilder();
     sb.append("<meta ");
-    for (String attrib : attribs.keySet()) {
-      sb.append(attrib).append("=\"").append(attribs.get(attrib)).append("\" ");
+    if (attribs != null) {
+      for (String attrib : attribs.keySet()) {
+        sb.append(attrib).append("=\"").append(attribs.get(attrib)).append("\" ");
+      }
     }
-    if (content.isPresent()) {
-      sb.append("content=\"").append(content.get()).append("\" ");
+    if (key != null) {
+      sb.append(ENameStandard.ATTRIB_NAME).append("=\"").append(key).append("\" ");
+    }
+    if (content != null) {
+      sb.append("content=\"").append(content).append("\" ");
     }
     sb.append("/>");
     return sb.toString();
   }
+
+  @Override
+  public boolean equals(Object tag) {
+    return (tag instanceof MetaTag) && equalsLang((MetaTag) tag) && display().equals(((MetaTag) tag)
+        .display());
+  }
+
+  private boolean equalsLang(MetaTag tag) {
+    return (getLangOpt().orElse(null) == tag.getLangOpt().orElse(null)) || ((getLangOpt()
+        .isPresent()) && getLangOpt().get().equals(tag
+            .getLangOpt().get()));
+  }
+
 }

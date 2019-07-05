@@ -6,6 +6,7 @@ com.celements.web.classcollections.ImageMapClasses
 com.celements.web.classcollections.MetaTagClasses
 com.celements.web.classes.CelementsClassPackage
 com.celements.web.classes.FormMailClass
+com.celements.web.classes.MetaTagClass
 com.celements.web.classes.UserCssClass
 com.celements.cells.CellsClasses
 com.celements.navigation.NavigationClasses
@@ -122,6 +123,8 @@ com.celements.navigation.factories.XObjectNavigationFactory
 com.celements.navigation.factories.JavaNavigationFactory
 com.celements.navigation.factories.PageTypeNavigationFactory
 com.celements.navigation.factories.DefaultNavigationFactory
+com.celements.metatag.BaseObjectMetaTagProvider
+com.celements.metatag.MetaTag
 com.celements.metatag.MetaTagService
 com.celements.metatag.MetaTagScriptService
 com.celements.pagetype.classes.PageTypeClass

@@ -121,6 +121,9 @@
     <property name="source" type="string">
       <column name="CMT_SOURCE" />
     </property>
+    <property name="overridable" type="integer">
+      <column name="CMT_OVERRIDABLE" />
+    </property>
   </class>
   <class entity-name="Classes.ImageMapConfigClass" table="cel_img_map">
     <id name="id" type="long" unsaved-value="undefined">
