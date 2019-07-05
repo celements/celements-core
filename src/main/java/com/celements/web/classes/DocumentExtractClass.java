@@ -5,11 +5,12 @@ import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.classes.AbstractClassDefinition;
 import com.celements.model.classes.fields.ClassField;
+import com.celements.model.classes.fields.LargeStringField;
 import com.celements.model.classes.fields.StringField;
 
 @Component(DocumentExtractClass.NAME)
-public class DocumentExtractClass extends AbstractClassDefinition
-    implements CelementsClassDefinition {
+public class DocumentExtractClass extends AbstractClassDefinition implements
+    CelementsClassDefinition {
 
   public static final String SPACE_NAME = "Classes";
   public static final String DOC_NAME = "DocumentExtract";
@@ -19,7 +20,7 @@ public class DocumentExtractClass extends AbstractClassDefinition
   public static final ClassField<String> FIELD_LANG = new StringField.Builder(NAME,
       "language").build();
 
-  public static final ClassField<String> FIELD_EXTRACT = new StringField.Builder(NAME,
+  public static final ClassField<String> FIELD_EXTRACT = new LargeStringField.Builder(NAME,
       "extract").build();
 
   @Override
