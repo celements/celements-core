@@ -123,4 +123,17 @@ public class RTEConfigScriptServiceTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void test_getActiveRteConfig() {
+    final String rteConfigHint1 = "rteConfigNotExistMock";
+    replayDefault();
+    rteConfigScriptSrv.setRteConfigHint(rteConfigHint1);
+    try {
+      assertNotNull("Must be @NotNull", rteConfigScriptSrv.getActiveRteConfig());
+    } catch (Exception exp) {
+      fail(exp.getMessage());
+    }
+    verifyDefault();
+  }
+
 }

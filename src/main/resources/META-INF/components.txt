@@ -143,3 +143,5 @@ com.celements.web.classes.DocumentExtractClass
 com.celements.migrator.PageTypeCategoryMigration
 com.celements.sajson.JsonScriptService
 com.celements.rteConfig.RTEConfig
+com.celements.rte.RteDefaultImplementation
+com.celements.rte.RteTinyMce3
