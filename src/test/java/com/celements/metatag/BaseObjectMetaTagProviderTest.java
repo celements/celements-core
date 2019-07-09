@@ -96,7 +96,7 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
     assertEquals(2, resultLists.get(2).size());
     assertEquals("newkey", resultLists.get(2).get(0).getKeyOpt().get());
     assertEquals("en", resultLists.get(2).get(0).getLangOpt().get());
-    assertTrue("", resultLists.get(2).get(1).getLangOpt().isEmpty());
+    assertFalse(resultLists.get(2).get(1).getLangOpt().isPresent());
   }
 
   @Test

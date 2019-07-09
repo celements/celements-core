@@ -75,8 +75,8 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
   @Override
   public List<MetaTag> getHeaderMetaTags() {
     SortedMap<String, List<MetaTag>> tags = new TreeMap<>();
-    addMetaTagsFromList(getMetaTagsForDoc(context.getOrCreateXWikiPreferenceDoc()), tags);
-    addMetaTagsFromList(getMetaTagsForDoc(context.getOrCreateSpacePreferenceDoc(context
+    addMetaTagsFromList(getMetaTagsForDoc(context.getXWikiPreferenceDoc()), tags);
+    addMetaTagsFromList(getMetaTagsForDoc(context.getSpacePreferenceDoc(context
         .getCurrentSpaceRefOrDefault())), tags);
     Optional<XWikiDocument> doc = context.getCurrentDoc().toJavaUtil();
     if (doc.isPresent()) {
@@ -167,7 +167,7 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
   void addMetaTagsFromList(List<MetaTag> newTags, SortedMap<String, List<MetaTag>> finalTags) {
     for (MetaTag tag : newTags) {
       Optional<String> lang = tag.getLangOpt();
-      if (lang.isEmpty() || lang.get().equals(context.getLanguage().orElse(null)) || lang.get()
+      if (!lang.isPresent() || lang.get().equals(context.getLanguage().orElse(null)) || lang.get()
           .equals(context.getDefaultLanguage())) {
         String key = tag.getKeyOpt().orElse(null);
         if (!finalTags.containsKey(key)) {
@@ -188,7 +188,8 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
                 return (MetaTag) metaTagConverter.apply(obj);
               }
 
-            }).collect(Collectors.<MetaTag>toList());
+            })
+        .collect(Collectors.<MetaTag>toList());
   }
 
   @Override
