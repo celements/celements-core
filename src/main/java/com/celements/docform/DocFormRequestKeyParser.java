@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.service.IWebUtilsService;
+import com.celements.model.util.ModelUtils;
 import com.xpn.xwiki.web.Utils;
 
 public class DocFormRequestKeyParser {
@@ -19,7 +19,7 @@ public class DocFormRequestKeyParser {
   private static Logger LOGGER = LoggerFactory.getLogger(DocFormRequestKeyParser.class);
 
   public static final String KEY_DELIM = "_";
-  public static final String REGEX_FULLNAME = "[a-zA-Z0-9]+\\.[a-zA-Z0-9]+";
+  public static final String REGEX_FULLNAME = "[a-zA-Z0-9-]+\\.[a-zA-Z0-9-]+";
   public static final String REGEX_OBJNB = "[-^]?(\\d)*";
   public static final String REGEX_WHITELIST = "content|title";
 
@@ -64,7 +64,7 @@ public class DocFormRequestKeyParser {
         1).matches(REGEX_WHITELIST))) {
       String fullName = keyParts.remove(0);
       if (fullName.matches(REGEX_FULLNAME)) {
-        ret = getWebUtils().resolveDocumentReference(fullName);
+        ret = getModelUtils().resolveRef(fullName, DocumentReference.class);
       }
     } else {
       ret = defaultDocRef;
@@ -84,7 +84,7 @@ public class DocFormRequestKeyParser {
   private DocumentReference parseClassRef(List<String> keyParts) {
     DocumentReference ret = null;
     if (getFirst(keyParts).matches(REGEX_FULLNAME)) {
-      ret = getWebUtils().resolveDocumentReference(keyParts.remove(0));
+      ret = getModelUtils().resolveRef(keyParts.remove(0), DocumentReference.class);
     }
     return ret;
   }
@@ -179,8 +179,8 @@ public class DocFormRequestKeyParser {
     return "";
   }
 
-  private IWebUtilsService getWebUtils() {
-    return Utils.getComponent(IWebUtilsService.class);
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }

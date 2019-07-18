@@ -1,5 +1,6 @@
 package com.celements.docform;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -10,11 +11,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.web.service.IWebUtilsService;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.reference.RefBuilder;
+import com.celements.model.util.ModelUtils;
 import com.xpn.xwiki.web.Utils;
 
-public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCase {
+public class DocFormRequestKeyParserTest extends AbstractComponentTest {
 
   private String db;
   private DocFormRequestKeyParser parser;
@@ -306,6 +308,26 @@ public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCas
     assertKey(iter.next(), keyStringOther, docRef, classRef2, false, objNb2, fieldName2);
   }
 
+  @Test
+  public void test_parse_specialFN() {
+    String delim = DocFormRequestKeyParser.KEY_DELIM;
+    String docName = "2019-07-15";
+    String docSpace = "TimeSheets-ebeutler10";
+    String docFN = docSpace + "." + docName;
+    DocumentReference docRef = RefBuilder.create().wiki(getContext().getDatabase()).doc(
+        docName).space(docSpace).build(DocumentReference.class);
+    String classFN = "TimeSheetClasses.TimesheetDayClass";
+    DocumentReference classRef = RefBuilder.create().wiki(getContext().getDatabase()).space(
+        "TimeSheetClasses").doc("TimesheetDayClass").build(DocumentReference.class);
+    String fieldName = "dailyComment";
+    String keyString = docFN + delim + classFN + delim + "0" + delim + fieldName;
+    DocFormRequestKey result = parser.parse(keyString, null);
+    assertEquals(docRef, result.getDocRef());
+    assertEquals(classRef, result.getClassRef());
+    assertEquals(fieldName, result.getFieldName());
+    assertEquals(Integer.valueOf(0), result.getObjNb());
+  }
+
   private void assertKey(DocFormRequestKey key, String keyString, DocumentReference docRef,
       DocumentReference classRef, boolean remove, Integer objNb, String fieldName) {
     assertEquals(keyString, key.getKeyString());
@@ -317,7 +339,7 @@ public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCas
   }
 
   private String serialize(DocumentReference docRef) {
-    return Utils.getComponent(IWebUtilsService.class).getRefLocalSerializer().serialize(docRef);
+    return Utils.getComponent(ModelUtils.class).serializeRefLocal(docRef);
   }
 
 }
