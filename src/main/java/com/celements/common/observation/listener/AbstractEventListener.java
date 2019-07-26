@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -21,6 +22,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public abstract class AbstractEventListener implements EventListener {
+
+  protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
   static final String CFG_SRC_KEY = "celements.observation.disabledListener";
 
@@ -116,22 +119,21 @@ public abstract class AbstractEventListener implements EventListener {
     return doc;
   }
 
-  protected abstract Logger getLogger();
+  protected Logger getLogger() {
+    return LOGGER;
+  }
 
-  /**
-   * FOR TEST PURPOSES ONLY
-   */
+  @Deprecated
   public void injectWebUtilsService(IWebUtilsService webUtilsService) {
     this.webUtilsService = webUtilsService;
   }
 
-  /**
-   * FOR TEST PURPOSES ONLY
-   */
+  @Deprecated
   public void injectObservationManager(ObservationManager observationManager) {
     this.observationManager = observationManager;
   }
 
+  @Deprecated
   void injectRemoteObservationManagerContext(RemoteObservationManagerContext context) {
     this.remoteObsManagerContext = context;
   }

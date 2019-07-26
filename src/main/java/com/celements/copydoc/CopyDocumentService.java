@@ -197,27 +197,29 @@ public class CopyDocumentService implements ICopyDocumentRole {
 
   boolean copyObject(BaseObject srcObj, BaseObject trgObj, boolean set) {
     boolean hasChanged = false;
-    Set<String> srcProps = srcObj.getPropertyList();
-    Set<String> trgProps = new HashSet<>(trgObj.getPropertyList());
-    for (String name : srcProps) {
-      Object srcVal = modelAccess.getProperty(srcObj, name);
-      Object trgVal = modelAccess.getProperty(trgObj, name);
-      if (!Objects.equal(srcVal, trgVal)) {
+    if (srcObj != trgObj) {
+      Set<String> srcProps = srcObj.getPropertyList();
+      Set<String> trgProps = new HashSet<>(trgObj.getPropertyList());
+      for (String name : srcProps) {
+        Object srcVal = modelAccess.getProperty(srcObj, name);
+        Object trgVal = modelAccess.getProperty(trgObj, name);
+        if (!Objects.equal(srcVal, trgVal)) {
+          if (set) {
+            modelAccess.setProperty(trgObj, name, srcVal);
+          }
+          hasChanged = true;
+          LOGGER.trace("for doc '{}' field '{}' changed from '{}' to '{}'",
+              trgObj.getDocumentReference(), name, trgVal, srcVal);
+        }
+        trgProps.remove(name);
+      }
+      for (String name : trgProps) {
         if (set) {
-          modelAccess.setProperty(trgObj, name, srcVal);
+          trgObj.removeField(name);
         }
         hasChanged = true;
-        LOGGER.trace("for doc '{}' field '{}' changed from '{}' to '{}'",
-            trgObj.getDocumentReference(), name, trgVal, srcVal);
+        LOGGER.trace("for doc '{}' field '{}' set to null", trgObj.getDocumentReference(), name);
       }
-      trgProps.remove(name);
-    }
-    for (String name : trgProps) {
-      if (set) {
-        trgObj.removeField(name);
-      }
-      hasChanged = true;
-      LOGGER.trace("for doc '{}' field '{}' set to null", trgObj.getDocumentReference(), name);
     }
     return hasChanged;
   }
