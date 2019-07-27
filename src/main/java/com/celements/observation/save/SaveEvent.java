@@ -6,9 +6,9 @@ import java.util.Objects;
 
 import org.xwiki.observation.event.AbstractFilterableEvent;
 
-import com.celements.common.observation.converter.Local;
+import com.celements.common.observation.converter.Remote;
 
-@Local
+@Remote
 public class SaveEvent<I> extends AbstractFilterableEvent {
 
   private static final long serialVersionUID = 5283183777778144685L;
