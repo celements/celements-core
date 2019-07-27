@@ -1,4 +1,4 @@
-package com.celements.observation.object;
+package com.celements.observation.save.object;
 
 import static java.util.Optional.*;
 
@@ -15,7 +15,7 @@ import com.celements.model.object.ObjectBridge;
 import com.celements.model.object.xwiki.XWikiObjectBridge;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
-import com.celements.observation.event.EventOperation;
+import com.celements.observation.save.SaveEventOperation;
 import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -45,14 +45,14 @@ abstract class AbstractXObjectEventConverter
   }
 
   private void notifyObjectEvent(Event sourceEvent, XWikiDocument doc, BaseObject xObj) {
-    EventOperation operation = ofNullable(getEventOperationMapping().get(sourceEvent.getClass()))
+    SaveEventOperation operation = ofNullable(getEventOperationMapping().get(sourceEvent.getClass()))
         .orElseThrow(() -> new IllegalArgumentException("illegal event: " + sourceEvent));
     ObjectEvent objEvent = new ObjectEvent(operation, ObjectMeta.from(xObj).classRef);
     getObservationManager().notify(objEvent, doc, xObj);
 
   }
 
-  protected abstract Map<Class<? extends Event>, EventOperation> getEventOperationMapping();
+  protected abstract Map<Class<? extends Event>, SaveEventOperation> getEventOperationMapping();
 
   protected abstract XWikiDocument getRelevantDoc(XWikiDocument doc);
 

@@ -1,6 +1,6 @@
-package com.celements.observation.object;
+package com.celements.observation.save.object;
 
-import static com.celements.observation.event.EventOperation.*;
+import static com.celements.observation.save.SaveEventOperation.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,12 +11,9 @@ import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.observation.event.Event;
 
-import com.celements.model.object.ObjectBridge;
-import com.celements.model.object.xwiki.XWikiObjectBridge;
-import com.celements.observation.event.EventOperation;
+import com.celements.observation.save.SaveEventOperation;
 import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -25,9 +22,6 @@ import com.xpn.xwiki.objects.BaseObject;
 public class XObjectCreateEventConverter extends AbstractXObjectEventConverter {
 
   public static final String NAME = "XObjectCreateEventConverter";
-
-  @Requirement(XWikiObjectBridge.NAME)
-  private ObjectBridge<XWikiDocument, BaseObject> xObjBridge;
 
   @Override
   public String getName() {
@@ -44,8 +38,8 @@ public class XObjectCreateEventConverter extends AbstractXObjectEventConverter {
   }
 
   @Override
-  protected Map<Class<? extends Event>, EventOperation> getEventOperationMapping() {
-    return new ImmutableMap.Builder<Class<? extends Event>, EventOperation>()
+  protected Map<Class<? extends Event>, SaveEventOperation> getEventOperationMapping() {
+    return new ImmutableMap.Builder<Class<? extends Event>, SaveEventOperation>()
         .put(DocumentUpdatingEvent.class, CREATING)
         .put(DocumentUpdatedEvent.class, CREATED)
         .put(DocumentCreatingEvent.class, CREATING)

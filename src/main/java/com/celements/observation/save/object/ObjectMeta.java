@@ -1,4 +1,4 @@
-package com.celements.observation.object;
+package com.celements.observation.save.object;
 
 import static com.celements.common.MoreObjectsCel.*;
 

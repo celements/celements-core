@@ -1,7 +1,7 @@
-package com.celements.observation.object;
+package com.celements.observation.save.object;
 
 import static com.celements.common.test.CelementsTestUtils.*;
-import static com.celements.observation.event.EventOperation.*;
+import static com.celements.observation.save.SaveEventOperation.*;
 import static org.easymock.EasyMock.*;
 
 import org.junit.Before;
@@ -18,7 +18,9 @@ import org.xwiki.observation.ObservationManager;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
-import com.celements.observation.event.EventOperation;
+import com.celements.observation.save.SaveEventOperation;
+import com.celements.observation.save.object.ObjectEvent;
+import com.celements.observation.save.object.XObjectCreateEventConverter;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -109,7 +111,7 @@ public class XObjectCreateEventConverterTest extends AbstractComponentTest {
     return xObj;
   }
 
-  static void expectNotify(XWikiDocument currDoc, BaseObject xObj, EventOperation ops) {
+  static void expectNotify(XWikiDocument currDoc, BaseObject xObj, SaveEventOperation ops) {
     ObjectEvent expEvent = new ObjectEvent(ops, new ClassReference(xObj.getXClassReference()));
     getMock(ObservationManager.class).notify(eq(expEvent), same(currDoc), same(xObj));
   }

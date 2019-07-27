@@ -1,6 +1,6 @@
-package com.celements.observation.event;
+package com.celements.observation.save;
 
-public enum EventOperation {
+public enum SaveEventOperation {
 
   CREATING,
   UPDATING,

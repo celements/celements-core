@@ -1,8 +1,8 @@
-package com.celements.observation.object;
+package com.celements.observation.save.object;
 
 import static com.celements.common.test.CelementsTestUtils.*;
-import static com.celements.observation.event.EventOperation.*;
-import static com.celements.observation.object.XObjectCreateEventConverterTest.*;
+import static com.celements.observation.save.SaveEventOperation.*;
+import static com.celements.observation.save.object.XObjectCreateEventConverterTest.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +14,7 @@ import org.xwiki.observation.ObservationManager;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
+import com.celements.observation.save.object.XObjectUpdateEventConverter;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
