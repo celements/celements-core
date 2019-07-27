@@ -18,6 +18,12 @@ public class SaveEvent<I> extends AbstractFilterableEvent {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public SaveEventFilter<I> getEventFilter() {
+    return (SaveEventFilter<I>) super.getEventFilter();
+  }
+
+  @Override
   public int hashCode() {
     return Objects.hash(getEventFilter());
   }
