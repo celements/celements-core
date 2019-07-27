@@ -23,6 +23,10 @@ public class SaveEvent<I> extends AbstractFilterableEvent {
     return (SaveEventFilter<I>) super.getEventFilter();
   }
 
+  public SaveEventOperation assertAndGetOperation() {
+    return getEventFilter().getOperation().get();
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(getEventFilter());
