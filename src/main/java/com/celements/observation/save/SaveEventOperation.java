@@ -1,29 +1,30 @@
 package com.celements.observation.save;
 
-import org.xwiki.bridge.event.AbstractDocumentEvent;
+import static com.google.common.base.Preconditions.*;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+import org.xwiki.observation.event.Event;
 
 public enum SaveEventOperation {
 
-  CREATING,
   UPDATING,
+  CREATING,
   DELETING,
-  CREATED,
   UPDATED,
+  CREATED,
   DELETED;
 
   public boolean isBeforeSave() {
     return ordinal() < 3;
   }
 
-  public boolean isAfterSave() {
-    return ordinal() >= 3;
-  }
-
-  public boolean isCreate() {
+  public boolean isUpdate() {
     return (ordinal() % 3) == 0;
   }
 
-  public boolean isUpdate() {
+  public boolean isCreate() {
     return (ordinal() % 3) == 1;
   }
 
@@ -31,10 +32,23 @@ public enum SaveEventOperation {
     return (ordinal() % 3) == 2;
   }
 
-  public static SaveEventOperation fromDocumentEvent(AbstractDocumentEvent event) {
-    String operationName = event.getClass().getSimpleName()
-        .replace("Document", "")
-        .replace("Event", "");
-    return valueOf(operationName.toUpperCase());
+  /**
+   * @return the appropriate operation for the given information:
+   *         A) if an original and new entity (doc, object, ...) exists
+   *         B) if the operation is before or after save.
+   */
+  public static Optional<SaveEventOperation> from(boolean origExists, boolean newExists, boolean beforeSave) {
+    int val = ((newExists ? 0 : 1) << 1) | (origExists ? 0 : 1);
+    if (val < 3) {
+      return Optional.of(values()[val + (beforeSave ? 0 : 3)]);
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  public static SaveEventOperation from(Event event) {
+    String eventName = checkNotNull(event).getClass().getSimpleName().toUpperCase();
+    return Arrays.stream(values()).filter(ops -> eventName.contains(ops.name()))
+        .findAny().orElseThrow(() -> new IllegalArgumentException("illegal save event: " + event));
   }
 }
