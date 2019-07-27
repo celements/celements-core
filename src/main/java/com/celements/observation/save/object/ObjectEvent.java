@@ -15,8 +15,8 @@ public class ObjectEvent extends SaveEvent<ClassIdentity> {
     super(new SaveEventFilter<>(null, null));
   }
 
-  public ObjectEvent(SaveEventOperation type) {
-    super(new SaveEventFilter<>(type, null));
+  public ObjectEvent(SaveEventOperation operation) {
+    super(new SaveEventFilter<>(operation, null));
   }
 
   public ObjectEvent(ClassIdentity classId) {
