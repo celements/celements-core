@@ -1,5 +1,7 @@
 package com.celements.observation.save;
 
+import org.xwiki.bridge.event.AbstractDocumentEvent;
+
 public enum SaveEventOperation {
 
   CREATING,
@@ -27,5 +29,12 @@ public enum SaveEventOperation {
 
   public boolean isDelete() {
     return (ordinal() % 3) == 2;
+  }
+
+  public static SaveEventOperation fromDocumentEvent(AbstractDocumentEvent event) {
+    String operationName = event.getClass().getSimpleName()
+        .replace("Document", "")
+        .replace("Event", "");
+    return valueOf(operationName.toUpperCase());
   }
 }
