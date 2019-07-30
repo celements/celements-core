@@ -14,19 +14,17 @@ import org.xwiki.observation.ObservationManager;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
-import com.celements.observation.save.object.XObjectUpdateEventConverter;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class XObjectUpdateEventConverterTest extends AbstractComponentTest {
 
-  XObjectUpdateEventConverter converter;
+  EventListener converter;
 
   @Before
   public void prepare() throws Exception {
     registerComponentMock(ObservationManager.class);
-    converter = (XObjectUpdateEventConverter) Utils.getComponent(EventListener.class,
-        XObjectUpdateEventConverter.NAME);
+    converter = Utils.getComponent(EventListener.class, XObjectEventConverter.NAME);
   }
 
   @Test

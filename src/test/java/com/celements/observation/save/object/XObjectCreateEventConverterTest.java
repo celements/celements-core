@@ -19,21 +19,18 @@ import org.xwiki.observation.ObservationManager;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
 import com.celements.observation.save.SaveEventOperation;
-import com.celements.observation.save.object.ObjectEvent;
-import com.celements.observation.save.object.XObjectCreateEventConverter;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class XObjectCreateEventConverterTest extends AbstractComponentTest {
 
-  XObjectCreateEventConverter converter;
+  EventListener converter;
 
   @Before
   public void prepare() throws Exception {
     registerComponentMock(ObservationManager.class);
-    converter = (XObjectCreateEventConverter) Utils.getComponent(EventListener.class,
-        XObjectCreateEventConverter.NAME);
+    converter = Utils.getComponent(EventListener.class, XObjectEventConverter.NAME);
   }
 
   @Test

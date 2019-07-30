@@ -35,4 +35,9 @@ class ObjectMeta {
   public static ObjectMeta from(BaseObject xObj) {
     return new ObjectMeta(new ClassReference(xObj.getXClassReference()), xObj.getNumber());
   }
+
+  @Override
+  public String toString() {
+    return "ObjectMeta [classRef=" + classRef + ", objNb=" + objNb + "]";
+  }
 }
