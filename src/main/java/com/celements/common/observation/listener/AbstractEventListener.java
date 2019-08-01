@@ -21,7 +21,7 @@ import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public abstract class AbstractEventListener implements EventListener {
+public abstract class AbstractEventListener<S, D> implements EventListener {
 
   protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -90,26 +90,25 @@ public abstract class AbstractEventListener implements EventListener {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void onEvent(Event event, Object source, Object data) {
     if (isDisabled()) {
-      getLogger().info("listener disabled");
+      LOGGER.info("onEvent - listener disabled");
     } else if ((event == null) || (source == null)) {
-      getLogger().warn("onEvent: got null event '{}' or source '{}'", event, source);
+      LOGGER.warn("onEvent - got null event '{}' or source '{}'", event, source);
     } else {
-      getLogger().trace("onEvent: '{}', source '{}', data '{}'", event.getClass(), source, data);
+      LOGGER.trace("onEvent - '{}', source '{}', data '{}'", event.getClass(), source, data);
       if (isLocalEvent()) {
-        onLocalEvent(event, source, data);
+        onLocalEvent(event, (S) source, (D) data);
       } else {
-        onRemoteEvent(event, source, data);
+        onRemoteEvent(event, (S) source, (D) data);
       }
     }
   }
 
-  protected abstract void onLocalEvent(@NotNull Event event, @NotNull Object source,
-      @Nullable Object data);
+  protected abstract void onLocalEvent(@NotNull Event event, @NotNull S source, @Nullable D data);
 
-  protected abstract void onRemoteEvent(@NotNull Event event, @NotNull Object source,
-      @Nullable Object data);
+  protected abstract void onRemoteEvent(@NotNull Event event, @NotNull S source, @Nullable D data);
 
   protected XWikiDocument getDocument(Object source, Event event) {
     XWikiDocument doc = (XWikiDocument) source;

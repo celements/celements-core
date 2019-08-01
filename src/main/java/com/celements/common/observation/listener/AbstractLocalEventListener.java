@@ -5,18 +5,17 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.observation.event.Event;
 
-public abstract class AbstractLocalEventListener<S, D> extends AbstractEventListener {
+public abstract class AbstractLocalEventListener<S, D> extends AbstractEventListener<S, D> {
 
   @Override
-  @SuppressWarnings("unchecked")
-  protected void onLocalEvent(Event event, Object source, Object data) {
-    onEventInternal(event, (S) source, (D) data);
+  protected void onLocalEvent(Event event, S source, D data) {
+    onEventInternal(event, source, data);
   }
 
   @Override
-  protected void onRemoteEvent(Event event, Object source, Object data) {
+  protected void onRemoteEvent(Event event, S source, D data) {
     if (getLogger().isTraceEnabled()) {
-      getLogger().trace("onRemoteEvent: skipped event '{}' on source '{}', data '{}'",
+      getLogger().trace("onRemoteEvent - skipped event '{}' on source '{}', data '{}'",
           event.getClass(), source, data);
     }
   }
