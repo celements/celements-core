@@ -148,6 +148,4 @@ com.celements.sajson.JsonScriptService
 com.celements.rteConfig.RTEConfig
 com.celements.rte.RteDefaultImplementation
 com.celements.rte.RteTinyMce3
-com.celements.observation.save.object.XObjectCreateEventConverter
-com.celements.observation.save.object.XObjectUpdateEventConverter
-com.celements.observation.save.object.XObjectDeleteEventConverter
+com.celements.observation.save.object.XObjectEventConverter
