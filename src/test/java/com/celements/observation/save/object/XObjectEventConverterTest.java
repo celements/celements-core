@@ -2,7 +2,6 @@ package com.celements.observation.save.object;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static com.celements.observation.save.SaveEventOperation.*;
-import static com.celements.observation.save.object.XObjectEventConverterTest.*;
 import static org.easymock.EasyMock.*;
 
 import org.junit.Before;
@@ -13,14 +12,12 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
-import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.common.test.ExceptionAsserter;
 import com.celements.observation.save.SaveEventOperation;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -154,20 +151,6 @@ public class XObjectEventConverterTest extends AbstractComponentTest {
     expectNotify(doc, addObject(doc.getOriginalDocument()), DELETED);
     replayDefault();
     converter.onEvent(new DocumentUpdatedEvent(), doc, null);
-    verifyDefault();
-  }
-
-  @Test
-  public void test_illegal_event() {
-    addObject(doc);
-    replayDefault();
-    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
-
-      @Override
-      protected void execute() throws Exception {
-        converter.onEvent(new WikiCreatedEvent(), doc, null);
-      }
-    }.evaluate();
     verifyDefault();
   }
 

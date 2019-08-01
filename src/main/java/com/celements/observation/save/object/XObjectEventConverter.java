@@ -21,7 +21,7 @@ import com.celements.common.observation.listener.AbstractLocalEventListener;
 import com.celements.copydoc.ICopyDocumentRole;
 import com.celements.model.object.ObjectBridge;
 import com.celements.model.object.xwiki.XWikiObjectBridge;
-import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.observation.save.SaveEventOperation;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
@@ -80,7 +80,7 @@ public class XObjectEventConverter extends AbstractLocalEventListener<XWikiDocum
   }
 
   private Map<ObjectMeta, BaseObject> getObjectMap(XWikiDocument doc) {
-    return XWikiObjectFetcher.on(doc).iter().stream().collect(
+    return XWikiObjectEditor.on(doc).fetch().iter().stream().collect(
         ImmutableMap.toImmutableMap(ObjectMeta::from, Function.identity()));
   }
 
