@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -20,7 +21,9 @@ import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public abstract class AbstractEventListener implements EventListener {
+public abstract class AbstractEventListener<S, D> implements EventListener {
+
+  protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
   static final String CFG_SRC_KEY = "celements.observation.disabledListener";
 
@@ -87,26 +90,25 @@ public abstract class AbstractEventListener implements EventListener {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void onEvent(Event event, Object source, Object data) {
     if (isDisabled()) {
-      getLogger().info("listener disabled");
+      LOGGER.info("onEvent - listener disabled");
     } else if ((event == null) || (source == null)) {
-      getLogger().warn("onEvent: got null event '{}' or source '{}'", event, source);
+      LOGGER.warn("onEvent - got null event '{}' or source '{}'", event, source);
     } else {
-      getLogger().trace("onEvent: '{}', source '{}', data '{}'", event.getClass(), source, data);
+      LOGGER.trace("onEvent - '{}', source '{}', data '{}'", event.getClass(), source, data);
       if (isLocalEvent()) {
-        onLocalEvent(event, source, data);
+        onLocalEvent(event, (S) source, (D) data);
       } else {
-        onRemoteEvent(event, source, data);
+        onRemoteEvent(event, (S) source, (D) data);
       }
     }
   }
 
-  protected abstract void onLocalEvent(@NotNull Event event, @NotNull Object source,
-      @Nullable Object data);
+  protected abstract void onLocalEvent(@NotNull Event event, @NotNull S source, @Nullable D data);
 
-  protected abstract void onRemoteEvent(@NotNull Event event, @NotNull Object source,
-      @Nullable Object data);
+  protected abstract void onRemoteEvent(@NotNull Event event, @NotNull S source, @Nullable D data);
 
   protected XWikiDocument getDocument(Object source, Event event) {
     XWikiDocument doc = (XWikiDocument) source;
@@ -116,22 +118,25 @@ public abstract class AbstractEventListener implements EventListener {
     return doc;
   }
 
-  protected abstract Logger getLogger();
-
   /**
-   * FOR TEST PURPOSES ONLY
+   * @deprecated since 4.0 instead use {@link #LOGGER}
    */
+  @Deprecated
+  protected Logger getLogger() {
+    return LOGGER;
+  }
+
+  @Deprecated
   public void injectWebUtilsService(IWebUtilsService webUtilsService) {
     this.webUtilsService = webUtilsService;
   }
 
-  /**
-   * FOR TEST PURPOSES ONLY
-   */
+  @Deprecated
   public void injectObservationManager(ObservationManager observationManager) {
     this.observationManager = observationManager;
   }
 
+  @Deprecated
   void injectRemoteObservationManagerContext(RemoteObservationManagerContext context) {
     this.remoteObsManagerContext = context;
   }
