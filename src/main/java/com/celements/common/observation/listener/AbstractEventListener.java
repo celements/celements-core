@@ -118,6 +118,7 @@ public abstract class AbstractEventListener<S, D> implements EventListener {
     return doc;
   }
 
+@deprecated
   protected Logger getLogger() {
     return LOGGER;
   }
