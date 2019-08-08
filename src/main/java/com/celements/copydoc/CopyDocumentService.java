@@ -208,7 +208,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
             modelAccess.setProperty(trgObj, name, srcVal);
           }
           hasChanged = true;
-          LOGGER.trace("for doc '{}' field '{}' changed from '{}' to '{}'",
+          LOGGER.trace("copyObject - for doc '{}' field '{}' changed from '{}' to '{}'",
               trgObj.getDocumentReference(), name, trgVal, srcVal);
         }
         trgProps.remove(name);
@@ -218,8 +218,11 @@ public class CopyDocumentService implements ICopyDocumentRole {
           trgObj.removeField(name);
         }
         hasChanged = true;
-        LOGGER.trace("for doc '{}' field '{}' set to null", trgObj.getDocumentReference(), name);
+        LOGGER.trace("copyObject - for doc '{}' field '{}' set to null",
+            trgObj.getDocumentReference(), name);
       }
+    } else {
+      LOGGER.warn("copyObject - skipped because identical reference: {}", srcObj);
     }
     return hasChanged;
   }
