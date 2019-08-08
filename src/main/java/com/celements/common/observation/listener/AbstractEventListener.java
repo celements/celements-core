@@ -118,7 +118,10 @@ public abstract class AbstractEventListener<S, D> implements EventListener {
     return doc;
   }
 
-@deprecated
+  /**
+   * @deprecated since 4.0 instead use {@link #LOGGER}
+   */
+  @Deprecated
   protected Logger getLogger() {
     return LOGGER;
   }
