@@ -314,6 +314,20 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
     assertEquals("myXWikiPrefDefPageType", pageTypeRef.getConfigName());
   }
 
+  @Test
+  public void test_resolvePageTypeReference_translationDoc() throws Exception {
+    doc.setNew(false);
+    doc.setTranslation(1);
+    BaseObject pageTypeObj = new BaseObject();
+    pageTypeObj.setXClassReference(getPageTypeClassRef(getContext().getDatabase()));
+    pageTypeObj.setStringValue("page_type", "MyPageType");
+    doc.addXObject(pageTypeObj);
+    replayDefault();
+    Optional<PageTypeReference> pageTypeRef = pageTypeResolver.resolvePageTypeReference(doc);
+    verifyDefault();
+    assertFalse(pageTypeRef.isPresent());
+  }
+
   private XWikiDocument expectDoc(DocumentReference docRef) {
     XWikiDocument doc = new XWikiDocument(docRef);
     return expectDoc(doc);

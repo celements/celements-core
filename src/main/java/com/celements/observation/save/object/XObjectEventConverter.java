@@ -1,7 +1,5 @@
 package com.celements.observation.save.object;
 
-import static com.google.common.base.MoreObjects.*;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +13,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.ImmutableObjectReference;
 import org.xwiki.observation.event.Event;
 
 import com.celements.common.observation.listener.AbstractLocalEventListener;
@@ -59,18 +58,18 @@ public class XObjectEventConverter extends AbstractLocalEventListener<XWikiDocum
   @Override
   protected void onEventInternal(Event sourceEvent, XWikiDocument doc, XWikiContext context) {
     if (doc.getTranslation() == 0) {
-      Map<ObjectMeta, BaseObject> newObjMap = getObjectMap(doc);
-      Map<ObjectMeta, BaseObject> origObjMap = getObjectMap(doc.getOriginalDocument());
-      for (ObjectMeta objMeta : Sets.union(newObjMap.keySet(), origObjMap.keySet())) {
-        BaseObject newObj = newObjMap.get(objMeta);
-        BaseObject origObj = origObjMap.get(objMeta);
+      Map<ImmutableObjectReference, BaseObject> newObjMap = getObjectMap(doc);
+      Map<ImmutableObjectReference, BaseObject> origObjMap = getObjectMap(doc.getOriginalDocument());
+      for (ImmutableObjectReference objRef : Sets.union(newObjMap.keySet(), origObjMap.keySet())) {
+        BaseObject newObj = newObjMap.get(objRef);
+        BaseObject origObj = origObjMap.get(objRef);
         SaveEventOperation operation = calculateOperation(sourceEvent, newObj, origObj);
         if (!operation.isUpdate() || copyDocService.checkObject(origObj, newObj)) {
-          ObjectEvent objEvent = new ObjectEvent(operation, objMeta.classRef);
-          getObservationManager().notify(objEvent, doc, firstNonNull(newObj, origObj));
-          LOGGER.trace("notified [{}] for changed object [{}]", objEvent, objMeta);
+          ObjectEvent objEvent = new ObjectEvent(operation, objRef.getClassReference());
+          getObservationManager().notify(objEvent, doc, objRef);
+          LOGGER.debug("notified [{}] for changed object [{}]", objEvent, objRef);
         } else {
-          LOGGER.trace("skip unchanged object [{}]", objMeta);
+          LOGGER.trace("skip unchanged object [{}]", objRef);
         }
       }
     } else {
@@ -79,9 +78,9 @@ public class XObjectEventConverter extends AbstractLocalEventListener<XWikiDocum
     }
   }
 
-  private Map<ObjectMeta, BaseObject> getObjectMap(XWikiDocument doc) {
+  private Map<ImmutableObjectReference, BaseObject> getObjectMap(XWikiDocument doc) {
     return XWikiObjectEditor.on(doc).fetch().iter().stream().collect(
-        ImmutableMap.toImmutableMap(ObjectMeta::from, Function.identity()));
+        ImmutableMap.toImmutableMap(ImmutableObjectReference::from, Function.identity()));
   }
 
   private SaveEventOperation calculateOperation(Event sourceEvent, BaseObject newObj,
