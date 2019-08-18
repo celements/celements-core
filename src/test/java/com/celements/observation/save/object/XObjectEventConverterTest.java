@@ -14,6 +14,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ImmutableObjectReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 
@@ -155,22 +156,23 @@ public class XObjectEventConverterTest extends AbstractComponentTest {
   }
 
   private static XWikiDocument createDocWithOriginal() {
-    XWikiDocument currDoc = new XWikiDocument(new DocumentReference("wiki", "space", "curr"));
-    XWikiDocument origDoc = new XWikiDocument(new DocumentReference("wiki", "space", "orig"));
+    XWikiDocument currDoc = new XWikiDocument(new DocumentReference("wiki", "space", "doc"));
+    XWikiDocument origDoc = new XWikiDocument(currDoc.getDocumentReference());
     currDoc.setOriginalDocument(origDoc);
     return currDoc;
   }
 
   private static BaseObject addObject(XWikiDocument doc) {
     BaseObject xObj = new BaseObject();
-    xObj.setXClassReference(new DocumentReference("wiki", "space", "class"));
+    xObj.setXClassReference(new ClassReference("space", "class"));
     doc.addXObject(xObj);
     return xObj;
   }
 
   private static void expectNotify(XWikiDocument currDoc, BaseObject xObj, SaveEventOperation ops) {
     ObjectEvent expEvent = new ObjectEvent(ops, new ClassReference(xObj.getXClassReference()));
-    getMock(ObservationManager.class).notify(eq(expEvent), same(currDoc), same(xObj));
+    getMock(ObservationManager.class).notify(eq(expEvent), same(currDoc),
+        eq(ImmutableObjectReference.from(xObj)));
   }
 
 }
