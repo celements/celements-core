@@ -20,6 +20,7 @@
 package com.celements.pagetype.service;
 
 import static com.google.common.base.MoreObjects.*;
+import static com.google.common.base.Preconditions.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,10 +184,13 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   private XWikiObjectFetcher getPageTypeFetcher(XWikiDocument doc) {
+    checkNotNull(doc);
     if (useTemplateDoc(doc)) {
       doc = webUtilsService.getWikiTemplateDoc();
     }
-    XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(doc).filter(pageTypeClassDef);
+    XWikiObjectFetcher fetcher = XWikiObjectFetcher.on((doc.getTranslation() == 0) ? doc
+        : new XWikiDocument(doc.getDocumentReference()))
+        .filter(pageTypeClassDef);
     if (LOGGER.isTraceEnabled() && fetcher.exists()) {
       LOGGER.trace("getPageTypeFetcher - for [{}] with object [{}] details: {}", doc,
           fetcher.first().get(), fetcher.first().get().toXMLString());
