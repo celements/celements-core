@@ -3,7 +3,9 @@ package com.celements.observation.save.object;
 import static com.celements.common.test.CelementsTestUtils.*;
 import static com.celements.observation.save.SaveEventOperation.*;
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -153,6 +155,13 @@ public class XObjectEventConverterTest extends AbstractComponentTest {
     replayDefault();
     converter.onEvent(new DocumentUpdatedEvent(), doc, null);
     verifyDefault();
+  }
+
+  @Test
+  public void test_serializable() {
+    ObjectEvent event = new ObjectEvent(UPDATED, new ClassReference("space", "class"));
+    byte[] data = SerializationUtils.serialize(event);
+    assertEquals(event, SerializationUtils.deserialize(data));
   }
 
   private static XWikiDocument createDocWithOriginal() {
