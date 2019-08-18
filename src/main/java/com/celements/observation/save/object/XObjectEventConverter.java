@@ -67,7 +67,7 @@ public class XObjectEventConverter extends AbstractLocalEventListener<XWikiDocum
         if (!operation.isUpdate() || copyDocService.checkObject(origObj, newObj)) {
           ObjectEvent objEvent = new ObjectEvent(operation, objRef.getClassReference());
           getObservationManager().notify(objEvent, doc, objRef);
-          LOGGER.trace("notified [{}] for changed object [{}]", objEvent, objRef);
+          LOGGER.debug("notified [{}] for changed object [{}]", objEvent, objRef);
         } else {
           LOGGER.trace("skip unchanged object [{}]", objRef);
         }
