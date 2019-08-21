@@ -2,12 +2,15 @@ package com.celements.observation.save;
 
 import static com.celements.common.MoreObjectsCel.*;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
-public class SaveEventFilter<I> implements EventFilter {
+public class SaveEventFilter<I extends Serializable> implements EventFilter, Serializable {
+
+  private static final long serialVersionUID = -5281875646212008651L;
 
   private final SaveEventOperation operation;
   private final I identity;

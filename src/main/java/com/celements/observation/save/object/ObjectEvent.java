@@ -1,13 +1,14 @@
 package com.celements.observation.save.object;
 
+import org.xwiki.model.reference.ClassReference;
+
 import com.celements.common.observation.converter.Remote;
-import com.celements.model.classes.ClassIdentity;
 import com.celements.observation.save.SaveEvent;
 import com.celements.observation.save.SaveEventFilter;
 import com.celements.observation.save.SaveEventOperation;
 
 @Remote
-public class ObjectEvent extends SaveEvent<ClassIdentity> {
+public class ObjectEvent extends SaveEvent<ClassReference> {
 
   private static final long serialVersionUID = -6666255714705030039L;
 
@@ -19,12 +20,12 @@ public class ObjectEvent extends SaveEvent<ClassIdentity> {
     super(new SaveEventFilter<>(operation, null));
   }
 
-  public ObjectEvent(ClassIdentity classId) {
-    super(new SaveEventFilter<>(null, classId));
+  public ObjectEvent(ClassReference classRef) {
+    super(new SaveEventFilter<>(null, classRef));
   }
 
-  public ObjectEvent(SaveEventOperation operation, ClassIdentity classId) {
-    super(new SaveEventFilter<>(operation, classId));
+  public ObjectEvent(SaveEventOperation operation, ClassReference classRef) {
+    super(new SaveEventFilter<>(operation, classRef));
   }
 
 }

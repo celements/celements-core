@@ -2,6 +2,7 @@ package com.celements.observation.save;
 
 import static com.celements.common.MoreObjectsCel.*;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import org.xwiki.observation.event.AbstractFilterableEvent;
@@ -9,7 +10,7 @@ import org.xwiki.observation.event.AbstractFilterableEvent;
 import com.celements.common.observation.converter.Remote;
 
 @Remote
-public class SaveEvent<I> extends AbstractFilterableEvent {
+public class SaveEvent<I extends Serializable> extends AbstractFilterableEvent {
 
   private static final long serialVersionUID = 5283183777778144685L;
 
