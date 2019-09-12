@@ -1,11 +1,11 @@
 package com.celements.copydoc;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +16,11 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.References;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -36,28 +38,29 @@ public class CopyDocumentService implements ICopyDocumentRole {
 
   @Override
   public boolean check(XWikiDocument doc1, XWikiDocument doc2) {
-    return check(doc1, doc2, null);
+    return copyInternal(doc1, doc2, null, false);
   }
 
   @Override
   public boolean check(XWikiDocument doc1, XWikiDocument doc2, Collection<BaseObject> toIgnore) {
-    try {
-      return copyInternal(doc1, doc2, toIgnore, false);
-    } catch (ClassDocumentLoadException exc) {
-      LOGGER.error("should not happen", exc); // since set is false
-      throw new RuntimeException("ClassDocumentLoadException should not happen");
-    }
+    final Set<BaseObject> toIgnoreSet = ImmutableSet.copyOf(toIgnore);
+    return copyInternal(doc1, doc2, o -> !toIgnoreSet.contains(o), false);
+  }
+
+  @Override
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2, Predicate<BaseObject> xObjFilter) {
+    return copyInternal(doc1, doc2, xObjFilter, false);
   }
 
   @Override
   public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc)
-      throws ClassDocumentLoadException, DocumentSaveException {
+      throws DocumentSaveException {
     return copyAndSave(srcDoc, trgDoc, null);
   }
 
   @Override
   public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc, Set<BaseObject> toIgnore)
-      throws ClassDocumentLoadException, DocumentSaveException {
+      throws DocumentSaveException {
     boolean hasChanged = copy(srcDoc, trgDoc, toIgnore);
     if (hasChanged) {
       modelAccess.saveDocument(trgDoc, "copy from " + srcDoc);
@@ -66,24 +69,29 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   @Override
-  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc)
-      throws ClassDocumentLoadException {
-    return copy(srcDoc, trgDoc, null);
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc) {
+    return copyInternal(srcDoc, trgDoc, null, true);
   }
 
   @Override
-  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc, Collection<BaseObject> toIgnore)
-      throws ClassDocumentLoadException {
-    return copyInternal(srcDoc, trgDoc, toIgnore, true);
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc, Collection<BaseObject> toIgnore) {
+    final Set<BaseObject> toIgnoreSet = ImmutableSet.copyOf(toIgnore);
+    return copyInternal(srcDoc, trgDoc, o -> !toIgnoreSet.contains(o), true);
+  }
+
+  @Override
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc,
+      Predicate<BaseObject> xObjFilter) {
+    return copyInternal(srcDoc, trgDoc, xObjFilter, true);
   }
 
   private boolean copyInternal(XWikiDocument srcDoc, XWikiDocument trgDoc,
-      Collection<BaseObject> toIgnore, boolean set) throws ClassDocumentLoadException {
+      Predicate<BaseObject> xObjFilter, boolean set) {
     boolean hasChanged = false;
     hasChanged |= copyDocFields(srcDoc, trgDoc, set);
-    hasChanged |= copyObjects(srcDoc, trgDoc, toIgnore, set);
-    LOGGER.info("for source '{}', target '{}', set '{}' has changed: {}" + hasChanged, srcDoc,
-        trgDoc, set, hasChanged);
+    hasChanged |= copyObjects(srcDoc, trgDoc, xObjFilter, set);
+    LOGGER.info("for source '{}', target '{}', set '{}' has changed: {}", srcDoc, trgDoc, set,
+        hasChanged);
     return hasChanged;
   }
 
@@ -130,16 +138,14 @@ public class CopyDocumentService implements ICopyDocumentRole {
     return hasChanged;
   }
 
-  boolean copyObjects(XWikiDocument srcDoc, XWikiDocument trgDoc, Collection<BaseObject> toIgnore,
-      boolean set) throws ClassDocumentLoadException {
+  boolean copyObjects(XWikiDocument srcDoc, XWikiDocument trgDoc, Predicate<BaseObject> xObjFilter,
+      boolean set) {
     boolean hasChanged = false;
-    for (DocumentReference classRef : getAllClassRefs(srcDoc, trgDoc)) {
-      List<BaseObject> srcObjs = getXObjects(srcDoc, classRef, toIgnore);
-      List<BaseObject> trgObjs = getXObjects(trgDoc, classRef, toIgnore);
-      hasChanged |= createOrUpdateObjects(trgDoc, srcObjs, trgObjs, set);
-      hasChanged |= (set && modelAccess.removeXObjects(trgDoc, trgObjs)) || (!set
-          && !trgObjs.isEmpty());
-    }
+    List<BaseObject> srcObjs = getXObjects(srcDoc, xObjFilter);
+    List<BaseObject> trgObjs = getXObjects(trgDoc, xObjFilter);
+    hasChanged |= createOrUpdateObjects(trgDoc, srcObjs, trgObjs, set);
+    hasChanged |= (set && modelAccess.removeXObjects(trgDoc, trgObjs)) || (!set
+        && !trgObjs.isEmpty());
     return hasChanged;
   }
 
@@ -153,13 +159,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
     return ret;
   }
 
-  List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
-      Collection<BaseObject> toIgnore) {
-    List<BaseObject> ret = new ArrayList<>(modelAccess.getXObjects(doc, classRef));
-    if (toIgnore != null) {
-      ret.removeAll(toIgnore);
-    }
-    return ret;
+  List<BaseObject> getXObjects(XWikiDocument doc, Predicate<BaseObject> xObjFilter) {
+    return XWikiObjectEditor.on(doc).filter(xObjFilter).fetch().list();
   }
 
   boolean createOrUpdateObjects(XWikiDocument doc, List<BaseObject> srcObjs,
