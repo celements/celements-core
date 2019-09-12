@@ -1,6 +1,7 @@
 package com.celements.copydoc;
 
 import static com.celements.common.test.CelementsTestUtils.*;
+import static com.celements.copydoc.CopyDocumentService.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -8,16 +9,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.reference.RefBuilder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -36,7 +40,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   private DocumentReference classRef;
 
   @Before
-  public void setUp_CopyDocumentServiceTest() throws Exception {
+  public void prepareTest() throws Exception {
     copyDocService = (CopyDocumentService) Utils.getComponent(ICopyDocumentRole.class);
     emptyList = new ArrayList<>();
     docRef = new DocumentReference("db", "Space", "SomeDoc");
@@ -49,22 +53,22 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObjects_none() throws Exception {
+  public void test_copyObjects_none() throws Exception {
     boolean set = true;
     DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
     XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
     XWikiDocument trgDoc = new XWikiDocument(docRef);
-    Set<BaseObject> toIgnore = Sets.newHashSet();
+    Predicate<BaseObject> filter = xObj -> true;
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertFalse(ret);
   }
 
   @Test
-  public void testCopyObjects_added() throws Exception {
+  public void test_copyObjects_added() throws Exception {
     boolean set = true;
     String name = "name";
     String val = "val";
@@ -75,12 +79,12 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
     srcDoc.addXObject(createObj(srcClassRef, name, val));
     XWikiDocument trgDoc = new XWikiDocument(docRef);
-    Set<BaseObject> toIgnore = Sets.newHashSet();
+    Predicate<BaseObject> filter = xObj -> true;
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, name, new StringClass());
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertTrue(ret);
@@ -88,7 +92,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObjects_added_notSet() throws Exception {
+  public void test_copyObjects_added_notSet() throws Exception {
     boolean set = false;
     String name = "name";
     String val = "val";
@@ -99,11 +103,11 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
     srcDoc.addXObject(createObj(srcClassRef, name, val));
     XWikiDocument trgDoc = new XWikiDocument(docRef);
-    Set<BaseObject> toIgnore = Sets.newHashSet();
+    Predicate<BaseObject> filter = xObj -> true;
     expectNewBaseObject(classRef);
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertTrue(ret);
@@ -111,7 +115,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObjects_removed() throws Exception {
+  public void test_copyObjects_removed() throws Exception {
     boolean set = true;
     String name1 = "name1";
     String val1 = "val1";
@@ -126,10 +130,10 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     XWikiDocument trgDoc = new XWikiDocument(docRef);
     trgDoc.addXObject(createObj(classRef, name1, val1));
     trgDoc.addXObject(createObj(classRef, name2, val2));
-    Set<BaseObject> toIgnore = Sets.newHashSet();
+    Predicate<BaseObject> filter = xObj -> true;
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertTrue(ret);
@@ -138,7 +142,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObjects_removed_notSet() throws Exception {
+  public void test_copyObjects_removed_notSet() throws Exception {
     boolean set = false;
     DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
     // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
@@ -149,10 +153,10 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     XWikiDocument trgDoc = new XWikiDocument(docRef);
     trgDoc.addXObject(createObj(classRef));
     trgDoc.addXObject(createObj(classRef));
-    Set<BaseObject> toIgnore = Sets.newHashSet();
+    Predicate<BaseObject> filter = xObj -> true;
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertTrue(ret);
@@ -160,7 +164,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObjects_removed_multiple() throws Exception {
+  public void test_copyObjects_removed_multiple() throws Exception {
     boolean set = true;
     DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
     XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
@@ -168,10 +172,10 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     trgDoc.addXObject(createObj(classRef));
     trgDoc.addXObject(createObj(classRef));
     trgDoc.addXObject(createObj(classRef));
-    Set<BaseObject> toIgnore = Sets.newHashSet();
+    Predicate<BaseObject> filter = xObj -> true;
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertTrue(ret);
@@ -179,7 +183,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObjects_removed_multiple_notSet() throws Exception {
+  public void test_copyObjects_removed_multiple_notSet() throws Exception {
     boolean set = false;
     DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
     XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
@@ -187,10 +191,10 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     trgDoc.addXObject(createObj(classRef));
     trgDoc.addXObject(createObj(classRef));
     trgDoc.addXObject(createObj(classRef));
-    Set<BaseObject> toIgnore = Sets.newHashSet();
+    Predicate<BaseObject> filter = xObj -> true;
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertTrue(ret);
@@ -198,7 +202,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObjects_noChange() throws Exception {
+  public void test_copyObjects_noChange() throws Exception {
     boolean set = true;
     DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
     // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
@@ -208,10 +212,10 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     srcDoc.addXObject(createObj(srcClassRef));
     XWikiDocument trgDoc = new XWikiDocument(docRef);
     trgDoc.addXObject(createObj(classRef));
-    Set<BaseObject> toIgnore = Sets.newHashSet();
+    Predicate<BaseObject> filter = xObj -> true;
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertFalse(ret);
@@ -220,7 +224,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObjects_toIgnore_add() throws Exception {
+  public void test_copyObjects_filter_add() throws Exception {
     boolean set = true;
     String name = "name";
     String val = "val";
@@ -234,10 +238,10 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     srcDoc.addXObject(ignoreObj);
     XWikiDocument trgDoc = new XWikiDocument(docRef);
     trgDoc.addXObject(createObj(classRef, name, val));
-    Set<BaseObject> toIgnore = Sets.newHashSet(ignoreObj);
+    Predicate<BaseObject> filter = asPredicate(ImmutableSet.of(ignoreObj));
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertFalse(ret);
@@ -246,7 +250,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObjects_toIgnore_remove() throws Exception {
+  public void test_copyObjects_filter_remove() throws Exception {
     boolean set = true;
     String name = "name";
     String val = "val";
@@ -260,10 +264,10 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     trgDoc.addXObject(createObj(classRef, name, val));
     BaseObject ignoreObj = createObj(classRef);
     trgDoc.addXObject(ignoreObj);
-    Set<BaseObject> toIgnore = Sets.newHashSet(ignoreObj);
+    Predicate<BaseObject> filter = asPredicate(ImmutableSet.of(ignoreObj));
 
     replayDefault();
-    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, filter, set);
     verifyDefault();
 
     assertFalse(ret);
@@ -272,7 +276,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAllClassRefs() throws Exception {
+  public void test_getAllClassRefs() throws Exception {
     DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
     XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
     DocumentReference classRef1 = new DocumentReference("odb", "Classes", "SomeClass1");
@@ -293,14 +297,13 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     assertEquals(3, ret.size());
     assertTrue(ret.contains(classRef3));
     assertTrue(ret.contains(classRef4));
-    // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
-    classRef2 = new DocumentReference("db", classRef2.getLastSpaceReference().getName(),
-        classRef2.getName());
+    classRef2 = RefBuilder.from(classRef2).with(EntityType.WIKI, "db")
+        .build(DocumentReference.class);
     assertTrue(ret.contains(classRef2));
   }
 
   @Test
-  public void testCreateOrUpdateObjects_none() throws Exception {
+  public void test_createOrUpdateObjects_none() throws Exception {
     boolean set = true;
     BaseObject obj = createObj(classRef);
 
@@ -313,7 +316,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCreateOrUpdateObjects_create() throws Exception {
+  public void test_createOrUpdateObjects_create() throws Exception {
     boolean set = true;
     BaseObject obj = createObj(classRef);
 
@@ -328,7 +331,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCreateOrUpdateObjects_create_notSet() throws Exception {
+  public void test_createOrUpdateObjects_create_notSet() throws Exception {
     boolean set = false;
     BaseObject obj = createObj(classRef);
 
@@ -341,7 +344,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCreateOrUpdateObjects_update() throws Exception {
+  public void test_createOrUpdateObjects_update() throws Exception {
     boolean set = true;
     String name = "name";
     String val = "val";
@@ -362,7 +365,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCreateOrUpdateObjects_update_notSet() throws Exception {
+  public void test_createOrUpdateObjects_update_notSet() throws Exception {
     boolean set = false;
     String name = "name";
     String val = "val";
@@ -379,7 +382,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObject_added() throws Exception {
+  public void test_copyObject_added() throws Exception {
     boolean set = true;
     String name1 = "name1";
     String val1 = "val1";
@@ -402,7 +405,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObject_removed() throws Exception {
+  public void test_copyObject_removed() throws Exception {
     boolean set = true;
     String name1 = "name1";
     String val1 = "val1";
@@ -425,7 +428,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCopyObject_noChange() throws Exception {
+  public void test_copyObject_noChange() throws Exception {
     boolean set = true;
     String name = "name";
     String val = "val";

@@ -1,5 +1,6 @@
 package com.celements.copydoc;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,8 +44,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
 
   @Override
   public boolean check(XWikiDocument doc1, XWikiDocument doc2, Collection<BaseObject> toIgnore) {
-    final Set<BaseObject> toIgnoreSet = ImmutableSet.copyOf(toIgnore);
-    return copyInternal(doc1, doc2, o -> !toIgnoreSet.contains(o), false);
+    return copyInternal(doc1, doc2, asPredicate(toIgnore), false);
   }
 
   @Override
@@ -75,8 +75,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
 
   @Override
   public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc, Collection<BaseObject> toIgnore) {
-    final Set<BaseObject> toIgnoreSet = ImmutableSet.copyOf(toIgnore);
-    return copyInternal(srcDoc, trgDoc, o -> !toIgnoreSet.contains(o), true);
+    return copyInternal(srcDoc, trgDoc, asPredicate(toIgnore), true);
   }
 
   @Override
@@ -142,7 +141,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
       boolean set) {
     boolean hasChanged = false;
     List<BaseObject> srcObjs = getXObjects(srcDoc, xObjFilter);
-    List<BaseObject> trgObjs = getXObjects(trgDoc, xObjFilter);
+    List<BaseObject> trgObjs = new ArrayList<>(getXObjects(trgDoc, xObjFilter));
     hasChanged |= createOrUpdateObjects(trgDoc, srcObjs, trgObjs, set);
     hasChanged |= (set && modelAccess.removeXObjects(trgDoc, trgObjs)) || (!set
         && !trgObjs.isEmpty());
@@ -226,6 +225,11 @@ public class CopyDocumentService implements ICopyDocumentRole {
       LOGGER.warn("copyObject - skipped because identical reference: {}", srcObj);
     }
     return hasChanged;
+  }
+
+  static final Predicate<BaseObject> asPredicate(Collection<BaseObject> toIgnore) {
+    final Set<BaseObject> toIgnoreSet = ImmutableSet.copyOf(toIgnore);
+    return obj -> !toIgnoreSet.contains(obj);
   }
 
 }
