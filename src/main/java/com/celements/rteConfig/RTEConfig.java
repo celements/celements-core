@@ -212,8 +212,9 @@ public class RTEConfig implements RteConfigRole {
     return rteConfigsList;
   }
 
-  private String getRteConfigsXWQL() {
-    return "from doc.object(" + getPropClassRef() + ") as rteConfig" + " where doc.translation = 0";
+  String getRteConfigsXWQL() {
+    return "from doc.object(" + modelUtils.serializeRefLocal(getPropClassRef()) + ") as rteConfig"
+        + " where doc.translation = 0";
   }
 
   private DocumentReference getRteConfigTypeClass() {

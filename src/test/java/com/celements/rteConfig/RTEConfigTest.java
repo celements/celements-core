@@ -261,4 +261,10 @@ public class RTEConfigTest extends AbstractComponentTest {
         prefDoc));
   }
 
+  @Test
+  public void test_getRteConfigsXWQL() {
+    assertEquals("from doc.object(Classes.RTEConfigTypePropertiesClass) as rteConfig"
+        + " where doc.translation = 0", config.getRteConfigsXWQL());
+  }
+
 }
