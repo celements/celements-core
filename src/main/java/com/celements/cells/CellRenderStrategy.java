@@ -52,7 +52,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CellRenderStrategy implements IRenderStrategy {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CellRenderStrategy.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CellRenderStrategy.class);
 
   private ICellWriter cellWriter;
   private XWikiContext context;
@@ -61,10 +61,10 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   RenderCommand rendererCmd;
   PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
-  private ICellsClassConfig cellClassConfig = Utils.getComponent(ICellsClassConfig.class);
-  private IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-  private ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
-  private Execution execution = Utils.getComponent(Execution.class);
+  private final ICellsClassConfig cellClassConfig = Utils.getComponent(ICellsClassConfig.class);
+  private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
+  private final ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
+  private final Execution execution = Utils.getComponent(Execution.class);
 
   public CellRenderStrategy(XWikiContext context) {
     this.context = context;
