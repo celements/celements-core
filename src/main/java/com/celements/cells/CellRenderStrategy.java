@@ -124,8 +124,8 @@ public class CellRenderStrategy implements IRenderStrategy {
         }
         attributes.addStyles(cellObj.getStringValue("css_styles"));
       }
-      attributes.addId(collectId(cellDocRef, cellObj));
       tagName = getTagName(cellDocRef, cellObj);
+      attributes.addId(collectId(cellDocRef, cellObj));
     } catch (DocumentNotExistsException exp) {
       LOGGER.error("failed to get cell [{}] document.", cellDocRef, exp);
     }
