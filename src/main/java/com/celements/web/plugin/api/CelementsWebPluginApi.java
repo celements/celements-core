@@ -2086,7 +2086,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   private CaptchaScriptService getCaptchaScriptService() {
-    return (CaptchaScriptService) Utils.getComponent(ScriptService.class, "captcha_old");
+    return (CaptchaScriptService) Utils.getComponent(ScriptService.class, "captchaold");
   }
 
   private CssScriptService getCSSScriptService() {
