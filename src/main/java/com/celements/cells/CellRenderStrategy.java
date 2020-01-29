@@ -142,8 +142,7 @@ public class CellRenderStrategy implements IRenderStrategy {
       id = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_IDNAME_FIELD).trim();
     }
     if (id.isEmpty()) {
-      id = modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", "..");
-      return "cell:" + id;
+      id = "cell:" + modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", "..");
     }
     Integer idNb = Ints.tryParse(Objects.toString(execution.getContext().getProperty(
         "celements.globalvalues.cell.number")));
