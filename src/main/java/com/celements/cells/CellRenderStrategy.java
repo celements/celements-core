@@ -19,8 +19,13 @@
  */
 package com.celements.cells;
 
+import static com.celements.model.util.ReferenceSerializationMode.*;
+
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -39,6 +44,7 @@ import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.primitives.Ints;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
@@ -58,6 +64,7 @@ public class CellRenderStrategy implements IRenderStrategy {
   private ICellsClassConfig cellClassConfig = Utils.getComponent(ICellsClassConfig.class);
   private IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
   private ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
+  private Execution execution = Utils.getComponent(Execution.class);
 
   public CellRenderStrategy(XWikiContext context) {
     this.context = context;
@@ -69,12 +76,10 @@ public class CellRenderStrategy implements IRenderStrategy {
   }
 
   @Override
-  public void endRenderChildren(EntityReference parentRef) {
-  }
+  public void endRenderChildren(EntityReference parentRef) {}
 
   @Override
-  public void endRendering() {
-  }
+  public void endRendering() {}
 
   @Override
   public String getMenuPart(TreeNode node) {
@@ -104,7 +109,6 @@ public class CellRenderStrategy implements IRenderStrategy {
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
     Optional<String> tagName = Optional.absent();
     AttributeBuilder attributes = new DefaultAttributeBuilder().addCssClasses("cel_cell");
-    String idname = "";
     DocumentReference cellDocRef = node.getDocumentReference();
     try {
       LOGGER.debug("startRenderCell: cellDocRef [{}] context db [{}].", cellDocRef,
@@ -117,23 +121,34 @@ public class CellRenderStrategy implements IRenderStrategy {
           attributes.addCssClasses(cellObjCssClasses);
         }
         attributes.addStyles(cellObj.getStringValue("css_styles"));
-        idname = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_IDNAME_FIELD);
       }
+      attributes.addId(collectId(cellDocRef, cellObj));
       tagName = getTagName(cellDocRef, cellObj);
-      if (Strings.isNullOrEmpty(idname)) {
-        String nodeFN = modelUtils.serializeRef(node.getDocumentReference());
-        nodeFN = nodeFN.replaceAll(context.getDatabase() + ":", "");
-        idname = "cell:" + nodeFN.replaceAll(":", "..");
-      }
-      attributes.addId(idname);
     } catch (DocumentNotExistsException exp) {
-      LOGGER.error("failed to get cell [{}] document.", node.getDocumentReference(), exp);
+      LOGGER.error("failed to get cell [{}] document.", cellDocRef, exp);
     }
     IPageTypeConfig cellTypeConfig = getCellTypeConfig(cellDocRef);
     if (cellTypeConfig != null) {
       cellTypeConfig.collectAttributes(attributes, cellDocRef);
     }
     cellWriter.openLevel(tagName.orNull(), attributes.build());
+  }
+
+  private String collectId(DocumentReference cellDocRef, BaseObject cellObj) {
+    String id = "";
+    if (cellObj != null) {
+      id = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_IDNAME_FIELD).trim();
+    }
+    if (id.isEmpty()) {
+      id = modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", "..");
+      return "cell:" + id;
+    }
+    Integer idNb = Ints.tryParse(Objects.toString(execution.getContext().getProperty(
+        "celements.globalvalues.cell.number")));
+    if (idNb != null) {
+      id += "_" + idNb;
+    }
+    return id;
   }
 
   Optional<String> getTagName(DocumentReference cellDocRef, BaseObject cellObj) {
@@ -162,8 +177,7 @@ public class CellRenderStrategy implements IRenderStrategy {
   }
 
   @Override
-  public void startRenderChildren(EntityReference parentRef) {
-  }
+  public void startRenderChildren(EntityReference parentRef) {}
 
   @Override
   public void startRendering() {
