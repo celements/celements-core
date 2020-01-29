@@ -76,10 +76,12 @@ public class CellRenderStrategy implements IRenderStrategy {
   }
 
   @Override
-  public void endRenderChildren(EntityReference parentRef) {}
+  public void endRenderChildren(EntityReference parentRef) {
+  }
 
   @Override
-  public void endRendering() {}
+  public void endRendering() {
+  }
 
   @Override
   public String getMenuPart(TreeNode node) {
@@ -177,7 +179,8 @@ public class CellRenderStrategy implements IRenderStrategy {
   }
 
   @Override
-  public void startRenderChildren(EntityReference parentRef) {}
+  public void startRenderChildren(EntityReference parentRef) {
+  }
 
   @Override
   public void startRendering() {
