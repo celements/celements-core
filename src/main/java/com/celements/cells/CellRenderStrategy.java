@@ -136,6 +136,21 @@ public class CellRenderStrategy implements IRenderStrategy {
     cellWriter.openLevel(tagName.orNull(), attributes.build());
   }
 
+  Optional<String> getTagName(DocumentReference cellDocRef, BaseObject cellObj) {
+    Optional<String> tagName = Optional.absent();
+    if (cellObj != null) {
+      tagName = Optional.fromNullable(Strings.emptyToNull(cellObj.getStringValue(
+          ICellsClassConfig.CELLCLASS_TAGNAME_FIELD)));
+    }
+    if (!tagName.isPresent()) {
+      IPageTypeConfig cellTypeConfig = getCellTypeConfig(cellDocRef);
+      if (cellTypeConfig != null) {
+        tagName = cellTypeConfig.defaultTagName();
+      }
+    }
+    return tagName;
+  }
+
   private String collectId(DocumentReference cellDocRef, BaseObject cellObj) {
     String id = "";
     if (cellObj != null) {
@@ -150,21 +165,6 @@ public class CellRenderStrategy implements IRenderStrategy {
       id += "_" + idNb;
     }
     return id;
-  }
-
-  Optional<String> getTagName(DocumentReference cellDocRef, BaseObject cellObj) {
-    Optional<String> tagName = Optional.absent();
-    if (cellObj != null) {
-      tagName = Optional.fromNullable(Strings.emptyToNull(cellObj.getStringValue(
-          ICellsClassConfig.CELLCLASS_TAGNAME_FIELD)));
-    }
-    if (!tagName.isPresent()) {
-      IPageTypeConfig cellTypeConfig = getCellTypeConfig(cellDocRef);
-      if (cellTypeConfig != null) {
-        tagName = cellTypeConfig.defaultTagName();
-      }
-    }
-    return tagName;
   }
 
   IPageTypeConfig getCellTypeConfig(DocumentReference cellDocRef) {
