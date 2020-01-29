@@ -8,7 +8,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.web.plugin.cmd.CaptchaCommand;
 import com.xpn.xwiki.XWikiContext;
 
-@Component("captcha")
+@Component("captcha_old")
 public class CaptchaScriptService implements ScriptService {
 
   @Requirement

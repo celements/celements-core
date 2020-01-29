@@ -1247,7 +1247,8 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public Map<String, String> validateRequest() {
     Map<String, String> ret = new HashMap<>();
-    Map<String, Map<ValidationType, Set<String>>> validateMap = getScriptService().validateRequest();
+    Map<String, Map<ValidationType, Set<String>>> validateMap = getScriptService()
+        .validateRequest();
     for (String key : validateMap.keySet()) {
       Set<String> set = validateMap.get(key).get(ValidationType.ERROR);
       if ((set != null) && (set.size() > 0)) {
@@ -2085,7 +2086,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   private CaptchaScriptService getCaptchaScriptService() {
-    return (CaptchaScriptService) Utils.getComponent(ScriptService.class, "captcha");
+    return (CaptchaScriptService) Utils.getComponent(ScriptService.class, "captcha_old");
   }
 
   private CssScriptService getCSSScriptService() {
