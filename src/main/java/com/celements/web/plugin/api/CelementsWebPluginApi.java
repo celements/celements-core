@@ -36,7 +36,6 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.AppScriptScriptService;
 import com.celements.auth.AuthenticationScriptService;
-import com.celements.captcha.CaptchaScriptService;
 import com.celements.css.CssScriptService;
 import com.celements.emptycheck.service.EmptyCheckScriptService;
 import com.celements.filebase.FileBaseScriptService;
@@ -60,6 +59,7 @@ import com.celements.web.contextmenu.ContextMenuItem;
 import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
 import com.celements.web.plugin.CelementsWebPlugin;
+import com.celements.web.plugin.cmd.CaptchaCommand;
 import com.celements.web.plugin.cmd.DocFormCommand;
 import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
@@ -1796,7 +1796,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public boolean checkCaptcha() {
-    return getCaptchaScriptService().checkCaptcha();
+    return new CaptchaCommand().checkCaptcha(context);
   }
 
   /**
@@ -1804,7 +1804,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getCaptchaId() {
-    return getCaptchaScriptService().getCaptchaId();
+    return new CaptchaCommand().getCaptchaId(context);
   }
 
   /**
@@ -2083,10 +2083,6 @@ public class CelementsWebPluginApi extends Api {
 
   private LayoutScriptService getLayoutScriptService() {
     return (LayoutScriptService) Utils.getComponent(ScriptService.class, "layout");
-  }
-
-  private CaptchaScriptService getCaptchaScriptService() {
-    return (CaptchaScriptService) Utils.getComponent(ScriptService.class, "captchaold");
   }
 
   private CssScriptService getCSSScriptService() {
