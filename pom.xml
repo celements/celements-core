@@ -28,7 +28,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-core</artifactId>
-  <version>4.2-SNAPSHOT</version>
+  <version>4.2</version>
   <description>Celements Core</description>
   <dependencies>
     <!-- Add here all your dependencies -->
@@ -85,6 +85,6 @@
     <connection>scm:git:git@github.com:celements/celements-core.git</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-core.git</developerConnection>
     <url>https://github.com/celements/celements-core</url>
-    <tag>celements-core-1.41.2</tag>
+    <tag>celements-core-4.2</tag>
   </scm>
 </project>
