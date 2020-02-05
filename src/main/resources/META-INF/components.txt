@@ -64,7 +64,6 @@ com.celements.webform.ActionService
 com.celements.auth.AuthenticationScriptService
 com.celements.auth.AuthenticationService
 com.celements.css.CssScriptService
-com.celements.captcha.CaptchaScriptService
 com.celements.mailsender.CelMailScriptService
 com.celements.webform.DocFormScriptService
 com.celements.web.service.EditorSupportScriptService
