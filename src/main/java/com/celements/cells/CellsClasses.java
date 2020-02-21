@@ -64,7 +64,6 @@ public class CellsClasses extends AbstractClassCollection {
   @Override
   protected void initClasses() throws XWikiException {
     LOGGER.debug("entering initClasses for database: " + getContext().getDatabase());
-    // getCellClass();
     getPageLayoutPropertiesClass();
     getGroupCellClass();
     getPageDepCellConfigClass();
@@ -123,8 +122,7 @@ public class CellsClasses extends AbstractClassCollection {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference pageLayoutPropertiesClassRef = cellsClassConfig
-        .getPageLayoutPropertiesClassRef(
-            getContext().getDatabase());
+        .getPageLayoutPropertiesClassRef(getContext().getDatabase());
     doc = modelAccess.getOrCreateDocument(pageLayoutPropertiesClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(pageLayoutPropertiesClassRef);
@@ -198,8 +196,7 @@ public class CellsClasses extends AbstractClassCollection {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference translationBoxCellConfigClassRef = cellsClassConfig
-        .getTranslationBoxCellConfigClassRef(
-            getContext().getDatabase());
+        .getTranslationBoxCellConfigClassRef(getContext().getDatabase());
     doc = modelAccess.getOrCreateDocument(translationBoxCellConfigClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(translationBoxCellConfigClassRef);

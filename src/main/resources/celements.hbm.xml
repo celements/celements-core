@@ -52,8 +52,8 @@
     <property name="css_styles" type="string">
       <column name="CEL_CSS_STYLES" />
     </property>
-    <property name="event_data_attr" type="string">
-      <column name="CEL_EVENT_DATA_ATTR" length="1024" />
+    <property name="event_data_attr" type="text">
+      <column name="CEL_EVENT_DATA_ATTR" />
     </property>
   </class>
   <class entity-name="Celements.PageLayoutPropertiesClass" table="cel_pagelayouts">
