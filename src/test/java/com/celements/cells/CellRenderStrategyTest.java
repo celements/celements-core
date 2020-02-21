@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+import java.util.Optional;
 
 import org.easymock.Capture;
 import org.junit.Before;
@@ -38,7 +38,9 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.cells.attribute.CellAttribute;
+import com.celements.cells.classes.CellClass;
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.ModelAccessStrategy;
 import com.celements.navigation.TreeNode;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
@@ -46,10 +48,7 @@ import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.google.common.base.Optional;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -58,19 +57,15 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   private CellRenderStrategy renderer;
   private ICellWriter outWriterMock;
   private XWikiContext context;
-  private XWiki xwiki;
   private RenderCommand mockctRendererCmd;
   private PageLayoutCommand pageLayoutCmdMock;
-  private IPageTypeResolverRole pageTypeResolverMock;
-  private IPageTypeRole pageTypeServiceMock;
 
   @Before
-  public void setUp_CellRendererTest() throws Exception {
-    pageTypeResolverMock = registerComponentMock(IPageTypeResolverRole.class);
-    pageTypeServiceMock = registerComponentMock(IPageTypeRole.class);
+  public void prepareTest() throws Exception {
+    registerComponentMocks(ModelAccessStrategy.class, IPageTypeResolverRole.class,
+        IPageTypeRole.class);
     outWriterMock = createMockAndAddToDefault(ICellWriter.class);
     context = getContext();
-    xwiki = getWikiMock();
     renderer = new CellRenderStrategy(context).setOutputWriter(outWriterMock);
     mockctRendererCmd = createMockAndAddToDefault(RenderCommand.class);
     renderer.rendererCmd = mockctRendererCmd;
@@ -79,60 +74,40 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testPageTypeCmd() {
+  public void test_pageTypeCmd() {
     renderer.rendererCmd = null;
     assertNotNull(renderer.getRendererCmd());
     assertSame("Expecting singleton.", renderer.getRendererCmd(), renderer.getRendererCmd());
   }
 
   @Test
-  public void testInject_ctRendererCmd() {
+  public void test_inject_ctRendererCmd() {
     renderer.rendererCmd = mockctRendererCmd;
     assertNotNull(renderer.getRendererCmd());
     assertSame("Expecting injected mock object.", mockctRendererCmd, renderer.getRendererCmd());
   }
 
   @Test
-  public void test_getCellTypeConfig_noTypeRef() throws Exception {
-    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
-        null).once();
-    replayDefault();
-    assertNull(renderer.getCellTypeConfig(cellRef));
-    verifyDefault();
-  }
-
-  @Test
   public void test_getCellTypeConfig_noTypeConfig() throws Exception {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
-    PageTypeReference cellTypeRef = new PageTypeReference("TestType", "TestTypeComponent",
-        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
-        cellTypeRef).once();
-    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
-        null).once();
+    expectNoCellTypeConfig(cellRef);
     replayDefault();
-    assertNull(renderer.getCellTypeConfig(cellRef));
+    assertFalse(renderer.getCellTypeConfig(cellRef).isPresent());
     verifyDefault();
   }
 
   @Test
   public void test_getCellTypeConfig_withTypeConfig() throws Exception {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
-    PageTypeReference cellTypeRef = new PageTypeReference("TestType", "TestTypeComponent",
-        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
-        cellTypeRef).once();
     IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
-    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
-        typeConfig).once();
+    expectCellTypeConfig(cellRef, typeConfig);
     replayDefault();
-    assertSame(typeConfig, renderer.getCellTypeConfig(cellRef));
+    assertSame(typeConfig, renderer.getCellTypeConfig(cellRef).orElse(null));
     verifyDefault();
   }
 
   @Test
-  public void testGetAsString() {
+  public void test_getAsString() {
     String expectedOutput = "blabla";
     expect(outWriterMock.getAsString()).andReturn(expectedOutput);
     replay(outWriterMock);
@@ -142,7 +117,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testStartRendering() {
+  public void test_startRendering() {
     outWriterMock.clear();
     expectLastCall().once();
     replay(outWriterMock);
@@ -151,7 +126,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testEndRenderCell() {
+  public void test_endRenderCell() {
     outWriterMock.closeLevel();
     expectLastCall().once();
     replay(outWriterMock);
@@ -160,19 +135,19 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetMenuPart() {
+  public void test_getMenuPart() {
     assertEquals("expecting empty menuPart for cells.", "", renderer.getMenuPart(null));
   }
 
   @Test
-  public void testIsRenderCell() {
+  public void test_isRenderCell() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     assertFalse(renderer.isRenderCell(null));
     assertTrue(renderer.isRenderCell(new TreeNode(docRef, null, 0)));
   }
 
   @Test
-  public void testGetSpaceReference_default() {
+  public void test_getSpaceReference_default() {
     renderer.setSpaceReference(null);
     SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
         context.getDatabase()));
@@ -183,7 +158,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetSpaceReference() {
+  public void test_getSpaceReference() {
     SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
         context.getDatabase()));
     renderer.setSpaceReference(layoutSpaceRef);
@@ -193,7 +168,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetSpaceReference_null_setBack() {
+  public void test_getSpaceReference_null_setBack() {
     SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
         context.getDatabase()));
     renderer.setSpaceReference(layoutSpaceRef);
@@ -207,7 +182,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testIsRenderSubCells() {
+  public void test_isRenderSubCells() {
     assertFalse(renderer.isRenderSubCells(null));
     SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
         context.getDatabase()));
@@ -215,32 +190,22 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testStartRenderCell() throws XWikiException {
+  public void test_startRenderCell() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = new XWikiDocument(docRef);
-    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
-    BaseObject cellObj = new BaseObject();
-    cellObj.setXClassReference(cellClassRef);
+    XWikiDocument doc = expectNewDoc(docRef);
+    BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String idname = "myDivId";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<>();
-    cellObjList.add(cellObj);
-    doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
-    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
-        null).atLeastOnce();
+    expectNoCellTypeConfig(docRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -248,30 +213,20 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testStartRenderCell_noCssClasses() throws XWikiException {
+  public void test_startRenderCell_noCssClasses() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = new XWikiDocument(docRef);
-    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
-    BaseObject cellObj = new BaseObject();
-    cellObj.setXClassReference(cellClassRef);
+    XWikiDocument doc = expectNewDoc(docRef);
+    BaseObject cellObj = addCellObj(doc);
     String idname = "myDivId";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<>();
-    cellObjList.add(cellObj);
-    doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
-    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
-        null).atLeastOnce();
+    expectNoCellTypeConfig(docRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes("", idname, cssStyles, capturedAttrList);
@@ -279,31 +234,21 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testStartRenderCell_auto_id_for_null() throws XWikiException {
+  public void test_startRenderCell_auto_id_for_null() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = new XWikiDocument(docRef);
-    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
-    BaseObject cellObj = new BaseObject();
-    cellObj.setXClassReference(cellClassRef);
+    XWikiDocument doc = expectNewDoc(docRef);
+    BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<>();
-    cellObjList.add(cellObj);
-    doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:Skin.MasterCell";
-    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
-        null).atLeastOnce();
+    expectNoCellTypeConfig(docRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -311,32 +256,22 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testStartRenderCell_auto_id_forEmpty() throws XWikiException {
+  public void test_startRenderCell_auto_id_forEmpty() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = new XWikiDocument(docRef);
-    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
-    BaseObject cellObj = new BaseObject();
-    cellObj.setXClassReference(cellClassRef);
+    XWikiDocument doc = expectNewDoc(docRef);
+    BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", "");
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<>();
-    cellObjList.add(cellObj);
-    doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:Skin.MasterCell";
-    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
-        null).atLeastOnce();
+    expectNoCellTypeConfig(docRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -344,31 +279,22 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testStartRenderCell_auto_id_forEmpty_diffdb() throws XWikiException {
+  public void test_startRenderCell_auto_id_forEmpty_diffdb() throws Exception {
     DocumentReference docRef = new DocumentReference("layoutDb", "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = new XWikiDocument(docRef);
-    DocumentReference cellClassRef = new DocumentReference("layoutDb",
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
-    BaseObject cellObj = new BaseObject();
-    cellObj.setXClassReference(cellClassRef);
+    XWikiDocument doc = expectNewDoc(docRef);
+    BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", "");
     cellObj.setStringValue("css_styles", cssStyles);
-    cellObj.setXClassReference(cellClassRef);
-    doc.addXObject(cellObj);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:layoutDb..Skin.MasterCell";
-    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
-        null).atLeastOnce();
+    expectNoCellTypeConfig(docRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -376,33 +302,23 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testStartRenderCell_otherDb() throws XWikiException {
+  public void test_startRenderCell_otherDb() throws Exception {
     String masterCellDb = "theMasterCellDB";
     DocumentReference docRef = new DocumentReference(masterCellDb, "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = new XWikiDocument(docRef);
-    DocumentReference cellClassRef = new DocumentReference(masterCellDb,
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
-    BaseObject cellObj = new BaseObject();
-    cellObj.setXClassReference(cellClassRef);
+    XWikiDocument doc = expectNewDoc(docRef);
+    BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String idname = "myDivId";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<>();
-    cellObjList.add(cellObj);
-    doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
-    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
-        null).atLeastOnce();
+    expectNoCellTypeConfig(docRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -410,42 +326,24 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testStartRenderCell_additionalAttributes() throws Exception {
+  public void test_startRenderCell_additionalAttributes() throws Exception {
     String masterCellDb = context.getDatabase();
     DocumentReference cellRef = new DocumentReference(masterCellDb, "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(cellRef, null, 0);
-    XWikiDocument doc = new XWikiDocument(cellRef);
-    DocumentReference cellClassRef = new DocumentReference(masterCellDb,
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
-    BaseObject cellObj = new BaseObject();
-    cellObj.setXClassReference(cellClassRef);
+    XWikiDocument doc = expectNewDoc(cellRef);
+    BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String idname = "myDivId";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<>();
-    cellObjList.add(cellObj);
-    doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(cellRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(cellRef), same(context))).andReturn(doc).atLeastOnce();
-    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectLastCall().once();
-    String configName = "TestType";
-    PageTypeReference cellTypeRef = new PageTypeReference(configName, "TestTypeComponent",
-        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
-        cellTypeRef).atLeastOnce();
-    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
-    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
-        typeConfig).atLeastOnce();
-    expect(typeConfig.defaultTagName()).andReturn(Optional.<String>absent()).atLeastOnce();
+    IPageTypeConfig typeConfig = expectCellTypeConfig(cellRef, (String) null);
     typeConfig.collectAttributes(isA(AttributeBuilder.class), eq(cellRef));
-    expectLastCall().once();
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -453,7 +351,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testRenderEmptyChildren() throws XWikiException {
+  public void test_renderEmptyChildren() throws Exception {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     TreeNode cellNode = new TreeNode(cellRef, null, 0);
     String cellContentExpected = "Cell test content Skin.MasterCell";
@@ -469,17 +367,11 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   @Test
   public void test_getTagName_noCellConfig_fallback_CellType() throws Exception {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    expectNewDoc(cellRef);
     String configName = "TestType";
-    PageTypeReference cellTypeRef = new PageTypeReference(configName, "TestTypeComponent",
-        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
-        cellTypeRef).once();
-    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
-    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
-        typeConfig).once();
-    expect(typeConfig.defaultTagName()).andReturn(Optional.of(configName)).once();
+    expectCellTypeConfig(cellRef, configName);
     replayDefault();
-    Optional<String> tagName = renderer.getTagName(cellRef, null);
+    Optional<String> tagName = renderer.getTagName(cellRef);
     assertNotNull(tagName);
     assertTrue(tagName.isPresent());
     assertEquals(configName, tagName.get());
@@ -489,19 +381,11 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   @Test
   public void test_getTagName_emptyTagName_fallback_CellType() throws Exception {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    addCellObj(expectNewDoc(cellRef));
     String configName = "TestType";
-    PageTypeReference cellTypeRef = new PageTypeReference(configName, "TestTypeComponent",
-        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
-        cellTypeRef).once();
-    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
-    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
-        typeConfig).once();
-    BaseObject cellObj = new BaseObject();
-    cellObj.setStringValue(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD, "");
-    expect(typeConfig.defaultTagName()).andReturn(Optional.of(configName)).once();
+    expectCellTypeConfig(cellRef, configName);
     replayDefault();
-    Optional<String> tagName = renderer.getTagName(cellRef, cellObj);
+    Optional<String> tagName = renderer.getTagName(cellRef);
     assertNotNull(tagName);
     assertTrue(tagName.isPresent());
     assertEquals(configName, tagName.get());
@@ -511,11 +395,11 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   @Test
   public void test_getTagName_fromCellConfig() throws Exception {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
-    BaseObject cellObj = new BaseObject();
+    BaseObject cellObj = addCellObj(expectNewDoc(cellRef));
     String expectedTagName = "form";
-    cellObj.setStringValue(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD, expectedTagName);
+    cellObj.setStringValue(CellClass.FIELD_TAG_NAME.getName(), expectedTagName);
     replayDefault();
-    Optional<String> tagName = renderer.getTagName(cellRef, cellObj);
+    Optional<String> tagName = renderer.getTagName(cellRef);
     assertNotNull(tagName);
     assertTrue(tagName.isPresent());
     assertEquals(expectedTagName, tagName.get());
@@ -525,22 +409,50 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   @Test
   public void test_getTagName_emptyTagName_fallback_CellType_noTagName() throws Exception {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
-    String configName = "TestType";
-    PageTypeReference cellTypeRef = new PageTypeReference(configName, "TestTypeComponent",
-        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
-        cellTypeRef).once();
-    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
-    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
-        typeConfig).once();
-    BaseObject cellObj = new BaseObject();
-    cellObj.setStringValue(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD, "");
-    expect(typeConfig.defaultTagName()).andReturn(Optional.<String>absent()).once();
+    expectNewDoc(cellRef);
+    expectCellTypeConfig(cellRef, (String) null);
     replayDefault();
-    Optional<String> tagName = renderer.getTagName(cellRef, cellObj);
+    Optional<String> tagName = renderer.getTagName(cellRef);
     assertNotNull(tagName);
     assertFalse(tagName.isPresent());
     verifyDefault();
+  }
+
+  private void expectNoCellTypeConfig(DocumentReference cellRef) {
+    expectCellTypeConfig(cellRef, (IPageTypeConfig) null);
+  }
+
+  private IPageTypeConfig expectCellTypeConfig(DocumentReference cellRef, String configName) {
+    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
+    expectCellTypeConfig(cellRef, typeConfig);
+    expect(typeConfig.defaultTagName())
+        .andReturn(com.google.common.base.Optional.fromNullable(configName));
+    return typeConfig;
+  }
+
+  private XWikiDocument expectNewDoc(DocumentReference docRef) {
+    XWikiDocument doc = new XWikiDocument(docRef);
+    expect(getMock(ModelAccessStrategy.class).exists(docRef, "")).andReturn(true).atLeastOnce();
+    expect(getMock(ModelAccessStrategy.class).getDocument(docRef, "")).andReturn(doc).atLeastOnce();
+    return doc;
+  }
+
+  private BaseObject addCellObj(XWikiDocument doc) {
+    BaseObject cellObj = new BaseObject();
+    cellObj.setDocumentReference(doc.getDocumentReference());
+    cellObj.setXClassReference(CellClass.CLASS_REF.getDocRef(
+        doc.getDocumentReference().getWikiReference()));
+    doc.addXObject(cellObj);
+    return cellObj;
+  }
+
+  private void expectCellTypeConfig(DocumentReference cellRef, IPageTypeConfig typeConfig) {
+    PageTypeReference cellTypeRef = new PageTypeReference("TestType", "TestTypeComponent",
+        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
+    expect(getMock(IPageTypeResolverRole.class).resolvePageTypeReferenceWithDefault(eq(cellRef)))
+        .andReturn(cellTypeRef).atLeastOnce();
+    expect(getMock(IPageTypeRole.class).getPageTypeConfigForPageTypeRef(eq(cellTypeRef)))
+        .andReturn(typeConfig).atLeastOnce();
   }
 
   private void assertDefaultAttributes(String cssClasses, String idname, String cssStyles,

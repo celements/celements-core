@@ -22,6 +22,7 @@ package com.celements.cells;
 import static com.celements.model.util.ReferenceSerializationMode.*;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +30,14 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.cells.attribute.DefaultAttributeBuilder;
+import com.celements.cells.classes.CellClass;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.TreeNode;
 import com.celements.pagetype.IPageTypeConfig;
@@ -41,13 +45,12 @@ import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
+import com.celements.velocity.VelocityService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class CellRenderStrategy implements IRenderStrategy {
@@ -61,10 +64,10 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   RenderCommand rendererCmd;
   PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
-  private final ICellsClassConfig cellClassConfig = Utils.getComponent(ICellsClassConfig.class);
   private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
   private final ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
   private final Execution execution = Utils.getComponent(Execution.class);
+  private final VelocityService velocityService = Utils.getComponent(VelocityService.class);
 
   public CellRenderStrategy(XWikiContext context) {
     this.context = context;
@@ -76,12 +79,10 @@ public class CellRenderStrategy implements IRenderStrategy {
   }
 
   @Override
-  public void endRenderChildren(EntityReference parentRef) {
-  }
+  public void endRenderChildren(EntityReference parentRef) {}
 
   @Override
-  public void endRendering() {
-  }
+  public void endRendering() {}
 
   @Override
   public String getMenuPart(TreeNode node) {
@@ -109,56 +110,46 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   @Override
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
-    Optional<String> tagName = Optional.absent();
-    AttributeBuilder attributes = new DefaultAttributeBuilder().addCssClasses("cel_cell");
+    AttributeBuilder attrBuilder = new DefaultAttributeBuilder().addCssClasses("cel_cell");
     DocumentReference cellDocRef = node.getDocumentReference();
-    try {
-      LOGGER.debug("startRenderCell: cellDocRef [{}] context db [{}].", cellDocRef,
-          context.getDatabase());
-      BaseObject cellObj = modelAccess.getXObject(cellDocRef, cellClassConfig.getCellClassRef(
-          cellDocRef.getWikiReference().getName()));
-      if (cellObj != null) {
-        String cellObjCssClasses = cellObj.getStringValue("css_classes");
-        if (!Strings.isNullOrEmpty(cellObjCssClasses)) {
-          attributes.addCssClasses(cellObjCssClasses);
-        }
-        attributes.addStyles(cellObj.getStringValue("css_styles"));
-      }
-      tagName = getTagName(cellDocRef, cellObj);
-      attributes.addId(collectId(cellDocRef, cellObj));
-    } catch (DocumentNotExistsException exp) {
-      LOGGER.error("failed to get cell [{}] document.", cellDocRef, exp);
-    }
-    IPageTypeConfig cellTypeConfig = getCellTypeConfig(cellDocRef);
-    if (cellTypeConfig != null) {
-      cellTypeConfig.collectAttributes(attributes, cellDocRef);
-    }
-    cellWriter.openLevel(tagName.orNull(), attributes.build());
+    LOGGER.debug("startRenderCell: cellDocRef [{}] db [{}].", cellDocRef, context.getDatabase());
+    collectCellAttributes(cellDocRef, attrBuilder);
+    getCellTypeConfig(cellDocRef).ifPresent(cellTypeConfig -> cellTypeConfig
+        .collectAttributes(attrBuilder, cellDocRef));
+    cellWriter.openLevel(getTagName(cellDocRef).orElse(null), attrBuilder.build());
   }
 
-  Optional<String> getTagName(DocumentReference cellDocRef, BaseObject cellObj) {
-    Optional<String> tagName = Optional.absent();
-    if (cellObj != null) {
-      tagName = Optional.fromNullable(Strings.emptyToNull(cellObj.getStringValue(
-          ICellsClassConfig.CELLCLASS_TAGNAME_FIELD)));
+  private void collectCellAttributes(DocumentReference cellDocRef,
+      AttributeBuilder attrBuilder) {
+    try {
+      XWikiDocument cellDoc = modelAccess.getDocument(cellDocRef);
+      XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(cellDoc).filter(CellClass.CLASS_REF);
+      attrBuilder.addId(collectId(cellDocRef, fetcher));
+      fetcher.fetchField(CellClass.FIELD_CSS_CLASSES).stream().findFirst()
+          .ifPresent(attrBuilder::addCssClasses);
+      fetcher.fetchField(CellClass.FIELD_CSS_STYLES).stream().findFirst()
+          .ifPresent(attrBuilder::addStyles);
+      fetcher.fetchField(CellClass.FIELD_EVENT_DATA_ATTR).stream().findFirst()
+          .ifPresent(value -> collectEventDataAttr(cellDocRef, attrBuilder, value));
+    } catch (DocumentNotExistsException exc) {
+      LOGGER.warn("failed to get cell doc [{}]", cellDocRef, exc);
     }
+  }
+
+  Optional<String> getTagName(DocumentReference cellDocRef) {
+    Optional<String> tagName = XWikiObjectFetcher.on(modelAccess.getOrCreateDocument(cellDocRef))
+        .fetchField(CellClass.FIELD_TAG_NAME).stream().findFirst();
     if (!tagName.isPresent()) {
-      IPageTypeConfig cellTypeConfig = getCellTypeConfig(cellDocRef);
-      if (cellTypeConfig != null) {
-        tagName = cellTypeConfig.defaultTagName();
-      }
+      tagName = getCellTypeConfig(cellDocRef)
+          .map(cellTypeConfig -> cellTypeConfig.defaultTagName().toJavaUtil())
+          .filter(Optional::isPresent).map(Optional::get);
     }
     return tagName;
   }
 
-  private String collectId(DocumentReference cellDocRef, BaseObject cellObj) {
-    String id = "";
-    if (cellObj != null) {
-      id = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_IDNAME_FIELD).trim();
-    }
-    if (id.isEmpty()) {
-      id = "cell:" + modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", "..");
-    }
+  private String collectId(DocumentReference cellDocRef, XWikiObjectFetcher fetcher) {
+    String id = fetcher.fetchField(CellClass.FIELD_ID_NAME).stream().findFirst()
+        .orElseGet(() -> "cell:" + modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", ".."));
     Integer idNb = Ints.tryParse(Objects.toString(execution.getContext().getProperty(
         "celements.globalvalues.cell.number")));
     if (idNb != null) {
@@ -167,19 +158,29 @@ public class CellRenderStrategy implements IRenderStrategy {
     return id;
   }
 
-  IPageTypeConfig getCellTypeConfig(DocumentReference cellDocRef) {
-    PageTypeReference cellTypeRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
-        cellDocRef);
-    IPageTypeConfig cellTypeConfig = null;
-    if (cellTypeRef != null) {
-      cellTypeConfig = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
+  private void collectEventDataAttr(DocumentReference cellDocRef, AttributeBuilder attributes,
+      String value) {
+    try {
+      value = velocityService.evaluateVelocityText(value).trim();
+      if (!value.isEmpty()) {
+        attributes.addCssClasses("celOnEvent");
+        attributes.addAttribute("data-cel-event", value);
+      }
+    } catch (XWikiVelocityException exc) {
+      LOGGER.warn("unable to velo-evaluate data-cel-event text on [{}]", cellDocRef, exc);
     }
-    return cellTypeConfig;
+  }
+
+  Optional<IPageTypeConfig> getCellTypeConfig(DocumentReference cellDocRef) {
+    PageTypeReference cellTypeRef = getPageTypeResolver()
+        .resolvePageTypeReferenceWithDefault(cellDocRef);
+    IPageTypeConfig cellTypeConfig = getPageTypeService()
+        .getPageTypeConfigForPageTypeRef(cellTypeRef);
+    return Optional.ofNullable(cellTypeConfig);
   }
 
   @Override
-  public void startRenderChildren(EntityReference parentRef) {
-  }
+  public void startRenderChildren(EntityReference parentRef) {}
 
   @Override
   public void startRendering() {
