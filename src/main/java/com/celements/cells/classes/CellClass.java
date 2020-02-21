@@ -40,13 +40,13 @@ public class CellClass extends AbstractClassDefinition implements CelementsClass
       "idname").prettyName("id attribute").build();
 
   public static final ClassField<String> FIELD_CSS_CLASSES = new StringField.Builder(CLASS_REF,
-      "css_classes").build();
+      "css_classes").size(80).build();
 
   public static final ClassField<String> FIELD_CSS_STYLES = new LargeStringField.Builder(CLASS_REF,
       "css_styles").rows(20).size(15).build();
 
   public static final ClassField<String> FIELD_EVENT_DATA_ATTR = new StringField.Builder(
-      CLASS_REF, "event_data_attr").prettyName("celEventJS data attribute").build();
+      CLASS_REF, "event_data_attr").prettyName("celEventJS data attribute").size(80).build();
 
   public CellClass() {
     super(CLASS_REF);
