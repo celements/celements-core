@@ -148,3 +148,4 @@ com.celements.rteConfig.RTEConfig
 com.celements.rte.RteDefaultImplementation
 com.celements.rte.RteTinyMce3
 com.celements.observation.save.object.XObjectEventConverter
+com.celements.cells.classes.CellClass

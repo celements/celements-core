@@ -3,33 +3,40 @@ package com.celements.cells;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.cells.classes.CellClass;
+
 @ComponentRole
 public interface ICellsClassConfig {
 
-  public static final String CELEMENTS_CELL_CLASS_SPACE = "Celements";
-  public static final String CELEMENTS_CELL_CLASS_NAME = "CellClass";
-  public static final String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
+  String CELEMENTS_CELL_CLASS_SPACE = "Celements";
+  @Deprecated
+  String CELEMENTS_CELL_CLASS_NAME = "CellClass";
+  @Deprecated
+  String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
       + CELEMENTS_CELL_CLASS_NAME;
-  public static final String CELLCLASS_TAGNAME_FIELD = "tagname";
-  public static final String CELLCLASS_IDNAME_FIELD = "idname";
-  public static final String PAGE_DEP_CELL_CONFIG_CLASS_DOC = "PageDepCellConfigClass";
+  @Deprecated
+  String CELLCLASS_TAGNAME_FIELD = CellClass.FIELD_TAG_NAME.getName();
+  @Deprecated
+  String CELLCLASS_IDNAME_FIELD = CellClass.FIELD_ID_NAME.getName();
+  String PAGE_DEP_CELL_CONFIG_CLASS_DOC = "PageDepCellConfigClass";
 
-  public static final String PAGE_LAYOUT_PROPERTIES_CLASS_DOC = "PageLayoutPropertiesClass";
-  public static final String PAGE_LAYOUT_PROPERTIES_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
+  String PAGE_LAYOUT_PROPERTIES_CLASS_DOC = "PageLayoutPropertiesClass";
+  String PAGE_LAYOUT_PROPERTIES_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
       + PAGE_LAYOUT_PROPERTIES_CLASS_DOC;
-  public static final String LAYOUT_TYPE_FIELD = "layout_type";
-  public static final String EDITOR_LAYOUT_VALUE = "editorLayout";
-  public static final String PAGE_LAYOUT_VALUE = "pageLayout";
-  public static final String LAYOUT_DOCTYPE_FIELD = "doctype";
+  String LAYOUT_TYPE_FIELD = "layout_type";
+  String EDITOR_LAYOUT_VALUE = "editorLayout";
+  String PAGE_LAYOUT_VALUE = "pageLayout";
+  String LAYOUT_DOCTYPE_FIELD = "doctype";
 
-  public DocumentReference getCellClassRef(String wikiName);
+  @Deprecated
+  DocumentReference getCellClassRef(String wikiName);
 
-  public DocumentReference getPageLayoutPropertiesClassRef(String wikiName);
+  DocumentReference getPageLayoutPropertiesClassRef(String wikiName);
 
-  public DocumentReference getGroupCellClassRef(String wikiName);
+  DocumentReference getGroupCellClassRef(String wikiName);
 
-  public DocumentReference getPageDepCellConfigClassRef(String wikiName);
+  DocumentReference getPageDepCellConfigClassRef(String wikiName);
 
-  public DocumentReference getTranslationBoxCellConfigClassRef(String wikiName);
+  DocumentReference getTranslationBoxCellConfigClassRef(String wikiName);
 
 }
