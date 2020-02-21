@@ -59,13 +59,11 @@ public class CellsClasses extends AbstractClassCollection {
   @Deprecated
   public static final String CELLCLASS_IDNAME_FIELD = ICellsClassConfig.CELLCLASS_IDNAME_FIELD;
 
-  public CellsClasses() {
-  }
+  public CellsClasses() {}
 
   @Override
   protected void initClasses() throws XWikiException {
     LOGGER.debug("entering initClasses for database: " + getContext().getDatabase());
-    getCellClass();
     getPageLayoutPropertiesClass();
     getGroupCellClass();
     getPageDepCellConfigClass();
@@ -90,6 +88,7 @@ public class CellsClasses extends AbstractClassCollection {
     return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE, CELEMENTS_CELL_CLASS_NAME);
   }
 
+  @Deprecated
   BaseClass getCellClass() throws XWikiException {
     boolean needsUpdate = false;
     DocumentReference cellClassRef = cellsClassConfig.getCellClassRef(getContext().getDatabase());
@@ -122,8 +121,8 @@ public class CellsClasses extends AbstractClassCollection {
   BaseClass getPageLayoutPropertiesClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference pageLayoutPropertiesClassRef = cellsClassConfig.getPageLayoutPropertiesClassRef(
-        getContext().getDatabase());
+    DocumentReference pageLayoutPropertiesClassRef = cellsClassConfig
+        .getPageLayoutPropertiesClassRef(getContext().getDatabase());
     doc = modelAccess.getOrCreateDocument(pageLayoutPropertiesClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(pageLayoutPropertiesClassRef);
@@ -196,8 +195,8 @@ public class CellsClasses extends AbstractClassCollection {
   BaseClass getTranslationBoxCellConfigClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference translationBoxCellConfigClassRef = cellsClassConfig.getTranslationBoxCellConfigClassRef(
-        getContext().getDatabase());
+    DocumentReference translationBoxCellConfigClassRef = cellsClassConfig
+        .getTranslationBoxCellConfigClassRef(getContext().getDatabase());
     doc = modelAccess.getOrCreateDocument(translationBoxCellConfigClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(translationBoxCellConfigClassRef);

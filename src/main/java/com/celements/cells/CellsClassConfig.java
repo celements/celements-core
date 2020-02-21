@@ -7,6 +7,7 @@ import org.xwiki.model.reference.DocumentReference;
 public class CellsClassConfig implements ICellsClassConfig {
 
   @Override
+  @Deprecated
   public DocumentReference getCellClassRef(String wikiName) {
     return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE, CELEMENTS_CELL_CLASS_NAME);
   }
