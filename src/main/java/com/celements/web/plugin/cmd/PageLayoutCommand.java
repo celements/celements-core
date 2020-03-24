@@ -182,7 +182,7 @@ public class PageLayoutCommand {
     return false;
   }
 
-  private DocumentReference getPageLayoutPropertiesClassRef(WikiReference wikiRef) {
+  DocumentReference getPageLayoutPropertiesClassRef(WikiReference wikiRef) {
     return RefBuilder.from(wikiRef)
         .space(PAGE_LAYOUT_PROPERTIES_CLASS_SPACE)
         .doc(PAGE_LAYOUT_PROPERTIES_CLASS_DOC)
@@ -543,7 +543,7 @@ public class PageLayoutCommand {
     }
   }
 
-  private static final WikiReference getCentralWikiRef() {
+  final WikiReference getCentralWikiRef() {
     return RefBuilder.create().wiki(CelConstant.CENTRAL_WIKI_NAME).build(WikiReference.class);
   }
 
