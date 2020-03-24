@@ -129,7 +129,7 @@ public class DocFormScriptService implements ScriptService {
 
   boolean hasEditOnAllDocs(Collection<XWikiDocument> xdocs) {
     return xdocs.stream()
-        .filter(getDocFormCommand()::notNewOrCreateAllowed)
+        .filter(xdoc -> !xdoc.isNew() || getDocFormCommand().isCreateAllowed(xdoc))
         .allMatch(xdoc -> rightsAccess.hasAccessLevel(
             xdoc.getDocumentReference(), EAccessLevel.EDIT));
   }

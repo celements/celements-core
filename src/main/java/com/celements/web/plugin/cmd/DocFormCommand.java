@@ -154,21 +154,19 @@ public class DocFormCommand {
       Collection<XWikiDocument> xdocs) {
     Map<String, Set<DocumentReference>> ret = createEmptySaveMap();
     for (XWikiDocument xdoc : xdocs) {
-      if (notNewOrCreateAllowed(xdoc)) {
-        if (newOrChanged(xdoc)) {
-          try {
-            getModelAccess().saveDocument(xdoc, "updateAndSaveDocFromRequest");
-            ret.get(MAP_KEY_SUCCESS).add(xdoc.getDocumentReference());
-          } catch (DocumentSaveException dse) {
-            ret.get(MAP_KEY_FAIL).add(xdoc.getDocumentReference());
-            LOGGER.error("failed saving [{}]", serialize(xdoc.getDocumentReference()), dse);
-          }
-        } else {
-          LOGGER.info("saveXWikiDocCollection: skip unchanged doc [{}]",
-              defer(() -> serialize(xdoc.getDocumentReference())));
-        }
-      } else {
+      if (!hasChanged(xdoc)) {
+        LOGGER.info("saveXWikiDocCollection: skip unchanged doc [{}]",
+            defer(() -> serialize(xdoc.getDocumentReference())));
+      } else if (xdoc.isNew() && !isCreateAllowed(xdoc)) {
         ret.get(MAP_KEY_FAIL).add(xdoc.getDocumentReference());
+      } else {
+        try {
+          getModelAccess().saveDocument(xdoc, "updateAndSaveDocFromRequest");
+          ret.get(MAP_KEY_SUCCESS).add(xdoc.getDocumentReference());
+        } catch (DocumentSaveException dse) {
+          ret.get(MAP_KEY_FAIL).add(xdoc.getDocumentReference());
+          LOGGER.error("failed saving [{}]", serialize(xdoc.getDocumentReference()), dse);
+        }
       }
     }
     return ret;
@@ -181,13 +179,13 @@ public class DocFormCommand {
     return map;
   }
 
-  public boolean notNewOrCreateAllowed(XWikiDocument xdoc) {
-    return !xdoc.isNew() || toBoolean(getContext().getRequestParameter("createIfNotExists").or(""));
-  }
-
-  boolean newOrChanged(XWikiDocument xdoc) {
+  boolean hasChanged(XWikiDocument xdoc) {
     return xdoc.isNew() || getCopyDocService().check(xdoc,
         getModelAccess().getOrCreateDocument(xdoc.getDocumentReference()));
+  }
+
+  public boolean isCreateAllowed(XWikiDocument xdoc) {
+    return toBoolean(getContext().getRequestParameter("createIfNotExists").or(""));
   }
 
   XWikiDocument getUpdateDoc(DocumentReference docRef) {
