@@ -96,10 +96,9 @@ public class LayoutScriptService implements ScriptService {
   }
 
   public PageLayoutApi getPageLayoutApiForRef(SpaceReference layoutSpaceRef) {
-    if (layoutSpaceRef != null) {
-      return getPageLayoutApiForDocRef(getPageLayoutCmd().standardPropDocRef(layoutSpaceRef));
-    }
-    return null;
+    return getPageLayoutCmd().resolveValidLayoutSpace(layoutSpaceRef)
+        .map(PageLayoutApi::new)
+        .orElse(null);
   }
 
   /**

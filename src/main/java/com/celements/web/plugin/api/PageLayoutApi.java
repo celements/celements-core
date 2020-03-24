@@ -29,11 +29,13 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.HtmlDoctype;
 import com.celements.cells.ICellsClassConfig;
+import com.celements.model.context.ModelContext;
 import com.celements.model.util.References;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.web.Utils;
 
 public class PageLayoutApi extends Api {
 
@@ -46,6 +48,10 @@ public class PageLayoutApi extends Api {
     super(context);
     this.pageLayoutCmd = new PageLayoutCommand();
     this.layoutSpaceRef = layoutSpaceRef;
+  }
+
+  public PageLayoutApi(SpaceReference layoutSpaceRef) {
+    this(layoutSpaceRef, getContext().getXWikiContext());
   }
 
   public SpaceReference getLayoutSpaceRef() {
@@ -104,6 +110,10 @@ public class PageLayoutApi extends Api {
       LOGGER.error("Failed to export page layout [{}]", layoutSpaceRef, exp);
     }
     return false;
+  }
+
+  private static final ModelContext getContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
 }
