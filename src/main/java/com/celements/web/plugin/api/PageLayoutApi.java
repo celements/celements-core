@@ -29,6 +29,7 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.HtmlDoctype;
 import com.celements.cells.ICellsClassConfig;
+import com.celements.model.util.References;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -36,7 +37,7 @@ import com.xpn.xwiki.api.Api;
 
 public class PageLayoutApi extends Api {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(PageLayoutApi.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PageLayoutApi.class);
 
   private PageLayoutCommand pageLayoutCmd;
   private SpaceReference layoutSpaceRef;
@@ -45,6 +46,10 @@ public class PageLayoutApi extends Api {
     super(context);
     this.pageLayoutCmd = new PageLayoutCommand();
     this.layoutSpaceRef = layoutSpaceRef;
+  }
+
+  public SpaceReference getLayoutSpaceRef() {
+    return References.cloneRef(layoutSpaceRef, SpaceReference.class);
   }
 
   public PageLayoutCommand getPageLayoutCommand() {
@@ -95,10 +100,8 @@ public class PageLayoutApi extends Api {
     try {
       pageLayoutCmd.exportLayoutXAR(layoutSpaceRef, withDocHistory);
       return true;
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
-    } catch (IOException exp) {
-      LOGGER.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
+    } catch (XWikiException | IOException exp) {
+      LOGGER.error("Failed to export page layout [{}]", layoutSpaceRef, exp);
     }
     return false;
   }
