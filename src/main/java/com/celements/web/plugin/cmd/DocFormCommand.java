@@ -19,10 +19,13 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.lambda.LambdaExceptionUtil.*;
+import static com.celements.logging.LogUtils.*;
+import static org.apache.commons.lang.BooleanUtils.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,14 +36,15 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.oro.text.perl.MalformedPerl5PatternException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.copydoc.ICopyDocumentRole;
 import com.celements.docform.DocFormRequestKey;
 import com.celements.docform.DocFormRequestKeyParser;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
@@ -62,49 +66,43 @@ import com.xpn.xwiki.web.XWikiRequest;
  */
 public class DocFormCommand {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(DocFormCommand.class);
+  public static final String MAP_KEY_SUCCESS = "successful";
+  public static final String MAP_KEY_FAIL = "failed";
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DocFormCommand.class);
 
   private final Map<String, BaseObject> changedObjects = new HashMap<>();
   private final Map<String, XWikiDocument> changedDocs = new HashMap<>();
 
   /**
-   * @Deprecated: since 2.59 instead use variable in
-   *              {@link #updateDocFromMap(DocumentReference, Map, XWikiContext)}
+   * @deprecated: since 2.59 instead use variable in
+   *              {@link #updateDocFromMap(DocumentReference, Map)}
    */
   @Deprecated
   public Set<XWikiDocument> updateDocFromMap(String fullname, Map<String, String[]> data,
       XWikiContext context) throws XWikiException {
-    return updateDocFromMap(getModelUtils().resolveRef(fullname, DocumentReference.class), data,
-        context);
+    return updateDocFromMap(getModelUtils().resolveRef(fullname, DocumentReference.class), data);
   }
 
+  /**
+   * @deprecated instead use {@link #updateDocFromMap(DocumentReference, Map)}
+   */
+  @Deprecated
   public Set<XWikiDocument> updateDocFromMap(DocumentReference docRef, Map<String, String[]> data,
       XWikiContext context) throws XWikiException {
-    XWikiDocument doc = getUpdateDoc(docRef, context);
-    String template = Strings.nullToEmpty(context.getRequest().getParameter("template")).trim();
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("updateDocFromMap: updating doc '{}' with template '{}' and request " + "'{}'",
-          doc, template, context.getRequest().getParameterMap());
-    } else {
-      LOGGER.debug("updateDocFromMap: updating doc '{}' with template '{}'", doc, template);
-    }
-    if (doc.isNew() && !template.isEmpty()) {
-      DocumentReference templRef = getModelUtils().resolveRef(template, DocumentReference.class);
-      try {
-        doc.readFromTemplate(templRef, context);
-      } catch (XWikiException e) {
-        if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
-          context.put("exception", e);
-        }
-        LOGGER.error("Exception reading doc " + docRef + " from template " + templRef, e);
-      }
-    }
+    return updateDocFromMap(docRef, data);
+  }
+
+  public Set<XWikiDocument> updateDocFromMap(DocumentReference docRef, Map<String, String[]> data)
+      throws XWikiException {
+    XWikiDocument doc = getUpdateDoc(docRef);
+    updateFromTemplate(doc);
     DocFormRequestKeyParser parser = new DocFormRequestKeyParser();
     for (DocFormRequestKey key : parser.parse(data.keySet(), docRef)) {
       String value = collapse(data.get(key.getKeyString()));
       LOGGER.debug("updateDocFromMap: request key '{}' with value '{}'", key, value);
       if (key.isWhiteListed()) {
-        XWikiDocument tSaveDoc = getTranslatedDoc(key.getDocRef(), context);
+        XWikiDocument tSaveDoc = getTranslatedDoc(key.getDocRef());
         if (key.getFieldName().equals("content")) {
           tSaveDoc.setContent(value);
         } else if (key.getFieldName().equals("title")) {
@@ -113,11 +111,28 @@ public class DocFormCommand {
           LOGGER.info("updateDocFromMap: unknown field name in key '{}'", key);
         }
       } else {
-        XWikiDocument saveDoc = getUpdateDoc(key.getDocRef(), context);
-        setOrRemoveObj(saveDoc, key, value, context);
+        XWikiDocument saveDoc = getUpdateDoc(key.getDocRef());
+        setOrRemoveObj(saveDoc, key, value);
       }
     }
     return new HashSet<>(changedDocs.values());
+  }
+
+  private void updateFromTemplate(XWikiDocument doc) {
+    String template = getContext().getRequestParameter("template").or("");
+    if (doc.isNew() && !template.isEmpty()) {
+      LOGGER.debug("updateFromTemplate: updating doc '{}' with template '{}'", doc, template);
+      DocumentReference templRef = getModelUtils().resolveRef(template, DocumentReference.class);
+      try {
+        doc.readFromTemplate(templRef, getContext().getXWikiContext());
+      } catch (XWikiException xwe) {
+        if (xwe.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
+          getContext().getXWikiContext().put("exception", xwe);
+        }
+        LOGGER.error("Exception reading doc [{}] from template [{}]", doc.getDocumentReference(),
+            templRef, xwe);
+      }
+    }
   }
 
   public Map<String, String[]> prepareMapForDocUpdate(Map<String, ?> map) {
@@ -137,67 +152,75 @@ public class DocFormCommand {
 
   public Map<String, Set<DocumentReference>> saveXWikiDocCollection(
       Collection<XWikiDocument> xdocs) {
-    Set<DocumentReference> savedSuccessfully = new HashSet<>();
-    Set<DocumentReference> saveFailed = new HashSet<>();
+    Map<String, Set<DocumentReference>> ret = createEmptySaveMap();
     for (XWikiDocument xdoc : xdocs) {
       if (notNewOrCreateAllowed(xdoc)) {
-        try {
-          getModelAccess().saveDocument(xdoc, "updateAndSaveDocFromRequest");
-          savedSuccessfully.add(xdoc.getDocumentReference());
-        } catch (DocumentSaveException dse) {
-          LOGGER.error("Exception saving document {}.", xdoc, dse);
-          saveFailed.add(xdoc.getDocumentReference());
+        if (newOrChanged(xdoc)) {
+          try {
+            getModelAccess().saveDocument(xdoc, "updateAndSaveDocFromRequest");
+            ret.get(MAP_KEY_SUCCESS).add(xdoc.getDocumentReference());
+          } catch (DocumentSaveException dse) {
+            ret.get(MAP_KEY_FAIL).add(xdoc.getDocumentReference());
+            LOGGER.error("failed saving [{}]", serialize(xdoc.getDocumentReference()), dse);
+          }
+        } else {
+          LOGGER.info("saveXWikiDocCollection: skip unchanged doc [{}]",
+              defer(() -> serialize(xdoc.getDocumentReference())));
         }
       } else {
-        saveFailed.add(xdoc.getDocumentReference());
+        ret.get(MAP_KEY_FAIL).add(xdoc.getDocumentReference());
       }
     }
-    Map<String, Set<DocumentReference>> docs = new HashMap<>();
-    docs.put("successful", savedSuccessfully);
-    docs.put("failed", saveFailed);
-    return docs;
+    return ret;
+  }
+
+  public Map<String, Set<DocumentReference>> createEmptySaveMap() {
+    Map<String, Set<DocumentReference>> map = new HashMap<>();
+    map.put(MAP_KEY_SUCCESS, new HashSet<>());
+    map.put(MAP_KEY_FAIL, new HashSet<>());
+    return map;
   }
 
   public boolean notNewOrCreateAllowed(XWikiDocument xdoc) {
-    return !xdoc.isNew() || "true".equals(getContext().getRequest().get("createIfNotExists"));
+    return !xdoc.isNew() || toBoolean(getContext().getRequestParameter("createIfNotExists").or(""));
   }
 
-  XWikiDocument getUpdateDoc(DocumentReference docRef, XWikiContext context) throws XWikiException {
-    XWikiDocument doc = getModelAccess().getOrCreateDocument(docRef);
-    if (doc.isNew() && "".equals(doc.getDefaultLanguage())) {
-      doc.setDefaultLanguage(context.getLanguage());
-    }
-    if (!changedDocs.containsKey(serialize(docRef) + ";" + doc.getDefaultLanguage())) {
-      LOGGER.debug("getUpdateDoc: [" + serialize(docRef) + ";" + doc.getDefaultLanguage()
-          + "] with doc language [" + doc.getLanguage() + "].");
-      applyCreationDateFix(doc, context);
-      changedDocs.put(serialize(docRef) + ";" + doc.getDefaultLanguage(), doc);
-    } else {
-      doc = changedDocs.get(serialize(docRef) + ";" + doc.getDefaultLanguage());
-    }
-    return doc;
+  boolean newOrChanged(XWikiDocument xdoc) {
+    return xdoc.isNew() || getCopyDocService().check(xdoc,
+        getModelAccess().getOrCreateDocument(xdoc.getDocumentReference()));
   }
 
-  XWikiDocument getTranslatedDoc(DocumentReference docRef, XWikiContext context)
+  XWikiDocument getUpdateDoc(DocumentReference docRef) {
+    String lang = getContext().getLanguage().orElse("");
+    return changedDocs.computeIfAbsent(buildDocMapKey(docRef, lang), key -> {
+      XWikiDocument doc = getModelAccess().getOrCreateDocument(docRef);
+      if (doc.isNew() && "".equals(doc.getDefaultLanguage())) {
+        doc.setDefaultLanguage(lang);
+      }
+      LOGGER.debug("getUpdateDoc: [{}] with doc language [{}]", key, doc.getLanguage());
+      return doc;
+    });
+  }
+
+  XWikiDocument getTranslatedDoc(DocumentReference docRef) throws XWikiException {
+    XWikiDocument doc = getUpdateDoc(docRef);
+    String lang = getContext().getLanguage().orElse("");
+    return changedDocs.computeIfAbsent(buildDocMapKey(docRef, lang), rethrowFunction(key -> {
+      return new AddTranslationCommand().getTranslatedDoc(doc, lang);
+    }));
+  }
+
+  private String buildDocMapKey(DocumentReference docRef, String lang) {
+    return serialize(docRef) + ";" + lang;
+  }
+
+  XWikiDocument setOrRemoveObj(XWikiDocument doc, DocFormRequestKey key, String value)
       throws XWikiException {
-    XWikiDocument tdoc;
-    if (!changedDocs.containsKey(serialize(docRef) + ";" + context.getLanguage())) {
-      XWikiDocument doc = getUpdateDoc(docRef, context);
-      tdoc = new AddTranslationCommand().getTranslatedDoc(doc, context.getLanguage());
-      changedDocs.put(serialize(docRef) + ";" + context.getLanguage(), tdoc);
-    } else {
-      tdoc = changedDocs.get(serialize(docRef) + ";" + context.getLanguage());
-    }
-    return tdoc;
-  }
-
-  XWikiDocument setOrRemoveObj(XWikiDocument doc, DocFormRequestKey key, String value,
-      XWikiContext context) throws XWikiException {
     BaseObject obj = changedObjects.get(getObjCacheKey(key));
     if (obj == null) {
       obj = doc.getXObject(key.getClassRef(), key.getObjNb());
       if ((obj == null) || (key.getObjNb() < 0)) {
-        obj = doc.newXObject(key.getClassRef(), context);
+        obj = doc.newXObject(key.getClassRef(), getContext().getXWikiContext());
         LOGGER.debug("setOrRemoveObj: new obj for key '{}'", key);
       }
       changedObjects.put(getObjCacheKey(key), obj);
@@ -208,7 +231,7 @@ public class DocFormCommand {
         boolean success = doc.removeXObject(obj);
         LOGGER.debug("setOrRemoveObj: removing obj for key '{}' was success '{}'", key, success);
       } else {
-        obj.set(key.getFieldName(), value, context);
+        obj.set(key.getFieldName(), value, getContext().getXWikiContext());
         LOGGER.debug("setOrRemoveObj: set value '{}' for key '{}'", value, key);
       }
     }
@@ -218,15 +241,6 @@ public class DocFormCommand {
   private String getObjCacheKey(DocFormRequestKey key) {
     return serialize(key.getDocRef()) + DocFormRequestKeyParser.KEY_DELIM + serialize(
         key.getClassRef()) + DocFormRequestKeyParser.KEY_DELIM + key.getObjNb();
-  }
-
-  void applyCreationDateFix(XWikiDocument doc, XWikiContext context) {
-    // FIXME Should be done when xwiki saves a new document. Unfortunately it is done
-    // when you first get a document and than cached.
-    if (doc.isNew()) {
-      doc.setCreationDate(new Date());
-      doc.setCreator(context.getUser());
-    }
   }
 
   /**
@@ -353,17 +367,20 @@ public class DocFormCommand {
     return changedDocs;
   }
 
-  private ModelUtils getModelUtils() {
+  private static final ModelUtils getModelUtils() {
     return Utils.getComponent(ModelUtils.class);
   }
 
-  private IModelAccessFacade getModelAccess() {
+  private static final IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
   }
 
-  private XWikiContext getContext() {
-    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
+  private static final ICopyDocumentRole getCopyDocService() {
+    return Utils.getComponent(ICopyDocumentRole.class);
+  }
+
+  private static final ModelContext getContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
 }

@@ -24,7 +24,6 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -95,7 +94,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     replayDefault();
-    XWikiDocument updateDoc = docFormCmd.getUpdateDoc(docRef, context);
+    XWikiDocument updateDoc = docFormCmd.getUpdateDoc(docRef);
     assertNotNull(updateDoc);
     assertEquals(doc, updateDoc);
     verifyDefault();
@@ -112,7 +111,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     objMock.set(eq("hi"), eq(value), same(context));
     expectLastCall().once();
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, value, context);
+    docFormCmd.setOrRemoveObj(docMock, key, value);
     verifyDefault();
   }
 
@@ -129,7 +128,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expectLastCall().once();
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, value, context);
+    docFormCmd.setOrRemoveObj(docMock, key, value);
     verifyDefault();
 
     assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
@@ -149,7 +148,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expectLastCall().once();
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, value, context);
+    docFormCmd.setOrRemoveObj(docMock, key, value);
     verifyDefault();
 
     assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
@@ -175,8 +174,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expectLastCall();
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key1, value1, context);
-    docFormCmd.setOrRemoveObj(docMock, key2, value2, context);
+    docFormCmd.setOrRemoveObj(docMock, key1, value1);
+    docFormCmd.setOrRemoveObj(docMock, key2, value2);
     verifyDefault();
 
     assertEquals(objMock1, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_-1"));
@@ -193,7 +192,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expect(docMock.removeXObject(same(objMock))).andReturn(true).once();
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, "", context);
+    docFormCmd.setOrRemoveObj(docMock, key, "");
     verifyDefault();
 
     assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
@@ -210,7 +209,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expect(docMock.removeXObject(same(objMock))).andReturn(true).once();
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, "", context);
+    docFormCmd.setOrRemoveObj(docMock, key, "");
     verifyDefault();
 
     assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
@@ -274,22 +273,6 @@ public class DocFormCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testApplyCreationDateFix() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Test",
-        "Doc"));
-    doc.setCreationDate(new Date(0));
-    doc.setCreator("");
-    replayDefault();
-    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
-    // calls xwiki.isVirtualMode
-    getContext().setUser("Hans.Wurscht");
-    docFormCmd.applyCreationDateFix(doc, getContext());
-    assertTrue(doc.getCreationDate().getTime() > 0);
-    assertEquals("Hans.Wurscht", doc.getCreator());
-    verifyDefault();
-  }
-
-  @Test
   public void testUpdateDocFromMap() throws XWikiException {
     Map<String, String[]> data = new HashMap<>();
     data.put("Oh.Noes_A.B_0_blabla", new String[] { "Blabla Value" });
@@ -317,7 +300,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     DocumentReference cdClassRef = new DocumentReference(db, "C", "D");
     defaultDoc.setXObjects(cdClassRef, cDobjects);
     expect(xwiki.exists(eq(fullNameRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc).times(2);
+    expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc).once();
     XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
     Vector<BaseObject> cDobjects2 = new Vector<>();
     cDobjects2.add(obj2);
@@ -328,9 +311,9 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc).once();
     XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    expect(request.getParameter(eq("template"))).andReturn("");
+    expect(request.get(eq("template"))).andReturn("");
     replayDefault();
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", data, context);
+    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap(fullNameRef, data);
     verifyDefault(obj, obj2);
     assertTrue(changedDocs.contains(defaultDoc));
     assertEquals(2, defaultDoc.getXObjects(cdClassRef).size());
@@ -355,7 +338,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(doc2Ref), same(context))).andReturn(true).atLeastOnce();
     XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    expect(request.getParameter(eq("template"))).andReturn("Templates.MyTempl");
+    expect(request.get(eq("template"))).andReturn("Templates.MyTempl");
     DocumentReference templRef = new DocumentReference(db, "Templates", "MyTempl");
     XWikiDocument templDoc = new XWikiDocument(templRef);
     expect(xwiki.getDocument(eq(templRef), same(context))).andReturn(templDoc);
@@ -366,7 +349,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     // expect(store.loadXWikiDoc(isA(XWikiDocument.class),
     // same(context))).andReturn(specificDoc);
     replayDefault();
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", data, context);
+    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap(fullNameRef, data);
     verifyDefault();
     // TODO Check how it works - getTranslatedDoc seems to create a new object which leads
     // to getContent() and getTitle() to be empty -> does it work correctly anyways?
@@ -405,8 +388,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
     defaultDoc.setXObjects(cdClassRef, cDobjects);
     DocumentReference doc1Ref = new DocumentReference(db, "Full", "Name");
     expect(xwiki.exists(eq(doc1Ref), same(context))).andReturn(false).atLeastOnce();
-    expect(getMock(XWikiDocumentCreator.class).create(eq(doc1Ref), eq(""))).andReturn(
-        defaultDoc).times(2);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(doc1Ref), eq("")))
+        .andReturn(defaultDoc).once();
     XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
     Vector<BaseObject> cDobjects2 = new Vector<>();
     cDobjects2.add(obj2);
@@ -417,12 +400,12 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(doc2Ref), same(context))).andReturn(true).atLeastOnce();
     XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
-    expect(request.getParameter(eq("template"))).andReturn("Templates.MyTempl");
+    expect(request.get(eq("template"))).andReturn("Templates.MyTempl");
     DocumentReference templRef = new DocumentReference(db, "Templates", "MyTempl");
     XWikiDocument templDoc = new XWikiDocument(templRef);
     expect(xwiki.getDocument(eq(templRef), same(context))).andReturn(templDoc);
     replayDefault();
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", data, context);
+    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap(fullNameRef, data);
     verifyDefault(obj, obj2);
     assertTrue(changedDocs.contains(defaultDoc));
     assertEquals(2, defaultDoc.getXObjects(cdClassRef).size());
@@ -445,7 +428,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
 
     replayDefault();
-    docFormCmd.updateDocFromMap(docRef, data, context);
+    docFormCmd.updateDocFromMap(docRef, data);
     verifyDefault();
 
     assertEquals(value, doc.getContent());
@@ -462,13 +445,13 @@ public class DocFormCommandTest extends AbstractComponentTest {
     Map<String, String[]> data = new HashMap<>();
     data.put("A.B_0_content", new String[] { value });
 
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).times(2);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     objMock.set(eq("content"), eq(value), same(context));
     expectLastCall().once();
 
     replayDefault();
-    docFormCmd.updateDocFromMap(docRef, data, context);
+    docFormCmd.updateDocFromMap(docRef, data);
     verifyDefault();
   }
 
@@ -487,7 +470,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
 
     replayDefault();
-    docFormCmd.updateDocFromMap(docRef, data, context);
+    docFormCmd.updateDocFromMap(docRef, data);
     verifyDefault();
 
     assertEquals(value, doc.getTitle());
@@ -510,7 +493,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expectLastCall().once();
 
     replayDefault();
-    docFormCmd.updateDocFromMap(docRef, data, context);
+    docFormCmd.updateDocFromMap(docRef, data);
     verifyDefault();
   }
 

@@ -1,5 +1,6 @@
 package com.celements.webform;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -11,68 +12,60 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
+public class DocFormScriptServiceTest extends AbstractComponentTest {
 
-  private XWikiContext context;
-  private XWiki xwiki;
   private DocFormScriptService docFormService;
   private IModelAccessFacade modelAccessFacade;
+  private XWikiRightService rightServiceMock;
 
   @Before
-  public void setUp_DocFormScriptServiceTest() throws Exception {
-    context = getContext();
-    xwiki = getWikiMock();
+  public void prepareTest() throws Exception {
+    modelAccessFacade = registerComponentMock(IModelAccessFacade.class);
     docFormService = (DocFormScriptService) Utils.getComponent(ScriptService.class, "docform");
-    modelAccessFacade = createMockAndAddToDefault(IModelAccessFacade.class);
-    DefaultComponentDescriptor<IModelAccessFacade> descriptor = new DefaultComponentDescriptor<>();
-    descriptor.setRole(IModelAccessFacade.class);
-    descriptor.setRoleHint("default");
-    Utils.getComponentManager().registerComponent(descriptor, modelAccessFacade);
+    rightServiceMock = createMockAndAddToDefault(XWikiRightService.class);
+    expect(getWikiMock().getRightService()).andReturn(rightServiceMock).anyTimes();
+    getContext().setRequest(createMockAndAddToDefault(XWikiRequest.class));
   }
 
   @Test
-  public void testCheckRightsAndSaveXWikiDocCollection_empty() throws XWikiException {
-    Map<String, Set<DocumentReference>> result = docFormService.checkRightsAndSaveXWikiDocCollection(
-        Collections.<XWikiDocument>emptyList());
+  public void test_checkRightsAndSaveXWikiDocCollection_empty() throws XWikiException {
+    Map<String, Set<DocumentReference>> result = docFormService
+        .checkRightsAndSaveXWikiDocCollection(
+            Collections.<XWikiDocument>emptyList());
     assertEquals(2, result.size());
     assertEquals(0, result.get("successful").size());
     assertEquals(0, result.get("failed").size());
   }
 
   @Test
-  public void testCheckRightsAndSaveXWikiDocCollection_saveDoc() throws XWikiException,
+  public void test_checkRightsAndSaveXWikiDocCollection_saveDoc() throws XWikiException,
       DocumentSaveException {
     Collection<XWikiDocument> xdocs = new ArrayList<>();
     XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
     doc.setNew(false);
+    doc.setTitle("some change happened");
     xdocs.add(doc);
+    expect(modelAccessFacade.getOrCreateDocument(doc.getDocumentReference()))
+        .andReturn(new XWikiDocument(doc.getDocumentReference()));
     modelAccessFacade.saveDocument(eq(doc), (String) anyObject());
-    expectLastCall();
-    XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), eq("w:S.D"), same(
-        getContext()))).andReturn(true);
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    expect(request.get(eq("createIfNotExists"))).andReturn("false").anyTimes();
-    context.setRequest(request);
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(getContext().getUser()), eq("w:S.D"),
+        same(getContext()))).andReturn(true);
+    expect(getContext().getRequest().get(eq("createIfNotExists"))).andReturn("false").anyTimes();
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.checkRightsAndSaveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = docFormService
+        .checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(1, result.get("successful").size());
@@ -80,17 +73,36 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testCheckRightsAndSaveXWikiDocCollection_newWithoutCreateIfNotExists()
+  public void test_checkRightsAndSaveXWikiDocCollection_noChange() throws XWikiException,
+      DocumentSaveException {
+    Collection<XWikiDocument> xdocs = new ArrayList<>();
+    XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
+    doc.setNew(false);
+    xdocs.add(doc);
+    expect(modelAccessFacade.getOrCreateDocument(doc.getDocumentReference()))
+        .andReturn(new XWikiDocument(doc.getDocumentReference()));
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(getContext().getUser()), eq("w:S.D"),
+        same(getContext()))).andReturn(true);
+    expect(getContext().getRequest().get(eq("createIfNotExists"))).andReturn("false").anyTimes();
+    replayDefault();
+    Map<String, Set<DocumentReference>> result = docFormService
+        .checkRightsAndSaveXWikiDocCollection(xdocs);
+    verifyDefault();
+    assertEquals(2, result.size());
+    assertEquals(0, result.get("successful").size());
+    assertEquals(0, result.get("failed").size());
+  }
+
+  @Test
+  public void test_checkRightsAndSaveXWikiDocCollection_newWithoutCreateIfNotExists()
       throws XWikiException {
     Collection<XWikiDocument> xdocs = new ArrayList<>();
     XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
     xdocs.add(doc);
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    expect(request.get(eq("createIfNotExists"))).andReturn("false").anyTimes();
-    context.setRequest(request);
+    expect(getContext().getRequest().get(eq("createIfNotExists"))).andReturn("false").anyTimes();
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.checkRightsAndSaveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = docFormService
+        .checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(0, result.get("successful").size());
@@ -98,7 +110,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testCheckRightsAndSaveXWikiDocCollection_saveDoc_multiple_notRightsOnAll()
+  public void test_checkRightsAndSaveXWikiDocCollection_saveDoc_multiple_notRightsOnAll()
       throws XWikiException {
     Collection<XWikiDocument> xdocs = new ArrayList<>();
     String docName1 = "HasRight";
@@ -108,18 +120,14 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
     xdocs.add(doc1);
     XWikiDocument doc2 = new XWikiDocument(new DocumentReference("w", "S", docName2));
     xdocs.add(doc2);
-    XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), eq("w:S."
-        + docName1), same(getContext()))).andReturn(true);
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), eq("w:S."
-        + docName2), same(getContext()))).andReturn(false);
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    expect(request.get(eq("createIfNotExists"))).andReturn("true").anyTimes();
-    context.setRequest(request);
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(getContext().getUser()),
+        eq("w:S." + docName1), same(getContext()))).andReturn(true);
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(getContext().getUser()),
+        eq("w:S." + docName2), same(getContext()))).andReturn(false);
+    expect(getContext().getRequest().get(eq("createIfNotExists"))).andReturn("true").anyTimes();
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.checkRightsAndSaveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = docFormService
+        .checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(0, result.get("successful").size());
@@ -131,7 +139,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testCheckRightsAndSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll()
+  public void test_checkRightsAndSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll()
       throws XWikiException, DocumentSaveException {
     Collection<XWikiDocument> xdocs = new ArrayList<>();
     String docName1 = "HasRight1";
@@ -144,18 +152,14 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
     expectLastCall();
     modelAccessFacade.saveDocument(eq(doc2), (String) anyObject());
     expectLastCall();
-    XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), eq("w:S."
-        + docName1), same(getContext()))).andReturn(true);
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), eq("w:S."
-        + docName2), same(getContext()))).andReturn(true);
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    expect(request.get(eq("createIfNotExists"))).andReturn("true").anyTimes();
-    context.setRequest(request);
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(getContext().getUser()),
+        eq("w:S." + docName1), same(getContext()))).andReturn(true);
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(getContext().getUser()),
+        eq("w:S." + docName2), same(getContext()))).andReturn(true);
+    expect(getContext().getRequest().get(eq("createIfNotExists"))).andReturn("true").anyTimes();
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.checkRightsAndSaveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = docFormService
+        .checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(2, result.get("successful").size());
@@ -167,7 +171,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testCheckRightsAndSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll_exception()
+  public void test_checkRightsAndSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll_exception()
       throws XWikiException, DocumentSaveException {
     Collection<XWikiDocument> xdocs = new ArrayList<>();
     String docName1 = "HasRight1";
@@ -181,18 +185,14 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
     expectLastCall();
     modelAccessFacade.saveDocument(eq(doc2), (String) anyObject());
     expectLastCall().andThrow(new DocumentSaveException(doc2Ref));
-    XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), eq("w:S."
-        + docName1), same(getContext()))).andReturn(true);
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), eq("w:S."
-        + docName2), same(getContext()))).andReturn(true);
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    expect(request.get(eq("createIfNotExists"))).andReturn("true").anyTimes();
-    context.setRequest(request);
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(getContext().getUser()),
+        eq("w:S." + docName1), same(getContext()))).andReturn(true);
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq(getContext().getUser()),
+        eq("w:S." + docName2), same(getContext()))).andReturn(true);
+    expect(getContext().getRequest().get(eq("createIfNotExists"))).andReturn("true").anyTimes();
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.checkRightsAndSaveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = docFormService
+        .checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(1, result.get("successful").size());
