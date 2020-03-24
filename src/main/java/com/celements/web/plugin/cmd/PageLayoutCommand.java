@@ -19,6 +19,8 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.io.IOException;
 import java.util.Deque;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.velocity.VelocityContext;
@@ -52,8 +55,11 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.context.ModelContext;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
+import com.celements.model.util.References;
+import com.celements.web.CelConstant;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -138,8 +144,7 @@ public class PageLayoutCommand {
           XWikiDocument propXdoc = getModelAccess().getOrCreateDocument(standardPropDocRef(
               layoutSpaceRef));
           BaseObject layoutPropObj = getModelAccess().newXObject(propXdoc,
-              getPageLayoutPropertiesClassRef(
-                  propXdoc.getDocumentReference().getWikiReference().getName()));
+              getPageLayoutPropertiesClassRef(propXdoc.getDocumentReference().getWikiReference()));
           layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName() + " Layout");
           layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, getDocType());
           getModelAccess().saveDocument(propXdoc, "Creating page layout", false);
@@ -177,9 +182,11 @@ public class PageLayoutCommand {
     return false;
   }
 
-  private DocumentReference getPageLayoutPropertiesClassRef(String dbName) {
-    return new DocumentReference(dbName, PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
-        PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+  private DocumentReference getPageLayoutPropertiesClassRef(WikiReference wikiRef) {
+    return RefBuilder.from(wikiRef)
+        .space(PAGE_LAYOUT_PROPERTIES_CLASS_SPACE)
+        .doc(PAGE_LAYOUT_PROPERTIES_CLASS_DOC)
+        .build(DocumentReference.class);
   }
 
   /**
@@ -201,7 +208,7 @@ public class PageLayoutCommand {
     XWikiDocument layoutPropDoc = getLayoutPropDoc(layoutSpaceRef);
     if (layoutPropDoc != null) {
       return layoutPropDoc.getXObject(getPageLayoutPropertiesClassRef(
-          layoutPropDoc.getDocumentReference().getWikiReference().getName()));
+          layoutPropDoc.getDocumentReference().getWikiReference()));
     } else {
       return null;
     }
@@ -234,7 +241,7 @@ public class PageLayoutCommand {
       try {
         XWikiDocument theDoc = getModelAccess().getDocument(layoutPropDocRef);
         if (theDoc.getXObject(getPageLayoutPropertiesClassRef(
-            theDoc.getDocumentReference().getWikiReference().getName())) != null) {
+            theDoc.getDocumentReference().getWikiReference())) != null) {
           layoutPropDoc = theDoc;
         }
       } catch (DocumentNotExistsException exp) {
@@ -247,7 +254,7 @@ public class PageLayoutCommand {
 
   public DocumentReference standardPropDocRef(SpaceReference layoutSpaceRef) {
     layoutSpaceRef = Optional.ofNullable(layoutSpaceRef)
-        .orElseGet(() -> getContext().getDoc().getDocumentReference().getLastSpaceReference());
+        .orElseGet(() -> getModelContext().getCurrentSpaceRefOrDefault());
     return RefBuilder.from(layoutSpaceRef).doc("WebHome").build(DocumentReference.class);
   }
 
@@ -295,13 +302,8 @@ public class PageLayoutCommand {
   private void setRenderLayoutInVelocityContext(SpaceReference layoutSpaceRef) {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
     if (layoutSpaceRef != null) {
-      /*
-       * IMPORTANT: do not use .clone() on any reference it will not be available on
-       * unstable branch
-       */
-      SpaceReference copyOfLayoutSpaceRef = new SpaceReference(layoutSpaceRef.getName(),
-          (WikiReference) layoutSpaceRef.getParent());
-      vcontext.put(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY, copyOfLayoutSpaceRef);
+      vcontext.put(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY,
+          References.cloneRef(layoutSpaceRef, SpaceReference.class));
     } else {
       vcontext.remove(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY);
     }
@@ -375,18 +377,18 @@ public class PageLayoutCommand {
    * @param layoutSpaceRef
    * @return
    */
-  public boolean checkLayoutAccess(SpaceReference layoutSpaceRef) {
-    if (layoutSpaceRef != null) {
-      String layoutWikiName = layoutSpaceRef.getParent().getName();
-      return getContext().getDatabase().equals(layoutWikiName) || "celements2web".equals(
-          layoutWikiName);
-    }
-    return false;
+  public boolean checkLayoutAccess(@NotNull SpaceReference layoutSpaceRef) {
+    WikiReference layoutWikiRef = References.extractRef(checkNotNull(layoutSpaceRef),
+        WikiReference.class).get();
+    return getModelContext().getWikiRef().equals(layoutWikiRef)
+        || getCentralWikiRef().equals(layoutWikiRef);
   }
 
   public SpaceReference getDefaultLayoutSpaceReference() {
-    SpaceReference defaultLayoutSpaceRef = new SpaceReference(getDefaultLayout(), new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference defaultLayoutSpaceRef = RefBuilder
+        .from(getModelContext().getWikiRef())
+        .space(getDefaultLayout())
+        .build(SpaceReference.class);
     return resolveValidLayoutSpace(defaultLayoutSpaceRef).orElse(null);
   }
 
@@ -405,25 +407,28 @@ public class PageLayoutCommand {
     return defaultLayout;
   }
 
-  public Optional<SpaceReference> resolveValidLayoutSpace(SpaceReference layoutSpaceRef) {
+  @NotNull
+  public Optional<SpaceReference> resolveValidLayoutSpace(@Nullable SpaceReference layoutSpaceRef) {
     if ((layoutSpaceRef != null) && !layoutExists(layoutSpaceRef)) {
-      SpaceReference centralLayoutSpaceRef = new SpaceReference(layoutSpaceRef.getName(),
-          new WikiReference("celements2web"));
+      SpaceReference centralLayoutSpaceRef = RefBuilder.from(layoutSpaceRef)
+          .with(getCentralWikiRef())
+          .build(SpaceReference.class);
       if (!layoutSpaceRef.equals(centralLayoutSpaceRef) && layoutExists(centralLayoutSpaceRef)) {
         layoutSpaceRef = centralLayoutSpaceRef;
       } else {
         layoutSpaceRef = null;
       }
     }
-    if (!checkLayoutAccess(layoutSpaceRef)) {
+    if ((layoutSpaceRef != null) && !checkLayoutAccess(layoutSpaceRef)) {
       layoutSpaceRef = null;
     }
     return Optional.ofNullable(layoutSpaceRef);
   }
 
   SpaceReference getCelLayoutEditorSpaceRef() {
-    return new SpaceReference(CEL_LAYOUT_EDITOR_PL_NAME, new WikiReference(
-        getContext().getDatabase()));
+    return RefBuilder.from(getModelContext().getWikiRef())
+        .space(CEL_LAYOUT_EDITOR_PL_NAME)
+        .build(SpaceReference.class);
   }
 
   private String getFullNameForDocRef(DocumentReference documentReference) {
@@ -538,6 +543,10 @@ public class PageLayoutCommand {
     }
   }
 
+  private static final WikiReference getCentralWikiRef() {
+    return RefBuilder.create().wiki(CelConstant.CENTRAL_WIKI_NAME).build(WikiReference.class);
+  }
+
   private static final IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
   }
@@ -546,8 +555,12 @@ public class PageLayoutCommand {
     return Utils.getComponent(ModelUtils.class);
   }
 
+  private static final ModelContext getModelContext() {
+    return Utils.getComponent(ModelContext.class);
+  }
+
   private static final XWikiContext getContext() {
-    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
+    return getModelContext().getXWikiContext();
   }
 
   private static final Execution getExecution() {
