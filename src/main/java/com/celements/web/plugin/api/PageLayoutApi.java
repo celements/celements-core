@@ -25,6 +25,7 @@ import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.HtmlDoctype;
@@ -54,15 +55,19 @@ public class PageLayoutApi extends Api {
     this(layoutSpaceRef, getContext().getXWikiContext());
   }
 
-  public SpaceReference getLayoutSpaceRef() {
-    return References.cloneRef(layoutSpaceRef, SpaceReference.class);
-  }
-
   public PageLayoutCommand getPageLayoutCommand() {
     if (hasProgrammingRights()) {
       return pageLayoutCmd;
     }
     return null;
+  }
+
+  public SpaceReference getLayoutSpaceRef() {
+    return References.cloneRef(layoutSpaceRef, SpaceReference.class);
+  }
+
+  public DocumentReference getLayoutConfigDocRef() {
+    return pageLayoutCmd.standardPropDocRef(layoutSpaceRef);
   }
 
   public boolean isActive() {
