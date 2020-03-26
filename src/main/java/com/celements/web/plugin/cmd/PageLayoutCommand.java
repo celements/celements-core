@@ -547,23 +547,23 @@ public class PageLayoutCommand {
     return RefBuilder.create().wiki(CelConstant.CENTRAL_WIKI_NAME).build(WikiReference.class);
   }
 
-  private static final IModelAccessFacade getModelAccess() {
+  private final IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
   }
 
-  private static final ModelUtils getModelUtils() {
+  private final ModelUtils getModelUtils() {
     return Utils.getComponent(ModelUtils.class);
   }
 
-  private static final ModelContext getModelContext() {
+  private final ModelContext getModelContext() {
     return Utils.getComponent(ModelContext.class);
   }
 
-  private static final XWikiContext getContext() {
+  private final XWikiContext getContext() {
     return getModelContext().getXWikiContext();
   }
 
-  private static final Execution getExecution() {
+  private final Execution getExecution() {
     return Utils.getComponent(Execution.class);
   }
 
