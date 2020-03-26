@@ -25,18 +25,22 @@ import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.HtmlDoctype;
 import com.celements.cells.ICellsClassConfig;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.References;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.web.Utils;
 
 public class PageLayoutApi extends Api {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(PageLayoutApi.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PageLayoutApi.class);
 
   private PageLayoutCommand pageLayoutCmd;
   private SpaceReference layoutSpaceRef;
@@ -47,11 +51,23 @@ public class PageLayoutApi extends Api {
     this.layoutSpaceRef = layoutSpaceRef;
   }
 
+  public PageLayoutApi(SpaceReference layoutSpaceRef) {
+    this(layoutSpaceRef, getContext().getXWikiContext());
+  }
+
   public PageLayoutCommand getPageLayoutCommand() {
     if (hasProgrammingRights()) {
       return pageLayoutCmd;
     }
     return null;
+  }
+
+  public SpaceReference getLayoutSpaceRef() {
+    return References.cloneRef(layoutSpaceRef, SpaceReference.class);
+  }
+
+  public DocumentReference getLayoutConfigDocRef() {
+    return pageLayoutCmd.standardPropDocRef(layoutSpaceRef);
   }
 
   public boolean isActive() {
@@ -95,12 +111,14 @@ public class PageLayoutApi extends Api {
     try {
       pageLayoutCmd.exportLayoutXAR(layoutSpaceRef, withDocHistory);
       return true;
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
-    } catch (IOException exp) {
-      LOGGER.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
+    } catch (XWikiException | IOException exp) {
+      LOGGER.error("Failed to export page layout [{}]", layoutSpaceRef, exp);
     }
     return false;
+  }
+
+  private static final ModelContext getContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
 }

@@ -1,5 +1,7 @@
 package com.celements.copydoc;
 
+import static com.google.common.base.Predicates.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,7 +41,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
 
   @Override
   public boolean check(XWikiDocument doc1, XWikiDocument doc2) {
-    return copyInternal(doc1, doc2, null, false);
+    return copyInternal(doc1, doc2, alwaysTrue(), false);
   }
 
   @Override
@@ -55,7 +57,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
   @Override
   public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc)
       throws DocumentSaveException {
-    return copyAndSave(srcDoc, trgDoc, null);
+    return copyAndSave(srcDoc, trgDoc, ImmutableSet.of());
   }
 
   @Override
@@ -70,7 +72,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
 
   @Override
   public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc) {
-    return copyInternal(srcDoc, trgDoc, null, true);
+    return copyInternal(srcDoc, trgDoc, alwaysTrue(), true);
   }
 
   @Override

@@ -67,6 +67,7 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
+import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.EntityTypeUtil;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -79,6 +80,7 @@ import com.celements.rendering.XHTMLtoHTML5cleanup;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.sajson.Builder;
+import com.celements.web.CelConstant;
 import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -100,8 +102,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 @Component
 public class WebUtilsService implements IWebUtilsService {
-
-  private static final WikiReference CENTRAL_WIKI_REF = new WikiReference("celements2web");
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
 
@@ -1407,7 +1407,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public WikiReference getCentralWikiRef() {
-    return CENTRAL_WIKI_REF;
+    return RefBuilder.create().wiki(CelConstant.CENTRAL_WIKI_NAME).build(WikiReference.class);
   }
 
   @Deprecated

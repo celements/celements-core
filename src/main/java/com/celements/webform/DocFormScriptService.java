@@ -2,7 +2,6 @@ package com.celements.webform;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -15,8 +14,10 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.model.context.ModelContext;
+import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.web.plugin.cmd.DocFormCommand;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -33,10 +34,13 @@ public class DocFormScriptService implements ScriptService {
   private Execution execution;
 
   @Requirement
-  IWebUtilsService webUtilsService;
+  private IRightsAccessFacadeRole rightsAccess;
+
+  @Requirement
+  private ModelContext context;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    return context.getXWikiContext();
   }
 
   /*
@@ -48,7 +52,7 @@ public class DocFormScriptService implements ScriptService {
   public Set<Document> updateDocFromMap(DocumentReference docRef, Map<String, ?> map)
       throws XWikiException {
     Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
-        getDocFormCommand().prepareMapForDocUpdate(map), getContext());
+        getDocFormCommand().prepareMapForDocUpdate(map));
     Set<Document> docs = new HashSet<>();
     for (XWikiDocument xdoc : xdocs) {
       docs.add(xdoc.newDocument(getContext()));
@@ -61,7 +65,7 @@ public class DocFormScriptService implements ScriptService {
     Collection<XWikiDocument> xdocs = Collections.<XWikiDocument>emptyList();
     try {
       xdocs = getDocFormCommand().updateDocFromMap(docRef,
-          getDocFormCommand().prepareMapForDocUpdate(map), getContext());
+          getDocFormCommand().prepareMapForDocUpdate(map));
       return checkRightsAndSaveXWikiDocCollection(xdocs);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
@@ -87,7 +91,7 @@ public class DocFormScriptService implements ScriptService {
   public Set<Document> updateDocFromRequest(DocumentReference docRef) throws XWikiException {
     Set<Document> docs = new HashSet<>();
     Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
-        getContext().getRequest().getParameterMap(), getContext());
+        getContext().getRequest().getParameterMap());
     for (XWikiDocument xdoc : xdocs) {
       docs.add(xdoc.newDocument(getContext()));
     }
@@ -100,10 +104,9 @@ public class DocFormScriptService implements ScriptService {
 
   @SuppressWarnings("unchecked")
   public Map<String, Set<DocumentReference>> updateAndSaveDocFromRequest(DocumentReference docRef) {
-    Collection<XWikiDocument> xdocs = Collections.<XWikiDocument>emptyList();
     try {
-      xdocs = getDocFormCommand().updateDocFromMap(docRef,
-          getContext().getRequest().getParameterMap(), getContext());
+      Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
+          getContext().getRequest().getParameterMap());
       return checkRightsAndSaveXWikiDocCollection(xdocs);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
@@ -111,40 +114,30 @@ public class DocFormScriptService implements ScriptService {
     return Collections.emptyMap();
   }
 
+  Map<String, Set<DocumentReference>> checkRightsAndSaveXWikiDocCollection(
+      Collection<XWikiDocument> xdocs) {
+    Map<String, Set<DocumentReference>> docs;
+    if (hasEditOnAllDocs(xdocs)) {
+      docs = getDocFormCommand().saveXWikiDocCollection(xdocs);
+    } else {
+      docs = getDocFormCommand().createEmptySaveMap();
+      xdocs.stream().map(XWikiDocument::getDocumentReference)
+          .forEach(docs.get(DocFormCommand.MAP_KEY_FAIL)::add);
+    }
+    return docs;
+  }
+
+  boolean hasEditOnAllDocs(Collection<XWikiDocument> xdocs) {
+    return xdocs.stream()
+        .filter(xdoc -> !xdoc.isNew() || getDocFormCommand().isCreateAllowed(xdoc))
+        .allMatch(xdoc -> rightsAccess.hasAccessLevel(
+            xdoc.getDocumentReference(), EAccessLevel.EDIT));
+  }
+
   private DocFormCommand getDocFormCommand() {
     if (getContext().get(_DOC_FORM_COMMAND_OBJECT) == null) {
       getContext().put(_DOC_FORM_COMMAND_OBJECT, new DocFormCommand());
     }
     return (DocFormCommand) getContext().get(_DOC_FORM_COMMAND_OBJECT);
-  }
-
-  Map<String, Set<DocumentReference>> checkRightsAndSaveXWikiDocCollection(
-      Collection<XWikiDocument> xdocs) throws XWikiException {
-    boolean hasEditOnAllDocs = hasEditOnAllDocs(xdocs);
-    Map<String, Set<DocumentReference>> docs;
-    if (hasEditOnAllDocs) {
-      docs = getDocFormCommand().saveXWikiDocCollection(xdocs);
-    } else {
-      Set<DocumentReference> saveFailed = new HashSet<>();
-      for (XWikiDocument xdoc : xdocs) {
-        saveFailed.add(xdoc.getDocumentReference());
-      }
-      docs = new HashMap<>();
-      docs.put("successful", new HashSet<DocumentReference>());
-      docs.put("failed", saveFailed);
-    }
-    return docs;
-  }
-
-  boolean hasEditOnAllDocs(Collection<XWikiDocument> xdocs) throws XWikiException {
-    boolean hasEditOnAllDocs = true;
-    for (XWikiDocument xdoc : xdocs) {
-      if (getDocFormCommand().notNewOrCreateAllowed(xdoc)) {
-        hasEditOnAllDocs &= getContext().getWiki().getRightService().hasAccessLevel("edit",
-            getContext().getUser(), webUtilsService.serializeRef(xdoc.getDocumentReference()),
-            getContext());
-      }
-    }
-    return hasEditOnAllDocs;
   }
 }
