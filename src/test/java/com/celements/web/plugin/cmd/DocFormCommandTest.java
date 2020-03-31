@@ -477,6 +477,31 @@ public class DocFormCommandTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testUpdateDocFromMap_title_lang() throws XWikiException {
+    docFormCmd.addTranslationCmd = createMockAndAddToDefault(AddTranslationCommand.class);
+    context.setRequest(new XWikiServletRequestStub());
+    context.setLanguage("it");
+    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    XWikiDocument docIt = new XWikiDocument(docRef);
+    docIt.setLanguage(context.getLanguage());
+    String value = "value";
+    Map<String, String[]> data = new HashMap<>();
+    data.put("title", new String[] { value });
+
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(docFormCmd.addTranslationCmd.getTranslatedDoc(same(doc), eq(context.getLanguage())))
+        .andReturn(docIt);
+
+    replayDefault();
+    docFormCmd.updateDocFromMap(docRef, data);
+    verifyDefault();
+
+    assertEquals(value, docIt.getTitle());
+  }
+
+  @Test
   public void testUpdateDocFromMap_objWithTitleField() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");

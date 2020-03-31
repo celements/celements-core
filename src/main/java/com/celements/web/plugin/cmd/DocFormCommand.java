@@ -189,11 +189,10 @@ public class DocFormCommand {
   }
 
   XWikiDocument getUpdateDoc(DocumentReference docRef) {
-    String lang = getContext().getLanguage().orElse("");
-    return changedDocs.computeIfAbsent(buildDocMapKey(docRef, lang), key -> {
+    return changedDocs.computeIfAbsent(buildDocMapKey(docRef, ""), key -> {
       XWikiDocument doc = getModelAccess().getOrCreateDocument(docRef);
       if (doc.isNew() && "".equals(doc.getDefaultLanguage())) {
-        doc.setDefaultLanguage(lang);
+        doc.setDefaultLanguage(getContext().getLanguage().orElse(""));
       }
       LOGGER.debug("getUpdateDoc: [{}] with doc language [{}]", key, doc.getLanguage());
       return doc;
@@ -203,9 +202,8 @@ public class DocFormCommand {
   XWikiDocument getTranslatedDoc(DocumentReference docRef) throws XWikiException {
     XWikiDocument doc = getUpdateDoc(docRef);
     String lang = getContext().getLanguage().orElse("");
-    return changedDocs.computeIfAbsent(buildDocMapKey(docRef, lang), rethrowFunction(key -> {
-      return new AddTranslationCommand().getTranslatedDoc(doc, lang);
-    }));
+    return changedDocs.computeIfAbsent(buildDocMapKey(docRef, lang),
+        rethrowFunction(key -> getAddTranslationCommand().getTranslatedDoc(doc, lang)));
   }
 
   private String buildDocMapKey(DocumentReference docRef, String lang) {
@@ -363,6 +361,18 @@ public class DocFormCommand {
 
   Map<String, XWikiDocument> getChangedDocs() {
     return changedDocs;
+  }
+
+  /**
+   * intended for test injects only
+   */
+  AddTranslationCommand addTranslationCmd;
+
+  private AddTranslationCommand getAddTranslationCommand() {
+    if (addTranslationCmd != null) {
+      return addTranslationCmd;
+    }
+    return new AddTranslationCommand();
   }
 
   private static final ModelUtils getModelUtils() {
