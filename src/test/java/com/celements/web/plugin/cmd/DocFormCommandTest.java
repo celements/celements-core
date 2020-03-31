@@ -498,6 +498,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     docFormCmd.updateDocFromMap(docRef, data);
     verifyDefault();
 
+    assertEquals("", doc.getTitle());
     assertEquals(value, docIt.getTitle());
   }
 
