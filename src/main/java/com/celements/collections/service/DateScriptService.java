@@ -15,12 +15,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.common.date.DateFormat;
+import com.celements.common.date.DateUtil;
 
 @Component("date")
 public class DateScriptService implements ScriptService {
 
   public ZoneId getZone() {
-    return ZoneId.systemDefault();
+    return DateUtil.getDefaultZone();
   }
 
   public ZoneId getZone(String zone) {
