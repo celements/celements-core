@@ -29,12 +29,16 @@ public class StreamScriptService implements ScriptService {
     return nullGuard(stream).collect(Collectors.toCollection(() -> collection));
   }
 
-  public String join(Stream<String> stream, String separator) {
+  public String join(Stream<?> stream, String separator) {
     return filterNonBlank(stream).collect(Collectors.joining(nullToEmpty(separator)));
   }
 
-  public Stream<String> filterNonBlank(Stream<String> stream) {
-    return nullGuard(stream).map(String::trim).filter(not(String::isEmpty));
+  public Stream<String> filterNonBlank(Stream<?> stream) {
+    return nullGuard(stream).map(Object::toString).map(String::trim).filter(not(String::isEmpty));
+  }
+
+  public <T> Stream<T> filterNull(Stream<T> stream) {
+    return nullGuard(stream);
   }
 
   private <T> Stream<T> nullGuard(Stream<T> stream) {
