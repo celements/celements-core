@@ -4,13 +4,15 @@ import static com.google.common.base.Predicates.*;
 
 import java.time.DateTimeException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.TemporalAccessor;
+import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 
@@ -19,6 +21,8 @@ import com.celements.common.date.DateUtil;
 
 @Component("date")
 public class DateScriptService implements ScriptService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DateScriptService.class);
 
   public ZoneId getZone() {
     return DateUtil.getDefaultZone();
@@ -66,30 +70,42 @@ public class DateScriptService implements ScriptService {
         .orElse(null);
   }
 
-  public Date toDate(TemporalAccessor temporal) {
+  public LocalDate getLocalDate(int year, int month, int dayOfMonth) {
     try {
-      return guard(temporal).map(Instant::from).map(Date::from).orElse(null);
-    } catch (DateTimeException | IllegalArgumentException exc) {
+      return LocalDate.of(year, month, dayOfMonth);
+    } catch (DateTimeException exc) {
+      LOGGER.info("getLocalDate - failed for [{}-{}-{}]", year, month, dayOfMonth);
       return null;
     }
   }
 
-  public String format(String pattern, TemporalAccessor temporal) {
+  public Date toDate(Temporal temporal) {
+    try {
+      return guard(temporal).map(Instant::from).map(Date::from).orElse(null);
+    } catch (DateTimeException | IllegalArgumentException exc) {
+      LOGGER.info("toDate - failed for [{}]", temporal);
+      return null;
+    }
+  }
+
+  public String format(String pattern, Temporal temporal) {
     try {
       return guard(temporal)
           .map(guard(pattern).map(DateFormat::formatter).orElseGet(() -> (t -> null)))
           .orElse(null);
     } catch (DateTimeException exc) {
+      LOGGER.info("format - failed for [{}] with pattern [{}]", temporal, pattern, exc);
       return null;
     }
   }
 
-  public TemporalAccessor parse(String pattern, String text) {
+  public ZonedDateTime parse(String pattern, String text) {
     try {
       return guard(text)
           .map(guard(pattern).map(DateFormat::parser).orElseGet(() -> (t -> null)))
           .orElse(null);
-    } catch (DateTimeParseException exc) {
+    } catch (DateTimeException exc) {
+      LOGGER.info("parse - failed for [{}] with pattern [{}]", text, pattern, exc);
       return null;
     }
   }
