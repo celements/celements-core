@@ -3,10 +3,12 @@ package com.celements.collections.service;
 import static com.google.common.base.Predicates.*;
 
 import java.time.DateTimeException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.Optional;
@@ -18,6 +20,8 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.common.date.DateFormat;
 import com.celements.common.date.DateUtil;
+import com.google.common.base.Enums;
+import com.google.common.base.Strings;
 
 @Component("date")
 public class DateScriptService implements ScriptService {
@@ -77,6 +81,18 @@ public class DateScriptService implements ScriptService {
       LOGGER.info("getLocalDate - failed for [{}-{}-{}]", year, month, dayOfMonth);
       return null;
     }
+  }
+
+  public Duration getDuration(long amount, ChronoUnit unit) {
+    return Optional.ofNullable(unit).map(u -> Duration.of(amount, u)).orElse(null);
+  }
+
+  public Duration getDuration(long amount, String unit) {
+    return getDuration(amount, getChronoUnit(unit));
+  }
+
+  public ChronoUnit getChronoUnit(String unit) {
+    return Enums.getIfPresent(ChronoUnit.class, Strings.nullToEmpty(unit).toUpperCase()).orNull();
   }
 
   public Date toDate(Temporal temporal) {
