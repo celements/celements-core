@@ -92,7 +92,10 @@ public class DateScriptService implements ScriptService {
   }
 
   public ChronoUnit getChronoUnit(String unit) {
-    return Enums.getIfPresent(ChronoUnit.class, Strings.nullToEmpty(unit).toUpperCase()).orNull();
+    String name = Strings.nullToEmpty(unit).toUpperCase();
+    return Enums.getIfPresent(ChronoUnit.class, name)
+        .or(() -> Enums.getIfPresent(ChronoUnit.class, name + "S")
+        .orNull());
   }
 
   public Date toDate(Temporal temporal) {
