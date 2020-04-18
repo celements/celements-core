@@ -17,6 +17,10 @@ import org.xwiki.script.service.ScriptService;
 @Component("stream")
 public class StreamScriptService implements ScriptService {
 
+  public Stream<?> of(Object... values) {
+    return (values != null) ? Stream.of(values).filter(Objects::nonNull) : Stream.of();
+  }
+
   public <T> List<T> toList(Stream<T> stream) {
     return nullGuard(stream).collect(Collectors.toList());
   }
