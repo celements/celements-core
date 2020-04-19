@@ -27,6 +27,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -54,6 +55,8 @@ import com.xpn.xwiki.web.XWikiServletRequest;
  * @author fabian pichler
  */
 public abstract class AbstractJob implements Job {
+
+  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   /**
    * {@inheritDoc}
@@ -87,6 +90,13 @@ public abstract class AbstractJob implements Job {
       // We must ensure we clean the ThreadLocal variables located in the Execution
       // component as otherwise we will have a potential memory leak.
       execution.removeContext();
+      Utils.getComponentList(PostJobRunnable.class).forEach(runnable -> {
+        try {
+          runnable.run();
+        } catch (Exception exc) {
+          getLogger().error("failed to execute [{}]", runnable, exc);
+        }
+      });
     }
   }
 
@@ -181,7 +191,9 @@ public abstract class AbstractJob implements Job {
     return Utils.getComponent(IModelAccessFacade.class);
   }
 
-  protected abstract Logger getLogger();
+  protected Logger getLogger() {
+    return logger;
+  }
 
   protected abstract void executeJob(JobExecutionContext jobContext) throws JobExecutionException;
 }

@@ -21,6 +21,10 @@ public class StreamScriptService implements ScriptService {
     return (values != null) ? Stream.of(values).filter(Objects::nonNull) : Stream.of();
   }
 
+  public Stream<?> concat(Stream<?>... streams) {
+    return Stream.of(streams).map(this::nullGuard).reduce(Stream::concat).orElseGet(Stream::empty);
+  }
+
   public <T> List<T> toList(Stream<T> stream) {
     return nullGuard(stream).collect(Collectors.toList());
   }
