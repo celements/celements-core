@@ -151,4 +151,3 @@ com.celements.observation.save.object.XObjectEventConverter
 com.celements.cells.classes.CellClass
 com.celements.collections.service.StreamScriptService
 com.celements.collections.service.DateScriptService
-com.xpn.xwiki.plugin.lucene.searcherProvider.JobSearchProviderCloser
