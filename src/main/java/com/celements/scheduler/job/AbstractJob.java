@@ -90,9 +90,9 @@ public abstract class AbstractJob implements Job {
       // We must ensure we clean the ThreadLocal variables located in the Execution
       // component as otherwise we will have a potential memory leak.
       execution.removeContext();
-      Utils.getComponentList(PostJobRunnable.class).forEach(runnable -> {
+      Utils.getComponentList(PostJobAction.class).forEach(runnable -> {
         try {
-          runnable.run();
+          runnable.accept(jobContext);
         } catch (Exception exc) {
           getLogger().error("failed to execute [{}]", runnable, exc);
         }
