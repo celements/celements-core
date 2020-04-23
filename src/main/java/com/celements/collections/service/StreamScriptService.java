@@ -22,13 +22,13 @@ public class StreamScriptService implements ScriptService {
   }
 
   public Stream<?> concat(Stream<?>... streams) {
-    return Stream
-        .of(streams)
-        .map(this::nullGuard)
-        .reduce(this::concat)
-        .orElseGet(Stream::empty);
+    return Stream.of(streams).map(this::nullGuard).reduce(this::concat).orElseGet(Stream::empty);
   }
 
+  /**
+   * wrap concat since it's generic parameters <? extends T>
+   * causes compile errors in older VMs when used with <?>
+   */
   private <T> Stream<T> concat(Stream<T> s1, Stream<T> s2) {
     return Stream.concat(s1, s2);
   }
