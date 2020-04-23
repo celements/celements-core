@@ -22,7 +22,11 @@ public class StreamScriptService implements ScriptService {
   }
 
   public Stream<?> concat(Stream<?>... streams) {
-    return Stream.of(streams).map(this::nullGuard).reduce(Stream::concat).orElseGet(Stream::empty);
+    return Stream
+        .of(streams)
+        .map(this::nullGuard)
+        .reduce(Stream::concat)
+        .orElseGet(Stream::empty);
   }
 
   public <T> List<T> toList(Stream<T> stream) {
