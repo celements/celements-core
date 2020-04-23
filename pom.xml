@@ -24,18 +24,18 @@
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements</artifactId>
-    <version>4.1</version>
+    <version>4.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-core</artifactId>
-  <version>4.5-SNAPSHOT</version>
+  <version>4.6-SNAPSHOT</version>
   <description>Celements Core</description>
   <dependencies>
     <!-- Add here all your dependencies -->
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-model</artifactId>
-      <version>4.3-SNAPSHOT</version>
+      <version>4.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
