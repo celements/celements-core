@@ -177,7 +177,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
             vcontext.put("hasedit", getContext().getWiki().getRightService().hasAccessLevel("edit",
                 getContext().getUser(), getContext().getDoc().getFullName(), getContext()));
           } catch (XWikiException exp) {
-            LOGGER.error("Failed to check edit Access Rights on "
+            LOGGER.info("Failed to check edit Access Rights on "
                 + getContext().getDoc().getDocumentReference(), exp);
             vcontext.put("hasedit", new Boolean(false));
           }
@@ -185,7 +185,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
           vcontext.put("hasedit", new Boolean(false));
         }
       }
-      if (!vcontext.containsKey("skin_doc")) {
+      if (!vcontext.containsKey("skin_doc") && (baseRef != null)) {
         try {
           DocumentReference skinDocRef = modelUtils.resolveRef(getContext().getWiki().getSkin(
               getContext()), DocumentReference.class, baseRef);
@@ -193,7 +193,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
               getContext()).newDocument(getContext());
           vcontext.put("skin_doc", skinDoc);
         } catch (XWikiException | IllegalArgumentException e) {
-          LOGGER.error("Failed to get skin_doc", e);
+          LOGGER.info("Failed to get skin_doc", e);
         }
       }
       if (!vcontext.containsKey("isAdmin")) {
@@ -222,7 +222,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
           }
         }
       } catch (XWikiException exp) {
-        LOGGER.error("failed to get CelementsSkin XWikiDocument.", exp);
+        LOGGER.info("failed to get CelementsSkin XWikiDocument.", exp);
       }
       if (!vcontext.containsKey("page_type")) {
         PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForCurrentDoc();
