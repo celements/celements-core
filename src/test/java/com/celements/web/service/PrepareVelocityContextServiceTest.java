@@ -116,10 +116,6 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     expect(getMock(IWebUtilsService.class).getAdminMessageTool()).andReturn(null).atLeastOnce();
     expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(
         context))).andReturn(null).atLeastOnce();
-    expect(xwiki.getSkin(same(context))).andReturn("celements2web:Skins.CellSkin").atLeastOnce();
-    DocumentReference cellSkinDoc = new DocumentReference("celements2web", "Skins", "CellSkin");
-    expect(xwiki.getDocument(eq(cellSkinDoc), same(context))).andReturn(new XWikiDocument(
-        cellSkinDoc)).atLeastOnce();
     expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context))).andReturn(new User(
         context.getXWikiUser(), context)).atLeastOnce();
     // if context doc is null -> getPageTypeRefForCurrentDoc returns null
