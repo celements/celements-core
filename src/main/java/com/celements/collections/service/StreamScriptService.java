@@ -25,8 +25,12 @@ public class StreamScriptService implements ScriptService {
     return Stream
         .of(streams)
         .map(this::nullGuard)
-        .reduce(Stream::concat)
+        .reduce(this::concat)
         .orElseGet(Stream::empty);
+  }
+
+  private <T> Stream<T> concat(Stream<T> s1, Stream<T> s2) {
+    return Stream.concat(s1, s2);
   }
 
   public <T> List<T> toList(Stream<T> stream) {
