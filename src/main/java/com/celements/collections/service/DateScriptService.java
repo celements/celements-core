@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -114,6 +115,18 @@ public class DateScriptService implements ScriptService {
           .orElse(null);
     } catch (DateTimeException exc) {
       LOGGER.info("format - failed for [{}] with pattern [{}]", temporal, pattern, exc);
+      return null;
+    }
+  }
+
+  public String format(String pattern, Temporal temporal, Locale locale) {
+    try {
+      return guard(temporal)
+          .map(guard(pattern).map(p -> DateFormat.formatter(p, locale)).orElseGet(() -> (t -> null)))
+          .orElse(null);
+    } catch (DateTimeException exc) {
+      LOGGER.info("format - failed for [{}] with pattern [{}] and locale [{}]", temporal, pattern,
+          locale, exc);
       return null;
     }
   }
