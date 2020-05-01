@@ -23,6 +23,7 @@ import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.References;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -161,7 +162,11 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   List<BaseObject> getXObjects(XWikiDocument doc, Predicate<BaseObject> xObjFilter) {
-    return XWikiObjectEditor.on(doc).filter(xObjFilter).fetch().list();
+    if (doc.getTranslation() == 0) {
+      return XWikiObjectEditor.on(doc).filter(xObjFilter).fetch().list();
+    } else {
+      return ImmutableList.of();
+    }
   }
 
   boolean createOrUpdateObjects(XWikiDocument doc, List<BaseObject> srcObjs,
