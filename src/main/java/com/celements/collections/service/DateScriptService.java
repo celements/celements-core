@@ -96,7 +96,7 @@ public class DateScriptService implements ScriptService {
     String name = Strings.nullToEmpty(unit).toUpperCase();
     return Enums.getIfPresent(ChronoUnit.class, name)
         .or(() -> Enums.getIfPresent(ChronoUnit.class, name + "S")
-        .orNull());
+            .orNull());
   }
 
   public Date toDate(Temporal temporal) {
@@ -109,20 +109,15 @@ public class DateScriptService implements ScriptService {
   }
 
   public String format(String pattern, Temporal temporal) {
-    try {
-      return guard(temporal)
-          .map(guard(pattern).map(DateFormat::formatter).orElseGet(() -> (t -> null)))
-          .orElse(null);
-    } catch (DateTimeException exc) {
-      LOGGER.info("format - failed for [{}] with pattern [{}]", temporal, pattern, exc);
-      return null;
-    }
+    return format(pattern, temporal, null);
   }
 
   public String format(String pattern, Temporal temporal, Locale locale) {
     try {
       return guard(temporal)
-          .map(guard(pattern).map(p -> DateFormat.formatter(p, locale)).orElseGet(() -> (t -> null)))
+          .map(guard(pattern)
+              .map(p -> DateFormat.formatter(p, guard(locale).orElseGet(Locale::getDefault)))
+              .orElseGet(() -> (t -> null)))
           .orElse(null);
     } catch (DateTimeException exc) {
       LOGGER.info("format - failed for [{}] with pattern [{}] and locale [{}]", temporal, pattern,
