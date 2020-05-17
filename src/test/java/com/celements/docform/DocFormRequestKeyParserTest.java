@@ -1,335 +1,299 @@
 package com.celements.docform;
 
 import static com.celements.common.test.CelementsTestUtils.*;
+import static com.celements.docform.DocFormRequestKeyParser.*;
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ImmutableDocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.docform.DocFormRequestKeyParser.DocFormRequestParseException;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
+import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.web.Utils;
 
 public class DocFormRequestKeyParserTest extends AbstractComponentTest {
 
   private String db;
+  private DocumentReference defaultDocRef;
   private DocFormRequestKeyParser parser;
 
   @Before
-  public void setUp_DocFormRequestKeyParserTest() throws Exception {
+  public void prepare() throws Exception {
     db = getContext().getDatabase();
-    parser = new DocFormRequestKeyParser();
+    defaultDocRef = new ImmutableDocumentReference(db, "Space", "DefaultDoc");
+    parser = new DocFormRequestKeyParser(defaultDocRef);
   }
 
   @Test
-  public void testParse_whitelist_content() {
+  public void test_parse_whitelist_content() throws Exception {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     String fieldName = "content";
-    String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    DocFormRequestKey key = parser.parse(keyString, null);
-    assertKey(key, keyString, docRef, null, false, null, fieldName);
+    String keyString = serialize(docRef) + KEY_DELIM + fieldName;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, docRef, null, 0, false, fieldName);
   }
 
   @Test
-  public void testParse_whitelist_content_noFullName() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
+  public void test_parse_whitelist_content_noFullName() throws Exception {
     String keyString = "content";
-    DocFormRequestKey key = parser.parse(keyString, docRef);
-    assertKey(key, keyString, docRef, null, false, null, keyString);
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, defaultDocRef, null, 0, false, keyString);
   }
 
   @Test
-  public void testParse_whitelist_title() {
+  public void test_parse_whitelist_title() throws Exception {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     String fieldName = "title";
-    String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    DocFormRequestKey key = parser.parse(keyString, null);
-    assertKey(key, keyString, docRef, null, false, null, fieldName);
+    String keyString = serialize(docRef) + KEY_DELIM + fieldName;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, docRef, null, 0, false, fieldName);
   }
 
   @Test
-  public void testParse_whitelist_title_noFullName() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
+  public void test_parse_whitelist_title_noFullName() throws Exception {
     String keyString = "title";
-    DocFormRequestKey key = parser.parse(keyString, docRef);
-    assertKey(key, keyString, docRef, null, false, null, keyString);
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, defaultDocRef, null, 0, false, keyString);
   }
 
   @Test
-  public void testParse_whitelist_other() {
+  public void test_parse_obj() throws Exception {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    String fieldName = "asdf";
-    String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    try {
-      parser.parse(keyString, null);
-      fail("expecting IllegalArgumentException, 'asdf' is not valid keyword");
-    } catch (IllegalArgumentException iae) {
-      // expected
-    }
-  }
-
-  @Test
-  public void testParse_obj() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + serialize(classRef)
-        + DocFormRequestKeyParser.KEY_DELIM + objNb + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    DocFormRequestKey key = parser.parse(keyString, null);
-    assertKey(key, keyString, docRef, classRef, false, objNb, fieldName);
+    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef)
+        + KEY_DELIM + objNb + KEY_DELIM + fieldName;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, docRef, classRef, objNb, false, fieldName);
   }
 
   @Test
-  public void testParse_obj_noFullName() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+  public void test_parse_obj_noFullName() throws Exception {
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + objNb
-        + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    DocFormRequestKey key = parser.parse(keyString, docRef);
-    assertKey(key, keyString, docRef, classRef, false, objNb, fieldName);
+    String keyString = serialize(classRef) + KEY_DELIM + objNb
+        + KEY_DELIM + fieldName;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, defaultDocRef, classRef, objNb, false, fieldName);
   }
 
   @Test
-  public void testParse_obj_local() {
+  public void test_parse_obj_local() throws Exception {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + serialize(classRef)
-        + DocFormRequestKeyParser.KEY_DELIM + objNb + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    DocFormRequestKey key = parser.parse(keyString, null);
-    // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
-    docRef = new DocumentReference("xwikidb", docRef.getLastSpaceReference().getName(),
-        docRef.getName());
-    // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
-    classRef = new DocumentReference("xwikidb", classRef.getLastSpaceReference().getName(),
-        classRef.getName());
-    assertKey(key, keyString, docRef, classRef, false, objNb, fieldName);
+    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef)
+        + KEY_DELIM + objNb + KEY_DELIM + fieldName;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    docRef = RefBuilder.from(docRef).wiki("xwikidb").build(DocumentReference.class);
+    assertKey(key, keyString, docRef, classRef, objNb, false, fieldName);
   }
 
   @Test
-  public void testParse_obj_longFieldName() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+  public void test_parse_obj_longFieldName() throws Exception {
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf_asdf2";
-    String keyString = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + objNb
-        + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    DocFormRequestKey key = parser.parse(keyString, docRef);
-    assertKey(key, keyString, docRef, classRef, false, objNb, fieldName);
+    String keyString = serialize(classRef) + KEY_DELIM + objNb
+        + KEY_DELIM + fieldName;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, defaultDocRef, classRef, objNb, false, fieldName);
   }
 
   @Test
-  public void testParse_obj_create() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+  public void test_parse_obj_create() throws Exception {
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = -3;
     String fieldName = "asdf";
-    String keyString = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + objNb
-        + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    DocFormRequestKey key = parser.parse(keyString, docRef);
-    assertKey(key, keyString, docRef, classRef, false, objNb, fieldName);
+    String keyString = serialize(classRef) + KEY_DELIM + objNb
+        + KEY_DELIM + fieldName;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, defaultDocRef, classRef, objNb, false, fieldName);
   }
 
   @Test
-  public void testParse_obj_delete() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+  public void test_parse_obj_remove() throws Exception {
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
-    String fieldName = "asdf";
-    String keyString = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + "^" + objNb
-        + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    DocFormRequestKey key = parser.parse(keyString, docRef);
-    assertKey(key, keyString, docRef, classRef, true, objNb, fieldName);
+    String keyString = serialize(classRef) + KEY_DELIM + "^" + objNb + KEY_DELIM + "asdf";
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, defaultDocRef, classRef, objNb, true, "");
   }
 
   @Test
-  public void testParse_obj_delete_noFieldName() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+  public void test_parse_obj_remove_noFieldName() throws Exception {
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
-    String keyString = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + "^" + objNb
-        + DocFormRequestKeyParser.KEY_DELIM;
-    DocFormRequestKey key = parser.parse(keyString, docRef);
-    assertKey(key, keyString, docRef, classRef, true, objNb, "");
+    String keyString = serialize(classRef) + KEY_DELIM + "^" + objNb;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, defaultDocRef, classRef, objNb, true, "");
   }
 
-  @Test
-  public void testParse_obj_delete_negative() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+  @Test(expected = DocFormRequestParseException.class)
+  public void test_parse_obj_remove_negative() throws Exception {
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = -3;
-    String keyString = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + "^" + objNb;
-    try {
-      parser.parse(keyString, docRef);
-      fail("expecting IllegalArgumentException, delete and create not allowed together");
-    } catch (IllegalArgumentException iae) {
-      // expected
-    }
+    String keyString = serialize(classRef) + KEY_DELIM + "^" + objNb;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    fail("expecting DocFormRequestParseException, delete and create not allowed together: " + key);
+  }
+
+  @Test(expected = DocFormRequestParseException.class)
+  public void test_parse_obj_noFieldName() throws Exception {
+    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
+    ClassReference classRef = new ClassReference("Classes", "Class");
+    Integer objNb = 3;
+    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef)
+        + KEY_DELIM + objNb;
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    fail("expecting DocFormRequestParseException, obj with positive nb must have field: " + key);
   }
 
   @Test
-  public void testParse_obj_invalid_fullName() {
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+  public void test_parse_skip_doc_invalidField() throws Exception {
+    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
+    String fieldName = "asdf";
+    String keyString = serialize(docRef) + KEY_DELIM + fieldName;
+    assertFalse(parser.parse(keyString).isPresent());
+  }
+
+  @Test
+  public void test_parse_skip_invalidFullName() throws Exception {
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = "SpaceDoc" + DocFormRequestKeyParser.KEY_DELIM + serialize(classRef)
-        + DocFormRequestKeyParser.KEY_DELIM + objNb + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    try {
-      parser.parse(keyString, null);
-      fail("expecting IllegalArgumentException, invalid fullName");
-    } catch (IllegalArgumentException iae) {
-      // expected
-    }
+    String keyString = "SpaceDoc" + KEY_DELIM + serialize(classRef)
+        + KEY_DELIM + objNb + KEY_DELIM + fieldName;
+    assertFalse(parser.parse(keyString).isPresent());
   }
 
   @Test
-  public void testParse_obj_invalid_className() {
+  public void test_parse_skip_invalidClassName() throws Exception {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + "ClassesClass"
-        + DocFormRequestKeyParser.KEY_DELIM + objNb + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    try {
-      parser.parse(keyString, docRef);
-      fail("expecting IllegalArgumentException, invalid fullName");
-    } catch (IllegalArgumentException iae) {
-      // expected
-    }
+    String keyString = serialize(docRef) + KEY_DELIM + "ClassesClass"
+        + KEY_DELIM + objNb + KEY_DELIM + fieldName;
+    assertFalse(parser.parse(keyString).isPresent());
   }
 
   @Test
-  public void testParse_obj_invalid_objNb() {
+  public void test_parse_skip_noObjNb() throws Exception {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+    ClassReference classRef = new ClassReference("Classes", "Class");
     String fieldName = "asdf";
-    String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + serialize(classRef)
-        + DocFormRequestKeyParser.KEY_DELIM + "3a" + DocFormRequestKeyParser.KEY_DELIM + fieldName;
-    try {
-      parser.parse(keyString, docRef);
-      fail("expecting IllegalArgumentException, invalid fullName");
-    } catch (IllegalArgumentException iae) {
-      // expected
-    }
+    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef)
+        + KEY_DELIM + "3a" + KEY_DELIM + fieldName;
+    assertFalse(parser.parse(keyString).isPresent());
   }
 
   @Test
-  public void testParse_obj_invalid_fieldName() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
-    Integer objNb = 3;
-    String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + serialize(classRef)
-        + DocFormRequestKeyParser.KEY_DELIM + objNb + DocFormRequestKeyParser.KEY_DELIM;
-    try {
-      parser.parse(keyString, docRef);
-      fail("expecting IllegalArgumentException, invalid fullName");
-    } catch (IllegalArgumentException iae) {
-      // expected
-    }
-  }
-
-  @Test
-  public void testParse_skip_blank() {
+  public void test_parse_skip_blank() throws Exception {
     String keyString = "";
-    assertNull(parser.parse(keyString, null));
+    assertFalse(parser.parse(keyString).isPresent());
   }
 
   @Test
-  public void testParse_skip_template() {
+  public void test_parse_skip_template() throws Exception {
     String keyString = "template";
-    assertNull(parser.parse(keyString, null));
+    assertFalse(parser.parse(keyString).isPresent());
   }
 
   @Test
-  public void testParse_skip_withDelim() {
-    String keyString = "template" + DocFormRequestKeyParser.KEY_DELIM + "other";
-    assertNull(parser.parse(keyString, null));
+  public void test_parse_skip_withDelim() throws Exception {
+    String keyString = "template" + KEY_DELIM + "other";
+    assertFalse(parser.parse(keyString).isPresent());
   }
 
   @Test
-  public void testParse_skip_withDelims_two() {
-    String keyString = "template" + DocFormRequestKeyParser.KEY_DELIM + "other1"
-        + DocFormRequestKeyParser.KEY_DELIM + "other2";
-    assertNull(parser.parse(keyString, null));
+  public void test_parse_skip_withDelims_two() throws Exception {
+    String keyString = "template" + KEY_DELIM + "other1"
+        + KEY_DELIM + "other2";
+    assertFalse(parser.parse(keyString).isPresent());
   }
 
   @Test
-  public void testParse_skip_withDelims_multiple() {
-    String keyString = "template" + DocFormRequestKeyParser.KEY_DELIM + "other1"
-        + DocFormRequestKeyParser.KEY_DELIM + "other2" + DocFormRequestKeyParser.KEY_DELIM
-        + "other3" + DocFormRequestKeyParser.KEY_DELIM + "other4"
-        + DocFormRequestKeyParser.KEY_DELIM + "other5";
-    assertNull(parser.parse(keyString, null));
+  public void test_parse_skip_withDelims_multiple() throws Exception {
+    String keyString = "template" + KEY_DELIM + "other1" + KEY_DELIM + "other2" + KEY_DELIM
+        + "other3" + KEY_DELIM + "other4" + KEY_DELIM + "other5";
+    assertFalse(parser.parse(keyString).isPresent());
   }
 
   @Test
-  public void testParse_skip_nb() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
-    String keyString = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + "nb";
-    assertNull(parser.parse(keyString, docRef));
+  public void test_parse_skip_nb() throws Exception {
+    ClassReference classRef = new ClassReference("Classes", "Class");
+    String keyString = serialize(classRef) + KEY_DELIM + "nb";
+    assertFalse(parser.parse(keyString).isPresent());
   }
 
   @Test
-  public void testParse_multiple() {
-    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
-    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+  public void test_parse_multiple() throws Exception {
+    ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb1 = 3;
-    String keyString = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + "^" + objNb1;
-    String keyString1 = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + objNb1
-        + DocFormRequestKeyParser.KEY_DELIM + "asdf1";
-    String keyString2 = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + objNb1
-        + DocFormRequestKeyParser.KEY_DELIM + "asdf2";
-    String keyString3 = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + objNb1
-        + DocFormRequestKeyParser.KEY_DELIM + "asdf3";
+    String keyStringRemove = serialize(classRef) + KEY_DELIM + "^" + objNb1;
+    String keyString1 = serialize(classRef) + KEY_DELIM + objNb1 + KEY_DELIM + "asdf1";
+    String keyString2 = serialize(classRef) + KEY_DELIM + objNb1 + KEY_DELIM + "asdf2";
     String keyStringContent = "content";
-    DocumentReference classRef2 = new DocumentReference(db, "Classes", "OtherClass");
+    ClassReference classRef2 = new ClassReference("Classes", "OtherClass");
     Integer objNb2 = 5;
     String fieldName2 = "asdf";
-    String keyStringOther = serialize(classRef2) + DocFormRequestKeyParser.KEY_DELIM + objNb2
-        + DocFormRequestKeyParser.KEY_DELIM + fieldName2;
+    String keyStringClass2 = serialize(classRef2) + KEY_DELIM + objNb2 + KEY_DELIM + fieldName2;
+    Map<String, ?> requestMap = ImmutableMap.<String, Object>builder()
+        .put(keyString2, "val2")
+        .put(keyStringRemove, "valRemove")
+        .put(keyString1, "val1")
+        .put(keyStringContent, "valContent")
+        .put(keyStringClass2, "val3")
+        .build();
+    List<DocFormRequestParam> params = parser.parseParameterMap(requestMap);
 
-    Collection<DocFormRequestKey> keys = parser.parse(Arrays.asList(keyString1, keyString2,
-        keyString, keyString3, keyStringContent, keyStringOther), docRef);
-
-    assertEquals(3, keys.size());
-    Iterator<DocFormRequestKey> iter = keys.iterator();
-    assertKey(iter.next(), keyString, docRef, classRef, true, objNb1, "");
-    assertKey(iter.next(), keyStringContent, docRef, null, false, null, keyStringContent);
-    assertKey(iter.next(), keyStringOther, docRef, classRef2, false, objNb2, fieldName2);
+    assertEquals(5, params.size());
+    Iterator<DocFormRequestParam> iter = params.iterator();
+    assertParam(iter.next(), keyString1, defaultDocRef,
+        classRef, objNb1, false, "asdf1", requestMap);
+    assertParam(iter.next(), keyString2, defaultDocRef,
+        classRef, objNb1, false, "asdf2", requestMap);
+    assertParam(iter.next(), keyStringRemove, defaultDocRef,
+        classRef, objNb1, true, "", requestMap);
+    assertParam(iter.next(), keyStringClass2, defaultDocRef,
+        classRef2, objNb2, false, fieldName2, requestMap);
+    assertParam(iter.next(), keyStringContent, defaultDocRef,
+        null, 0, false, keyStringContent, requestMap);
   }
 
   @Test
-  public void test_parse_specialFN() {
-    String delim = DocFormRequestKeyParser.KEY_DELIM;
+  public void test_parse_specialFN() throws Exception {
+    String delim = KEY_DELIM;
     String docName = "2019-07-15";
     String docSpace = "TimeSheets-ebeutler10";
     String docFN = docSpace + "." + docName;
     DocumentReference docRef = RefBuilder.create().wiki(getContext().getDatabase()).doc(
         docName).space(docSpace).build(DocumentReference.class);
     String classFN = "TimeSheetClasses.TimesheetDayClass";
-    DocumentReference classRef = RefBuilder.create().wiki(getContext().getDatabase()).space(
-        "TimeSheetClasses").doc("TimesheetDayClass").build(DocumentReference.class);
+    ClassReference classRef = new ClassReference("TimeSheetClasses", "TimesheetDayClass");
     String fieldName = "dailyComment";
     String keyString = docFN + delim + classFN + delim + "0" + delim + fieldName;
-    DocFormRequestKey result = parser.parse(keyString, null);
-    assertEquals(docRef, result.getDocRef());
-    assertEquals(classRef, result.getClassRef());
-    assertEquals(fieldName, result.getFieldName());
-    assertEquals(Integer.valueOf(0), result.getObjNb());
+    DocFormRequestKey key = parser.parse(keyString).orElse(null);
+    assertKey(key, keyString, docRef, classRef, 0, false, fieldName);
   }
 
   private void assertKey(DocFormRequestKey key, String keyString, DocumentReference docRef,
-      DocumentReference classRef, boolean remove, Integer objNb, String fieldName) {
+      ClassReference classRef, int objNb, boolean remove, String fieldName) {
+    assertNotNull(key);
     assertEquals(keyString, key.getKeyString());
     assertEquals(docRef, key.getDocRef());
     assertEquals(classRef, key.getClassRef());
@@ -338,8 +302,15 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     assertEquals(fieldName, key.getFieldName());
   }
 
-  private String serialize(DocumentReference docRef) {
-    return Utils.getComponent(ModelUtils.class).serializeRefLocal(docRef);
+  private void assertParam(DocFormRequestParam param, String keyString, DocumentReference docRef,
+      ClassReference classRef, int objNb, boolean remove, String fieldName,
+      Map<String, ?> requestMap) {
+    assertKey(param.getKey(), keyString, docRef, classRef, objNb, remove, fieldName);
+    assertEquals(param.getValuesAsString(), requestMap.get(keyString));
+  }
+
+  private String serialize(EntityReference ref) {
+    return Utils.getComponent(ModelUtils.class).serializeRefLocal(ref);
   }
 
 }
