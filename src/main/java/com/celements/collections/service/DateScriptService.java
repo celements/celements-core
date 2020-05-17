@@ -101,7 +101,8 @@ public class DateScriptService implements ScriptService {
 
   public Date toDate(Temporal temporal) {
     try {
-      return guard(temporal).map(Instant::from).map(Date::from).orElse(null);
+      return guard(temporal).map(DateUtil::atZone).map(ZonedDateTime::toInstant).map(Date::from)
+          .orElse(null);
     } catch (DateTimeException | IllegalArgumentException exc) {
       LOGGER.info("toDate - failed for [{}]", temporal);
       return null;
