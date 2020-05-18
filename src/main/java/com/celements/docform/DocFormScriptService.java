@@ -1,9 +1,13 @@
-package com.celements.webform;
+package com.celements.docform;
 
-import java.util.Collection;
+import static com.google.common.collect.ImmutableMap.*;
+import static org.apache.commons.lang.BooleanUtils.*;
+
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -14,21 +18,23 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
+import com.celements.model.util.ReferenceSerializationMode;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
-import com.celements.web.plugin.cmd.DocFormCommand;
+import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 
 @Component("docform")
 public class DocFormScriptService implements ScriptService {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(DocFormScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DocFormScriptService.class);
 
-  private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
+  private static final String DOC_FORM_COMMAND_CTX_KEY = "com.celements.DocFormCommand";
 
   @Requirement
   private Execution execution;
@@ -37,107 +43,68 @@ public class DocFormScriptService implements ScriptService {
   private IRightsAccessFacadeRole rightsAccess;
 
   @Requirement
+  private IModelAccessFacade modelAccess;
+
+  @Requirement
+  private ModelUtils modelUtils;
+
+  @Requirement
   private ModelContext context;
 
   private XWikiContext getContext() {
     return context.getXWikiContext();
   }
 
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file ATTENTION: use only for preview and NOT for save!
-   * Removed objects will not be saved correctly using this method. To save use
-   * updateAndSaveDocFromRequest() instead.
-   */
-  public Set<Document> updateDocFromMap(DocumentReference docRef, Map<String, ?> map)
-      throws XWikiException {
-    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
-        getDocFormCommand().prepareMapForDocUpdate(map));
-    Set<Document> docs = new HashSet<>();
-    for (XWikiDocument xdoc : xdocs) {
-      docs.add(xdoc.newDocument(getContext()));
-    }
-    return docs;
-  }
-
-  public Map<String, Set<DocumentReference>> updateAndSaveDocFromMap(DocumentReference docRef,
-      Map<String, ?> map) {
-    Collection<XWikiDocument> xdocs = Collections.<XWikiDocument>emptyList();
+  public Map<String, Set<DocumentReference>> updateAndSaveDocFromMap(
+      DocumentReference docRef, Map<String, ?> map) {
     try {
-      xdocs = getDocFormCommand().updateDocFromMap(docRef,
-          getDocFormCommand().prepareMapForDocUpdate(map));
-      return checkRightsAndSaveXWikiDocCollection(xdocs);
-    } catch (XWikiException xwe) {
-      LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
+      docRef = Optional.ofNullable(docRef).orElseGet(() -> context.getCurrentDocRef().get());
+      map = Optional.ofNullable(map).orElseGet(Collections::emptyMap);
+      DocFormRequestKeyParser parser = new DocFormRequestKeyParser(docRef);
+      List<DocFormRequestParam> requestParams = parser.parseParameterMap(map);
+      IDocForm docForm = getDocFormCommand(docRef);
+      if (hasEditOnAllDocs(requestParams)) {
+        docForm.updateDocs(requestParams);
+      }
+      return docForm.getResponseMap(requestParams)
+          .entrySet().stream()
+          .collect(toImmutableMap(entry -> entry.getKey().name(), Entry::getValue));
+    } catch (Exception exc) {
+      LOGGER.warn("updateAndSaveDocFromMap: failed for map [{}]", map, exc);
+      return ImmutableMap.of();
     }
-    return Collections.emptyMap();
-  }
-
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
-   */
-  public Set<Document> updateDocFromRequest() throws XWikiException {
-    return updateDocFromRequest(null);
-  }
-
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file ATTENTION: use only for preview and NOT for save!
-   * Removed objects will not be saved correctly using this method. To save use
-   * updateAndSaveDocFromRequest() instead.
-   */
-  @SuppressWarnings("unchecked")
-  public Set<Document> updateDocFromRequest(DocumentReference docRef) throws XWikiException {
-    Set<Document> docs = new HashSet<>();
-    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
-        getContext().getRequest().getParameterMap());
-    for (XWikiDocument xdoc : xdocs) {
-      docs.add(xdoc.newDocument(getContext()));
-    }
-    return docs;
   }
 
   public Map<String, Set<DocumentReference>> updateAndSaveDocFromRequest() {
     return updateAndSaveDocFromRequest(null);
   }
 
-  @SuppressWarnings("unchecked")
   public Map<String, Set<DocumentReference>> updateAndSaveDocFromRequest(DocumentReference docRef) {
-    try {
-      Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
-          getContext().getRequest().getParameterMap());
-      return checkRightsAndSaveXWikiDocCollection(xdocs);
-    } catch (XWikiException xwe) {
-      LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
-    }
-    return Collections.emptyMap();
+    return updateAndSaveDocFromMap(docRef, getRequestParameterMap());
   }
 
-  Map<String, Set<DocumentReference>> checkRightsAndSaveXWikiDocCollection(
-      Collection<XWikiDocument> xdocs) {
-    Map<String, Set<DocumentReference>> docs;
-    if (hasEditOnAllDocs(xdocs)) {
-      docs = getDocFormCommand().saveXWikiDocCollection(xdocs);
-    } else {
-      docs = getDocFormCommand().createEmptySaveMap();
-      xdocs.stream().map(XWikiDocument::getDocumentReference)
-          .forEach(docs.get(DocFormCommand.MAP_KEY_FAIL)::add);
-    }
-    return docs;
+  @SuppressWarnings("unchecked")
+  private <T> Map<String, T> getRequestParameterMap() {
+    return context.getRequest().transform(XWikiRequest::getParameterMap)
+        .or(Collections.emptyMap());
   }
 
-  boolean hasEditOnAllDocs(Collection<XWikiDocument> xdocs) {
-    return xdocs.stream()
-        .filter(xdoc -> !xdoc.isNew() || getDocFormCommand().isCreateAllowed(xdoc))
-        .allMatch(xdoc -> rightsAccess.hasAccessLevel(
-            xdoc.getDocumentReference(), EAccessLevel.EDIT));
+  boolean hasEditOnAllDocs(List<DocFormRequestParam> requestParams) {
+    return requestParams.stream()
+        .map(DocFormRequestParam::getDocRef)
+        .distinct()
+        .filter(docRef -> modelAccess.exists(docRef) || isCreateAllowed())
+        .allMatch(docRef -> rightsAccess.hasAccessLevel(docRef, EAccessLevel.EDIT));
   }
 
-  private DocFormCommand getDocFormCommand() {
-    if (getContext().get(_DOC_FORM_COMMAND_OBJECT) == null) {
-      getContext().put(_DOC_FORM_COMMAND_OBJECT, new DocFormCommand());
-    }
-    return (DocFormCommand) getContext().get(_DOC_FORM_COMMAND_OBJECT);
+  public boolean isCreateAllowed() {
+    return toBoolean(context.getRequestParameter("createIfNotExists").or(""));
+  }
+
+  private IDocForm getDocFormCommand(DocumentReference docRef) {
+    return (IDocForm) getContext().computeIfAbsent(DOC_FORM_COMMAND_CTX_KEY + "_" +
+        modelUtils.serializeRef(docRef, ReferenceSerializationMode.GLOBAL),
+        key -> Utils.getComponent(IDocForm.class)
+            .initialize(docRef, isCreateAllowed()));
   }
 }
