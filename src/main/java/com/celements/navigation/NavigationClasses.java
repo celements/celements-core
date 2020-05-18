@@ -19,8 +19,6 @@
  */
 package com.celements.navigation;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -98,19 +96,12 @@ public class NavigationClasses extends AbstractClassCollection {
   @Deprecated
   public static final String PART_NAME_FIELD = "part_name";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(NavigationClasses.class);
-
   @Requirement
   INavigationClassConfig navClassCfg;
 
   @Override
   public String getConfigName() {
     return "celNavigationClasses";
-  }
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
   }
 
   @Override

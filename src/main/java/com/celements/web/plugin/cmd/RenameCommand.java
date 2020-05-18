@@ -22,8 +22,8 @@ package com.celements.web.plugin.cmd;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class RenameCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(RenameCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RenameCommand.class);
   private IWebUtils injectedWebUtils;
 
   /**
@@ -51,7 +51,7 @@ public class RenameCommand {
         if (renameDoc(fullname, newDocName, true, context)) {
           renamedPages.add(docName);
         } else {
-          mLogger.error("renameSpace: Failed to rename Document [" + fullname + "] to ["
+          LOGGER.error("renameSpace: Failed to rename Document [" + fullname + "] to ["
               + newDocName + "].");
         }
       }
@@ -59,7 +59,7 @@ public class RenameCommand {
         getWebUtils().flushMenuItemCache(context);
       }
     } catch (XWikiException exp) {
-      mLogger.error("renameSpace: Failed to rename Space [" + spaceName + "] to [" + newSpaceName
+      LOGGER.error("renameSpace: Failed to rename Space [" + spaceName + "] to [" + newSpaceName
           + "].", exp);
     }
     return renamedPages;
@@ -97,11 +97,11 @@ public class RenameCommand {
         }
         return true;
       } catch (XWikiException exp) {
-        mLogger.error("renameDoc: Failed to rename Document [" + fullname + "] to [" + newDocName
+        LOGGER.error("renameDoc: Failed to rename Document [" + fullname + "] to [" + newDocName
             + "].", exp);
       }
     }
-    mLogger.warn("renameDoc: Failed to rename Document [" + fullname + " ; "
+    LOGGER.warn("renameDoc: Failed to rename Document [" + fullname + " ; "
         + context.getWiki().exists(fullname, context) + "] to [" + newDocName + " ; "
         + context.getWiki().exists(newDocName, context) + "].");
     return false;

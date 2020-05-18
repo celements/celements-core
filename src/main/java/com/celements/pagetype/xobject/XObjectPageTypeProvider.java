@@ -38,7 +38,7 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
 
   public static final String X_OBJECT_PAGE_TYPE_PROVIDER = "com.celements.XObjectPageTypeProvider";
 
-  private static Logger LOGGER = LoggerFactory.getLogger(XObjectPageTypeProvider.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(XObjectPageTypeProvider.class);
 
   private String _CEL_XOBJ_GETALLPAGETYPES_COUNTER = "celXObjectGetAllPageTypesCounter";
   private String _CEL_XOBJ_GETALLPAGETYPES_TOTALTIME = "celXObjectGetAllPageTypesTotelTime";

@@ -19,8 +19,8 @@
  */
 package com.celements.web.plugin.cmd;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class SkinConfigObjCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(SkinConfigObjCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SkinConfigObjCommand.class);
 
   IWebUtilsService injected_webService;
 
@@ -70,7 +70,7 @@ public class SkinConfigObjCommand {
         return configObj;
       }
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error("failed", e);
     }
     return null;
   }

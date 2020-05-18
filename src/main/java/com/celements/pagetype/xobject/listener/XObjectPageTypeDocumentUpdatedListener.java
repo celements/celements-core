@@ -47,7 +47,7 @@ public class XObjectPageTypeDocumentUpdatedListener extends AbstractXObjectPageT
 
   public static final String NAME = "XObjectPageTypeDocumentUpdatedListener";
 
-  private static Logger LOGGER = LoggerFactory.getLogger(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentUpdatedListener.class);
 
   @Requirement

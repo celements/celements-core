@@ -65,7 +65,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class TreeNodeService implements ITreeNodeService {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(TreeNodeService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TreeNodeService.class);
 
   public PageLayoutCommand pageLayoutCmd;
 

@@ -91,7 +91,7 @@ public class Navigation implements INavigation {
 
   public static final String MENU_TYPE_MENUITEM = "menuitem";
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(Navigation.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Navigation.class);
 
   private static final String NAVIGATION_COUNTER_KEY = NavigationApi.class.getCanonicalName()
       + "_NavigationCounter";
@@ -324,7 +324,8 @@ public class Navigation implements INavigation {
   @Override
   public SpaceReference getNodeSpaceRef() {
     if (nodeSpaceRef == null) {
-      SpaceReference currentSpaceRef = getContext().getDoc().getDocumentReference().getLastSpaceReference();
+      SpaceReference currentSpaceRef = getContext().getDoc().getDocumentReference()
+          .getLastSpaceReference();
       if (fromHierarchyLevel == 1) {
         if (isEmptyMainMenu(currentSpaceRef) && getWebUtilsService().hasParentSpace(
             currentSpaceRef.getName())) {
@@ -413,19 +414,23 @@ public class Navigation implements INavigation {
       } else if ((getCurrentLevel(numMoreLevels) == 1) && hasedit()) {
         LOGGER.trace("addNavigationForParent: empty navigation hint for parent [" + parentRef
             + "] numMoreLevels [" + numMoreLevels + "], currentLevel [" + getCurrentLevel(
-                numMoreLevels) + "].");
+                numMoreLevels)
+            + "].");
         // is main Menu and no mainMenuItem found ; user has edit rights
         outStream.append("<ul class=\"cel_nav_empty\">");
         openMenuItemOut(outStream, null, true, true, false, 1);
         outStream.append("<span " + addUniqueElementId(null) + " " + addCssClasses(null, true, true,
-            true, false, 1) + ">" + getWebUtilsService().getAdminMessageTool().get(
-                getEmptyDictKey()) + "</span>");
+            true, false, 1) + ">"
+            + getWebUtilsService().getAdminMessageTool().get(
+                getEmptyDictKey())
+            + "</span>");
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
       } else {
         LOGGER.debug("addNavigationForParent: empty output for parent [" + parentRef
             + "] numMoreLevels [" + numMoreLevels + "], currentLevel [" + getCurrentLevel(
-                numMoreLevels) + "], hasEdit [" + hasedit() + "].");
+                numMoreLevels)
+            + "], hasEdit [" + hasedit() + "].");
       }
     }
   }

@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -36,7 +36,7 @@ public class ImageMapCommand {
 
   public static final String IMG_MAP_CONFIG_SET = "imageMapConfigSet";
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(ImageMapCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ImageMapCommand.class);
 
   private XWikiContext context;
   private Set<String> imageMapSet;
@@ -56,7 +56,7 @@ public class ImageMapCommand {
     try {
       mapList = context.getWiki().search(hql, context);
     } catch (XWikiException e) {
-      mLogger.error("Error searching for image map config", e);
+      LOGGER.error("Error searching for image map config", e);
     }
     if (mapList != null) {
       if (mapList.size() == 1) {

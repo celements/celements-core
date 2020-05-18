@@ -29,7 +29,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 
 public class FieldInheritor extends AbstractObjectInheritor {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(FieldInheritor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FieldInheritor.class);
 
   private IEmptyFieldChecker _emptyFieldChecker;
 

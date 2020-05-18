@@ -58,7 +58,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class PasswordRecoveryAndEmailValidationCommand {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       PasswordRecoveryAndEmailValidationCommand.class);
 
   public static final String CEL_PASSWORD_RECOVERY_FAILED = "cel_password_recovery_failed";

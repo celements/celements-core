@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.service.IWebUtilsService;
@@ -45,7 +45,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObject> {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(XObjectIterator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(XObjectIterator.class);
 
   private List<String> _docList;
   private String _xwikiClassName;
@@ -101,7 +101,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
         return ((BaseProperty) _nextObject.get(_key)).getValue();
       }
     } catch (XWikiException exp) {
-      mLogger.warn("Failed to get a propery with key [" + _key + "]", exp);
+      LOGGER.warn("Failed to get a propery with key [" + _key + "]", exp);
     }
     return null;
   }
@@ -137,7 +137,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
       // If getDocument failed, getDocIterator still moved on by one document in list.
       // Yet, _objectIterator is not reset and hasNext is still false.
       // Hence the while loop in 'next' moves on to the next document in list.
-      mLogger.error("Failed to get next xwiki document.", exp);
+      LOGGER.error("Failed to get next xwiki document.", exp);
     }
   }
 

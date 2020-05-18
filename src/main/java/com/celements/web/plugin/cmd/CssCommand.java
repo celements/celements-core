@@ -51,7 +51,7 @@ public class CssCommand {
   public static final String SKINS_USER_CSS_CLASS = SKINS_USER_CSS_CLASS_SPACE + "."
       + SKINS_USER_CSS_CLASS_DOC;
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CssCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CssCommand.class);
 
   public DocumentReference getSkinsUserCssClassRef(String wikiName) {
     return new DocumentReference(wikiName, SKINS_USER_CSS_CLASS_SPACE, SKINS_USER_CSS_CLASS_DOC);

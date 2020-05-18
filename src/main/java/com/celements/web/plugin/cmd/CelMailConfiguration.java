@@ -3,8 +3,8 @@ package com.celements.web.plugin.cmd;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWiki;
@@ -28,7 +28,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class CelMailConfiguration extends MailConfiguration {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(CelMailConfiguration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelMailConfiguration.class);
 
   public static final String MAIL_DEFAULT_ADMIN_EMAIL_KEY = "celements.mail.default.admin_email";
 

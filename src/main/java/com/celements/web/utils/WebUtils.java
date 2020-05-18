@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.inheritor.InheritorFactory;
@@ -59,7 +59,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 @Deprecated
 public class WebUtils implements IWebUtils {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(WebUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(WebUtils.class);
 
   private static IWebUtils instance;
 
@@ -71,8 +71,7 @@ public class WebUtils implements IWebUtils {
   /**
    * FOR TEST ONLY!!! Please use getInstance instead.
    */
-  WebUtils() {
-  }
+  WebUtils() {}
 
   public static IWebUtils getInstance() {
     if (instance == null) {
@@ -163,7 +162,7 @@ public class WebUtils implements IWebUtils {
         nextParent = getParentFullName(nextParent, context);
       }
     } catch (XWikiException e) {
-      LOGGER.error(e, e);
+      LOGGER.error("failed", e);
     }
     return docParents;
   }
@@ -536,7 +535,7 @@ public class WebUtils implements IWebUtils {
         return imgList;
       }
     } catch (XWikiException e) {
-      LOGGER.error(e, e);
+      LOGGER.error("failed", e);
     }
     return Collections.emptyList();
   }

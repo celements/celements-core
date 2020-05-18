@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.emptycheck.service.IEmptyCheckRole;
@@ -15,7 +15,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class NextNonEmptyChildrenCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       NextNonEmptyChildrenCommand.class);
 
   private Set<DocumentReference> visitedDocRefs;

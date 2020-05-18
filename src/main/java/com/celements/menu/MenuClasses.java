@@ -19,8 +19,6 @@
  */
 package com.celements.menu;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -34,20 +32,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celMenuClasses")
 public class MenuClasses extends CelementsClassCollection {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(MenuClasses.class);
-
-  public MenuClasses() {
-  }
+  public MenuClasses() {}
 
   @Override
   protected void initClasses(XWikiContext context) throws XWikiException {
     getMenuBarHeaderItemClass(context);
     getMenuBarSubItemClass(context);
-  }
-
-  @Override
-  protected Log getLogger() {
-    return mLogger;
   }
 
   @Override
@@ -64,7 +54,7 @@ public class MenuClasses extends CelementsClassCollection {
     try {
       doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error("failed", e);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -89,7 +79,7 @@ public class MenuClasses extends CelementsClassCollection {
     try {
       doc = xwiki.getDocument(classRef, context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error("failed", e);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }

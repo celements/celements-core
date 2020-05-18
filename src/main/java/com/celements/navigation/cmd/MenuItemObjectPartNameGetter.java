@@ -32,7 +32,7 @@ import com.xpn.xwiki.web.Utils;
 
 final class MenuItemObjectPartNameGetter implements PartNameGetter {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(MenuItemObjectPartNameGetter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MenuItemObjectPartNameGetter.class);
 
   private final IModelAccessFacade modelAccess;
 

@@ -13,7 +13,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component("mobileLogging")
 public class MobileLoggingScriptService implements ScriptService {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(MobileLoggingScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MobileLoggingScriptService.class);
 
   @Requirement
   Execution execution;
@@ -27,7 +27,7 @@ public class MobileLoggingScriptService implements ScriptService {
   }
 
   public String dimensionAndAgentLog(String message) {
-    _LOGGER.info("dimensionAndAgentLog: mobileDim [" + getContext().getRequest().getParameter(
+    LOGGER.info("dimensionAndAgentLog: mobileDim [" + getContext().getRequest().getParameter(
         "mobileDim") + "], userAgent [" + getContext().getRequest().getParameter("userAgent")
         + "], isOrientationLandscape [" + getContext().getRequest().getParameter(
             "isOrientationLandscape") + "], message [" + message + "]");

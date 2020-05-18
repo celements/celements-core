@@ -23,7 +23,7 @@ public class JavaNavigationFactory extends AbstractNavigationFactory<PageTypeRef
 
   public static final String JAVA_NAV_FACTORY_HINT = "java";
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(JavaNavigationFactory.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(JavaNavigationFactory.class);
 
   @Requirement
   private List<JavaNavigationConfigurator> javaNavConfigList;

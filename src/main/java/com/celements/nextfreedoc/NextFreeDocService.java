@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 public class NextFreeDocService implements INextFreeDocRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(NextFreeDocService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NextFreeDocService.class);
 
   // TODO refactor to org.xwiki.cache.CacheManager
   private final Map<DocumentReference, Long> numCache = new HashMap<>();

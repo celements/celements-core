@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 public class LastChangedService implements ILastChangedRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(LastChangedService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LastChangedService.class);
 
   @Requirement
   IWebUtilsService webUtilsService;

@@ -22,8 +22,8 @@ package com.celements.web.comparators;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
@@ -35,7 +35,7 @@ import com.xpn.xwiki.objects.StringProperty;
 
 public class BaseObjectComparator implements Comparator<BaseObject> {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(BaseObjectComparator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BaseObjectComparator.class);
 
   private String orderField1 = null;
   private boolean asc1 = true;

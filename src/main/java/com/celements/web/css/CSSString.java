@@ -32,7 +32,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class CSSString extends CSS {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CSSString.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CSSString.class);
 
   private String file;
   private boolean alternate;

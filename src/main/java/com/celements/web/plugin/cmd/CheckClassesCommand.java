@@ -30,7 +30,7 @@ import com.xpn.xwiki.web.Utils;
 @Deprecated
 public class CheckClassesCommand {
 
-  // private static Log LOGGER = LogFactory.getFactory().getInstance(
+  // private static final Logger LOGGER = LoggerFactory.getLogger(
   // CheckClassesCommand.class);
 
   @Deprecated

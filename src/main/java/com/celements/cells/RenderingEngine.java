@@ -21,8 +21,8 @@ package com.celements.cells;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -33,15 +33,14 @@ import com.xpn.xwiki.web.Utils;
 
 public class RenderingEngine implements IRenderingEngine {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(RenderingEngine.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RenderingEngine.class);
 
   private IRenderStrategy renderStrategy;
 
   ITreeNodeService treeNodeService;
   IWebUtilsService webUtilsService;
 
-  public RenderingEngine() {
-  }
+  public RenderingEngine() {}
 
   /*
    * (non-Javadoc)

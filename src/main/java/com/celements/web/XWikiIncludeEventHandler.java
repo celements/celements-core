@@ -21,22 +21,22 @@ package com.celements.web;
 
 import java.net.URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.app.event.IncludeEventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XWikiIncludeEventHandler implements IncludeEventHandler {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(XWikiIncludeEventHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(XWikiIncludeEventHandler.class);
 
   @Override
   public String includeEvent(String includeResourcePath, String currentResourcePath,
       String directiveName) {
-    mLogger.trace("velocity include event: [" + includeResourcePath + "], [" + currentResourcePath
+    LOGGER.trace("velocity include event: [" + includeResourcePath + "], [" + currentResourcePath
         + "], [" + directiveName + "]");
     String template = URI.create("/templates/" + includeResourcePath).normalize().toString();
     if (!template.startsWith("/templates/")) {
-      mLogger.warn("Illegal access, tried to use file [" + template
+      LOGGER.warn("Illegal access, tried to use file [" + template
           + "] as a template. Possible break-in attempt!");
       return null;
     }

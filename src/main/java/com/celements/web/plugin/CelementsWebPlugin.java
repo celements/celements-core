@@ -72,7 +72,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CelementsWebPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebPlugin.class);
 
   private final static IWebUtils util = WebUtils.getInstance();
 

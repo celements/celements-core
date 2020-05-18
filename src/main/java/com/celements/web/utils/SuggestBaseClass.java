@@ -21,8 +21,8 @@ package com.celements.web.utils;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -35,7 +35,8 @@ import com.xpn.xwiki.objects.classes.StringClass;
 
 public class SuggestBaseClass {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(SuggestBaseClass.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SuggestBaseClass.class);
+
   private PropertyClass bc;
 
   public SuggestBaseClass(DocumentReference classreference, String fieldname,
@@ -44,7 +45,7 @@ public class SuggestBaseClass {
       XWikiDocument doc = context.getWiki().getDocument(classreference, context);
       bc = (PropertyClass) doc.getXClass().get(fieldname);
     } catch (XWikiException e) {
-      mLogger.error("Exception getting XWikiDocument for class " + classreference);
+      LOGGER.error("Exception getting XWikiDocument for class " + classreference, e);
     }
   }
 

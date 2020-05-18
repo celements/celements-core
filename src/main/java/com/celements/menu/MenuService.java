@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -45,7 +45,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class MenuService implements IMenuService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(MenuService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MenuService.class);
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -92,8 +92,9 @@ public class MenuService implements IMenuService {
         DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(fullName);
         if (accessService.hasview(menuBarDocRef)) {
           List<BaseObject> headerObjList = getContext().getWiki().getDocument(menuBarDocRef,
-              getContext()).getXObjects(getMenuBarHeaderClassRef(
-                  menuBarDocRef.getWikiReference().getName()));
+              getContext()).getXObjects(
+                  getMenuBarHeaderClassRef(
+                      menuBarDocRef.getWikiReference().getName()));
           LOGGER.trace("addMenuHeaders: hasview for ["
               + webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef)
               + "] adding items [" + ((headerObjList != null) ? headerObjList.size() : "null")
@@ -176,9 +177,9 @@ public class MenuService implements IMenuService {
         menuItemsMap.put(obj.getIntValue("itempos"), obj);
       }
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error("failed", e);
     } catch (QueryException e) {
-      LOGGER.error(e);
+      LOGGER.error("failed", e);
     }
   }
 

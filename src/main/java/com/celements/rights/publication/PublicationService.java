@@ -46,7 +46,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class PublicationService implements IPublicationServiceRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(PublicationService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PublicationService.class);
 
   @Requirement(DocumentDetailsClasses.NAME)
   IClassCollectionRole documentDetailsClasses;

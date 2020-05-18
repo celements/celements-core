@@ -14,7 +14,7 @@ import com.xpn.xwiki.XWikiException;
 @Component("renderedContent")
 public class RenderedContentPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(RenderedContentPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RenderedContentPresentationType.class);
 
   private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 

@@ -24,14 +24,14 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 
 public class ParseObjStoreCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(ParseObjStoreCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ParseObjStoreCommand.class);
 
   /**
    * Get the options (checkbox and radio buttons) saved using the ObjectSorage Action as a
@@ -79,7 +79,7 @@ public class ParseObjStoreCommand {
       md.update(text.getBytes());
       hash = new String(md.digest());
     } catch (NoSuchAlgorithmException e) {
-      mLogger.error("SHA-1 algorithm not available", e);
+      LOGGER.error("SHA-1 algorithm not available", e);
     }
     return hash;
   }

@@ -22,8 +22,8 @@ package com.celements.mandatory;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -42,7 +42,7 @@ public class HTMLWebPreferences implements IMandatoryDocumentRole {
 
   private static final String _SPACE_PREFERENCE_PAGE_TYPE = "SpacePreference";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(HTMLWebPreferences.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(HTMLWebPreferences.class);
 
   @Requirement("celements.celPageTypeClasses")
   IClassCollectionRole pageTypeClasses;

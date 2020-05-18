@@ -25,7 +25,7 @@ public class SingleDocFileBaseService implements IFileBaseServiceRole {
 
   public static final String FILEBASE_SINGLE_DOC = "filebase.singleDoc";
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(SingleDocFileBaseService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SingleDocFileBaseService.class);
 
   @Requirement
   IAttachmentServiceRole attService;
@@ -46,7 +46,7 @@ public class SingleDocFileBaseService implements IFileBaseServiceRole {
         DocumentReference fileBaseDocRef = webUtils.resolveDocumentReference(fileBaseDocFN);
         return modelAccess.getOrCreateDocument(fileBaseDocRef);
       } catch (DocumentLoadException exp) {
-        _LOGGER.error("Failed to load FileBaseDocument.", exp);
+        LOGGER.error("Failed to load FileBaseDocument.", exp);
         throw new FileBaseLoadException(fileBaseDocFN, exp);
       }
     } else {
@@ -65,7 +65,7 @@ public class SingleDocFileBaseService implements IFileBaseServiceRole {
     try {
       return attService.getAttachmentNameEqual(getFileBaseDoc(), filename);
     } catch (AttachmentNotExistsException attNotExistsExp) {
-      _LOGGER.trace("failed to get file in filebase. ", attNotExistsExp);
+      LOGGER.trace("failed to get file in filebase. ", attNotExistsExp);
       throw new FileNotExistsException(filename);
     }
   }

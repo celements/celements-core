@@ -31,7 +31,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class ContentInheritor {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(ContentInheritor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ContentInheritor.class);
 
   private IIteratorFactory<DocumentIterator> _iteratorFactory;
   private IEmptyDocumentChecker _emptyDocumentChecker;
@@ -124,11 +124,11 @@ public class ContentInheritor {
       throw new IllegalStateException("No IteratorFactory given.");
     }
     DocumentIterator iterator = getIteratorFactory().createIterator();
-    _LOGGER.info("ContentInheritor getDoc before while : " + iterator.hasNext());
+    LOGGER.info("ContentInheritor getDoc before while : " + iterator.hasNext());
     while (iterator.hasNext()) {
       try {
         XWikiDocument doc = iterator.next();
-        _LOGGER.debug("ContentInheritor getDoc next: " + doc);
+        LOGGER.debug("ContentInheritor getDoc next: " + doc);
         if (!getLanguage().equals(doc.getDefaultLanguage())) {
           doc = doc.getTranslatedDocument(getLanguage(), getContext());
         }
@@ -136,7 +136,7 @@ public class ContentInheritor {
           return doc;
         }
       } catch (Exception exp) {
-        _LOGGER.warn("Failed to get translated document.", exp);
+        LOGGER.warn("Failed to get translated document.", exp);
       }
     }
     return null;

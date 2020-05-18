@@ -25,7 +25,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 @Component("webUtils")
 public class WebUtilsScriptService implements ScriptService {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(AuthenticationScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationScriptService.class);
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -58,7 +58,7 @@ public class WebUtilsScriptService implements ScriptService {
         return webUtilsService.getAttachmentApi(attRef);
       }
     } catch (XWikiException xwe) {
-      _LOGGER.error("failed getting attachment for ref '{}'", attRef, xwe);
+      LOGGER.error("failed getting attachment for ref '{}'", attRef, xwe);
     }
     return null;
   }
@@ -107,10 +107,10 @@ public class WebUtilsScriptService implements ScriptService {
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
     List<Attachment> attachments = Collections.emptyList();
     if (hasProgrammingRights()) {
-      _LOGGER.info("getAttachmentsForDocs: fetching attachments...");
+      LOGGER.info("getAttachmentsForDocs: fetching attachments...");
       attachments = webUtilsService.getAttachmentsForDocs(docsFN);
     } else {
-      _LOGGER.info("getAttachmentsForDocs: no programming rights");
+      LOGGER.info("getAttachmentsForDocs: no programming rights");
     }
     return attachments;
   }
@@ -158,7 +158,7 @@ public class WebUtilsScriptService implements ScriptService {
         return webUtilsService.getJSONContent(docRef);
       }
     } catch (Exception exp) {
-      _LOGGER.warn("getJSONContent failed for docRef[" + docRef + "]. ", exp);
+      LOGGER.warn("getJSONContent failed for docRef[" + docRef + "]. ", exp);
     }
     return "{}";
   }
@@ -171,7 +171,7 @@ public class WebUtilsScriptService implements ScriptService {
     try {
       return webUtilsService.getUserNameForDocRef(userDocRef);
     } catch (XWikiException exp) {
-      _LOGGER.error("Failed to get user document [" + userDocRef + "].", exp);
+      LOGGER.error("Failed to get user document [" + userDocRef + "].", exp);
     }
     return "N/A";
   }

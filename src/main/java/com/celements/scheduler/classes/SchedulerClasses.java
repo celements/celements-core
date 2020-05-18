@@ -1,7 +1,5 @@
 package com.celements.scheduler.classes;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -15,15 +13,8 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Component("SchedulerClasses")
 public class SchedulerClasses extends AbstractClassCollection {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(SchedulerClasses.class);
-
   @Requirement
   private ISchedulerClassConfig classConf;
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
-  }
 
   @Override
   public String getConfigName() {

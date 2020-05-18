@@ -26,7 +26,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("docform")
 public class DocFormScriptService implements ScriptService {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(DocFormScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DocFormScriptService.class);
 
   private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
 

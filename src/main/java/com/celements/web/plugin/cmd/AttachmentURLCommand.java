@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class AttachmentURLCommand {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(AttachmentURLCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentURLCommand.class);
 
   public String getAttachmentURL(String link, XWikiContext context) {
     return getAttachmentURL(link, getDefaultAction(), context);

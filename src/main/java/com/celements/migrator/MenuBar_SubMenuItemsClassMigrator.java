@@ -22,8 +22,8 @@ package com.celements.migrator;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 public class MenuBar_SubMenuItemsClassMigrator
     extends AbstractCelementsHibernateMigrator {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       MenuBar_SubMenuItemsClassMigrator.class);
 
   @Requirement

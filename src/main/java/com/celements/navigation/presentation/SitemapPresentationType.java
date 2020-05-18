@@ -2,8 +2,8 @@ package com.celements.navigation.presentation;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -15,7 +15,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("sitemap")
 public class SitemapPresentationType extends DefaultPresentationType {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(SitemapPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SitemapPresentationType.class);
 
   private static final String _CEL_CM_SM_TREENODE_DEFAULT_CSSCLASS = "cel_cm_sitemap_treenode";
 

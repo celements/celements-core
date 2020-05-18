@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -43,7 +43,7 @@ public class Robots_TXT implements IMandatoryDocumentRole {
 
   private static final String _ROBOTS_TXT_PAGE_TYPE = "Code";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(Robots_TXT.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Robots_TXT.class);
 
   @Requirement("celements.celPageTypeClasses")
   IClassCollectionRole pageTypeClasses;

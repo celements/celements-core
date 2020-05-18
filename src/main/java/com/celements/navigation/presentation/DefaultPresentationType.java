@@ -18,7 +18,7 @@ import com.xpn.xwiki.XWikiException;
 @Component
 public class DefaultPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(DefaultPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPresentationType.class);
 
   private static final String _CEL_CM_NAV_MI_DEFAULT_CSSCLASS = "cel_cm_navigation_menuitem";
 

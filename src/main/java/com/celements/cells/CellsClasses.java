@@ -19,8 +19,6 @@
  */
 package com.celements.cells;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -32,8 +30,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.celCellsClasses")
 public class CellsClasses extends AbstractClassCollection {
-
-  private static Log LOGGER = LogFactory.getFactory().getInstance(CellsClasses.class);
 
   @Requirement
   ICellsClassConfig cellsClassConfig;
@@ -68,11 +64,6 @@ public class CellsClasses extends AbstractClassCollection {
     getGroupCellClass();
     getPageDepCellConfigClass();
     getTranslationBoxCellConfigClass();
-  }
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
   }
 
   @Override

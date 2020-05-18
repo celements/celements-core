@@ -19,8 +19,6 @@
  */
 package com.celements.web.classcollections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -33,16 +31,9 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.metaTag.classes")
 public class MetaTagClasses extends AbstractClassCollection {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(MetaTagClasses.class);
-
   public static final String META_TAG_CLASS_SPACE = "Classes";
   public static final String META_TAG_CLASS_DOC = "MetaTagClass";
   public static final String META_TAG_CLASS = META_TAG_CLASS_SPACE + "." + META_TAG_CLASS_DOC;
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
-  }
 
   @Override
   public String getConfigName() {

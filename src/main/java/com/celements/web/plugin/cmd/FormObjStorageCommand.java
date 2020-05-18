@@ -21,8 +21,8 @@ package com.celements.web.plugin.cmd;
 
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,19 +32,19 @@ import com.xpn.xwiki.objects.BaseObject;
 public class FormObjStorageCommand {
 
   private static final int _MAX_OBJ_ON_DOC = 500;
-  private static Log mLogger = LogFactory.getFactory().getInstance(FormObjStorageCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FormObjStorageCommand.class);
 
   public BaseObject newObject(XWikiDocument storageDoc, String className, XWikiContext context) {
     Vector<BaseObject> objects = storageDoc.getObjects(className);
     if ((objects != null) && (objects.size() > _MAX_OBJ_ON_DOC)) {
-      mLogger.warn("PERFORMANCE WARNING! There are more than " + _MAX_OBJ_ON_DOC
+      LOGGER.warn("PERFORMANCE WARNING! There are more than " + _MAX_OBJ_ON_DOC
           + " objects of the class [" + className + "] on storageDoc [" + storageDoc.getFullName()
           + "].");
     }
     try {
       return storageDoc.newObject(className, context);
     } catch (XWikiException exp) {
-      mLogger.error("Failed to create new object [" + className + "] on document ["
+      LOGGER.error("Failed to create new object [" + className + "] on document ["
           + storageDoc.getFullName() + "].", exp);
     }
     return null;
