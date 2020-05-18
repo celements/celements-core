@@ -17,526 +17,485 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.plugin.cmd;
+package com.celements.docform;
 
+import static com.celements.common.lambda.LambdaExceptionUtil.*;
 import static com.celements.common.test.CelementsTestUtils.*;
+import static com.google.common.collect.ImmutableSet.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.Vector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.docform.DocFormRequestKey;
-import com.celements.docform.DocFormRequestKeyParser;
+import com.celements.docform.IDocForm.ResponseState;
+import com.celements.model.access.ModelAccessStrategy;
 import com.celements.model.access.XWikiDocumentCreator;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.web.plugin.cmd.AddTranslationCommand;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 public class DocFormCommandTest extends AbstractComponentTest {
 
-  private XWikiContext context;
-  private XWiki xwiki;
+  private DocFormRequestKeyParser parser;
+  private WikiReference wiki = new WikiReference("db");
+  private DocumentReference docRef;
+  private XWikiDocument xdoc;
+  private XWikiDocument tdoc;
+
   private DocFormCommand docFormCmd;
-  private String db;
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMock(XWikiDocumentCreator.class);
-    context = getContext();
-    xwiki = getWikiMock();
-    docFormCmd = new DocFormCommand();
-    db = "db";
-    context.setDatabase(db);
-    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
+    registerComponentMocks(ModelAccessStrategy.class);
+    getContext().setDatabase(wiki.getName());
+    docRef = new DocumentReference(wiki.getName(), "Space", "Doc");
+    parser = new DocFormRequestKeyParser(docRef);
+    docFormCmd = (DocFormCommand) Utils.getComponent(IDocForm.class)
+        .initialize(docRef, true);
+
+    xdoc = create(docRef);
+    tdoc = create(docRef, "it");
   }
 
   @Test
-  public void testCollapse_nullElems() {
-    assertEquals("abf|cdf", docFormCmd.collapse(new String[] { "abf", null, "cdf", null }));
-  }
-
-  @Test
-  public void testCollapse_emptyStrings() {
-    assertEquals("", docFormCmd.collapse(new String[] { "", "" }));
-  }
-
-  @Test
-  public void testCollapse_someEmptyStrings() {
-    assertEquals("abc|dfg", docFormCmd.collapse(new String[] { "abc", "", "", "dfg" }));
-  }
-
-  @Test
-  public void testCollapse_trailingEmptyStrings() {
-    assertEquals("abc3|df2g", docFormCmd.collapse(new String[] { "", "abc3", "df2g", "" }));
-  }
-
-  @Test
-  public void testGetUpdateDoc() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(db, "Full", "Name");
-    XWikiDocument doc = new XWikiDocument(docRef);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
-    replayDefault();
-    XWikiDocument updateDoc = docFormCmd.getUpdateDoc(docRef);
-    assertNotNull(updateDoc);
-    assertEquals(doc, updateDoc);
-    verifyDefault();
-  }
-
-  @Test
-  public void setOrRemoveObj_fromCache() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    DocFormRequestKey key = new DocFormRequestKeyParser().parse("A.B_0_hi", docRef);
-    String value = "value";
-    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
-    docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
-    objMock.set(eq("hi"), eq(value), same(context));
-    expectLastCall().once();
-    replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, value);
-    verifyDefault();
-  }
-
-  @Test
-  public void setOrRemoveObj_get() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    DocFormRequestKey key = new DocFormRequestKeyParser().parse("A.B_0_hi", docRef);
-    DocumentReference classRef = new DocumentReference(db, "A", "B");
-    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
-    expect(docMock.getXObject(eq(classRef), eq(0))).andReturn(objMock).once();
-    String value = "value";
-    objMock.set(eq("hi"), eq(value), same(context));
-    expectLastCall().once();
+  public void test_updateDoc_docField() throws Exception {
+    DocFormRequestParam param = parseParam("title", "val");
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, value);
+    assertSame(tdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, param));
     verifyDefault();
 
-    assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
+    assertEquals(param.getValuesAsString(), tdoc.getTitle());
   }
 
   @Test
-  public void setOrRemoveObj_get_notExists() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    DocFormRequestKey key = new DocFormRequestKeyParser().parse("A.B_0_hi", docRef);
-    DocumentReference classRef = new DocumentReference(db, "A", "B");
-    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
-    expect(docMock.getXObject(eq(classRef), eq(0))).andReturn(null).once();
-    expect(docMock.newXObject(eq(classRef), same(context))).andReturn(objMock).once();
-    String value = "value";
-    objMock.set(eq("hi"), eq(value), same(context));
-    expectLastCall().once();
+  public void test_updateDoc_docField_alreadySet() throws Exception {
+    DocFormRequestParam param = parseParam("title", "val");
+    tdoc.setTitle(param.getValuesAsString());
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, value);
+    assertNull(docFormCmd.updateDocFromParam(xdoc, tdoc, param));
     verifyDefault();
 
-    assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
+    assertEquals(param.getValuesAsString(), tdoc.getTitle());
   }
 
   @Test
-  public void setOrRemoveObj_create() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    DocFormRequestKey key1 = new DocFormRequestKeyParser().parse("A.B_-1_hi", docRef);
-    DocumentReference classRef1 = new DocumentReference(db, "A", "B");
-    BaseObject objMock1 = createMockAndAddToDefault(BaseObject.class);
-    expect(docMock.getXObject(eq(classRef1), eq(-1))).andReturn(null).once();
-    expect(docMock.newXObject(eq(classRef1), same(context))).andReturn(objMock1).once();
-    String value1 = "value1";
-    objMock1.set(eq("hi"), eq(value1), same(context));
-    expectLastCall();
-    DocFormRequestKey key2 = new DocFormRequestKeyParser().parse("B.C_0_bla", docRef);
-    String value2 = "value2";
-    BaseObject objMock2 = createMockAndAddToDefault(BaseObject.class);
-    docFormCmd.getChangedObjects().put("db:Sp.Doc_db:B.C_0", objMock2);
-    objMock2.set(eq("bla"), eq(value2), same(context));
-    expectLastCall();
+  public void test_updateDoc_objField_get() throws Exception {
+    DocFormRequestParam param = parseParam("A.B_3_hi", "val");
+    BaseObject obj = addXObject(xdoc, param.getKey());
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key1, value1);
-    docFormCmd.setOrRemoveObj(docMock, key2, value2);
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, param));
     verifyDefault();
 
-    assertEquals(objMock1, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_-1"));
-    assertEquals(objMock2, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:B.C_0"));
+    assertSame(obj, assertObj(param, xdoc));
+    assertEquals(1, XWikiObjectFetcher.on(xdoc).count());
   }
 
   @Test
-  public void setOrRemoveObj_remove_fromCache() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    DocFormRequestKey key = new DocFormRequestKeyParser().parse("A.B_^0", docRef);
-    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
-    docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
-    expect(docMock.removeXObject(same(objMock))).andReturn(true).once();
+  public void test_updateDoc_objField_alreadySet() throws Exception {
+    DocFormRequestParam param = parseParam("A.B_3_hi", "val");
+    BaseObject obj = addXObject(xdoc, param.getKey());
+    obj.setStringValue(param.getKey().getFieldName(), param.getValuesAsString());
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, "");
+    assertNull(docFormCmd.updateDocFromParam(xdoc, tdoc, param));
     verifyDefault();
 
-    assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
+    assertSame(obj, assertObj(param, xdoc));
+    assertEquals(1, XWikiObjectFetcher.on(xdoc).count());
   }
 
   @Test
-  public void setOrRemoveObj_remove() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    DocFormRequestKey key = new DocFormRequestKeyParser().parse("A.B_^0", docRef);
-    DocumentReference classRef = new DocumentReference(db, "A", "B");
-    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
-    expect(docMock.getXObject(eq(classRef), eq(0))).andReturn(objMock).once();
-    expect(docMock.removeXObject(same(objMock))).andReturn(true).once();
+  public void test_updateDoc_objField_multipleFields() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
+        "A.B_0_hi", "val1",
+        "A.B_0_content", "val2"));
+    BaseObject obj = addXObject(xdoc, params.get(0).getKey());
 
     replayDefault();
-    docFormCmd.setOrRemoveObj(docMock, key, "");
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(0)));
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(1)));
     verifyDefault();
 
-    assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
+    assertSame(obj, assertObj(params.get(0), xdoc));
+    assertEquals(1, XWikiObjectFetcher.on(xdoc).count());
+    params.forEach(param -> assertEquals(param.getValuesAsString(),
+        obj.getStringValue(param.getKey().getFieldName())));
   }
 
   @Test
-  public void testValidateField() throws XWikiException {
-    BaseProperty regexProp = new StringProperty();
-    regexProp.setValue("/.{1,5}/");
-    BaseProperty msgProp = new StringProperty();
-    msgProp.setValue("msg");
-    Map<String, BaseProperty> propfields = new HashMap<>();
-    PropertyClass property = new PropertyClass();
-    propfields.put("validationRegExp", regexProp);
-    propfields.put("validationMessage", msgProp);
-    property.setFields(propfields);
-    Map<String, PropertyClass> fields = new HashMap<>();
-    fields.put("testField", property);
-    BaseClass bclass = new BaseClass();
-    bclass.setFields(fields);
-    DocumentReference bclassDocRef = new DocumentReference(db, "Test", "TestClass");
-    XWikiDocument doc = new XWikiDocument(bclassDocRef);
-    doc.setXClass(bclass);
-    expect(xwiki.getDocument(eq(bclassDocRef), same(context))).andReturn(doc).atLeastOnce();
-    expect(xwiki.exists(eq(bclassDocRef), same(context))).andReturn(true).atLeastOnce();
-    replayDefault();
-    String result = docFormCmd.validateField("Test.TestClass", "testField", "value", context);
-    assertNull("Successful validation should result in answoer null", result);
-    result = docFormCmd.validateField("Test.TestClass", "testField", "", context);
-    assertEquals("msg", result);
-    verifyDefault();
-  }
-
-  @Test
-  public void testGetFieldFromProperty() throws XWikiException {
-    BaseProperty prop = new StringProperty();
-    prop.setValue("value");
-    PropertyClass propclass = new PropertyClass();
-    propclass.put("test", prop);
-    assertEquals("value", docFormCmd.getFieldFromProperty(propclass, "test"));
-  }
-
-  @Test
-  public void testGetFindObjectFieldInRequestRegex_noMatch() {
-    assertFalse("".matches(docFormCmd.getFindObjectFieldInRequestRegex()));
-    assertFalse("abcd".matches(docFormCmd.getFindObjectFieldInRequestRegex()));
-    assertFalse("Hi_0_there".matches(docFormCmd.getFindObjectFieldInRequestRegex()));
-    assertFalse("Space.Doc_Class.Name_+3_field".matches(
-        docFormCmd.getFindObjectFieldInRequestRegex()));
-  }
-
-  @Test
-  public void testGetFindObjectFieldInRequestRegex_match() {
-    assertTrue("Space.Doc_0_field_one".matches(docFormCmd.getFindObjectFieldInRequestRegex()));
-    assertTrue("Space.Doc_Class.Name_3_field".matches(
-        docFormCmd.getFindObjectFieldInRequestRegex()));
-    assertTrue("Space.Doc_Class.Name_-3_field".matches(
-        docFormCmd.getFindObjectFieldInRequestRegex()));
-    assertTrue("Space.Doc_Class.Name_^3_field".matches(
-        docFormCmd.getFindObjectFieldInRequestRegex()));
-  }
-
-  @Test
-  public void testUpdateDocFromMap() throws XWikiException {
-    Map<String, String[]> data = new HashMap<>();
-    data.put("Oh.Noes_A.B_0_blabla", new String[] { "Blabla Value" });
-    data.put("C.D_1_blabla2", new String[] { "Another Blabla Value" });
-    BaseObject obj = createMock(BaseObject.class);
-    obj.setNumber(1);
-    expectLastCall().once();
-    obj.set(eq("blabla2"), eq("Another Blabla Value"), same(context));
-    expectLastCall();
-    DocumentReference fullNameRef = new DocumentReference(db, "Full", "Name");
-    obj.setDocumentReference(fullNameRef);
-    expectLastCall().atLeastOnce();
-    BaseObject obj2 = createMock(BaseObject.class);
-    obj2.setNumber(0);
-    expectLastCall().once();
-    obj2.set(eq("blabla"), eq("Blabla Value"), same(context));
-    expectLastCall().once();
-    DocumentReference specificDocRef = new DocumentReference(db, "Oh", "Noes");
-    obj2.setDocumentReference(specificDocRef);
-    expectLastCall().atLeastOnce();
-    replay(obj, obj2);
-    XWikiDocument defaultDoc = new XWikiDocument(fullNameRef);
-    Vector<BaseObject> cDobjects = new Vector<>();
-    cDobjects.addAll(Arrays.asList(new BaseObject(), obj));
-    DocumentReference cdClassRef = new DocumentReference(db, "C", "D");
-    defaultDoc.setXObjects(cdClassRef, cDobjects);
-    expect(xwiki.exists(eq(fullNameRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc).once();
-    XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
-    Vector<BaseObject> cDobjects2 = new Vector<>();
-    cDobjects2.add(obj2);
-    DocumentReference abClassRef = new DocumentReference(db, "A", "B");
-    specificDoc.setXObjects(abClassRef, cDobjects2);
-    DocumentReference doc2Ref = new DocumentReference(db, "Oh", "Noes");
-    expect(xwiki.exists(eq(doc2Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc).once();
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    context.setRequest(request);
-    expect(request.get(eq("template"))).andReturn("");
-    replayDefault();
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap(fullNameRef, data);
-    verifyDefault(obj, obj2);
-    assertTrue(changedDocs.contains(defaultDoc));
-    assertEquals(2, defaultDoc.getXObjects(cdClassRef).size());
-    assertTrue(changedDocs.contains(specificDoc));
-    assertEquals(1, specificDoc.getXObjects(abClassRef).size());
-  }
-
-  @Test
-  public void testUpdateDocFromMap_newFromTemplate_titleAndContent() throws XWikiException {
-    context.setLanguage("de");
-    Map<String, String[]> data = new HashMap<>();
-    data.put("Oh.Noes_title", new String[] { "Blabla Value" });
-    data.put("content", new String[] { "Another Blabla Value" });
-    DocumentReference fullNameRef = new DocumentReference(db, "Full", "Name");
-    XWikiDocument defaultDoc = new XWikiDocument(fullNameRef);
-    DocumentReference specificDocRef = new DocumentReference(db, "Oh", "Noes");
-    expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc).once();
-    expect(xwiki.exists(eq(fullNameRef), same(context))).andReturn(true).atLeastOnce();
-    XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
-    DocumentReference doc2Ref = new DocumentReference(db, "Oh", "Noes");
-    expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc).once();
-    expect(xwiki.exists(eq(doc2Ref), same(context))).andReturn(true).atLeastOnce();
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    context.setRequest(request);
-    expect(request.get(eq("template"))).andReturn("Templates.MyTempl");
-    DocumentReference templRef = new DocumentReference(db, "Templates", "MyTempl");
-    XWikiDocument templDoc = new XWikiDocument(templRef);
-    expect(xwiki.getDocument(eq(templRef), same(context))).andReturn(templDoc);
-    // //TODO is there a better method to match the parameter? -> eq and same do not work
-    // // since loadXWikiDoc create a new XWikiDocument
-    // expect(store.loadXWikiDoc(isA(XWikiDocument.class),
-    // same(context))).andReturn(defaultDoc);
-    // expect(store.loadXWikiDoc(isA(XWikiDocument.class),
-    // same(context))).andReturn(specificDoc);
-    replayDefault();
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap(fullNameRef, data);
-    verifyDefault();
-    // TODO Check how it works - getTranslatedDoc seems to create a new object which leads
-    // to getContent() and getTitle() to be empty -> does it work correctly anyways?
-    assertTrue(changedDocs.contains(defaultDoc));
-    assertEquals("de", defaultDoc.getDefaultLanguage());
-    assertTrue(changedDocs.contains(specificDoc));
-    assertEquals("de", specificDoc.getDefaultLanguage());
-  }
-
-  @Test
-  public void testUpdateDocFromMap_newFromTemplate() throws XWikiException {
-    Map<String, String[]> data = new HashMap<>();
-    data.put("Oh.Noes_A.B_0_blabla", new String[] { "Blabla Value" });
-    data.put("C.D_1_blabla2", new String[] { "Another Blabla Value" });
-    BaseObject obj = createMock(BaseObject.class);
-    obj.setNumber(1);
-    expectLastCall().once();
-    obj.set(eq("blabla2"), eq("Another Blabla Value"), same(context));
-    expectLastCall();
-    DocumentReference fullNameRef = new DocumentReference(db, "Full", "Name");
-    obj.setDocumentReference(fullNameRef);
-    expectLastCall().atLeastOnce();
-    BaseObject obj2 = createMock(BaseObject.class);
-    obj2.setNumber(0);
-    expectLastCall().once();
-    obj2.set(eq("blabla"), eq("Blabla Value"), same(context));
-    expectLastCall().once();
-    DocumentReference specificDocRef = new DocumentReference(db, "Oh", "Noes");
-    obj2.setDocumentReference(specificDocRef);
-    expectLastCall().atLeastOnce();
-    replay(obj, obj2);
-    XWikiDocument defaultDoc = new XWikiDocument(fullNameRef);
-    Vector<BaseObject> cDobjects = new Vector<>();
-    cDobjects.addAll(Arrays.asList(new BaseObject(), obj));
-    DocumentReference cdClassRef = new DocumentReference(db, "C", "D");
-    defaultDoc.setXObjects(cdClassRef, cDobjects);
-    DocumentReference doc1Ref = new DocumentReference(db, "Full", "Name");
-    expect(xwiki.exists(eq(doc1Ref), same(context))).andReturn(false).atLeastOnce();
-    expect(getMock(XWikiDocumentCreator.class).create(eq(doc1Ref), eq("")))
-        .andReturn(defaultDoc).once();
-    XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
-    Vector<BaseObject> cDobjects2 = new Vector<>();
-    cDobjects2.add(obj2);
-    DocumentReference abClassRef = new DocumentReference(db, "A", "B");
-    specificDoc.setXObjects(abClassRef, cDobjects2);
-    DocumentReference doc2Ref = new DocumentReference(db, "Oh", "Noes");
-    expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc).once();
-    expect(xwiki.exists(eq(doc2Ref), same(context))).andReturn(true).atLeastOnce();
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    context.setRequest(request);
-    expect(request.get(eq("template"))).andReturn("Templates.MyTempl");
-    DocumentReference templRef = new DocumentReference(db, "Templates", "MyTempl");
-    XWikiDocument templDoc = new XWikiDocument(templRef);
-    expect(xwiki.getDocument(eq(templRef), same(context))).andReturn(templDoc);
-    replayDefault();
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap(fullNameRef, data);
-    verifyDefault(obj, obj2);
-    assertTrue(changedDocs.contains(defaultDoc));
-    assertEquals(2, defaultDoc.getXObjects(cdClassRef).size());
-    assertTrue(changedDocs.contains(specificDoc));
-    assertEquals(1, specificDoc.getXObjects(abClassRef).size());
-  }
-
-  @Test
-  public void testUpdateDocFromMap_content() throws XWikiException {
-    context.setRequest(new XWikiServletRequestStub());
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument doc = new XWikiDocument(docRef);
-    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
-    docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
-    String value = "value";
-    Map<String, String[]> data = new HashMap<>();
-    data.put("content", new String[] { value });
-
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+  public void test_updateDoc_objField_create_positiveNb() throws Exception {
+    DocFormRequestParam param = parseParam("A.B_3_hi", "val");
 
     replayDefault();
-    docFormCmd.updateDocFromMap(docRef, data);
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, param));
     verifyDefault();
 
-    assertEquals(value, doc.getContent());
+    assertEquals(0, assertObj(param, xdoc).getNumber());
+    assertEquals(1, XWikiObjectFetcher.on(xdoc).count());
   }
 
   @Test
-  public void testUpdateDocFromMap_objWithContentField() throws XWikiException {
-    context.setRequest(new XWikiServletRequestStub());
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument doc = new XWikiDocument(docRef);
-    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
-    docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
-    String value = "value";
-    Map<String, String[]> data = new HashMap<>();
-    data.put("A.B_0_content", new String[] { value });
-
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    objMock.set(eq("content"), eq(value), same(context));
-    expectLastCall().once();
+  public void test_updateDoc_objField_create_negativeNb() throws Exception {
+    DocFormRequestParam param = parseParam("A.B_-3_hi", "val");
 
     replayDefault();
-    docFormCmd.updateDocFromMap(docRef, data);
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, param));
     verifyDefault();
+
+    assertEquals(0, assertObj(param, xdoc).getNumber());
+    assertEquals(1, XWikiObjectFetcher.on(xdoc).count());
   }
 
   @Test
-  public void testUpdateDocFromMap_title() throws XWikiException {
-    context.setRequest(new XWikiServletRequestStub());
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument doc = new XWikiDocument(docRef);
-    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
-    docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
-    String value = "value";
-    Map<String, String[]> data = new HashMap<>();
-    data.put("title", new String[] { value });
-
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+  public void test_updateDoc_objField_create_multiple_sameClass() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
+        "A.B_0_hi", "val1",
+        "A.B_-1_hi", "val2"));
 
     replayDefault();
-    docFormCmd.updateDocFromMap(docRef, data);
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(0)));
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(1)));
     verifyDefault();
 
-    assertEquals(value, doc.getTitle());
+    assertEquals(0, assertObj(params.get(0), xdoc).getNumber());
+    assertEquals(1, assertObj(params.get(1), xdoc).getNumber());
+    assertEquals(2, XWikiObjectFetcher.on(xdoc).count());
   }
 
   @Test
-  public void testUpdateDocFromMap_title_lang() throws XWikiException {
+  public void test_updateDoc_objField_create_multiple_otherClasses() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
+        "A.B_-1_hi", "val1",
+        "X.Y_-1_hi", "val2"));
+
+    replayDefault();
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(0)));
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(1)));
+    verifyDefault();
+
+    assertObj(params.get(0), xdoc);
+    assertObj(params.get(1), xdoc);
+    assertEquals(2, XWikiObjectFetcher.on(xdoc).count());
+  }
+
+  @Test
+  public void test_updateDoc_objRemove_none() throws Exception {
+    DocFormRequestParam param = parseParam("A.B_^3", "");
+
+    replayDefault();
+    assertNull(docFormCmd.updateDocFromParam(xdoc, tdoc, param));
+    verifyDefault();
+
+    assertEquals(0, XWikiObjectFetcher.on(xdoc).count());
+  }
+
+  @Test
+  public void test_updateDoc_objRemove() throws Exception {
+    DocFormRequestParam param = parseParam("A.B_^3", "");
+    addXObject(xdoc, param.getKey());
+
+    replayDefault();
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, param));
+    verifyDefault();
+
+    assertEquals(0, XWikiObjectFetcher.on(xdoc).count());
+  }
+
+  @Test
+  public void test_updateDoc_objRemove_withField() throws Exception {
+    DocFormRequestParam param = parseParam("A.B_^3_hi", "val");
+    addXObject(xdoc, param.getKey());
+
+    replayDefault();
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, param));
+    verifyDefault();
+
+    assertEquals(0, XWikiObjectFetcher.on(xdoc).count());
+  }
+
+  @Test
+  public void test_updateDocs_none() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of());
+    expectDoc(xdoc);
+
+    replayDefault();
+    docFormCmd.updateDocs(params);
+    verifyDefault();
+
+    assertEquals(0, XWikiObjectFetcher.on(xdoc).count());
+    assertResponse(params, null, null, ImmutableSet.of(xdoc));
+  }
+
+  @Test
+  public void test_updateDocs() throws Exception {
+    DocFormRequestParam param = parseParam("A.B_0_hi", "val");
+    expectDocWithSave(xdoc);
+
+    replayDefault();
+    docFormCmd.updateDocs(ImmutableList.of(param));
+    verifyDefault();
+
+    assertEquals(0, assertObj(param, xdoc).getNumber());
+    assertEquals(1, XWikiObjectFetcher.on(xdoc).count());
+    assertResponse(ImmutableList.of(param), ImmutableSet.of(xdoc), null, null);
+  }
+
+  @Test
+  public void test_updateDocs_alreadySet() throws Exception {
+    DocFormRequestParam param = parseParam("A.B_0_hi", "val");
+    expectDoc(xdoc);
+    BaseObject obj = addXObject(xdoc, param.getKey());
+    obj.setStringValue(param.getKey().getFieldName(), param.getValuesAsString());
+
+    replayDefault();
+    docFormCmd.updateDocs(ImmutableList.of(param));
+    verifyDefault();
+
+    assertSame(obj, assertObj(param, xdoc));
+    assertEquals(1, XWikiObjectFetcher.on(xdoc).count());
+    assertResponse(ImmutableList.of(param), null, null, ImmutableSet.of(xdoc));
+  }
+
+  @Test
+  public void test_updateDocs_multipleDocs() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
+        "This.Doc_A.B_0_foo", "val1",
+        "That.Doc_A.B_0_foo", "val1"));
+    XWikiDocument docThis = expectDocWithSave(create(
+        new DocumentReference(wiki.getName(), "This", "Doc")));
+    XWikiDocument docThat = expectDocWithSave(create(
+        new DocumentReference(wiki.getName(), "That", "Doc")));
+    expectDoc(xdoc);
+
+    replayDefault();
+    docFormCmd.updateDocs(params);
+    verifyDefault();
+
+    assertEquals(1, XWikiObjectFetcher.on(docThis).count());
+    assertEquals(1, XWikiObjectFetcher.on(docThat).count());
+    assertResponse(params, ImmutableSet.of(docThis, docThat), null, ImmutableSet.of(xdoc));
+  }
+
+  @Test
+  public void test_updateDocs_newFromTemplate() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of());
+    expectDocWithSave(xdoc);
+
+    getContext().setRequest(createMockAndAddToDefault(XWikiRequest.class));
+    expect(getContext().getRequest().get(eq("template"))).andReturn("Tmpl.MyTmpl");
+    XWikiDocument templateDoc = create(new DocumentReference(wiki.getName(), "Tmpl", "MyTmpl"));
+    templateDoc.setNew(false);
+    templateDoc.setContent("Content");
+    expect(getWikiMock().getDocument(eq(templateDoc.getDocumentReference()), same(getContext())))
+        .andReturn(templateDoc);
+
+    replayDefault();
+    docFormCmd.updateDocs(params);
+    verifyDefault();
+
+    assertEquals("Content", xdoc.getContent());
+    assertResponse(params, ImmutableSet.of(xdoc), null, null);
+  }
+
+  @Test
+  public void test_updateDocs_docFields() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
+        "Space.Doc_title", "Title",
+        "content", "Content"));
+    expectDocWithSave(xdoc);
+
+    replayDefault();
+    docFormCmd.updateDocs(params);
+    verifyDefault();
+
+    assertEquals("Title", xdoc.getTitle());
+    assertEquals("Content", xdoc.getContent());
+    assertResponse(params, ImmutableSet.of(xdoc), null, null);
+  }
+
+  @Test
+  public void test_updateDocs_docFields_translation() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
+        "Space.Doc_title", "Title",
+        "content", "Content"));
+    expectDoc(xdoc);
+    getContext().setLanguage(tdoc.getLanguage());
     docFormCmd.addTranslationCmd = createMockAndAddToDefault(AddTranslationCommand.class);
-    context.setRequest(new XWikiServletRequestStub());
-    context.setLanguage("it");
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument doc = new XWikiDocument(docRef);
-    XWikiDocument docIt = new XWikiDocument(docRef);
-    docIt.setLanguage(context.getLanguage());
-    String value = "value";
-    Map<String, String[]> data = new HashMap<>();
-    data.put("title", new String[] { value });
-
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(docFormCmd.addTranslationCmd.getTranslatedDoc(same(doc), eq(context.getLanguage())))
-        .andReturn(docIt);
+    expect(docFormCmd.addTranslationCmd.getTranslatedDoc(same(xdoc), eq(tdoc.getLanguage())))
+        .andReturn(tdoc);
+    expectDocWithSave(tdoc);
 
     replayDefault();
-    docFormCmd.updateDocFromMap(docRef, data);
+    docFormCmd.updateDocs(params);
     verifyDefault();
 
-    assertEquals("", doc.getTitle());
-    assertEquals(value, docIt.getTitle());
+    assertEquals("", xdoc.getTitle());
+    assertEquals("", xdoc.getContent());
+    assertEquals("Title", tdoc.getTitle());
+    assertEquals("Content", tdoc.getContent());
+    assertResponse(params, ImmutableSet.of(xdoc), null, null);
   }
 
   @Test
-  public void testUpdateDocFromMap_objWithTitleField() throws XWikiException {
-    context.setRequest(new XWikiServletRequestStub());
-    DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument doc = new XWikiDocument(docRef);
-    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
-    docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
-    String value = "value";
-    Map<String, String[]> data = new HashMap<>();
-    data.put("A.B_0_title", new String[] { value });
-
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).anyTimes();
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    objMock.set(eq("title"), eq(value), same(context));
-    expectLastCall().once();
+  public void test_updateDocs_objFields_deleteAndSet() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
+        "A.B_^0", "",
+        "A.B_1_foo", "val1",
+        "A.B_0_foo", "val2"));
+    addXObject(xdoc, params.get(0).getKey());
+    expectDocWithSave(xdoc);
 
     replayDefault();
-    docFormCmd.updateDocFromMap(docRef, data);
+    docFormCmd.updateDocs(params);
     verifyDefault();
+
+    assertEquals(1, XWikiObjectFetcher.on(xdoc).count());
+    assertResponse(params, ImmutableSet.of(xdoc), null, null);
   }
 
   @Test
-  public void testPrepareMapForDocUpdate() {
-    Map<String, Object> inMap = new HashMap<>();
-    String key1 = "key1";
-    String key2 = "key2";
-    String val1 = "Value1";
-    String val2 = "Value2";
-    inMap.put(key1, val1);
-    inMap.put(key2, new String[] { val1, val2 });
-    inMap.put("key3", new Object());
-    Map<String, String[]> result = docFormCmd.prepareMapForDocUpdate(inMap);
-    assertEquals(2, result.size());
-    assertEquals(val1, result.get(key1)[0]);
-    assertEquals(val1, result.get(key2)[0]);
-    assertEquals(val2, result.get(key2)[1]);
+  public void test_updateDocs_createNotAllowed() throws Exception {
+    docFormCmd = (DocFormCommand) Utils.getComponent(IDocForm.class)
+        .initialize(docRef, false);
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of("A.B_0_foo", "val"));
+    xdoc.setNew(true);
+    expectDoc(xdoc);
+
+    replayDefault();
+    docFormCmd.updateDocs(params);
+    verifyDefault();
+
+    assertResponse(params, null, ImmutableSet.of(xdoc), null);
   }
+
+  @Test
+  public void test_updateDocs_createNotAllowed_notNew() throws Exception {
+    docFormCmd = (DocFormCommand) Utils.getComponent(IDocForm.class)
+        .initialize(docRef, false);
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of("A.B_0_foo", "val"));
+    xdoc.setNew(false);
+    expectDocWithSave(xdoc);
+
+    replayDefault();
+    docFormCmd.updateDocs(params);
+    verifyDefault();
+
+    assertResponse(params, ImmutableSet.of(xdoc), null, null);
+  }
+
+  @Test
+  public void test_updateDocs_saveFail() throws Exception {
+    List<DocFormRequestParam> params = parseParams(ImmutableMap.of("A.B_0_foo", "val"));
+    xdoc.setNew(false);
+    expectDocWithSave(xdoc);
+    expectLastCall().andThrow(new DocumentSaveException(docRef));
+
+    replayDefault();
+    docFormCmd.updateDocs(params);
+    verifyDefault();
+
+    assertResponse(params, null, ImmutableSet.of(xdoc), null);
+  }
+
+  private void assertResponse(List<DocFormRequestParam> params,
+      Set<XWikiDocument> successful,
+      Set<XWikiDocument> failed,
+      Set<XWikiDocument> unchanged) {
+    Map<ResponseState, Set<DocumentReference>> responseMap = docFormCmd.getResponseMap(params);
+    assertEquals(3, responseMap.size());
+    assertEquals("successful", convert(successful), responseMap.get(ResponseState.successful));
+    assertEquals("failed", convert(failed), responseMap.get(ResponseState.failed));
+    assertEquals("unchanged", convert(unchanged), responseMap.get(ResponseState.unchanged));
+  }
+
+  private Set<DocumentReference> convert(Set<XWikiDocument> docs) {
+    return Optional.ofNullable(docs).map(Set::stream).orElse(Stream.empty())
+        .map(XWikiDocument::getDocumentReference).collect(toImmutableSet());
+  }
+
+  private BaseObject addXObject(XWikiDocument doc, DocFormRequestKey key) {
+    BaseObject obj = new BaseObject();
+    obj.setXClassReference(key.getClassRef());
+    doc.setXObject(key.getObjNb(), obj);
+    return obj;
+  }
+
+  private XWikiDocument expectDoc(XWikiDocument doc) {
+    expect(getMock(ModelAccessStrategy.class).exists(doc.getDocumentReference(), ""))
+        .andReturn(true).anyTimes();
+    expect(getMock(ModelAccessStrategy.class).getDocument(doc.getDocumentReference(), ""))
+        .andReturn(doc).anyTimes();
+    return doc;
+  }
+
+  private XWikiDocument expectDocWithSave(XWikiDocument doc) throws DocumentSaveException {
+    expectDoc(doc);
+    getMock(ModelAccessStrategy.class).saveDocument(doc, "updateAndSaveDocFormRequest", false);
+    return doc;
+  }
+
+  private DocFormRequestParam parseParam(String key, String value) throws Exception {
+    return parseParams(ImmutableMap.of(key, value)).get(0);
+  }
+
+  private List<DocFormRequestParam> parseParams(Map<String, String> map) throws Exception {
+    List<DocFormRequestParam> requestParams = parser.parseParameterMap(map);
+    requestParams.stream().map(DocFormRequestParam::getKey)
+        .filter(key -> key.getClassRef() != null)
+        .collect(Collectors.groupingBy(key -> key.getClassRef()))
+        .forEach(rethrowBiConsumer((classRef, keys) -> {
+          final BaseClass bClass = expectNewBaseObject(classRef.getDocRef(wiki));
+          keys.stream().map(DocFormRequestKey::getFieldName)
+              .forEach(field -> expect(bClass.get(field)).andReturn(new StringClass()).anyTimes());
+        }));
+    return requestParams;
+  }
+
+  private BaseObject assertObj(DocFormRequestParam param, XWikiDocument xdoc) {
+    DocFormRequestKey key = param.getKey();
+    int actualObjNb = docFormCmd.getChangedObjects().get(key.getObjHash());
+    BaseObject obj = XWikiObjectEditor.on(xdoc)
+        .filter(param.getKey().getClassRef())
+        .filter(actualObjNb)
+        .fetch().unique();
+    assertEquals(param.getValuesAsString(), obj.getStringValue(key.getFieldName()));
+    assertEquals(obj.getNumber(), actualObjNb);
+    return obj;
+  }
+
+  static XWikiDocument create(DocumentReference docRef) {
+    XWikiDocument doc = Utils.getComponent(XWikiDocumentCreator.class)
+        .createWithoutDefaults(docRef);
+    doc.setDefaultLanguage("de");
+    return doc;
+  }
+
+  static XWikiDocument create(DocumentReference docRef, String lang) {
+    return Utils.getComponent(XWikiDocumentCreator.class).createWithoutDefaults(docRef, lang);
+  }
+
 }
