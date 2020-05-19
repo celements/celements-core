@@ -107,6 +107,8 @@ public class DocFormCommand implements IDocForm {
     Stream.of(ResponseState.values())
         .forEach(state -> responseMap.put(state, new HashSet<>()));
     changedObjects = new HashMap<>();
+    defaultDocRef = Optional.empty();
+    isCreateAllowed = false;
   }
 
   @Override
