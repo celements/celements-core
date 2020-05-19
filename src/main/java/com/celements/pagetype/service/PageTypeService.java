@@ -51,7 +51,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class PageTypeService implements IPageTypeRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(PageTypeService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PageTypeService.class);
 
   @Requirement
   Map<String, IPageTypeProviderRole> pageTypeProviders;

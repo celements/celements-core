@@ -61,7 +61,7 @@ public class PageDependentDocumentReferenceCommand {
   public static final String PROPNAME_SPACE_NAME = "space_name";
   public static final String PROPNAME_IS_INHERITABLE = "is_inheritable";
 
-  private static Logger LOGGER = LoggerFactory.getLogger(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       PageDependentDocumentReferenceCommand.class);
 
   PageLayoutCommand pageLayoutCmd;

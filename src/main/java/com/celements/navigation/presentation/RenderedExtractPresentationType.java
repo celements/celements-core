@@ -26,7 +26,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("renderedExtract")
 public class RenderedExtractPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(RenderedExtractPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RenderedExtractPresentationType.class);
 
   private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 

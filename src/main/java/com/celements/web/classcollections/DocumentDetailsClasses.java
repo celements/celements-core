@@ -19,8 +19,6 @@
  */
 package com.celements.web.classcollections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -38,15 +36,8 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
 
   public static final String PUBLISH_DATE_FIELD = "publishDate";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(DocumentDetailsClasses.class);
-
   public static final String FIELD_DOC_EXTRACT_CONTENT = "extract";
   public static final String FIELD_DOC_EXTRACT_LANGUAGE = "language";
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
-  }
 
   @Override
   protected void initClasses() throws XWikiException {
@@ -66,7 +57,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error(exp);
+      LOGGER.error("failed", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -99,7 +90,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error(exp);
+      LOGGER.error("failed", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }

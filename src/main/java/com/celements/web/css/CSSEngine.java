@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
@@ -33,7 +33,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class CSSEngine implements ICSSEngine {
 
   private static final String _CSS_ENGINE_OBJECT_KEY = "com.celements.web.css.CSSEngine";
-  static Log LOGGER = LogFactory.getFactory().getInstance(CSSEngine.class);
+  static final Logger LOGGER = LoggerFactory.getLogger(CSSEngine.class);
 
   private CSSEngine() {
   }

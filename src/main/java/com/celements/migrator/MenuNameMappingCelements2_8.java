@@ -21,8 +21,8 @@ package com.celements.migrator;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.celements.common.classes.IClassCollectionRole;
@@ -37,26 +37,26 @@ import com.xpn.xwiki.web.Utils;
 @Component("MenuNameMappingCelements2_8")
 public class MenuNameMappingCelements2_8 extends AbstractCelementsHibernateMigrator {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       MenuNameMappingCelements2_8.class);
 
   @Override
-  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context
-      ) throws XWikiException {
+  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
+      throws XWikiException {
     manager.updateSchema(context);
     getNavigationClasses().runUpdate();
-    List<Object> result = context.getWiki().search(
-        "select o.name from BaseObject o, StringProperty s"
+    String hql = "select o.name from BaseObject o, StringProperty s"
         + " where o.className = 'Celements2.MenuName' and o.id = s.id"
-        + " and s.name = 'menu_name'", context);
-    mLogger.info("found [" + ((result != null) ? result.size() : result)
+        + " and s.name = 'menu_name'";
+    List<Object> result = context.getWiki().search(hql, context);
+    LOGGER.info("found [" + ((result != null) ? result.size() : result)
         + "] documents to migrate.");
     for (Object fullName : result) {
       XWikiDocument doc = context.getWiki().getDocument(fullName.toString(), context);
-   // we do not want a new history entry. Thus we cancel MetaData and Content Dirty flags
+      // we do not want a new history entry. Thus we cancel MetaData and Content Dirty flags
       doc.setMetaDataDirty(false);
       doc.setContentDirty(false);
-      mLogger.debug("migrating MenuName on [" + doc.getFullName() + "] "
+      LOGGER.debug("migrating MenuName on [" + doc.getFullName() + "] "
           + doc.isMetaDataDirty() + ", " + doc.isContentDirty());
       // save directly over store method to prevent observation manager executing events.
       context.getWiki().getStore().saveXWikiDoc(doc, context);
@@ -68,10 +68,12 @@ public class MenuNameMappingCelements2_8 extends AbstractCelementsHibernateMigra
         "celements.celNavigationClasses");
   }
 
+  @Override
   public String getDescription() {
     return "'Adding HBM Mapping for MenuName'";
   }
 
+  @Override
   public String getName() {
     return "MenuNameMappingCelements2_8";
   }
@@ -81,6 +83,7 @@ public class MenuNameMappingCelements2_8 extends AbstractCelementsHibernateMigra
    * 1.1.2010 until the day of committing this migration
    * 21.6.2011 -> 536
    */
+  @Override
   public XWikiDBVersion getVersion() {
     return new XWikiDBVersion(536);
   }

@@ -105,7 +105,7 @@ public class CelementsWebScriptService implements ScriptService {
 
   private static final String CEL_SUPPORTLINK_URL = "cel_supportLink_url";
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CelementsWebScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebScriptService.class);
 
   @Requirement
   QueryManager queryManager;

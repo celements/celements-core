@@ -44,7 +44,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class RenderCommand {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(RenderCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RenderCommand.class);
 
   private PageTypeReference defaultPageTypeRef = null;
 

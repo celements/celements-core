@@ -29,7 +29,7 @@ import com.xpn.xwiki.XWikiContext;
 
 public class ReorderSaveCommand {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(ReorderSaveCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReorderSaveCommand.class);
   private ReorderSaveHandler injected_Handler;
 
   /**

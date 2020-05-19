@@ -21,8 +21,8 @@ package com.celements.navigation;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -36,7 +36,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class NavigationApi extends Api {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(NavigationApi.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NavigationApi.class);
 
   private INavigation navigation;
 

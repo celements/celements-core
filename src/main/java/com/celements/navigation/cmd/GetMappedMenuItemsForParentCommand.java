@@ -42,7 +42,7 @@ public class GetMappedMenuItemsForParentCommand {
 
   public final static String CELEMENTS_MAPPED_MENU_ITEMS_KEY = "com.celements.web.utils.GetMappedMenuItemsForParendCmd";
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       GetMappedMenuItemsForParentCommand.class);
 
   private boolean isActive;

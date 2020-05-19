@@ -26,7 +26,7 @@ import com.xpn.xwiki.web.Utils;
 @Component
 public class ActionService implements IActionServiceRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(ActionService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ActionService.class);
 
   @Requirement
   IModelAccessFacade modelAccess;

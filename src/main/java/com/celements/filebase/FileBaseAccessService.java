@@ -14,7 +14,7 @@ import com.google.common.base.Strings;
 @Component
 public class FileBaseAccessService implements IFileBaseAccessRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(FileBaseAccessService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileBaseAccessService.class);
 
   @Requirement
   ConfigurationSource configuration;

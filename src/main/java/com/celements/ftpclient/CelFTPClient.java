@@ -22,7 +22,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class CelFTPClient extends FTPClient implements ICelFTPClient {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(CelFTPClient.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelFTPClient.class);
 
   /** A convenience method for connecting and logging in */
   @Override
@@ -138,7 +138,7 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
         return true;
       }
     } catch (IOException exp) {
-      _LOGGER.debug("isConnected failed with ioException.", exp);
+      LOGGER.debug("isConnected failed with ioException.", exp);
     }
     return false;
   }

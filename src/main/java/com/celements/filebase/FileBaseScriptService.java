@@ -27,7 +27,7 @@ public class FileBaseScriptService implements ScriptService {
   @Requirement
   IWebUtilsService webUtilsService;
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(FileBaseScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileBaseScriptService.class);
 
   @Requirement
   IAttachmentServiceRole attachmentService;
@@ -50,7 +50,7 @@ public class FileBaseScriptService implements ScriptService {
       return new TokenBasedUploadCommand().tokenBasedUploadDocRef(attachToDocRef, fieldName,
           userToken, createIfNotExists);
     } catch (XWikiException exp) {
-      _LOGGER.error("token based attachment upload failed: ", exp);
+      LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
   }
@@ -68,9 +68,9 @@ public class FileBaseScriptService implements ScriptService {
       XWikiAttachment xwikiAtt = filebaseService.getFileNameEqual(filename);
       return attachmentService.getApiAttachment(xwikiAtt);
     } catch (FileNotExistsException e) {
-      _LOGGER.trace("Filebase could not find file [" + filename + "]");
+      LOGGER.trace("Filebase could not find file [" + filename + "]");
     } catch (NoAccessRightsException nare) {
-      _LOGGER.info("User {} was refused {} access on file base document {}", nare.getUser(),
+      LOGGER.info("User {} was refused {} access on file base document {}", nare.getUser(),
           nare.getExpectedAccessLevel(), nare.getEntityRef());
     }
     return null;
@@ -84,7 +84,7 @@ public class FileBaseScriptService implements ScriptService {
       try {
         attList.add(attachmentService.getApiAttachment(xwikiAtt));
       } catch (NoAccessRightsException nare) {
-        _LOGGER.info("User {} was refused {} access on file base document {}", nare.getUser(),
+        LOGGER.info("User {} was refused {} access on file base document {}", nare.getUser(),
             nare.getExpectedAccessLevel(), nare.getEntityRef());
       }
     }

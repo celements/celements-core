@@ -19,8 +19,6 @@
  */
 package com.celements.pagetype;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,8 +36,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Deprecated
 @Component("celements.celPageTypeClasses")
 public class PageTypeClasses extends AbstractClassCollection {
-
-  private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeClasses.class);
 
   /**
    * @deprecated instead use constants from IPageTypeClassConfig
@@ -91,11 +87,6 @@ public class PageTypeClasses extends AbstractClassCollection {
   }
 
   @Override
-  protected Log getLogger() {
-    return LOGGER;
-  }
-
-  @Override
   public String getConfigName() {
     return "celPageTypeClasses";
   }
@@ -103,8 +94,8 @@ public class PageTypeClasses extends AbstractClassCollection {
   public BaseClass getPageTypePropertiesClass() throws XWikiException {
     boolean needsUpdate = false;
 
-    DocumentReference pageTypePropertiesClassRef = pageTypeClassConfig.getPageTypePropertiesClassRef(
-        modelContext.getWikiRef());
+    DocumentReference pageTypePropertiesClassRef = pageTypeClassConfig
+        .getPageTypePropertiesClassRef(modelContext.getWikiRef());
     XWikiDocument doc = modelAccess.getOrCreateDocument(pageTypePropertiesClassRef);
 
     BaseClass bclass = doc.getXClass();

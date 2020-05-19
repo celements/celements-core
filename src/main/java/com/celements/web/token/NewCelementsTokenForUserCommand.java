@@ -51,7 +51,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommand {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(NewCelementsTokenForUserCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NewCelementsTokenForUserCommand.class);
 
   /**
    * @deprecated since 3.0 instead use

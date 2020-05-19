@@ -22,7 +22,7 @@ import com.xpn.xwiki.web.Utils;
 @Immutable
 public final class NavigationConfig {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(NavigationConfig.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NavigationConfig.class);
 
   public static final NavigationConfig DEFAULTS = new NavigationConfig();
 

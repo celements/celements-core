@@ -19,8 +19,6 @@
  */
 package com.celements.web.classcollections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -31,8 +29,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.oldCoreLegacyClasses")
 public class OldCoreLegacyClasses extends AbstractClassCollection {
-
-  private static Log LOGGER = LogFactory.getFactory().getInstance(OldCoreLegacyClasses.class);
 
   public static final String XWIKI_SKINS_CLASS_DOC = "XWikiSkins";
   public static final String XWIKI_SKINS_CLASS_SPACE = "XWiki";
@@ -62,11 +58,6 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
   public static final String FORM_FIELD_CLASS_DOC = "FormFieldClass";
   public static final String FORM_FIELD_CLASS_SPACE = "Celements2";
   public static final String FORM_FIELD_CLASS = FORM_FIELD_CLASS_SPACE + "." + FORM_FIELD_CLASS_DOC;
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
-  }
 
   @Override
   public String getConfigName() {

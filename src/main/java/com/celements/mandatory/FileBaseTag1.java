@@ -22,8 +22,8 @@ package com.celements.mandatory;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -44,7 +44,7 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
 
   private static final String _FILE_BASE_TAG_PAGE_TYPE = "FileBaseTag";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(FileBaseTag1.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileBaseTag1.class);
 
   @Requirement("celements.celPageTypeClasses")
   IClassCollectionRole pageTypeClasses;

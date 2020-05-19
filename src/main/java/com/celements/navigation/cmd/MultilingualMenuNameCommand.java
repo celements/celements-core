@@ -20,8 +20,8 @@
 package com.celements.navigation.cmd;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -45,20 +45,18 @@ public class MultilingualMenuNameCommand {
         MENU_NAME_CLASS_DOC);
   }
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      MultilingualMenuNameCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MultilingualMenuNameCommand.class);
 
   private IWebUtils webUtils = WebUtils.getInstance();
 
-  public MultilingualMenuNameCommand() {
-  }
+  public MultilingualMenuNameCommand() {}
 
   public String getMultilingualMenuName(String fullName, String language, XWikiContext context) {
     try {
       return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName, language, context),
           false, context);
     } catch (XWikiException exp) {
-      mLogger.error(exp);
+      LOGGER.error("failed", exp);
       return "";
     }
   }
@@ -87,7 +85,7 @@ public class MultilingualMenuNameCommand {
         menuName = getMenuNameFromBaseObject(docFullName, getMenuNameBaseObject(docFullName,
             language, context), allowEmptyMenuNames, context);
       } catch (XWikiException e) {
-        mLogger.error(e);
+        LOGGER.error("failed", e);
       }
     }
     return menuName;
@@ -112,7 +110,7 @@ public class MultilingualMenuNameCommand {
       return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName, language, context),
           allowEmptyMenuNames, context);
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get MenuName for [" + fullName + "].", exp);
+      LOGGER.error("Failed to get MenuName for [" + fullName + "].", exp);
       if (allowEmptyMenuNames) {
         return "";
       } else {

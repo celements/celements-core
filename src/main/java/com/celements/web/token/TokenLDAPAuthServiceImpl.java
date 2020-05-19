@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -36,7 +36,7 @@ import com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl;
 
 public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       TokenLDAPAuthServiceImpl.class);
 
   @Override

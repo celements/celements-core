@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -40,7 +40,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class SuggestListCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(SuggestListCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SuggestListCommand.class);
 
   public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
       List<String> excludes, String input, String firstCol, String secCol, int limit,
@@ -75,7 +75,7 @@ public class SuggestListCommand {
       for (int i = 0; i < excludes.size(); i++) {
         xwql += "and doc.fullName <> ?" + (i + 2) + " ";
       }
-      mLogger.trace("searching for xwql " + xwql);
+      LOGGER.trace("searching for xwql " + xwql);
       try {
         query = queryManager.createQuery(xwql, Query.XWQL);
         query.bindValue(1, input);
@@ -83,10 +83,10 @@ public class SuggestListCommand {
           query.bindValue(i + 2, excludes.get(i));
         }
         query.setLimit(limit);
-        mLogger.trace(query.getStatement());
+        LOGGER.trace(query.getStatement());
         results = query.execute();
       } catch (QueryException qe) {
-        mLogger.error("Exception while querying suggest for classname '" + classname
+        LOGGER.error("Exception while querying suggest for classname '" + classname
             + "', fieldname '" + fieldname + "', input '" + input + "'.", qe);
       }
     }
@@ -99,7 +99,7 @@ public class SuggestListCommand {
     try {
       classDoc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
-      mLogger.error("Exception while getting doc for DocumentReference " + classRef, e);
+      LOGGER.error("Exception while getting doc for DocumentReference " + classRef, e);
     }
     if (classDoc != null) {
       BaseClass bc = classDoc.getXClass();

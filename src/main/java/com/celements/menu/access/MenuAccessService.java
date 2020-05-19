@@ -2,8 +2,8 @@ package com.celements.menu.access;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -15,7 +15,7 @@ import com.xpn.xwiki.XWikiException;
 @Component
 public class MenuAccessService implements IMenuAccessServiceRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(MenuAccessService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MenuAccessService.class);
 
   @Requirement
   Map<String, IMenuAccessProviderRole> accessProviderMap;

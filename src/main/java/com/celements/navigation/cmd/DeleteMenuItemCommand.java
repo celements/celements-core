@@ -19,8 +19,8 @@
  */
 package com.celements.navigation.cmd;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -32,7 +32,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class DeleteMenuItemCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(DeleteMenuItemCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DeleteMenuItemCommand.class);
 
   public boolean deleteMenuItem(DocumentReference docRef) {
     DocumentReference menuItemClassRef = new DocumentReference(getContext().getDatabase(),

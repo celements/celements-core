@@ -22,8 +22,8 @@ package com.celements.web.plugin.cmd;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -33,7 +33,7 @@ public class GetCellDocument {
 
   private PageLayoutCommand injected_pageLayoutCommand = null;
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(GetCellDocument.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GetCellDocument.class);
 
   public XWikiDocument getCellDoc(String className, String field, String value,
       XWikiContext context) {
@@ -54,7 +54,7 @@ public class GetCellDocument {
     try {
       docs = context.getWiki().getStore().searchDocuments(hql, argsList, context);
     } catch (XWikiException e) {
-      mLogger.error("Exception while searching cell document in layout '" + layoutSpace
+      LOGGER.error("Exception while searching cell document in layout '" + layoutSpace
           + "' with object of class '" + className + "' and field '" + field + "' == '" + value
           + "'.", e);
     }

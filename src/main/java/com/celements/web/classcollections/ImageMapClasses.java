@@ -19,8 +19,6 @@
  */
 package com.celements.web.classcollections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -32,15 +30,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.imageMap.classes")
 public class ImageMapClasses extends AbstractClassCollection {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(ImageMapClasses.class);
-
-  public ImageMapClasses() {
-  }
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
-  }
+  public ImageMapClasses() {}
 
   @Override
   protected void initClasses() throws XWikiException {

@@ -16,7 +16,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class DocFormRequestKeyParser {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(DocFormRequestKeyParser.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DocFormRequestKeyParser.class);
 
   public static final String KEY_DELIM = "_";
   public static final String REGEX_FULLNAME = "[a-zA-Z0-9-]+\\.[a-zA-Z0-9-]+";

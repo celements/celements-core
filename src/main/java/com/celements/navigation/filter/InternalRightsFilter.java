@@ -32,7 +32,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class InternalRightsFilter implements INavFilter<BaseObject> {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(InternalRightsFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InternalRightsFilter.class);
 
   private String menuPart = "";
 

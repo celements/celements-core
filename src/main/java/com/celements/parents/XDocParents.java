@@ -35,7 +35,7 @@ import com.xpn.xwiki.XWikiException;
 @Component(XDocParents.DOC_PROVIDER_NAME)
 public class XDocParents implements IDocParentProviderRole {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(XDocParents.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(XDocParents.class);
 
   public static final String DOC_PROVIDER_NAME = "xwiki";
 
@@ -57,7 +57,7 @@ public class XDocParents implements IDocParentProviderRole {
         nextParent = getParentRef(nextParent);
       }
     } catch (XWikiException exp) {
-      _LOGGER.error("Failed to get parent reference. ", exp);
+      LOGGER.error("Failed to get parent reference. ", exp);
     }
     return docParents;
   }

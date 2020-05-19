@@ -40,7 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
     IDefaultEmptyDocStrategyRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(DefaultEmptyDocStrategy.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultEmptyDocStrategy.class);
 
   @Requirement
   Execution execution;

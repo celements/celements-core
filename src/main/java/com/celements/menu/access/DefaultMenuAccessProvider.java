@@ -1,7 +1,7 @@
 package com.celements.menu.access;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -15,7 +15,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Component("celements.defaultMenuAccess")
 public class DefaultMenuAccessProvider implements IMenuAccessProviderRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(DefaultMenuAccessProvider.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMenuAccessProvider.class);
 
   @Requirement
   IWebUtilsService webUtilsService;

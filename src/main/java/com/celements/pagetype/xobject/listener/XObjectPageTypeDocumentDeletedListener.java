@@ -43,7 +43,7 @@ public class XObjectPageTypeDocumentDeletedListener extends AbstractXObjectPageT
 
   public static final String NAME = "XObjectPageTypeDocumentDeletedListener";
 
-  private static Logger LOGGER = LoggerFactory.getLogger(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentDeletedListener.class);
 
   @Requirement

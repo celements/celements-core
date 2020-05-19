@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -112,7 +112,7 @@ public class CelementsWebPluginApi extends Api {
 
   private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(CelementsWebPluginApi.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebPluginApi.class);
 
   private CelementsWebPlugin plugin;
 

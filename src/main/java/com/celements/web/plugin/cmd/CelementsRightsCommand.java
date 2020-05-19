@@ -24,8 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -33,7 +33,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class CelementsRightsCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(CelementsRightsCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelementsRightsCommand.class);
 
   public boolean isCelementsRights(String fullName, XWikiContext context) {
     try {
@@ -45,10 +45,10 @@ public class CelementsRightsCommand {
             boolean validGroups = isValidGroups(right);
             boolean validUsers = isValidUsers(right);
             boolean validLevels = isValidLevels(right);
-            mLogger.debug("isCelementsRights: for doc [" + fullName + "], objNr ["
+            LOGGER.debug("isCelementsRights: for doc [" + fullName + "], objNr ["
                 + right.getNumber() + "] results: " + validGroups + ", " + validUsers + ", "
                 + validLevels);
-            if (!(validGroups && validUsers && validLevels)) {
+            if ((!validGroups || !validUsers || !validLevels)) {
               return false;
             }
           }
@@ -56,7 +56,7 @@ public class CelementsRightsCommand {
       }
       return true;
     } catch (Exception exp) {
-      mLogger.error("Exception while trying to check celements rights", exp);
+      LOGGER.error("Exception while trying to check celements rights", exp);
     }
     return false;
   }
@@ -89,7 +89,7 @@ public class CelementsRightsCommand {
   }
 
   private List<String> getPropertyList(BaseObject right, String key) {
-    mLogger.trace("getPropertyList: key [" + key + "] value [" + right.getLargeStringValue(key)
+    LOGGER.trace("getPropertyList: key [" + key + "] value [" + right.getLargeStringValue(key)
         + "] ");
     if ((right.getLargeStringValue(key) == null) || "".equals(right.getLargeStringValue(key))) {
       return Collections.emptyList();

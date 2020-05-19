@@ -25,8 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 
@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class GetPageTypesCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(GetPageTypesCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GetPageTypesCommand.class);
 
   private String _CEL_GETXOBJ_PAGETYPES_COUNTER = "celGetXObjectPageTypesCounter";
   private String _CEL_GETXOBJ_PAGETYPES_TOTALTIME = "celGetXObjectPageTypesTotelTime";
