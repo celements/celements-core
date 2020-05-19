@@ -68,10 +68,9 @@ public class DocHeaderTitleCommand {
       }
       if (!"".equals(getContext().getWiki().getSpacePreference("title",
           docRef.getLastSpaceReference().getName(), "", getContext()))) {
-        docHeaderTitle = docHeaderTitle + getContext().getWiki().parseContent(
-            getContext().getWiki().getSpacePreference("title",
-                docRef.getLastSpaceReference().getName(), "", getContext()),
-            getContext());
+        docHeaderTitle = docHeaderTitle + getContext().getWiki()
+            .parseContent(getContext().getWiki().getSpacePreference("title",
+                docRef.getLastSpaceReference().getName(), "", getContext()), getContext());
       }
     } catch (Exception exp) {
       LOGGER.error("failed", exp);

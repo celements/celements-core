@@ -30,9 +30,6 @@ import com.xpn.xwiki.web.Utils;
 @Deprecated
 public class CheckClassesCommand {
 
-  // private static final Logger LOGGER = LoggerFactory.getLogger(
-  // CheckClassesCommand.class);
-
   @Deprecated
   public static final String CLASS_PANEL_CONFIG_CLASS = OldCoreClasses.PANEL_CONFIG_CLASS;
 

@@ -413,24 +413,21 @@ public class Navigation implements INavigation {
         outStream.append("</ul>");
       } else if ((getCurrentLevel(numMoreLevels) == 1) && hasedit()) {
         LOGGER.trace("addNavigationForParent: empty navigation hint for parent [" + parentRef
-            + "] numMoreLevels [" + numMoreLevels + "], currentLevel [" + getCurrentLevel(
-                numMoreLevels)
-            + "].");
+            + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
+            + getCurrentLevel(numMoreLevels) + "].");
         // is main Menu and no mainMenuItem found ; user has edit rights
         outStream.append("<ul class=\"cel_nav_empty\">");
         openMenuItemOut(outStream, null, true, true, false, 1);
-        outStream.append("<span " + addUniqueElementId(null) + " " + addCssClasses(null, true, true,
-            true, false, 1) + ">"
-            + getWebUtilsService().getAdminMessageTool().get(
-                getEmptyDictKey())
+        outStream.append("<span " + addUniqueElementId(null) + " "
+            + addCssClasses(null, true, true, true, false, 1) + ">"
+            + getWebUtilsService().getAdminMessageTool().get(getEmptyDictKey())
             + "</span>");
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
       } else {
         LOGGER.debug("addNavigationForParent: empty output for parent [" + parentRef
-            + "] numMoreLevels [" + numMoreLevels + "], currentLevel [" + getCurrentLevel(
-                numMoreLevels)
-            + "], hasEdit [" + hasedit() + "].");
+            + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
+            + getCurrentLevel(numMoreLevels) + "], hasEdit [" + hasedit() + "].");
       }
     }
   }

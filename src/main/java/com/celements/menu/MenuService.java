@@ -91,10 +91,9 @@ public class MenuService implements IMenuService {
       for (String fullName : new HashSet<>(result)) {
         DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(fullName);
         if (accessService.hasview(menuBarDocRef)) {
-          List<BaseObject> headerObjList = getContext().getWiki().getDocument(menuBarDocRef,
-              getContext()).getXObjects(
-                  getMenuBarHeaderClassRef(
-                      menuBarDocRef.getWikiReference().getName()));
+          List<BaseObject> headerObjList = getContext().getWiki()
+              .getDocument(menuBarDocRef, getContext())
+              .getXObjects(getMenuBarHeaderClassRef(menuBarDocRef.getWikiReference().getName()));
           LOGGER.trace("addMenuHeaders: hasview for ["
               + webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef)
               + "] adding items [" + ((headerObjList != null) ? headerObjList.size() : "null")

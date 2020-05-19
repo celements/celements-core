@@ -95,8 +95,7 @@ public class PageTypeClasses extends AbstractClassCollection {
     boolean needsUpdate = false;
 
     DocumentReference pageTypePropertiesClassRef = pageTypeClassConfig
-        .getPageTypePropertiesClassRef(
-            modelContext.getWikiRef());
+        .getPageTypePropertiesClassRef(modelContext.getWikiRef());
     XWikiDocument doc = modelAccess.getOrCreateDocument(pageTypePropertiesClassRef);
 
     BaseClass bclass = doc.getXClass();
