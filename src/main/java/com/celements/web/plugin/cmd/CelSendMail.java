@@ -25,8 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -48,7 +48,7 @@ import com.xpn.xwiki.web.Utils;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class CelSendMail implements IMailObjectRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(CelSendMail.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelSendMail.class);
 
   private Mail mail;
   private CelMailConfiguration mailConfiguration;

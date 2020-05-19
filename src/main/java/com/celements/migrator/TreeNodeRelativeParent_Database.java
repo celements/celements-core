@@ -43,7 +43,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("TreeNodeRelativeParent_Database")
 public class TreeNodeRelativeParent_Database extends AbstractCelementsHibernateMigrator {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       TreeNodeRelativeParent_Database.class);
 
   @Requirement
@@ -68,7 +68,7 @@ public class TreeNodeRelativeParent_Database extends AbstractCelementsHibernateM
           + " where doc.parent like :buggyParent", Query.XWQL);
       theQuery.bindValue("buggyParent", context.getDatabase() + ":%");
       List<String> result = theQuery.execute();
-      _LOGGER.info("found [" + ((result != null) ? result.size() : result)
+      LOGGER.info("found [" + ((result != null) ? result.size() : result)
           + "] documents to migrate.");
       for (String fullName : result) {
         XWikiDocument doc = context.getWiki().getDocument(
@@ -76,14 +76,14 @@ public class TreeNodeRelativeParent_Database extends AbstractCelementsHibernateM
         String parentFN = webUtilsService.getRefLocalSerializer().serialize(
             doc.getParentReference());
         doc.setParentReference(getRelativeParentReference(parentFN));
-        _LOGGER.debug("migrating TreeNodes parent on [" + fullName + "] "
+        LOGGER.debug("migrating TreeNodes parent on [" + fullName + "] "
             + doc.isMetaDataDirty() + ", " + doc.isContentDirty());
         // save directly over store method to prevent observation manager executing events.
         context.getWiki().saveDocument(doc, "TreeNodeRelativeParent_Database Migration",
             context);
       }
     } catch (QueryException exp) {
-      _LOGGER.error("cannot create query for TreeNodeRelativeParent_Database Migration ",
+      LOGGER.error("cannot create query for TreeNodeRelativeParent_Database Migration ",
           exp);
       throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
           XWikiException.MODULE_XWIKI, "Failed to execute migration"

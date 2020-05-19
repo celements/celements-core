@@ -45,7 +45,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class FileBaseTagsCmd {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(FileBaseTagsCmd.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileBaseTagsCmd.class);
 
   public final static String FILEBASE_TAG_CLASS = "Classes.FilebaseTag";
   private final ITreeNodeService treeNodeSrv = Utils.getComponent(ITreeNodeService.class);

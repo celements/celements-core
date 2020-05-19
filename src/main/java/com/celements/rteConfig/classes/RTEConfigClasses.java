@@ -19,8 +19,6 @@
  */
 package com.celements.rteConfig.classes;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,8 +31,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.rteConfigClasses")
 public class RTEConfigClasses extends AbstractClassCollection {
-
-  private static Log LOGGER = LogFactory.getFactory().getInstance(RTEConfigClasses.class);
 
   /**
    * @Deprecated instead use IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC
@@ -54,11 +50,6 @@ public class RTEConfigClasses extends AbstractClassCollection {
 
   @Requirement
   IRTEConfigClassConfig rteConfigClassCfg;
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
-  }
 
   @Override
   public String getConfigName() {

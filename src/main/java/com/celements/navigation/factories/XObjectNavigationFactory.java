@@ -32,7 +32,7 @@ public final class XObjectNavigationFactory extends AbstractNavigationFactory<Do
 
   public static final String XOBJECT_NAV_FACTORY_HINT = "xobject";
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(XObjectNavigationFactory.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(XObjectNavigationFactory.class);
 
   @Requirement
   private Execution execution;

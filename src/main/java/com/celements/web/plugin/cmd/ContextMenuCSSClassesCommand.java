@@ -38,7 +38,7 @@ import com.xpn.xwiki.XWikiException;
  */
 public class ContextMenuCSSClassesCommand {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(ContextMenuCSSClassesCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ContextMenuCSSClassesCommand.class);
 
   public String getAllContextMenuCSSClassesAsJSON(XWikiContext context) {
     Builder jsonBuilder = new Builder();

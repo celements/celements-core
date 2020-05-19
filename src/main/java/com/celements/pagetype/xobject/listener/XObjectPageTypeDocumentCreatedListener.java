@@ -43,7 +43,7 @@ public class XObjectPageTypeDocumentCreatedListener extends AbstractXObjectPageT
 
   public static final String NAME = "XObjectPageTypeDocumentCreatedListener";
 
-  private static Logger LOGGER = LoggerFactory.getLogger(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentCreatedListener.class);
 
   @Requirement

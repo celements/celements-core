@@ -19,8 +19,8 @@
  */
 package com.celements.pagetype.cmd;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageType;
@@ -55,7 +55,7 @@ public class PageTypeCommand {
   public static final String PAGE_TYPE_CLASSNAME = PAGE_TYPE_CLASS_SPACE + "."
       + PAGE_TYPE_CLASS_DOC;
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PageTypeCommand.class);
 
   public static IPageType getApiInstance(XWikiContext context) throws XWikiException {
     Object obj = context.get("pageTypeApi");

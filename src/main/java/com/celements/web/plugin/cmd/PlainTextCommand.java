@@ -23,14 +23,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.web.utils.Html2Text;
 
 public class PlainTextCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(PlainTextCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PlainTextCommand.class);
 
   public String convertHtmlToPlainText(String htmlContent) throws ConvertToPlainTextException {
     try {

@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
@@ -33,7 +33,7 @@ import com.celements.web.service.IWebUtilsService;
 @Component
 public class FormValidationService implements IFormValidationServiceRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(FormValidationService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FormValidationService.class);
 
   private static final MapHandler<String, ValidationType, String> MAPHANDLER = new MapHandler<>();
 

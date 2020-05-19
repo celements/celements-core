@@ -41,7 +41,7 @@ import com.xpn.xwiki.web.Utils;
 @Deprecated
 public class CreateDocumentCommand {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CreateDocumentCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CreateDocumentCommand.class);
 
   /**
    * @deprecated use {@link IModelAccessFacade#createDocument(DocumentReference)} and

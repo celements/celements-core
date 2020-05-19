@@ -39,7 +39,7 @@ public class AppScriptAction extends XWikiAction {
 
   private static final String CEL_APPSCRIPT_CONTEXT_PROPERTY = "celAppScript";
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(AppScriptAction.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AppScriptAction.class);
 
   /**
    * The identifier of the view action.
@@ -61,7 +61,7 @@ public class AppScriptAction extends XWikiAction {
     String path = context.getRequest().getPathInfo();
     if (getAppScriptService().getStartIndex(path) > 0) {
       String celAppScript = getAppScriptService().getScriptNameFromURL();
-      _LOGGER.debug("action: found script path [" + celAppScript + "].");
+      LOGGER.debug("action: found script path [" + celAppScript + "].");
       context.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);
       VelocityContext vcontext = (VelocityContext) context.get("vcontext");
       vcontext.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);

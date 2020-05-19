@@ -39,7 +39,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component(WikiCreatedEventListener.NAME)
 public class WikiCreatedEventListener implements EventListener {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(WikiCreatedEventListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(WikiCreatedEventListener.class);
 
   public static final String NAME = "celements.classes.WikiCreatedEventListener";
 

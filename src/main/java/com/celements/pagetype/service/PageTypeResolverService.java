@@ -48,7 +48,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class PageTypeResolverService implements IPageTypeResolverRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(PageTypeResolverService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PageTypeResolverService.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;

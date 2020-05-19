@@ -42,7 +42,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(XObjectPageTypeCache.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(XObjectPageTypeCache.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;

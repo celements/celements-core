@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -23,7 +23,7 @@ import com.xpn.xwiki.util.Util;
 @Component
 public class AppScriptService implements IAppScriptService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(AppScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AppScriptService.class);
 
   @Requirement
   IEmptyCheckRole emptyCheck;

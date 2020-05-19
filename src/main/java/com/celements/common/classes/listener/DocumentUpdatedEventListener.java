@@ -22,8 +22,8 @@ package com.celements.common.classes.listener;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -39,7 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("celements.classes.DocumentUpdatedEventListener")
 public class DocumentUpdatedEventListener implements EventListener {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       DocumentUpdatedEventListener.class);
 
   @Requirement

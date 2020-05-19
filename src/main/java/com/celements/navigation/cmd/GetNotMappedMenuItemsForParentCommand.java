@@ -41,7 +41,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class GetNotMappedMenuItemsForParentCommand {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       GetNotMappedMenuItemsForParentCommand.class);
 
   private final Map<String, Map<String, List<TreeNode>>> menuItems;

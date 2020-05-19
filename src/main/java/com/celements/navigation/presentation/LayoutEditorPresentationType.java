@@ -1,8 +1,8 @@
 package com.celements.navigation.presentation;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -19,7 +19,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("layoutEditor")
 public class LayoutEditorPresentationType extends DefaultPresentationType {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       LayoutEditorPresentationType.class);
 
   private static final String _CEL_CM_CELLEDITOR_MENUITEM = "cel_cm_celleditor_menuitem";

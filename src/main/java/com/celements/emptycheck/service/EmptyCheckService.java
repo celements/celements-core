@@ -6,8 +6,8 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -20,7 +20,7 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class EmptyCheckService implements IEmptyCheckRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(EmptyCheckService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EmptyCheckService.class);
 
   @Requirement
   Map<String, IEmptyDocStrategyRole> emptyDocStrategies;

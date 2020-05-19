@@ -108,7 +108,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public static final String CELEMENTS_PAGE_LAYOUT_COMMAND = LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND;
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CelementsWebPluginApi.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebPluginApi.class);
 
   private CelementsWebPlugin plugin;
 

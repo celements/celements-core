@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWikiDocument> {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(DocumentIterator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DocumentIterator.class);
 
   private List<String> _docList;
 
@@ -100,21 +100,21 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
       DocumentReference docRef;
       do {
         fullname = getDocIterator().next();
-        _LOGGER.debug("moveToNextDoc fullname [{}]", fullname);
+        LOGGER.debug("moveToNextDoc fullname [{}]", fullname);
         docRef = getWebUtils().resolveDocumentReference(fullname);
       } while (!getModelAccess().exists(docRef) && getDocIterator().hasNext());
       if (getModelAccess().exists(docRef)) {
-        _LOGGER.info("moveToNextDoc found next doc [{}]", docRef);
+        LOGGER.info("moveToNextDoc found next doc [{}]", docRef);
         _currentDoc = getModelAccess().getDocument(docRef);
       } else {
-        _LOGGER.info("moveToNextDoc no next doc found.");
+        LOGGER.info("moveToNextDoc no next doc found.");
         _currentDoc = null;
       }
     } catch (DocumentLoadException | DocumentNotExistsException exp) {
       // If getDocument failed, getDocIterator still moved on by one document in
       // list.
       // Hence the while loop in 'next' moves on to the next document in list.
-      _LOGGER.error("Failed to get next xwiki document.", exp);
+      LOGGER.error("Failed to get next xwiki document.", exp);
     }
   }
 

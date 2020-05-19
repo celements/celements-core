@@ -30,7 +30,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 @Component("authentication")
 public class AuthenticationScriptService implements ScriptService {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(AuthenticationScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationScriptService.class);
 
   @Requirement
   private IAuthenticationServiceRole authenticationService;

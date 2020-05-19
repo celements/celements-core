@@ -30,7 +30,7 @@ import com.xpn.xwiki.XWikiException;
 
 public class ResetProgrammingRightsCommand {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(ResetProgrammingRightsCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResetProgrammingRightsCommand.class);
 
   public boolean resetCelements2webRigths(XWikiContext context) {
     int result = 0;

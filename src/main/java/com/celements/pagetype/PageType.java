@@ -37,8 +37,6 @@ import com.xpn.xwiki.web.Utils;
  */
 public class PageType {
 
-  // private static Log LOGGER = LogFactory.getFactory().getInstance(PageType.class);
-
   /**
    * @deprecated since 2.18.0 instead use PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS
    */

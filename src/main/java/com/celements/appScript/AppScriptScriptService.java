@@ -11,7 +11,7 @@ import com.xpn.xwiki.util.Util;
 @Component("appscript")
 public class AppScriptScriptService implements ScriptService {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(AppScriptScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AppScriptScriptService.class);
 
   @Requirement
   IAppScriptService appScriptService;
@@ -19,13 +19,13 @@ public class AppScriptScriptService implements ScriptService {
   public String getCurrentPageURL(String queryString) {
     String ret;
     if (isAppScriptRequest()) {
-      _LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
+      LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
       ret = getAppScriptURL(getScriptNameFromURL(), queryString);
     } else {
-      _LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
+      LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
       ret = Util.escapeURL("?" + queryString);
     }
-    _LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
+    LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
     return ret;
   }
 

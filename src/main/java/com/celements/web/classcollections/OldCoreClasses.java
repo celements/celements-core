@@ -19,8 +19,6 @@
  */
 package com.celements.web.classcollections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,8 +33,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.oldCoreClasses")
 public class OldCoreClasses extends AbstractClassCollection {
-
-  private static Log LOGGER = LogFactory.getFactory().getInstance(OldCoreClasses.class);
 
   @Deprecated
   public static final String PHOTO_ALBUM_CLASS_DOC = IOldCoreClassConfig.PHOTO_ALBUM_CLASS_DOC;
@@ -195,11 +191,6 @@ public class OldCoreClasses extends AbstractClassCollection {
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS = JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
       + "." + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC;
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
-  }
 
   @Override
   public String getConfigName() {

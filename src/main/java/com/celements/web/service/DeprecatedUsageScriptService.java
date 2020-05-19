@@ -8,10 +8,10 @@ import org.xwiki.script.service.ScriptService;
 @Component("deprecated")
 public class DeprecatedUsageScriptService implements ScriptService {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(DeprecatedUsageScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DeprecatedUsageScriptService.class);
 
   public void logVelocityScript(String logMessage) {
-    _LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
+    LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
   }
 
 }

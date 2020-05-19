@@ -19,8 +19,6 @@
  */
 package com.celements.web.classcollections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -33,16 +31,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.remoteValidator.classes")
 public class RemoteUserValidationClasses extends CelementsClassCollection {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      RemoteUserValidationClasses.class);
-
   @Override
   public void initClasses(XWikiContext context) throws XWikiException {
     getRemoteUserValidationClass(context);
   }
 
-  public RemoteUserValidationClasses() {
-  }
+  public RemoteUserValidationClasses() {}
 
   protected BaseClass getRemoteUserValidationClass(XWikiContext context) throws XWikiException {
     XWikiDocument doc;
@@ -53,7 +47,7 @@ public class RemoteUserValidationClasses extends CelementsClassCollection {
     try {
       doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error("failed", e);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -70,10 +64,5 @@ public class RemoteUserValidationClasses extends CelementsClassCollection {
   @Override
   public String getConfigName() {
     return "remoteValidator";
-  }
-
-  @Override
-  protected Log getLogger() {
-    return mLogger;
   }
 }

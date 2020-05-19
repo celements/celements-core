@@ -19,8 +19,8 @@
  */
 package com.celements.captcha;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.CaptchaVerifier;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -35,7 +35,7 @@ import com.xpn.xwiki.web.Utils;
 @Component
 public class CaptchaService implements ICaptchaServiceRole {
 
-  private static Log _LOGGER = LogFactory.getFactory().getInstance(CaptchaService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CaptchaService.class);
 
   @Requirement
   Execution execution;
@@ -49,7 +49,7 @@ public class CaptchaService implements ICaptchaServiceRole {
     String answer = getContext().getRequest().get("captcha_answer");
     if ((answer != null) && (answer.length() > 0)) {
       try {
-        _LOGGER.info("Checking answer for user id '" + getCaptchaVerifier().getUserId(
+        LOGGER.info("Checking answer for user id '" + getCaptchaVerifier().getUserId(
             getContext().getRequest()) + "'");
         String anwserCacheKey = "captcha_" + getCaptchaType() + "_anwserCache";
         if (!getContext().containsKey(anwserCacheKey)) {
@@ -59,7 +59,7 @@ public class CaptchaService implements ICaptchaServiceRole {
         }
         return (Boolean) getContext().get(anwserCacheKey);
       } catch (Exception e) {
-        _LOGGER.error("Exception while attempting to verify captcha", e);
+        LOGGER.error("Exception while attempting to verify captcha", e);
       }
     }
     return false;
@@ -83,10 +83,10 @@ public class CaptchaService implements ICaptchaServiceRole {
     CaptchaVerifier cv = Utils.getComponent(CaptchaVerifier.class, captchaType);
     try {
       String userId = cv.getUserId(getContext().getRequest());
-      _LOGGER.info("Captcha user id is [" + userId + "]");
+      LOGGER.info("Captcha user id is [" + userId + "]");
       return userId;
     } catch (Exception e) {
-      _LOGGER.error("Exception while attempting to verify captcha", e);
+      LOGGER.error("Exception while attempting to verify captcha", e);
     }
     return "";
   }

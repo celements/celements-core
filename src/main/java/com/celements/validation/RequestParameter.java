@@ -19,12 +19,12 @@
  */
 package com.celements.validation;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class RequestParameter {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(RequestParameter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RequestParameter.class);
 
   private final String parameterName;
   private final String className;

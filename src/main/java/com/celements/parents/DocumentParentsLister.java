@@ -44,7 +44,7 @@ import com.google.common.collect.Iterables;
 @Component
 public class DocumentParentsLister implements IDocumentParentsListerRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(DocumentParentsLister.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DocumentParentsLister.class);
 
   @Requirement
   Map<String, IDocParentProviderRole> docParentProviderMap;

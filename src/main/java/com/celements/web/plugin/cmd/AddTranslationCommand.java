@@ -21,8 +21,8 @@ package com.celements.web.plugin.cmd;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -34,7 +34,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class AddTranslationCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(AddTranslationCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AddTranslationCommand.class);
 
   /**
    * Adds a Translation document in given language if it does not already exist. The

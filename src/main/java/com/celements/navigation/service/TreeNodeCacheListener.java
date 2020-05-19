@@ -22,8 +22,8 @@ package com.celements.navigation.service;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.observation.EventListener;
@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("TreeNodeCacheListener")
 public class TreeNodeCacheListener implements EventListener {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(TreeNodeCacheListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TreeNodeCacheListener.class);
 
   @Requirement
   ITreeNodeCache treeNodeCache;

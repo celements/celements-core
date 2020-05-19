@@ -51,7 +51,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Singleton
 public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(PrepareVelocityContextService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PrepareVelocityContextService.class);
 
   private String _CEL_PREPARE_VELOCITY_COUNTER = "celPrepareVelocityCounter";
   private String _CEL_PREPARE_VELOCITY_TOTALTIME = "celPrepareVelocityTotelTime";
