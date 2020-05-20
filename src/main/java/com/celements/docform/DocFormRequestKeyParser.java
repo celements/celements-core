@@ -1,17 +1,34 @@
 package com.celements.docform;
 
+import static com.celements.docform.DocFormRequestKey.*;
+import static com.celements.model.util.References.*;
+import static com.google.common.base.Strings.*;
+import static com.google.common.collect.ImmutableList.*;
+import static com.google.common.collect.ImmutableSet.*;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ImmutableDocumentReference;
 
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.fields.ClassField;
+import com.celements.model.util.EntityTypeUtil;
 import com.celements.model.util.ModelUtils;
+import com.celements.web.classes.oldcore.XWikiDocumentClass;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.primitives.Ints;
 import com.xpn.xwiki.web.Utils;
 
 public class DocFormRequestKeyParser {
@@ -19,168 +36,137 @@ public class DocFormRequestKeyParser {
   private static final Logger LOGGER = LoggerFactory.getLogger(DocFormRequestKeyParser.class);
 
   public static final String KEY_DELIM = "_";
-  public static final String REGEX_FULLNAME = "[a-zA-Z0-9-]+\\.[a-zA-Z0-9-]+";
-  public static final String REGEX_OBJNB = "[-^]?(\\d)*";
-  public static final String REGEX_WHITELIST = "content|title";
+
+  private static final Pattern PATTERN_FULLNAME = Pattern.compile(EntityTypeUtil.REGEX_DOC);
+  private static final Pattern PATTERN_OBJNB = Pattern.compile("\\^?-?(\\d)*");
+
+  private ImmutableSet<String> allowedDocFields;
 
   /**
-   * Parses a given key string to {@link DocFormRequestKey} object
+   * used if no fullName is provided in the parsed string keys
+   */
+  private final ImmutableDocumentReference defaultDocRef;
+
+  public DocFormRequestKeyParser(DocumentReference defaultDocRef) {
+    this.defaultDocRef = cloneRef(defaultDocRef, ImmutableDocumentReference.class);
+  }
+
+  /**
+   * Parses given map to {@link DocFormRequestParam} objects. See {@link #parse(String)}.
+   */
+  public List<DocFormRequestParam> parseParameterMap(Map<String, ?> map) {
+    return map.keySet().stream()
+        .filter(key -> !nullToEmpty(key).trim().isEmpty())
+        .map(key -> {
+          try {
+            return parse(key).orElse(null);
+          } catch (DocFormRequestParseException exc) {
+            LOGGER.warn("unable to parse {}", key, exc);
+            return null;
+          }
+        }).filter(Objects::nonNull)
+        .map(key -> new DocFormRequestParam(key, map.get(key.getKeyString())))
+        .sorted()
+        .collect(toImmutableList());
+  }
+
+  /**
+   * Parses a given key string to a {@link DocFormRequestKey} object.
    *
    * @param key
    *          syntax: "[{fullName}_]{className}_[-|^]{objNb}_{fieldName}" whereas fullName
    *          is optional and objNb can be preceded by "-" to create or "^" to delete the
    *          object
-   * @param defaultDocRef
-   *          used if no fullName is provided in the key
-   * @return key or null
+   * @return the parsed key if it matches the expected pattern
+   * @throws DocFormRequestParseException
+   *           if the key matches the expected pattern but cannot be parsed
    */
-  public DocFormRequestKey parse(String key, DocumentReference defaultDocRef) {
-    List<String> keyParts = new ArrayList<>(Arrays.asList(key.split(KEY_DELIM)));
-    DocFormRequestKey ret;
-    DocumentReference docRef = parseDocRef(keyParts, defaultDocRef);
-    if (isWhiteListKey(keyParts)) {
-      String fieldName = parseFieldName(keyParts);
-      ret = new DocFormRequestKey(key, docRef, null, false, null, fieldName);
-    } else if (isPropertyKey(keyParts)) {
-      DocumentReference classRef = parseClassRef(keyParts);
-      boolean remove = parseRemove(keyParts);
-      Integer objNb = parseObjNb(keyParts);
-      String fieldName = parseFieldName(keyParts);
-      ret = new DocFormRequestKey(key, docRef, classRef, remove, objNb, fieldName);
-    } else {
-      LOGGER.info("parse: skipped key '{}'", key);
-      ret = null;
-    }
-    if (validate(ret)) {
-      return ret;
-    } else {
-      throw new IllegalArgumentException("Illegal request key '" + ret + "'");
-    }
-  }
-
-  private DocumentReference parseDocRef(List<String> keyParts, DocumentReference defaultDocRef) {
-    DocumentReference ret = null;
-    if ((keyParts.size() > 1) && (keyParts.get(1).matches(REGEX_FULLNAME) || keyParts.get(
-        1).matches(REGEX_WHITELIST))) {
-      String fullName = keyParts.remove(0);
-      if (fullName.matches(REGEX_FULLNAME)) {
-        ret = getModelUtils().resolveRef(fullName, DocumentReference.class);
+  public Optional<DocFormRequestKey> parse(String key) throws DocFormRequestParseException {
+    List<String> keyParts = new ArrayList<>(Splitter.on(KEY_DELIM)
+        .trimResults().omitEmptyStrings().splitToList(key));
+    try {
+      DocumentReference docRef = parseDocRefIfPresent(keyParts).orElse(defaultDocRef);
+      if (isAllowedDocField(asFieldName(keyParts))) {
+        return Optional.of(createDocFieldKey(key, docRef, asFieldName(keyParts)));
+      } else if (isObjKey(keyParts)) {
+        ClassReference classRef = new ClassReference(keyParts.remove(0));
+        String objNbKeyPart = keyParts.remove(0);
+        Integer objNb = parseObjNb(objNbKeyPart).orElseThrow(parseException(key));
+        if (objNbKeyPart.startsWith("^")) {
+          return Optional.of(createObjRemoveKey(key, docRef, classRef, objNb));
+        } else {
+          return Optional.of(createObjFieldKey(key, docRef, classRef, objNb,
+              asFieldName(keyParts)));
+        }
+      } else {
+        LOGGER.info("parse: skip key [{}]", key);
+        return Optional.empty();
       }
-    } else {
-      ret = defaultDocRef;
+    } catch (IllegalArgumentException iae) {
+      throw new DocFormRequestParseException(key, iae);
     }
-    return ret;
   }
 
-  private boolean isWhiteListKey(List<String> keyParts) {
-    return (keyParts.size() == 1) && keyParts.get(0).matches(REGEX_WHITELIST);
-  }
-
-  private boolean isPropertyKey(List<String> keyParts) {
-    return (keyParts.size() > 1) && keyParts.get(0).matches(REGEX_FULLNAME) && !keyParts.get(
-        1).matches("nb"); // to skip "{classeName}_nb" keys
-  }
-
-  private DocumentReference parseClassRef(List<String> keyParts) {
-    DocumentReference ret = null;
-    if (getFirst(keyParts).matches(REGEX_FULLNAME)) {
-      ret = getModelUtils().resolveRef(keyParts.remove(0), DocumentReference.class);
-    }
-    return ret;
-  }
-
-  private boolean parseRemove(List<String> keyParts) {
-    boolean ret = false;
-    String str = getFirst(keyParts);
-    if (str.matches(REGEX_OBJNB) && str.startsWith("^")) {
-      keyParts.set(0, str.substring(1, str.length()));
-      ret = true;
-    }
-    return ret;
-  }
-
-  private Integer parseObjNb(List<String> keyParts) {
-    Integer ret = null;
-    if (getFirst(keyParts).matches(REGEX_OBJNB)) {
-      String intStr = keyParts.remove(0);
-      try {
-        ret = Integer.parseInt(intStr);
-      } catch (NumberFormatException exc) {
-        LOGGER.trace("Unable to parse: " + intStr, exc);
+  private Optional<DocumentReference> parseDocRefIfPresent(List<String> keyParts) {
+    if ((keyParts.size() > 1) && PATTERN_FULLNAME.matcher(keyParts.get(0)).matches()) {
+      String docKeyPart = keyParts.remove(0);
+      if (isAllowedDocField(asFieldName(keyParts)) || isObjKey(keyParts)) {
+        return Optional.of(getModelUtils().resolveRef(docKeyPart, DocumentReference.class));
+      } else {
+        keyParts.add(0, docKeyPart);
       }
     }
-    return ret;
+    return Optional.empty();
   }
 
-  private String parseFieldName(List<String> keyParts) {
+  private boolean isAllowedDocField(String key) {
+    if (allowedDocFields == null) {
+      allowedDocFields = getXDocClassDef().getFields().stream()
+          .filter(field -> String.class.equals(field.getType()))
+          .map(ClassField::getName)
+          .collect(toImmutableSet());
+    }
+    return allowedDocFields.contains(key);
+  }
+
+  private boolean isObjKey(List<String> keyParts) {
+    return (keyParts.size() > 1)
+        && PATTERN_FULLNAME.matcher(keyParts.get(0)).matches()
+        && PATTERN_OBJNB.matcher(keyParts.get(1)).matches();
+  }
+
+  private Optional<Integer> parseObjNb(String objNbKeyPart) {
+    return Optional.ofNullable(Ints.tryParse(objNbKeyPart.replace("^", "")));
+  }
+
+  private String asFieldName(List<String> keyParts) {
     return StringUtils.join(keyParts.iterator(), KEY_DELIM);
   }
 
-  private boolean validate(DocFormRequestKey key) {
-    boolean valid;
-    if (key != null) {
-      valid = (key.getDocRef() != null);
-      if (!key.isWhiteListed()) {
-        valid &= (key.getClassRef() != null);
-        valid &= (key.getObjNb() != null);
-        if (!key.isRemove()) {
-          valid &= StringUtils.isNotBlank(key.getFieldName());
-        }
-      }
-    } else {
-      valid = true;
-    }
-    return valid;
-  }
-
-  /**
-   * Parses given key strings to {@link DocFormRequestKey} objects. See
-   * {@link #parse(String, DocumentReference)}
-   *
-   * @param keys
-   * @param defaultDocRef
-   * @return list of keys with no null elements
-   */
-  public Collection<DocFormRequestKey> parse(Collection<String> keys,
-      DocumentReference defaultDocRef) {
-    Collection<DocFormRequestKey> ret = new ArrayList<>();
-    for (String keyString : keys) {
-      if (StringUtils.isNotBlank(keyString)) {
-        DocFormRequestKey key = parse(keyString, defaultDocRef);
-        if ((key != null) && filterRequestKeySetForRemove(ret, key)) {
-          ret.add(key);
-        }
-      }
-    }
-    return ret;
-  }
-
-  private boolean filterRequestKeySetForRemove(Collection<DocFormRequestKey> keys,
-      DocFormRequestKey key) {
-    boolean ret = true;
-    Iterator<DocFormRequestKey> iter = keys.iterator();
-    while (iter.hasNext()) {
-      DocFormRequestKey currKey = iter.next();
-      if (key.sameObject(currKey)) {
-        if (key.isRemove()) {
-          iter.remove();
-        } else if (currKey.isRemove()) {
-          ret = false;
-        }
-      }
-    }
-    return ret;
-  }
-
-  private String getFirst(List<String> list) {
-    if (list.size() > 0) {
-      return list.get(0);
-    }
-    return "";
+  private ClassDefinition getXDocClassDef() {
+    return Utils.getComponent(ClassDefinition.class, XWikiDocumentClass.CLASS_DEF_HINT);
   }
 
   private ModelUtils getModelUtils() {
     return Utils.getComponent(ModelUtils.class);
+  }
+
+  private static Supplier<DocFormRequestParseException> parseException(String key) {
+    return () -> new DocFormRequestParseException(key);
+  }
+
+  public static class DocFormRequestParseException extends Exception {
+
+    private static final long serialVersionUID = 7960168302772273291L;
+
+    private DocFormRequestParseException(String key) {
+      super(key);
+    }
+
+    private DocFormRequestParseException(String key, Throwable cause) {
+      super(key, cause);
+    }
+
   }
 
 }

@@ -33,6 +33,10 @@ public class StreamScriptService implements ScriptService {
     return Stream.concat(s1, s2);
   }
 
+  public <T> Optional<T> findLast(Stream<T> stream) {
+    return nullGuard(stream).reduce((a, b) -> b);
+  }
+
   public <T> List<T> toList(Stream<T> stream) {
     return nullGuard(stream).collect(Collectors.toList());
   }

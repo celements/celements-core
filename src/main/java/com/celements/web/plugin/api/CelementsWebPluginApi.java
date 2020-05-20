@@ -60,7 +60,6 @@ import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
 import com.celements.web.plugin.CelementsWebPlugin;
 import com.celements.web.plugin.cmd.CaptchaCommand;
-import com.celements.web.plugin.cmd.DocFormCommand;
 import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -74,7 +73,6 @@ import com.celements.web.service.WebUtilsService;
 import com.celements.web.utils.SuggestBaseClass;
 import com.celements.web.utils.WebUtils;
 import com.celements.webform.ActionScriptService;
-import com.celements.webform.DocFormScriptService;
 import com.celements.webform.WebFormScriptService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -109,8 +107,6 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public static final String CELEMENTS_PAGE_LAYOUT_COMMAND = LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND;
-
-  private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebPluginApi.class);
 
@@ -1084,42 +1080,6 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link DocFormScriptService #updateDocFromMap(String, Map)}
-   */
-  @Deprecated
-  public Set<Document> updateDocFromMap(String fullname, Map<String, ?> map) throws XWikiException {
-    return getDocFormScriptService().updateDocFromMap(getWebUtilsService().resolveDocumentReference(
-        fullname), map);
-  }
-
-  private DocFormCommand getDocFormCommand() {
-    if (context.get(_DOC_FORM_COMMAND_OBJECT) == null) {
-      context.put(_DOC_FORM_COMMAND_OBJECT, new DocFormCommand());
-    }
-    return (DocFormCommand) context.get(_DOC_FORM_COMMAND_OBJECT);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link DocFormScriptService #updateDocFromRequest()}
-   */
-  @Deprecated
-  public Set<Document> updateDocFromRequest() throws XWikiException {
-    return getDocFormScriptService().updateDocFromRequest();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link DocFormScriptService #updateDocFromRequest(String)}
-   */
-  @Deprecated
-  public Set<Document> updateDocFromRequest(String fullname) throws XWikiException {
-    return getDocFormScriptService().updateDocFromRequest(
-        getWebUtilsService().resolveDocumentReference(fullname));
-  }
-
-  /**
    * @param attachToDoc
    * @param fieldName
    * @param userToken
@@ -1223,19 +1183,6 @@ public class CelementsWebPluginApi extends Api {
       String possibleLogins, boolean noRedirect) throws XWikiException {
     return getAuthenticationScriptService().checkAuth(logincredential, password, rememberme,
         possibleLogins, noRedirect);
-  }
-
-  /**
-   * @deprecated: since 2.59 instead use
-   *              {@link EditorSupportScriptService #validateField(String, String, String)}
-   *              , Note: the validateField Method has an other return parameter
-   *              (Map<ValidationType, Set<String>> instead of String)
-   * @return null means the validation has been successful. Otherwise the validation
-   *         message configured in the class is returned.
-   */
-  @Deprecated
-  public String validateField(String className, String fieldName, String value) {
-    return getDocFormCommand().validateField(className, fieldName, value, context);
   }
 
   /**
@@ -2091,10 +2038,6 @@ public class CelementsWebPluginApi extends Api {
 
   private LegacySkinScriptService getLegacySkinScriptService() {
     return (LegacySkinScriptService) Utils.getComponent(ScriptService.class, "legacyskin");
-  }
-
-  private DocFormScriptService getDocFormScriptService() {
-    return (DocFormScriptService) Utils.getComponent(ScriptService.class, "docform");
   }
 
   private FileBaseScriptService getFileBaseScriptService() {
