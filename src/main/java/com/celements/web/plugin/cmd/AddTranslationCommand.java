@@ -19,13 +19,12 @@
  */
 package com.celements.web.plugin.cmd;
 
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.XWikiDocumentCreator;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -101,29 +100,16 @@ public class AddTranslationCommand {
   XWikiDocument createTranslationDoc(XWikiDocument mainDoc, String language) throws XWikiException {
     XWikiDocument transDoc = mainDoc.getTranslatedDocument(language, getContext());
     if ((transDoc == mainDoc) && getContext().getWiki().isMultiLingual(getContext())) {
-      transDoc = new XWikiDocument(mainDoc.getDocumentReference());
-      transDoc.setLanguage(language);
-      transDoc.setDefaultLanguage(mainDoc.getDefaultLanguage());
-      transDoc.setStore(mainDoc.getStore());
+      transDoc = getDocCreator().create(mainDoc.getDocumentReference(), language);
       transDoc.setContent(mainDoc.getContent());
-      applyCreationDateFix(transDoc);
     } else if (transDoc != mainDoc) {
-      LOGGER.debug("Translation document [" + mainDoc.getDocumentReference() + "] , " + language
-          + "] already exists.");
+      LOGGER.debug("Translation document [{}], language [{}] already exists.",
+          mainDoc.getDocumentReference(), language);
     }
     transDoc.setTranslation(1);
     // Make sure we have at least the meta data dirty status
     transDoc.setMetaDataDirty(true);
     return transDoc;
-  }
-
-  void applyCreationDateFix(XWikiDocument doc) {
-    // FIXME Should be done when xwiki saves a new document. Unfortunately it is done
-    // when you first get a document and than cached.
-    if (doc.isNew()) {
-      doc.setCreationDate(new Date());
-      doc.setCreator(getContext().getUser());
-    }
   }
 
   public XWikiDocument getTranslatedDoc(XWikiDocument mainDoc, String language)
@@ -140,6 +126,10 @@ public class AddTranslationCommand {
 
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private XWikiDocumentCreator getDocCreator() {
+    return Utils.getComponent(XWikiDocumentCreator.class);
   }
 
   private XWikiContext getContext() {
