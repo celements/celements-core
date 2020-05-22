@@ -70,7 +70,7 @@ public class DocFormScriptService implements ScriptService {
           .entrySet().stream()
           .collect(toImmutableMap(entry -> entry.getKey().name(), Entry::getValue));
     } catch (Exception exc) {
-      LOGGER.warn("updateAndSaveDocFromMap: failed for map [{}]", map, exc);
+      LOGGER.error("updateAndSaveDocFromMap: failed for map [{}]", map, exc);
       return ImmutableMap.of();
     }
   }
