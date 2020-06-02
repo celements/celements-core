@@ -1,6 +1,7 @@
 package com.celements.cells.attribute;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -47,5 +48,8 @@ public interface AttributeBuilder {
 
   @NotNull
   AttributeBuilder addStyles(@Nullable String cssStyles);
+
+  @NotNull
+  Optional<String> getAttribute(@Nullable String attrName);
 
 }
