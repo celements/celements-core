@@ -50,6 +50,7 @@ import com.celements.copydoc.ICopyDocumentRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.XDocumentFieldAccessor;
@@ -154,7 +155,7 @@ public class DocFormCommand implements IDocForm {
   private boolean updateDocFromTemplateIfNew(XWikiDocument doc) {
     String template = context.getRequestParameter("template").or("");
     if (doc.isNew() && !template.isEmpty()) {
-      LOGGER.debug("updateFromTemplate: updating doc '{}' with template '{}'", doc, template);
+      LOGGER.info("updateFromTemplate: updating doc '{}' with template '{}'", doc, template);
       try {
         DocumentReference templRef = modelUtils.resolveRef(template, DocumentReference.class);
         doc.readFromTemplate(templRef, context.getXWikiContext());
@@ -191,11 +192,14 @@ public class DocFormCommand implements IDocForm {
 
   private XWikiDocument setDocField(XWikiDocument tdoc, DocFormRequestParam param) {
     DocFormRequestKey key = param.getKey();
-    if (xDocClassDef.getField(key.getFieldName(), String.class).toJavaUtil()
-        .map(field -> xDocFieldAccessor.setValue(tdoc, field, param.getValuesAsString()))
-        .orElse(false)) {
-      LOGGER.info("setDocField: set doc field [{}]", param);
+    ClassField<String> field = xDocClassDef.getField(key.getFieldName(), String.class).orNull();
+    if (field == null) {
+      LOGGER.debug("setDocField: not a doc field [{}]", param);
+    } else if (xDocFieldAccessor.setValue(tdoc, field, param.getValuesAsString())) {
+      LOGGER.debug("setDocField: set doc field [{}]", param);
       return tdoc;
+    } else {
+      LOGGER.trace("setDocField: unchanged for [{}]", param);
     }
     return null;
   }
@@ -213,10 +217,12 @@ public class DocFormCommand implements IDocForm {
     BaseObject obj = editor.createFirstIfNotExists();
     getChangedObjects().put(key.getObjHash(), obj.getNumber());
     if (modelAccess.setProperty(obj, key.getFieldName(), param.getValueSingleOrList())) {
-      LOGGER.debug("setObjField: set value for [{}]", param);
+      LOGGER.debug("setObjField: set value for [{}] on obj [{}]", param, obj.getNumber());
       return xdoc;
+    } else {
+      LOGGER.trace("setObjField: unchanged for [{}]", param);
+      return null;
     }
-    return null;
   }
 
   private XWikiDocument removeObj(XWikiDocument xdoc, DocFormRequestKey key) {
@@ -224,21 +230,27 @@ public class DocFormCommand implements IDocForm {
         .filter(key.getClassRef())
         .filter(key.getObjNb());
     if (!editor.delete().isEmpty()) {
-      LOGGER.debug("removeObj: for [{}]", key);
+      LOGGER.debug("removeObj: removed obj for [{}]", key);
       return xdoc;
+    } else {
+      LOGGER.trace("removeObj: nothing to remove for [{}]", key);
+      return null;
     }
-    return null;
   }
 
   private void trySaveDoc(XWikiDocument doc) {
     ResponseState state;
     if (!copyDocService.check(doc, doc.getOriginalDocument())) {
+      LOGGER.debug("skip doc, no changes [{}]", doc.getDocumentReference());
       state = ResponseState.unchanged;
     } else if (doc.isNew() && !isCreateAllowed) {
+      LOGGER.warn("unable to create doc when create not allowed [{}]", doc.getDocumentReference());
       state = ResponseState.failed;
     } else {
       try {
+        LOGGER.info("saving doc [{}]", doc.getDocumentReference());
         modelAccess.saveDocument(doc, "updateAndSaveDocFormRequest");
+        LOGGER.info("saved doc [{}]", doc.getDocumentReference());
         state = ResponseState.successful;
       } catch (DocumentSaveException dse) {
         LOGGER.error("failed saving [{}]", doc.getDocumentReference(), dse);

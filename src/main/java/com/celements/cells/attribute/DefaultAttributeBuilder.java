@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -64,6 +65,11 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
       attributeList.add(builder.build());
     }
     return Collections.unmodifiableList(attributeList);
+  }
+
+  @Override
+  public Optional<String> getAttribute(String attrName) {
+    return getCellAttributeBuilder(attrName).build().getValue().toJavaUtil();
   }
 
   DefaultCellAttribute.Builder getCellAttributeBuilder(String attrName) {
