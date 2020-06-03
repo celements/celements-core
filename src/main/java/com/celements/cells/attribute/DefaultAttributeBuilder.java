@@ -59,6 +59,12 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
   }
 
   @Override
+  public AttributeBuilder addUniqAttribute(String attrName, String attrValue) {
+    attributeMap.remove(attrName);
+    return addNonEmptyAttribute(attrName, attrValue);
+  }
+
+  @Override
   public List<CellAttribute> build() {
     List<CellAttribute> attributeList = new ArrayList<>();
     for (DefaultCellAttribute.Builder builder : attributeMap.values()) {
@@ -73,15 +79,13 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
   }
 
   DefaultCellAttribute.Builder getCellAttributeBuilder(String attrName) {
-    if (!attributeMap.containsKey(attrName)) {
-      attributeMap.put(attrName, new DefaultCellAttribute.Builder().attrName(attrName));
-    }
-    return attributeMap.get(attrName);
+    return attributeMap.computeIfAbsent(attrName,
+        key -> new DefaultCellAttribute.Builder().attrName(key));
   }
 
   @Override
   public AttributeBuilder addId(String idname) {
-    return addNonEmptyAttribute("id", idname);
+    return addUniqAttribute("id", idname);
   }
 
   @Override

@@ -35,6 +35,9 @@ public interface AttributeBuilder {
       @NotNull Iterable<String> attrValues);
 
   @NotNull
+  AttributeBuilder addUniqAttribute(@NotNull String attrName, @Nullable String attrValue);
+
+  @NotNull
   List<CellAttribute> build();
 
   @NotNull
