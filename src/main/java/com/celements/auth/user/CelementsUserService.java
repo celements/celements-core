@@ -281,6 +281,7 @@ public class CelementsUserService implements UserService {
     if (user == null) {
       user = loadUniqueUserForQuery(login, possibleLoginFields);
     }
+    user = ((user != null) && !user.isSuspended()) ? user : null;
     return Optional.fromNullable(user);
   }
 
