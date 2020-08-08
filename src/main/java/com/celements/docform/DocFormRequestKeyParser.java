@@ -2,6 +2,7 @@ package com.celements.docform;
 
 import static com.celements.docform.DocFormRequestKey.*;
 import static com.celements.model.util.References.*;
+import static com.celements.web.classes.oldcore.XWikiDocumentClass.*;
 import static com.google.common.base.Strings.*;
 import static com.google.common.collect.ImmutableList.*;
 import static com.google.common.collect.ImmutableSet.*;
@@ -122,7 +123,7 @@ public class DocFormRequestKeyParser {
   private boolean isAllowedDocField(String key) {
     if (allowedDocFields == null) {
       allowedDocFields = getXDocClassDef().getFields().stream()
-          .filter(field -> String.class.equals(field.getType()))
+          .filter(ImmutableSet.of(FIELD_TITLE, FIELD_CONTENT)::contains)
           .map(ClassField::getName)
           .collect(toImmutableSet());
     }
