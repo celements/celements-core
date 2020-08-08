@@ -19,6 +19,7 @@
  */
 package com.celements.docform;
 
+import static com.celements.logging.LogUtils.*;
 import static com.celements.model.util.References.*;
 import static com.google.common.base.Predicates.*;
 import static com.google.common.collect.ImmutableMap.*;
@@ -35,6 +36,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -45,6 +47,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.copydoc.ICopyDocumentRole;
 import com.celements.model.access.IModelAccessFacade;
@@ -56,6 +59,7 @@ import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.XDocumentFieldAccessor;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.ModelUtils;
+import com.celements.model.util.ReferenceSerializationMode;
 import com.celements.web.classes.oldcore.XWikiDocumentClass;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.google.common.collect.ImmutableList;
@@ -241,19 +245,21 @@ public class DocFormCommand implements IDocForm {
   private void trySaveDoc(XWikiDocument doc) {
     ResponseState state;
     if (!copyDocService.check(doc, doc.getOriginalDocument())) {
-      LOGGER.debug("skip doc, no changes [{}]", doc.getDocumentReference());
+      LOGGER.debug("skip doc, no changes [{}]", serialize(doc.getDocumentReference()));
       state = ResponseState.unchanged;
     } else if (doc.isNew() && !isCreateAllowed) {
-      LOGGER.warn("unable to create doc when create not allowed [{}]", doc.getDocumentReference());
+      LOGGER.warn("unable to create doc when create not allowed [{}]",
+          serialize(doc.getDocumentReference()));
       state = ResponseState.failed;
     } else {
       try {
-        LOGGER.info("saving doc [{}]", doc.getDocumentReference());
         modelAccess.saveDocument(doc, "updateAndSaveDocFormRequest");
-        LOGGER.info("saved doc [{}]", doc.getDocumentReference());
+        LOGGER.info("saved doc [{}], lang [{}]",
+            serialize(doc.getDocumentReference()), doc.getLanguage());
         state = ResponseState.successful;
       } catch (DocumentSaveException dse) {
-        LOGGER.error("failed saving [{}]", doc.getDocumentReference(), dse);
+        LOGGER.error("failed saving [{}], lang [{}]",
+            serialize(doc.getDocumentReference()), doc.getLanguage(), dse);
         state = ResponseState.failed;
       }
     }
@@ -275,11 +281,19 @@ public class DocFormCommand implements IDocForm {
   private XWikiDocument getTranslatedDoc(XWikiDocument xdoc) {
     String lang = context.getLanguage().orElse("");
     try {
-      return getAddTranslationCommand().getTranslatedDoc(xdoc, lang);
+      XWikiDocument tdoc = getAddTranslationCommand().getTranslatedDoc(xdoc, lang);
+      LOGGER.debug("getTranslatedDoc - [{}], [{}]: lang [{}], defaultLang [{}], isSameAsMain [{}]",
+          serialize(xdoc.getDocumentReference()), lang,
+          tdoc.getLanguage(), tdoc.getDefaultLanguage(), xdoc == tdoc);
+      return tdoc;
     } catch (XWikiException xwe) {
-      LOGGER.warn("getTranslatedDoc: failed for {}", xdoc.getDocumentReference(), xwe);
+      LOGGER.warn("getTranslatedDoc: failed for [{}]", serialize(xdoc.getDocumentReference()), xwe);
       return xdoc;
     }
+  }
+
+  private Supplier<String> serialize(EntityReference ref) {
+    return defer(() -> modelUtils.serializeRef(ref, ReferenceSerializationMode.GLOBAL));
   }
 
   /**
