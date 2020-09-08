@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -22,6 +23,7 @@ import org.xwiki.query.QueryManager;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.ModelAccessStrategy;
 import com.celements.model.access.exception.DocumentNotExistsException;
@@ -54,6 +56,8 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
+        getConfigurationSource());
     registerComponentMocks(ModelAccessStrategy.class, IWebUtilsService.class, QueryManager.class,
         IQueryExecutionServiceRole.class);
     service = (CelementsUserService) Utils.getComponent(UserService.class);

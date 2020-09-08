@@ -28,9 +28,11 @@ import java.util.Collections;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.model.access.XWikiDocumentCreator;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeRole;
@@ -44,6 +46,8 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
+        getConfigurationSource());
     registerComponentMock(XWikiDocumentCreator.class);
     pageTypeServiceMock = registerComponentMock(IPageTypeRole.class);
     createDocumentCmd = new CreateDocumentCommand();

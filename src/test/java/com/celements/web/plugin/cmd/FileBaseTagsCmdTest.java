@@ -35,6 +35,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.model.access.XWikiDocumentCreator;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.TreeNode;
@@ -57,6 +58,8 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
+        getConfigurationSource());
     registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     xwiki = getWikiMock();
