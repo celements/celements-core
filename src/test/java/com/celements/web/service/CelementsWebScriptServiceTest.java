@@ -73,7 +73,7 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetHumanReadableSize_PartSize_de_country_CH() {
     context.setLanguage("de");
-    assertEquals("de-ch", "1’006.7 MiB", celWebService.getHumanReadableSize(1055563210, false,
+    assertEquals("de-ch", "1'006.7 MiB", celWebService.getHumanReadableSize(1055563210, false,
         celWebService.getLocal("de", "ch")));
     assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210, true, "fr"));
   }
@@ -87,13 +87,13 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetLocal_country() {
     java.text.NumberFormat formater = NumberFormat.getInstance(celWebService.getLocal("de", "ch"));
-    assertEquals("12’312’312", formater.format(12312312L));
+    assertEquals("12'312'312", formater.format(12312312L));
   }
 
   @Test
   public void testGetLocal_country_illegal_combination() {
     java.text.NumberFormat formater = NumberFormat.getInstance(celWebService.getLocal("en", "ch"));
-    assertEquals("12’312’312", formater.format(12312312L));
+    assertEquals("12,312,312", formater.format(12312312L));
   }
 
   @Test

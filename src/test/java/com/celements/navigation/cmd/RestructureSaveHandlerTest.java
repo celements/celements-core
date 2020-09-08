@@ -80,8 +80,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     String navUniqLiId = helpNav.getUniqueId(menuItemName);
     assertEquals("getUniqueId in Navigation returns [" + navUniqLiId + "] which cannot be"
         + " parsed correctly in extractDocFN.", menuItemName,
-        restrSaveCmd.extractDocFN(
-            navUniqLiId));
+        restrSaveCmd.extractDocFN(navUniqLiId));
   }
 
   @Test
