@@ -9,11 +9,13 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.migrations.celSubSystem.ICelementsMigrator;
 import com.celements.model.access.ModelAccessStrategy;
 import com.celements.model.classes.ClassDefinition;
@@ -32,6 +34,8 @@ public class PageTypeCategoryMigrationTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
+        getConfigurationSource());
     registerComponentMocks(IQueryExecutionServiceRole.class, ModelAccessStrategy.class);
     migration = (PageTypeCategoryMigration) Utils.getComponent(ICelementsMigrator.class,
         PageTypeCategoryMigration.NAME);

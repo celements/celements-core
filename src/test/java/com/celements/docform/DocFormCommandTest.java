@@ -34,10 +34,12 @@ import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.docform.IDocForm.ResponseState;
 import com.celements.model.access.ModelAccessStrategy;
 import com.celements.model.access.XWikiDocumentCreator;
@@ -67,6 +69,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
+        getConfigurationSource());
     registerComponentMocks(ModelAccessStrategy.class);
     getContext().setDatabase(wiki.getName());
     docRef = new DocumentReference(wiki.getName(), "Space", "Doc");
