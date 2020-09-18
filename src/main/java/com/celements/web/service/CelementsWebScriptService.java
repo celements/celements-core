@@ -654,7 +654,7 @@ public class CelementsWebScriptService implements ScriptService {
       try {
         Session sess = getNewHibSession(getContext());
         Transaction transaction = sess.beginTransaction();
-        org.hibernate.Query query = sess.createQuery("delete from xwikiattrecyclebin"
+        org.hibernate.Query query = sess.createSQLQuery("delete from xwikiattrecyclebin"
             + " where XDA_DATE < :deleteBeforeDate");
         query.setParameter("deleteBeforeDate", delBeforeDate);
         result = query.executeUpdate();
