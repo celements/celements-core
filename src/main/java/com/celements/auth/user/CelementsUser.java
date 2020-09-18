@@ -102,7 +102,7 @@ public class CelementsUser implements User {
 
   @Override
   public boolean isSuspended() {
-    return getUserFieldValue(XWikiUsersClass.FIELD_SUSPENDED).or(true);
+    return getUserFieldValue(XWikiUsersClass.FIELD_SUSPENDED).or(false);
   }
 
   @Override
