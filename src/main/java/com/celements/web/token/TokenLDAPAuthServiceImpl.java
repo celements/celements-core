@@ -31,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.auth.user.CelementsUser;
 import com.celements.auth.user.User;
 import com.celements.auth.user.UserInstantiationException;
+import com.celements.auth.user.UserService;
 import com.celements.model.util.ModelUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -57,8 +57,19 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
     }
     return Optional.ofNullable(checkAuthByToken(context)
         .orElseGet(rethrowSupplier(() -> super.checkAuth(context))))
-        // .filter(isNotSuspended)
+        .filter(this::isNotSuspended)
         .orElse(null);
+  }
+
+  private boolean isNotSuspended(XWikiUser xUser) {
+    try {
+      User user = getUserService().getUser(getModelUtils().resolveRef(xUser.getUser(),
+          DocumentReference.class));
+      return !user.isSuspended();
+    } catch (UserInstantiationException uie) {
+      LOGGER.warn("isNotSuspended - unable to instantiate user [{}]", xUser.getUser());
+      return false;
+    }
   }
 
   private Optional<XWikiUser> checkAuthByToken(XWikiContext context) throws XWikiException {
@@ -68,29 +79,15 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       String username = context.getRequest().getParameter("username");
       boolean hasToken = (token != null) && !"".equals(token);
       if (hasToken && (username != null) && !"".equals(username)) {
-        LOGGER.info("trying to authenticate user [" + username + "] with token [" + hasToken
-            + "].");
+        LOGGER.info("checkAuthByToken - user [{}] with token [{}]", username, hasToken);
         user = checkAuthByToken(username, token, context);
       }
-      LOGGER.info("checkAuth for token skipped or failed. user [" + username + "] with token ["
-          + hasToken + "].");
-    }
-    return Optional.ofNullable(user);
-  }
-
-  private XWikiUser filterSuspended(XWikiUser tokenUser) {
-    if (tokenUser != null) {
-      User user = Utils.getComponent(User.class, CelementsUser.NAME);
-      try {
-        user.initialize(getModelUtils().resolveRef(tokenUser.getUser(), DocumentReference.class));
-        if (!user.isSuspended()) {
-          return tokenUser;
-        }
-      } catch (UserInstantiationException uie) {
-        LOGGER.warn("Unable to Instantiate User [{}]", tokenUser.getUser());
+      if (user == null) {
+        LOGGER.info("checkAuthByToken - skipped/failed for user [{}] with token [{}]",
+            username, hasToken);
       }
     }
-    return null;
+    return Optional.ofNullable(user);
   }
 
   public XWikiUser checkAuthByToken(String loginname, String userToken, XWikiContext context)
@@ -164,7 +161,11 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
     return new PasswordClass().getEquivalentPassword(encoding, str);
   }
 
-  ModelUtils getModelUtils() {
+  private static UserService getUserService() {
+    return Utils.getComponent(UserService.class);
+  }
+
+  private static ModelUtils getModelUtils() {
     return Utils.getComponent(ModelUtils.class);
   }
 
