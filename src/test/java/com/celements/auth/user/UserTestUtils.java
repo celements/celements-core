@@ -13,6 +13,7 @@ public class UserTestUtils {
     userObj.setDocumentReference(userDoc.getDocumentReference());
     userObj.setXClassReference(getUserClass().getClassReference().getDocRef(
         userDoc.getDocumentReference().getWikiReference()));
+    userObj.setIntValue(XWikiUsersClass.FIELD_SUSPENDED.getName(), 0);
     userDoc.addXObject(userObj);
     return userObj;
   }

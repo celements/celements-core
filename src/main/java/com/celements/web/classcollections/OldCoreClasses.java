@@ -394,6 +394,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addBooleanField("force_pwd_change", "force_pwd_change", "yesno");
     needsUpdate |= bclass.addTextField("admin_language", "User Edit-Interface Language", 4);
+    needsUpdate |= addBooleanField(bclass, "suspended", "Suspended", "yesno", 0);
 
     LOGGER.debug("checking XWikiUsers Class for " + getContext().getDatabase() + " update needed: "
         + needsUpdate);
