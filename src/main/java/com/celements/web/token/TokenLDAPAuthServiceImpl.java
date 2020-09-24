@@ -19,9 +19,12 @@
  */
 package com.celements.web.token;
 
+import static com.celements.common.lambda.LambdaExceptionUtil.*;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
 
 import org.slf4j.Logger;
@@ -52,6 +55,14 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       context.getResponse().addHeader("P3P", "CP=\"" + context.getWiki().Param("celements.auth.P3P")
           + "\"");
     }
+    return Optional.ofNullable(checkAuthByToken(context)
+        .orElseGet(rethrowSupplier(() -> super.checkAuth(context))))
+        // .filter(isNotSuspended)
+        .orElse(null);
+  }
+
+  private Optional<XWikiUser> checkAuthByToken(XWikiContext context) throws XWikiException {
+    XWikiUser user = null;
     if (context.getRequest() != null) {
       String token = context.getRequest().getParameter("token");
       String username = context.getRequest().getParameter("username");
@@ -59,24 +70,20 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       if (hasToken && (username != null) && !"".equals(username)) {
         LOGGER.info("trying to authenticate user [" + username + "] with token [" + hasToken
             + "].");
-        XWikiUser tokenUser = checkAuthByToken(username, token, context);
-        if (tokenUser != null) {
-          return filterSuspended(tokenUser);
-        }
+        user = checkAuthByToken(username, token, context);
       }
       LOGGER.info("checkAuth for token skipped or failed. user [" + username + "] with token ["
           + hasToken + "].");
     }
-    XWikiUser fallbackUser = super.checkAuth(context);
-    return filterSuspended(fallbackUser);
+    return Optional.ofNullable(user);
   }
 
   private XWikiUser filterSuspended(XWikiUser tokenUser) {
-    if(tokenUser != null) {
+    if (tokenUser != null) {
       User user = Utils.getComponent(User.class, CelementsUser.NAME);
       try {
         user.initialize(getModelUtils().resolveRef(tokenUser.getUser(), DocumentReference.class));
-        if(!user.isSuspended()) {
+        if (!user.isSuspended()) {
           return tokenUser;
         }
       } catch (UserInstantiationException uie) {
