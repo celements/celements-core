@@ -30,13 +30,20 @@ import java.util.Vector;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.util.ModelUtils;
+import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCase {
@@ -187,6 +194,15 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     String userToken = "123456789012345678901234";
     String loginName = "theUserLoginName";
     String username = "XWiki." + loginName;
+    DocumentReference userDocRef = Utils.getComponent(ModelUtils.class).resolveRef(username,
+        DocumentReference.class);
+    BaseObject userObj = new BaseObject();
+    userObj.setDocumentReference(userDocRef);
+    userObj.setXClassReference(Utils.getComponent(ClassDefinition.class,
+        XWikiUsersClass.CLASS_DEF_HINT).getClassReference());
+    userObj.setIntValue(XWikiUsersClass.FIELD_SUSPENDED.getName(), 0);
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    userDoc.addXObject(userObj);
     XWikiRequest request = createMock(XWikiRequest.class);
     expect(request.getParameter(eq("token"))).andReturn(userToken).atLeastOnce();
     expect(request.getParameter(eq("username"))).andReturn(loginName).atLeastOnce();
@@ -197,6 +213,8 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     Capture<List<?>> captParams = new Capture<>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
         context))).andReturn(userDocs).once();
+    expect(xwiki.exists(eq(userDocRef), same(context))).andReturn(true);
+    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
     replay(xwiki, store, request);
     assertEquals(username, tokenAuthImpl.checkAuth(context).getUser());
     assertEquals(username, context.getXWikiUser().getUser());

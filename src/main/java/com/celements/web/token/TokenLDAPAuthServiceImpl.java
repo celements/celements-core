@@ -29,13 +29,19 @@ import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.auth.user.CelementsUser;
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserInstantiationException;
+import com.celements.model.util.ModelUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl;
+import com.xpn.xwiki.web.Utils;
 
 public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
 
@@ -70,6 +76,21 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
           + hasToken + "].");
     }
     return Optional.ofNullable(user);
+  }
+
+  private XWikiUser filterSuspended(XWikiUser tokenUser) {
+    if (tokenUser != null) {
+      User user = Utils.getComponent(User.class, CelementsUser.NAME);
+      try {
+        user.initialize(getModelUtils().resolveRef(tokenUser.getUser(), DocumentReference.class));
+        if (!user.isSuspended()) {
+          return tokenUser;
+        }
+      } catch (UserInstantiationException uie) {
+        LOGGER.warn("Unable to Instantiate User [{}]", tokenUser.getUser());
+      }
+    }
+    return null;
   }
 
   public XWikiUser checkAuthByToken(String loginname, String userToken, XWikiContext context)
@@ -141,6 +162,10 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
 
   String encryptString(String encoding, String str) {
     return new PasswordClass().getEquivalentPassword(encoding, str);
+  }
+
+  ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }
