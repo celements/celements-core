@@ -10,10 +10,10 @@ public class UserTestUtils {
 
   public static BaseObject addUserObj(XWikiDocument userDoc) {
     BaseObject userObj = new BaseObject();
-    userObj.setIntValue(XWikiUsersClass.FIELD_SUSPENDED.getName(), 0);
     userObj.setDocumentReference(userDoc.getDocumentReference());
     userObj.setXClassReference(getUserClass().getClassReference().getDocRef(
         userDoc.getDocumentReference().getWikiReference()));
+    userObj.setIntValue(XWikiUsersClass.FIELD_SUSPENDED.getName(), 0);
     userDoc.addXObject(userObj);
     return userObj;
   }
