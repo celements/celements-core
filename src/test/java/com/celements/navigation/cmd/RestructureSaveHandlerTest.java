@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -34,6 +35,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
 import com.xpn.xwiki.XWiki;
@@ -50,6 +52,8 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
 
   @Before
   public void setUp_RestructureSaveCommandTest() throws Exception {
+    registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
+        getConfigurationSource());
     context = getContext();
     wiki = getWikiMock();
     restrSaveCmd = new ReorderSaveHandler();
@@ -75,8 +79,8 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     String menuItemName = "MySpace.MyDoc";
     String navUniqLiId = helpNav.getUniqueId(menuItemName);
     assertEquals("getUniqueId in Navigation returns [" + navUniqLiId + "] which cannot be"
-        + " parsed correctly in extractDocFN.", menuItemName, restrSaveCmd.extractDocFN(
-            navUniqLiId));
+        + " parsed correctly in extractDocFN.", menuItemName,
+        restrSaveCmd.extractDocFN(navUniqLiId));
   }
 
   @Test

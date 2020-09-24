@@ -68,6 +68,14 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_parse_language() throws Exception {
+    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
+    String fieldName = "language";
+    String keyString = serialize(docRef) + KEY_DELIM + fieldName;
+    assertFalse(parser.parse(keyString).isPresent());
+  }
+
+  @Test
   public void test_parse_obj() throws Exception {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     ClassReference classRef = new ClassReference("Classes", "Class");
