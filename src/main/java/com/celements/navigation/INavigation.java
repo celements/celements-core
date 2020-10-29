@@ -20,7 +20,9 @@
 package com.celements.navigation;
 
 import java.util.List;
+import java.util.Optional;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -139,6 +141,9 @@ public interface INavigation extends PresentationNodeData {
   public boolean useImagesForNavigation();
 
   public String getMenuLink(DocumentReference docRef);
+  
+  @NotNull
+  Optional<String> getMenuLinkTarget(@Nullable DocumentReference docRef);
 
   public String getNavLanguage();
 

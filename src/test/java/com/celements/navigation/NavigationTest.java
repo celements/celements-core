@@ -281,8 +281,10 @@ public class NavigationTest extends AbstractComponentTest {
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
-        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName(
-            "bli"), getDocRefForDocName("blu")));
+        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+            getDocRefForDocName(
+                "bli"),
+            getDocRefForDocName("blu")));
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
@@ -318,8 +320,10 @@ public class NavigationTest extends AbstractComponentTest {
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
-        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName(
-            "bli"), getDocRefForDocName("blu")));
+        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+            getDocRefForDocName(
+                "bli"),
+            getDocRefForDocName("blu")));
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
@@ -344,8 +348,10 @@ public class NavigationTest extends AbstractComponentTest {
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
-        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName(
-            "bli"), getDocRefForDocName("blu"), docRef));
+        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+            getDocRefForDocName(
+                "bli"),
+            getDocRefForDocName("blu"), docRef));
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
@@ -427,8 +433,10 @@ public class NavigationTest extends AbstractComponentTest {
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
-        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName(
-            "bli"), getDocRefForDocName("blu")));
+        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+            getDocRefForDocName(
+                "bli"),
+            getDocRefForDocName("blu")));
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
@@ -453,8 +461,10 @@ public class NavigationTest extends AbstractComponentTest {
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
-        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName(
-            "bli"), getDocRefForDocName("blu")));
+        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+            getDocRefForDocName(
+                "bli"),
+            getDocRefForDocName("blu")));
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
@@ -477,8 +487,10 @@ public class NavigationTest extends AbstractComponentTest {
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
-        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName(
-            "bli"), getDocRefForDocName("blu")));
+        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+            getDocRefForDocName(
+                "bli"),
+            getDocRefForDocName("blu")));
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
     SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
@@ -503,8 +515,10 @@ public class NavigationTest extends AbstractComponentTest {
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
-        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName(
-            "bli"), getDocRefForDocName("blu")));
+        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+            getDocRefForDocName(
+                "bli"),
+            getDocRefForDocName("blu")));
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
     SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
@@ -529,8 +543,10 @@ public class NavigationTest extends AbstractComponentTest {
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
-        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName(
-            "bli"), getDocRefForDocName("blu")));
+        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+            getDocRefForDocName(
+                "bli"),
+            getDocRefForDocName("blu")));
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
     SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
@@ -1162,6 +1178,7 @@ public class NavigationTest extends AbstractComponentTest {
         new XWikiDocument(homeDocRef)).atLeastOnce();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq("MySpace.Home"),
         same(getContext()))).andReturn(true).atLeastOnce();
+    expect(getWikiMock().exists(eq(homeDocRef), same(getContext()))).andReturn(false);
     replayDefault();
     assertEquals("one tree node for level 1. Thus output expected.", "<ul"
         + " id=\"CN1:MySpace::\" ><li class=\"first last cel_nav_odd cel_nav_item1"

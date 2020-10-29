@@ -1,6 +1,7 @@
 package com.celements.navigation;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -42,6 +43,8 @@ public interface INavigationClassConfig {
   public static final String MENU_POSITION_FIELD = "menu_position";
   public static final String PART_NAME_FIELD = "part_name";
   public static final String TARGET_FIELD = "link_target";
+  public static final ClassReference MENU_ITEM_CLASS_REF = new ClassReference(
+      MENU_ITEM_CLASS_SPACE, MENU_ITEM_CLASS_DOC);
 
   @Deprecated
   public DocumentReference getMenuNameClassRef(String wikiName);
