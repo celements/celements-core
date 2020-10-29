@@ -1162,7 +1162,6 @@ public class NavigationTest extends AbstractComponentTest {
         new XWikiDocument(homeDocRef)).atLeastOnce();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq("MySpace.Home"),
         same(getContext()))).andReturn(true).atLeastOnce();
-    expect(getWikiMock().exists(eq(homeDocRef), same(getContext()))).andReturn(false);
     replayDefault();
     assertEquals("one tree node for level 1. Thus output expected.", "<ul"
         + " id=\"CN1:MySpace::\" ><li class=\"first last cel_nav_odd cel_nav_item1"

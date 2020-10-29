@@ -46,6 +46,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.configuration.ConfigSourceUtils;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
@@ -711,11 +712,19 @@ public class Navigation implements INavigation {
   @Override
   public Optional<String> getMenuLinkTarget(DocumentReference docRef) {
     return Optional.ofNullable(docRef)
+        .filter(this::isMenuLinkTargetEnabled)
         .map(getModelAccess()::getOrCreateDocument)
         .map(doc -> getModelAccess().getProperty(doc, MENU_ITEM_CLASS_REF.getDocRef(
             docRef.getWikiReference()), TARGET_FIELD))
         .map(prop -> Objects.toString(prop, "").trim())
         .filter(not(String::isEmpty));
+  }
+
+  private boolean isMenuLinkTargetEnabled(DocumentReference docRef) {
+    return ConfigSourceUtils.getStringProperty("navigation.linkTarget.enabled").toJavaUtil()
+        .map(String::toLowerCase)
+        .map(Boolean::parseBoolean)
+        .orElse(false);
   }
 
   /**

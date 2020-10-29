@@ -140,7 +140,6 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
         "MySpace.MyCurrentDoc"), same(context))).andReturn(true).atLeastOnce();
-    expect(getWikiMock().exists(currentDocRef, getContext())).andReturn(true);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), false, 1, nav);
@@ -194,6 +193,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
         "MySpace.MyCurrentDoc"), same(context))).andReturn(true).atLeastOnce();
     expect(getWikiMock().exists(currentDocRef, getContext())).andReturn(true);
+    getConfigurationSource().setProperty("navigation.linkTarget.enabled", "true");
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), false, 1, nav);
@@ -246,7 +246,6 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
         "MySpace.MyCurrentDoc"), same(context))).andReturn(true).atLeastOnce();
-    expect(getWikiMock().exists(eq(currentDocRef), same(getContext()))).andReturn(true);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), false, 1, nav);
