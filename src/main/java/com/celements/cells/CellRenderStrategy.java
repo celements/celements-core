@@ -141,8 +141,7 @@ public class CellRenderStrategy implements IRenderStrategy {
         .fetchField(CellClass.FIELD_TAG_NAME).stream().findFirst();
     if (!tagName.isPresent()) {
       tagName = getCellTypeConfig(cellDocRef)
-          .map(cellTypeConfig -> cellTypeConfig.defaultTagName().toJavaUtil())
-          .filter(Optional::isPresent).map(Optional::get);
+          .flatMap(cellTypeConfig -> cellTypeConfig.defaultTagName().toJavaUtil());
     }
     return tagName;
   }

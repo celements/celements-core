@@ -1,5 +1,7 @@
 package com.celements.navigation.presentation;
 
+import static com.celements.model.util.ReferenceSerializationMode.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -9,6 +11,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.ICellWriter;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -27,6 +30,9 @@ public class DefaultPresentationType implements IPresentationTypeRole<INavigatio
 
   @Requirement
   IWebUtilsService webUtilsService;
+
+  @Requirement
+  private ModelUtils modelUtils;
 
   MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
 
@@ -54,16 +60,12 @@ public class DefaultPresentationType implements IPresentationTypeRole<INavigatio
   protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
       boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav)
       throws XWikiException {
-    String fullName = webUtilsService.getRefLocalSerializer().serialize(docRef);
-    String tagName;
-    if (nav.hasLink()) {
-      tagName = "a";
-    } else {
-      tagName = "span";
-    }
+    String fullName = modelUtils.serializeRef(docRef, LOCAL);
+    String tagName = (nav.hasLink() ? "a" : "span");
     String menuItemHTML = "<" + tagName;
     if (nav.hasLink()) {
-      menuItemHTML += " href=\"" + nav.getMenuLink(docRef) + "\"";
+      menuItemHTML += " href=\"" + nav.getMenuLink(docRef) + "\""
+          + nav.getMenuLinkTarget(docRef).map(target -> " target=\"" + target + "\"").orElse("");
     }
     if (nav.useImagesForNavigation()) {
       menuItemHTML += " " + menuNameCmd.addNavImageStyle(fullName, nav.getNavLanguage(),

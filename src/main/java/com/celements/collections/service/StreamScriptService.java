@@ -1,7 +1,7 @@
 package com.celements.collections.service;
 
+import static com.google.common.base.Predicates.*;
 import static com.google.common.base.Strings.*;
-import static org.glassfish.jersey.internal.guava.Predicates.*;
 
 import java.util.Collection;
 import java.util.List;

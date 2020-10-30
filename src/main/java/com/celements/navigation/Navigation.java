@@ -19,11 +19,16 @@
  */
 package com.celements.navigation;
 
+import static com.celements.navigation.INavigationClassConfig.*;
+import static com.google.common.base.Predicates.*;
+
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
@@ -41,6 +46,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.configuration.ConfigSourceUtils;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
@@ -702,6 +709,24 @@ public class Navigation implements INavigation {
     return docURL;
   }
 
+  @Override
+  public Optional<String> getMenuLinkTarget(DocumentReference docRef) {
+    return Optional.ofNullable(docRef)
+        .filter(this::isMenuLinkTargetEnabled)
+        .map(getModelAccess()::getOrCreateDocument)
+        .map(doc -> getModelAccess().getProperty(doc, MENU_ITEM_CLASS_REF.getDocRef(
+            docRef.getWikiReference()), TARGET_FIELD))
+        .map(prop -> Objects.toString(prop, "").trim())
+        .filter(not(String::isEmpty));
+  }
+
+  private boolean isMenuLinkTargetEnabled(DocumentReference docRef) {
+    return ConfigSourceUtils.getStringProperty("navigation.linkTarget.enabled").toJavaUtil()
+        .map(String::toLowerCase)
+        .map(Boolean::parseBoolean)
+        .orElse(false);
+  }
+
   /**
    * @deprecated since 1.142 instead use createNavigation()
    */
@@ -967,35 +992,6 @@ public class Navigation implements INavigation {
     this.menuNameCmd = menuNameCmd;
   }
 
-  private IWebUtilsService getWebUtilsService() {
-    if (injected_WebUtilsService != null) {
-      return injected_WebUtilsService;
-    }
-    return Utils.getComponent(IWebUtilsService.class);
-  }
-
-  private XWikiContext getContext() {
-    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
-  }
-
-  private Execution getExecution() {
-    return Utils.getComponent(Execution.class);
-  }
-
-  private ITreeNodeService getTreeNodeService() {
-    if (injected_TreeNodeService != null) {
-      return injected_TreeNodeService;
-    }
-    return Utils.getComponent(ITreeNodeService.class);
-  }
-
-  IPageTypeResolverRole getPageTypeResolverService() {
-    if (injected_PageTypeResolverService != null) {
-      return injected_PageTypeResolverService;
-    }
-    return Utils.getComponent(IPageTypeResolverRole.class);
-  }
-
   @Override
   public void setOffset(int offset) {
     if (offset >= 0) {
@@ -1056,6 +1052,39 @@ public class Navigation implements INavigation {
         + nrOfItemsPerPage + "] fromHierarchyLevel [" + fromHierarchyLevel + "] parent [" + parent
         + "]");
     return currentMenuItems.size() > 0;
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    if (injected_WebUtilsService != null) {
+      return injected_WebUtilsService;
+    }
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
+  }
+
+  private Execution getExecution() {
+    return Utils.getComponent(Execution.class);
+  }
+
+  private ITreeNodeService getTreeNodeService() {
+    if (injected_TreeNodeService != null) {
+      return injected_TreeNodeService;
+    }
+    return Utils.getComponent(ITreeNodeService.class);
+  }
+
+  IPageTypeResolverRole getPageTypeResolverService() {
+    if (injected_PageTypeResolverService != null) {
+      return injected_PageTypeResolverService;
+    }
+    return Utils.getComponent(IPageTypeResolverRole.class);
+  }
+
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
   }
 
 }
