@@ -33,20 +33,23 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.web.Utils;
 
 public class AddTranslationCommandTest extends AbstractComponentTest {
 
   private AddTranslationCommand addTransCmd;
 
+  private XWikiDocumentCreator docCreator;
+
   @Before
   public void prepare() throws Exception {
+    docCreator = Utils.getComponent(XWikiDocumentCreator.class);
     registerComponentMock(XWikiDocumentCreator.class);
     addTransCmd = new AddTranslationCommand();
   }
 
   private XWikiDocument expectNewDoc(DocumentReference docRef, String lang) {
-    XWikiDocument doc = new XWikiDocument(docRef);
-    doc.setLanguage(lang);
+    XWikiDocument doc = docCreator.createWithoutDefaults(docRef, lang);
     doc.setDefaultLanguage("default");
     expect(getMock(XWikiDocumentCreator.class).create(docRef, lang)).andReturn(doc);
     return doc;
@@ -93,6 +96,7 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     XWikiDocument transDoc = new XWikiDocument(docRef);
     transDoc.setLanguage("fr");
     transDoc.setDefaultLanguage("fr");
+    transDoc.setTranslation(1);
     transDoc.setNew(false);
     expect(mainDoc.getTranslatedDocument(eq("fr"), same(getContext()))).andReturn(transDoc);
     xwiki.saveDocument(same(transDoc), same(getContext()));
@@ -101,7 +105,6 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     replayDefault(xwiki, mainDoc);
     assertFalse("expecting false if no new translation was created", addTransCmd.addTranslation(
         docRef, "fr"));
-    assertEquals("expecting translation flag to be set to 1.", 1, transDoc.getTranslation());
     verifyDefault(xwiki, mainDoc);
   }
 
@@ -120,6 +123,7 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     XWikiDocument transDoc = new XWikiDocument(docRef);
     transDoc.setLanguage("fr");
     transDoc.setDefaultLanguage("fr");
+    transDoc.setTranslation(1);
     transDoc.setNew(false);
     expect(mainDoc.getTranslatedDocument(eq("fr"), same(getContext()))).andReturn(transDoc);
     xwiki.saveDocument(same(transDoc), same(getContext()));
@@ -128,7 +132,6 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     replayDefault(xwiki, mainDoc);
     assertFalse("expecting false if no new translation was created", addTransCmd.addTranslation(
         fullName, "fr", getContext()));
-    assertEquals("expecting translation flag to be set to 1.", 1, transDoc.getTranslation());
     verifyDefault(xwiki, mainDoc);
   }
 
