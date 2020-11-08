@@ -116,13 +116,13 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     DocumentReference cellConfigDocRef = new DocumentReference(getContext().getDatabase(),
         "MySpace", "MyDoc");
     XWikiDocument collConfigDoc = new XWikiDocument(cellConfigDocRef);
+    collConfigDoc.setNew(false);
     getContext().setDoc(collConfigDoc);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     collConfigDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(cellConfigDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(cellConfigDocRef, getContext())).andReturn(collConfigDoc).once();
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
@@ -139,12 +139,12 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     DocumentReference cellConfigDocRef = new DocumentReference(getContext().getDatabase(),
         "MySpace", "MyDoc");
     XWikiDocument collConfigDoc = new XWikiDocument(cellConfigDocRef);
+    collConfigDoc.setNew(false);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     collConfigDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(cellConfigDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(cellConfigDocRef, getContext())).andReturn(collConfigDoc).once();
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
@@ -161,13 +161,13 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     DocumentReference cellConfigDocRef = new DocumentReference(getContext().getDatabase(),
         "MySpace", "MyDoc");
     XWikiDocument collConfigDoc = new XWikiDocument(cellConfigDocRef);
+    collConfigDoc.setNew(false);
     getContext().setDoc(collConfigDoc);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     collConfigDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(cellConfigDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(cellConfigDocRef, getContext())).andReturn(collConfigDoc).once();
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
@@ -181,12 +181,12 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     DocumentReference cellConfigDocRef = new DocumentReference(getContext().getDatabase(),
         "MySpace", "MyDoc");
     XWikiDocument collConfigDoc = new XWikiDocument(cellConfigDocRef);
+    collConfigDoc.setNew(false);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     collConfigDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(cellConfigDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(cellConfigDocRef, getContext())).andReturn(collConfigDoc).once();
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
@@ -200,7 +200,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     DocumentReference cellConfigDocRef = new DocumentReference(getContext().getDatabase(),
         "MySpace", "MyDoc");
     XWikiDocument collConfigDoc = new XWikiDocument(cellConfigDocRef);
-    expect(xwiki.exists(cellConfigDocRef, getContext())).andReturn(true);
+    collConfigDoc.setNew(false);
     expect(xwiki.getDocument(cellConfigDocRef, getContext())).andReturn(collConfigDoc).once();
     replayDefault();
     assertFalse(xobjNavFactory.hasNavigationConfig(cellConfigDocRef));
@@ -211,7 +211,9 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
   public void testHasNavigationConfig_docRef_NotExists_false() throws Exception {
     DocumentReference cellConfigDocRef = new DocumentReference(getContext().getDatabase(),
         "MySpace", "MyDoc");
-    expect(xwiki.exists(cellConfigDocRef, getContext())).andReturn(false);
+    XWikiDocument collConfigDoc = new XWikiDocument(cellConfigDocRef);
+    collConfigDoc.setNew(true);
+    expect(xwiki.getDocument(cellConfigDocRef, getContext())).andReturn(collConfigDoc).once();
     replayDefault();
     assertFalse(xobjNavFactory.hasNavigationConfig(cellConfigDocRef));
     verifyDefault();
@@ -222,12 +224,12 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     DocumentReference cellConfigDocRef = new DocumentReference(getContext().getDatabase(),
         "MySpace", "MyDoc");
     XWikiDocument collConfigDoc = new XWikiDocument(cellConfigDocRef);
+    collConfigDoc.setNew(false);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     collConfigDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(cellConfigDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(cellConfigDocRef, getContext())).andReturn(collConfigDoc).once();
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);

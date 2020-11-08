@@ -141,13 +141,13 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
         context.getDatabase()));
     expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
         celFileBaseName).anyTimes();
-    DocumentReference tagDocRef = new DocumentReference(context.getDatabase(), celFileBaseName,
-        "tag0");
-    expect(xwiki.exists(eq(tagDocRef), same(context))).andReturn(true).atLeastOnce();
+    XWikiDocument tagDoc = new XWikiDocument(new DocumentReference(context.getDatabase(),
+        celFileBaseName, "tag0"));
+    tagDoc.setNew(false);
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
         InternalRightsFilter.class))).andReturn(Collections.<TreeNode>emptyList());
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(new XWikiDocument(
-        tagDocRef)).once();
+    expect(xwiki.exists(eq(tagDoc.getDocumentReference()), same(context))).andReturn(true);
+    expect(xwiki.getDocument(eq(tagDoc.getDocumentReference()), same(context))).andReturn(tagDoc);
     replayDefault();
     assertNotNull("docAlready exists: expecting existing doc", fileBaseTagCmd.getTagDocument("tag0",
         false, context));
@@ -238,13 +238,13 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
         context.getDatabase()));
     expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
         celFileBaseName).anyTimes();
-    DocumentReference tagDocRef = new DocumentReference(context.getDatabase(), celFileBaseName,
-        "tag0");
-    expect(xwiki.exists(eq(tagDocRef), same(context))).andReturn(true).atLeastOnce();
+    XWikiDocument tagDoc = new XWikiDocument(new DocumentReference(context.getDatabase(),
+        celFileBaseName, "tag0"));
+    tagDoc.setNew(false);
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
         InternalRightsFilter.class))).andReturn(Collections.<TreeNode>emptyList());
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(new XWikiDocument(
-        tagDocRef)).once();
+    expect(xwiki.exists(eq(tagDoc.getDocumentReference()), same(context))).andReturn(true);
+    expect(xwiki.getDocument(eq(tagDoc.getDocumentReference()), same(context))).andReturn(tagDoc);
     replayDefault();
     assertNotNull("docAlready exists: expecting existing doc",
         fileBaseTagCmd.getOrCreateTagDocument("tag0", false));
@@ -335,7 +335,9 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
         celFileBaseName).anyTimes();
     DocumentReference tagDocRef = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag0");
-    expect(xwiki.exists(eq(tagDocRef), same(context))).andReturn(false).atLeastOnce();
+    XWikiDocument inExistTagDoc = new XWikiDocument(tagDocRef);
+    expect(xwiki.exists(eq(tagDocRef), same(context))).andReturn(false);
+    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(inExistTagDoc).atLeastOnce();
     DocumentReference tagDocRef2 = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag1");
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(

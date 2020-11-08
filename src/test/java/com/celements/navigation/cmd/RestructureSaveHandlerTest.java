@@ -210,6 +210,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
+    xdoc.setNew(false);
     xdoc.setParentReference(parentRef);
     BaseObject menuItemObj = new BaseObject();
     menuItemObj.setXClassReference(getMenuItemClassRef());
@@ -237,6 +238,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
+    xdoc.setNew(false);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "OldParentDoc");
     xdoc.setParentReference(oldParentRef);
@@ -268,6 +270,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
+    xdoc.setNew(false);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "OldParentDoc");
     xdoc.setParentReference(oldParentRef);
@@ -298,6 +301,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
+    xdoc.setNew(false);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "OldParentDoc");
     xdoc.setParentReference(oldParentRef);

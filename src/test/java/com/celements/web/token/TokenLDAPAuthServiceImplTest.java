@@ -178,6 +178,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
         XWikiUsersClass.CLASS_DEF_HINT).getClassReference());
     userObj.setIntValue(XWikiUsersClass.FIELD_SUSPENDED.getName(), 0);
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    userDoc.setNew(false);
     userDoc.addXObject(userObj);
     XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     expect(request.getParameter(eq("token"))).andReturn(userToken).atLeastOnce();
@@ -185,7 +186,6 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
     getContext().setRequest(request);
     expect(store.searchDocumentsNames(anyString(), eq(0), eq(0), anyObject(List.class),
         same(getContext()))).andReturn(Arrays.asList(username)).once();
-    expect(getWikiMock().exists(eq(userDocRef), same(getContext()))).andReturn(true);
     expect(getWikiMock().getDocument(eq(userDocRef), same(getContext()))).andReturn(userDoc);
 
     replayDefault();
@@ -237,6 +237,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
         XWikiUsersClass.CLASS_DEF_HINT).getClassReference());
     userObj.setIntValue(XWikiUsersClass.FIELD_SUSPENDED.getName(), 1);
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    userDoc.setNew(false);
     userDoc.addXObject(userObj);
     XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     expect(request.getParameter(eq("token"))).andReturn(userToken).atLeastOnce();
@@ -244,7 +245,6 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
     getContext().setRequest(request);
     expect(store.searchDocumentsNames(anyString(), eq(0), eq(0), anyObject(List.class),
         same(getContext()))).andReturn(Arrays.asList(username)).once();
-    expect(getWikiMock().exists(eq(userDocRef), same(getContext()))).andReturn(true);
     expect(getWikiMock().getDocument(eq(userDocRef), same(getContext()))).andReturn(userDoc);
 
     replayDefault();

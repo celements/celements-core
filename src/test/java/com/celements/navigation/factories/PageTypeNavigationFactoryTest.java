@@ -47,12 +47,14 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     defaultPageTypeDocRef = new DocumentReference(getContext().getDatabase(), "PageTypes",
         "RichText");
     defaultPageTypeDoc = new XWikiDocument(defaultPageTypeDocRef);
+    defaultPageTypeDoc.setNew(false);
     PageTypeReference defaultPageTypeRef = new PageTypeReference(defaultPageTypeDocRef.getName(),
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER, Collections.<String>emptyList());
     expect(mockPageTypeResolver.getPageTypeRefForCurrentDoc()).andReturn(
         defaultPageTypeRef).anyTimes();
     pageTypeDocRef = new DocumentReference(getContext().getDatabase(), "PageTypes", "MyPageType");
     pageTypeDoc = new XWikiDocument(pageTypeDocRef);
+    pageTypeDoc.setNew(false);
     PageTypeReference pageTypeRef = new PageTypeReference(pageTypeDocRef.getName(),
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER, Collections.<String>emptyList());
     testDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyTestDoc");
@@ -60,6 +62,7 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
         pageTypeRef).anyTimes();
     currDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyDoc");
     currDoc = new XWikiDocument(currDocRef);
+    currDoc.setNew(false);
     getContext().setDoc(currDoc);
   }
 
@@ -70,7 +73,6 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     defaultPageTypeDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(defaultPageTypeDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(defaultPageTypeDocRef, getContext())).andReturn(
         defaultPageTypeDoc).once();
     String spaceName = "MySpace";
@@ -90,7 +92,6 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     pageTypeDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(pageTypeDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(pageTypeDocRef, getContext())).andReturn(pageTypeDoc).once();
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
@@ -109,7 +110,6 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     defaultPageTypeDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(defaultPageTypeDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(defaultPageTypeDocRef, getContext())).andReturn(
         defaultPageTypeDoc).once();
     String spaceName = "MySpace";
@@ -126,7 +126,6 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     pageTypeDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(pageTypeDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(pageTypeDocRef, getContext())).andReturn(pageTypeDoc).once();
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
@@ -137,7 +136,6 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
 
   @Test
   public void testHasNavigationConfig_docRef_false() throws Exception {
-    expect(xwiki.exists(pageTypeDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(pageTypeDocRef, getContext())).andReturn(pageTypeDoc).once();
     replayDefault();
     assertFalse(xobjNavFactory.hasNavigationConfig(testDocRef));
@@ -146,7 +144,8 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
 
   @Test
   public void testHasNavigationConfig_docRef_NotExists_false() throws Exception {
-    expect(xwiki.exists(pageTypeDocRef, getContext())).andReturn(false);
+    pageTypeDoc.setNew(true);
+    expect(xwiki.getDocument(pageTypeDocRef, getContext())).andReturn(pageTypeDoc).once();
     replayDefault();
     assertFalse(xobjNavFactory.hasNavigationConfig(testDocRef));
     verifyDefault();
@@ -159,7 +158,6 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
     pageTypeDoc.addXObject(navConfigObj);
-    expect(xwiki.exists(pageTypeDocRef, getContext())).andReturn(true);
     expect(xwiki.getDocument(pageTypeDocRef, getContext())).andReturn(pageTypeDoc).once();
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);

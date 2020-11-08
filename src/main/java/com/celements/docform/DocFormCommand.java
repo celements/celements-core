@@ -196,7 +196,7 @@ public class DocFormCommand implements IDocForm {
 
   private XWikiDocument setDocField(XWikiDocument tdoc, DocFormRequestParam param) {
     DocFormRequestKey key = param.getKey();
-    ClassField<String> field = xDocClassDef.getField(key.getFieldName(), String.class).orNull();
+    ClassField<String> field = xDocClassDef.getField(key.getFieldName(), String.class).orElse(null);
     if (field == null) {
       LOGGER.debug("setDocField: not a doc field [{}]", param);
     } else if (xDocFieldAccessor.setValue(tdoc, field, param.getValuesAsString())) {

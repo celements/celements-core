@@ -432,7 +432,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
 
   private XWikiDocument expectNewDoc(DocumentReference docRef) {
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(getMock(ModelAccessStrategy.class).exists(docRef, "")).andReturn(true).atLeastOnce();
+    doc.setNew(false);
     expect(getMock(ModelAccessStrategy.class).getDocument(docRef, "")).andReturn(doc).atLeastOnce();
     return doc;
   }

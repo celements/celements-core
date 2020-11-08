@@ -87,12 +87,12 @@ public class PageTypeCategoryMigrationTest extends AbstractComponentTest {
 
   private XWikiDocument expectPtDoc(DocumentReference docRef, String ptCategory) {
     XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setNew(false);
     BaseObject xObj = new BaseObject();
     xObj.setDocumentReference(docRef);
     xObj.setXClassReference(getClassDef().getClassReference());
     xObj.setStringValue(FIELD.getName(), ptCategory);
     doc.addXObject(xObj);
-    expect(getMock(ModelAccessStrategy.class).exists(docRef, "")).andReturn(true);
     expect(getMock(ModelAccessStrategy.class).getDocument(docRef, "")).andReturn(doc);
     return doc;
   }

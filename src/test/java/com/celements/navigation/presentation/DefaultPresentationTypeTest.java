@@ -74,6 +74,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     context = getContext();
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
+    currentDoc.setNew(false);
     context.setDoc(currentDoc);
     nav = new Navigation("N1");
     navFilterMock = createMock(InternalRightsFilter.class);
@@ -192,7 +193,6 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
         "MySpace.MyCurrentDoc"), same(context))).andReturn(true).atLeastOnce();
-    expect(getWikiMock().exists(currentDocRef, getContext())).andReturn(true);
     getConfigurationSource().setProperty("navigation.linkTarget.enabled", "true");
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
