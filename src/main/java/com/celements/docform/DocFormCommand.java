@@ -19,10 +19,12 @@
  */
 package com.celements.docform;
 
+import static com.celements.logging.LogLevel.*;
 import static com.celements.logging.LogUtils.*;
 import static com.celements.model.util.References.*;
 import static com.google.common.base.Predicates.*;
 import static com.google.common.collect.ImmutableMap.*;
+import static java.text.MessageFormat.*;
 import static java.util.stream.Collectors.*;
 import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.*;
 
@@ -53,7 +55,6 @@ import com.celements.copydoc.ICopyDocumentRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
-import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.XDocumentFieldAccessor;
@@ -196,16 +197,11 @@ public class DocFormCommand implements IDocForm {
 
   private XWikiDocument setDocField(XWikiDocument tdoc, DocFormRequestParam param) {
     DocFormRequestKey key = param.getKey();
-    ClassField<String> field = xDocClassDef.getField(key.getFieldName(), String.class).orElse(null);
-    if (field == null) {
-      LOGGER.debug("setDocField: not a doc field [{}]", param);
-    } else if (xDocFieldAccessor.setValue(tdoc, field, param.getValuesAsString())) {
-      LOGGER.debug("setDocField: set doc field [{}]", param);
-      return tdoc;
-    } else {
-      LOGGER.trace("setDocField: unchanged for [{}]", param);
-    }
-    return null;
+    return xDocClassDef.getField(key.getFieldName(), String.class)
+        .filter(log(field -> xDocFieldAccessor.setValue(tdoc, field, param.getValuesAsString()),
+            LOGGER, DEBUG, TRACE, format("setDocField - [{0}]", param)))
+        .map(field -> tdoc)
+        .orElse(null);
   }
 
   private XWikiDocument setObjField(XWikiDocument xdoc, DocFormRequestParam param) {
