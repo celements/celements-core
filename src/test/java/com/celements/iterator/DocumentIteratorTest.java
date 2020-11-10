@@ -63,7 +63,9 @@ public class DocumentIteratorTest extends AbstractComponentTest {
     docRef2 = new DocumentReference(_context.getDatabase(), "Test", "Doc2");
     _iterator = new DocumentIterator();
     _testDoc1 = new XWikiDocument(docRef1);
+    _testDoc1.setNew(false);
     _testDoc2 = new XWikiDocument(docRef2);
+    _testDoc2.setNew(false);
     _docList = new ArrayList<>();
   }
 
@@ -105,10 +107,8 @@ public class DocumentIteratorTest extends AbstractComponentTest {
     _docList.add(fullname1);
     _docList.add(fullname2);
     _iterator.setDocList(_docList);
-    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(new XWikiDocument(
-        docRef1)).once();
-    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(new XWikiDocument(
-        docRef2)).once();
+    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(_testDoc1).once();
+    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(_testDoc2).once();
     expect(_xwiki.exists(eq(docRef1), same(_context))).andReturn(true).anyTimes();
     expect(_xwiki.exists(eq(docRef2), same(_context))).andReturn(true).anyTimes();
     expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1).once();

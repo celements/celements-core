@@ -106,12 +106,12 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     DocumentReference myDoc2Ref = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc2");
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(myDoc1Ref, null, 1), new TreeNode(
         myDoc2Ref, null, 2));
-    expect(xwiki.exists(eq(myDoc1Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc1Ref)).atLeastOnce();
-    expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc2Ref)).atLeastOnce();
+    XWikiDocument doc1 = new XWikiDocument(myDoc2Ref);
+    doc1.setNew(false);
+    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(doc1).atLeastOnce();
+    XWikiDocument doc2 = new XWikiDocument(myDoc2Ref);
+    doc2.setNew(false);
+    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(doc2).atLeastOnce();
     replayDefault();
     List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey("mydatabase:MySpace.");
     assertEquals(expectedList.size(), resultTNlist.size());
@@ -136,9 +136,9 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     DocumentReference myDoc1Ref = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     DocumentReference myDoc2Ref = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc2");
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(myDoc2Ref, myDoc1Ref, 2));
-    expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc2Ref)).atLeastOnce();
+    XWikiDocument doc2 = new XWikiDocument(myDoc2Ref);
+    doc2.setNew(false);
+    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(doc2).atLeastOnce();
     replayDefault();
     List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey(
         "mydatabase:MySpace.MyDoc1");
@@ -215,19 +215,19 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
         resultList).atLeastOnce();
     DocumentReference myDoc1Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc1");
     XWikiDocument doc1 = new XWikiDocument(myDoc1Ref);
+    doc1.setNew(false);
     BaseObject menuItem1 = new BaseObject();
     menuItem1.setXClassReference(getNavClassConfig().getMenuItemClassRef("mydatabase"));
     menuItem1.setStringValue(INavigationClassConfig.PART_NAME_FIELD, expectedPartName);
     doc1.addXObject(menuItem1);
     DocumentReference myDoc2Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc2");
-    expect(xwiki.exists(eq(myDoc1Ref), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(doc1).atLeastOnce();
     XWikiDocument doc2 = new XWikiDocument(myDoc2Ref);
+    doc2.setNew(false);
     BaseObject menuItem2 = new BaseObject();
     menuItem2.setXClassReference(getNavClassConfig().getMenuItemClassRef("mydatabase"));
     menuItem2.setStringValue(INavigationClassConfig.PART_NAME_FIELD, expectedPartName);
     doc2.addXObject(menuItem2);
-    expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(doc2).atLeastOnce();
     replayDefault();
     List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey(searchParentKey);
@@ -247,16 +247,16 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     String searchParentKey = "mydatabase:MySpace.";
     DocumentReference myDoc1Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc1");
     DocumentReference myDoc2Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc2");
-    expect(xwiki.exists(eq(myDoc1Ref), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument doc1 = new XWikiDocument(myDoc1Ref);
+    doc1.setNew(false);
     String expectedPartName = "mainPart";
     BaseObject menuItem1 = new BaseObject();
     menuItem1.setXClassReference(getNavClassConfig().getMenuItemClassRef("mydatabase"));
     menuItem1.setStringValue(INavigationClassConfig.PART_NAME_FIELD, expectedPartName);
     doc1.addXObject(menuItem1);
     expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(doc1).atLeastOnce();
-    expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument doc2 = new XWikiDocument(myDoc2Ref);
+    doc2.setNew(false);
     BaseObject menuItem2 = new BaseObject();
     menuItem2.setXClassReference(getNavClassConfig().getMenuItemClassRef("mydatabase"));
     menuItem2.setStringValue(INavigationClassConfig.PART_NAME_FIELD, expectedPartName);

@@ -304,7 +304,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     DocumentReference pageTypesDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
         "TestPageType");
     XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
-    expect(xwiki.exists(eq(pageTypesDocRef), same(context))).andReturn(true).atLeastOnce();
+    pageTypesDoc.setNew(false);
     expect(xwiki.getDocument(eq(pageTypesDocRef), same(context))).andReturn(
         pageTypesDoc).atLeastOnce();
     DocumentReference mainWebHomeDocRef = new DocumentReference(context.getDatabase(), "Main",

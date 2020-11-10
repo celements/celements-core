@@ -307,7 +307,10 @@ public class DocFormCommandTest extends AbstractComponentTest {
   @Test
   public void test_updateDocs_newFromTemplate() throws Exception {
     List<DocFormRequestParam> params = parseParams(ImmutableMap.of());
+    xdoc.setNew(true);
     expectDocWithSave(xdoc);
+    expect(getMock(ModelAccessStrategy.class).createDocument(xdoc.getDocumentReference(), ""))
+        .andReturn(xdoc);
 
     getContext().setRequest(createMockAndAddToDefault(XWikiRequest.class));
     expect(getContext().getRequest().get(eq("template"))).andReturn("Tmpl.MyTmpl");
@@ -388,6 +391,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
     List<DocFormRequestParam> params = parseParams(ImmutableMap.of("A.B_0_foo", "val"));
     xdoc.setNew(true);
     expectDoc(xdoc);
+    expect(getMock(ModelAccessStrategy.class).createDocument(xdoc.getDocumentReference(), ""))
+        .andReturn(xdoc);
 
     replayDefault();
     docFormCmd.updateDocs(params);
@@ -495,6 +500,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     XWikiDocument doc = Utils.getComponent(XWikiDocumentCreator.class)
         .createWithoutDefaults(docRef);
     doc.setDefaultLanguage("de");
+    doc.setNew(false);
     return doc;
   }
 

@@ -46,6 +46,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     xwiki = getWikiMock();
     cellDocRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
     cellDoc = new XWikiDocument(cellDocRef);
+    cellDoc.setNew(false);
     expect(xwiki.getDocument(eq(cellDocRef), same(context))).andReturn(cellDoc).anyTimes();
     pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
     webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
@@ -132,6 +133,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     XWikiDocument leftParentDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.getDocument(eq(expDepDocRef), same(context))).andReturn(
         leftParentDoc).atLeastOnce();
+    expect(leftParentDoc.isNew()).andReturn(false);
     expect(leftParentDoc.getContent()).andReturn("parent Content").atLeastOnce();
     expect(leftParentDoc.getDocumentReference()).andReturn(expDepDocRef).atLeastOnce();
     expect(leftParentDoc.getDefaultLanguage()).andReturn("en").anyTimes();
@@ -151,6 +153,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDoc");
     XWikiDocument myCurrDoc = new XWikiDocument(myDocRef);
+    myCurrDoc.setNew(false);
     context.setDoc(myCurrDoc);
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyParentDoc");
@@ -199,6 +202,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDoc");
     XWikiDocument myCurrDoc = new XWikiDocument(myDocRef);
+    myCurrDoc.setNew(false);
     context.setDoc(myCurrDoc);
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyParentDoc");
@@ -223,6 +227,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         expDepDocRef).atLeastOnce();
     expect(xwiki.exists(eq(expDepDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument spaceDefaultDocument = new XWikiDocument(expDepDocRef);
+    spaceDefaultDocument.setNew(false);
     spaceDefaultDocument.setDefaultLanguage("en");
     spaceDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(expDepDocRef), same(context))).andReturn(spaceDefaultDocument);
@@ -248,6 +253,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDoc");
     XWikiDocument myCurrDoc = new XWikiDocument(myDocRef);
+    myCurrDoc.setNew(false);
     context.setDoc(myCurrDoc);
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyParentDoc");
@@ -280,6 +286,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         pdcWikiDefaultDocRef).atLeastOnce();
     expect(xwiki.exists(eq(pdcWikiDefaultDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument wikiDefaultDocument = new XWikiDocument(pdcWikiDefaultDocRef);
+    wikiDefaultDocument.setNew(false);
     wikiDefaultDocument.setDefaultLanguage("en");
     wikiDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(pdcWikiDefaultDocRef), same(context))).andReturn(
@@ -301,6 +308,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDoc");
     XWikiDocument myCurrDoc = new XWikiDocument(myDocRef);
+    myCurrDoc.setNew(false);
     context.setDoc(myCurrDoc);
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyParentDoc");
@@ -347,6 +355,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         expectedLayoutDefaultRef).atLeastOnce();
     expect(xwiki.exists(eq(expectedLayoutDefaultRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
+    layoutDefaultDocument.setNew(false);
     layoutDefaultDocument.setDefaultLanguage("en");
     layoutDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(expectedLayoutDefaultRef), same(context))).andReturn(
@@ -367,6 +376,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDoc");
     XWikiDocument myCurrDoc = new XWikiDocument(myDocRef);
+    myCurrDoc.setNew(false);
     context.setDoc(myCurrDoc);
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyParentDoc");
@@ -413,6 +423,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         expectedLayoutDefaultRef).atLeastOnce();
     expect(xwiki.exists(eq(expectedLayoutDefaultRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
+    layoutDefaultDocument.setNew(false);
     layoutDefaultDocument.setDefaultLanguage("en");
     layoutDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(expectedLayoutDefaultRef), same(context))).andReturn(
@@ -433,6 +444,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDoc");
     XWikiDocument myCurrDoc = new XWikiDocument(myDocRef);
+    myCurrDoc.setNew(false);
     context.setDoc(myCurrDoc);
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyParentDoc");
@@ -480,6 +492,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         expectedLayoutDefaultRef).atLeastOnce();
     expect(xwiki.exists(eq(expectedLayoutDefaultRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
+    layoutDefaultDocument.setNew(false);
     layoutDefaultDocument.setDefaultLanguage("en");
     layoutDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(expectedLayoutDefaultRef), same(context))).andReturn(

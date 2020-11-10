@@ -75,6 +75,7 @@ public class ContentInheritorTest extends AbstractComponentTest {
     String title1 = "Title1";
     docList.add("Test.Doc1");
     XWikiDocument testDoc1 = new XWikiDocument(docRef);
+    testDoc1.setNew(false);
     testDoc1.setDefaultLanguage("de");
     testDoc1.setTitle(title1);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(testDoc1).anyTimes();
@@ -93,6 +94,7 @@ public class ContentInheritorTest extends AbstractComponentTest {
     XWikiDocument translatedDoc1 = new XWikiDocument(docRef);
     translatedDoc1.setTitle(title_de);
     XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
+    expect(testDoc1.isNew()).andReturn(false).anyTimes();
     expect(testDoc1.isFromCache()).andReturn(false).atLeastOnce();
     expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
         translatedDoc1).anyTimes();
@@ -113,6 +115,7 @@ public class ContentInheritorTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Test", "Doc1");
     String content1 = "Content1";
     XWikiDocument testDoc1 = new XWikiDocument(docRef);
+    testDoc1.setNew(false);
     testDoc1.setDefaultLanguage("de");
     testDoc1.setContent(content1);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(testDoc1).anyTimes();
@@ -131,6 +134,7 @@ public class ContentInheritorTest extends AbstractComponentTest {
     XWikiDocument translatedDoc1 = new XWikiDocument(docRef);
     translatedDoc1.setContent(content_de);
     XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
+    expect(testDoc1.isNew()).andReturn(false).anyTimes();
     expect(testDoc1.isFromCache()).andReturn(false).atLeastOnce();
     expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
         translatedDoc1).anyTimes();
@@ -200,14 +204,10 @@ public class ContentInheritorTest extends AbstractComponentTest {
   // *****************************************************************/
 
   private IIteratorFactory<DocumentIterator> getTestIteratorFactory(final List<String> docList) {
-    return new IIteratorFactory<DocumentIterator>() {
-
-      @Override
-      public DocumentIterator createIterator() {
-        DocumentIterator iterator = new DocumentIterator();
-        iterator.setDocList(docList);
-        return iterator;
-      }
+    return () -> {
+      DocumentIterator iterator = new DocumentIterator();
+      iterator.setDocList(docList);
+      return iterator;
     };
   }
 

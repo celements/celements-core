@@ -330,6 +330,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         "WebHome");
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    layoutPropDoc.setNew(false);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
@@ -341,6 +342,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         "CelLayoutEditor", "WebHome");
     expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutEditorPropDoc = new XWikiDocument(layoutEditorPropDocRef);
+    layoutEditorPropDoc.setNew(false);
     BaseObject layoutEditorPropObj = new BaseObject();
     layoutEditorPropObj.setXClassReference(pagePropClassRef);
     layoutEditorPropDoc.addXObject(layoutEditorPropObj);
@@ -361,6 +363,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         "WebHome");
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    layoutPropDoc.setNew(false);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
@@ -376,6 +379,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(
         true).atLeastOnce();
     XWikiDocument layoutEditorPropDoc = new XWikiDocument(centralLayoutEditorPropDocRef);
+    layoutEditorPropDoc.setNew(false);
     BaseObject layoutEditorPropObj = new BaseObject();
     DocumentReference centralPagePropClassRef = new DocumentReference("celements2web",
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
@@ -437,9 +441,10 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference myCellDocRef = new DocumentReference(context.getDatabase(), layoutName,
         "myCell");
     XWikiDocument myCellDoc = new XWikiDocument(myCellDocRef);
+    myCellDoc.setNew(false);
     myCellDoc.setStore(storeMock);
-    expect(xwiki.exists(eq(myCellDocRef), same(context))).andReturn(true).once();
-    expect(xwiki.getDocument(eq(myCellDocRef), same(context))).andReturn(myCellDoc).once();
+    expect(xwiki.exists(eq(myCellDocRef), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(myCellDocRef), same(context))).andReturn(myCellDoc).atLeastOnce();
     xwiki.deleteDocument(same(myCellDoc), eq(true), same(context));
     expectLastCall().once();
     expect(storeMock.getTranslationList(same(myCellDoc), same(context))).andReturn(
@@ -447,9 +452,10 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), layoutName,
         "WebHome");
     XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
+    webHomeDoc.setNew(false);
     webHomeDoc.setStore(storeMock);
-    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).once();
-    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(webHomeDoc).once();
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(webHomeDoc).atLeastOnce();
     xwiki.deleteDocument(same(webHomeDoc), eq(true), same(context));
     expectLastCall().once();
     expect(storeMock.getTranslationList(same(webHomeDoc), same(context))).andReturn(
@@ -615,6 +621,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    layoutPropDoc.setNew(false);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
@@ -635,6 +642,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    layoutPropDoc.setNew(false);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
@@ -656,6 +664,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    layoutPropDoc.setNew(false);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
@@ -677,6 +686,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    layoutPropDoc.setNew(false);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
@@ -699,6 +709,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    layoutPropDoc.setNew(false);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
@@ -722,8 +733,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
   private XWikiDocument expectLayoutDoc(SpaceReference layoutSpaceRef,
       boolean exists, boolean withObject) throws XWikiException {
     DocumentReference layoutDocRef = plCmd.standardPropDocRef(layoutSpaceRef);
-    expect(xwiki.exists(eq(layoutDocRef), same(context))).andReturn(exists).atLeastOnce();
+    expect(xwiki.exists(eq(layoutDocRef), same(context))).andReturn(exists).anyTimes();
     XWikiDocument layoutDoc = new XWikiDocument(layoutDocRef);
+    layoutDoc.setNew(!exists);
     if (exists) {
       expect(xwiki.getDocument(eq(layoutDocRef), same(context))).andReturn(layoutDoc).once();
       if (withObject) {

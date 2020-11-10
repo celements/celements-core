@@ -75,6 +75,7 @@ public class NavigationTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     currentDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
+    currentDoc.setNew(false);
     getContext().setDoc(currentDoc);
     nav = new Navigation("N1");
     navFilterMock = createMockAndAddToDefault(InternalRightsFilter.class);
@@ -260,7 +261,6 @@ public class NavigationTest extends AbstractComponentTest {
     ptObj.setXClassReference(new PageTypeClasses().getPageTypeClassRef(getContext().getDatabase()));
     ptObj.setStringValue(PageTypeClasses.PAGE_TYPE_FIELD, "TestPageType");
     currentDoc.addXObject(ptObj);
-    expect(getWikiMock().exists(eq(currentDocRef), same(getContext()))).andReturn(true);
     expect(getWikiMock().getDocument(eq(currentDocRef), same(getContext()))).andReturn(
         currentDoc).once();
     String testPageType = "TestPageType";

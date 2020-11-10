@@ -193,7 +193,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_resolvePageTypeReferenceWithDefault_docRef_Exception() throws Exception {
-    expect(modelStrategyMock.exists(docRef, "")).andReturn(false).atLeastOnce();
+    expectDoc(docRef);
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andThrow(
         new XWikiException());
     replayDefault();
@@ -334,7 +334,8 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   }
 
   private XWikiDocument expectDoc(XWikiDocument doc) {
-    expect(modelStrategyMock.exists(doc.getDocumentReference(), "")).andReturn(true).atLeastOnce();
+    doc.setNew(false);
+    expect(modelStrategyMock.exists(doc.getDocumentReference(), "")).andReturn(true).anyTimes();
     expect(modelStrategyMock.getDocument(doc.getDocumentReference(), "")).andReturn(doc);
     return doc;
   }

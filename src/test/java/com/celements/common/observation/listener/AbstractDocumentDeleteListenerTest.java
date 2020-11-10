@@ -208,6 +208,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
     expectLastCall().once();
     expect(origDocMock.isFromCache()).andReturn(false).anyTimes();
+    expect(origDocMock.isNew()).andReturn(false);
 
     replayDefault();
     listener.onEvent(event, docMock, context);

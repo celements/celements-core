@@ -93,7 +93,9 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_getUser_DocumentNotExistsException() throws Exception {
-    expect(getMock(ModelAccessStrategy.class).exists(userDocRef, "")).andReturn(false);
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    expect(getMock(ModelAccessStrategy.class).getDocument(userDocRef, "")).andReturn(userDoc);
+    userDoc.setNew(true);
 
     replayDefault();
     assertSame(DocumentNotExistsException.class, new ExceptionAsserter<UserInstantiationException>(
@@ -208,8 +210,10 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getUserForLoginField_name_query() throws Exception {
     String login = "mSladek";
-    expect(getMock(ModelAccessStrategy.class).exists(service.resolveUserDocRef(login),
-        "")).andReturn(false);
+    XWikiDocument userDoc = new XWikiDocument(service.resolveUserDocRef(login));
+    userDoc.setNew(true);
+    expect(getMock(ModelAccessStrategy.class).getDocument(userDoc.getDocumentReference(), ""))
+        .andReturn(userDoc);
     expectUserQuery(login, Arrays.asList(UserService.DEFAULT_LOGIN_FIELD), Arrays.asList(
         userDocRef));
 
@@ -249,8 +253,10 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getUserForLoginField_invalidField() throws Exception {
     String login = "mSladek";
-    expect(getMock(ModelAccessStrategy.class).exists(service.resolveUserDocRef(login),
-        "")).andReturn(false);
+    XWikiDocument userDoc = new XWikiDocument(service.resolveUserDocRef(login));
+    userDoc.setNew(true);
+    expect(getMock(ModelAccessStrategy.class).getDocument(userDoc.getDocumentReference(), ""))
+        .andReturn(userDoc);
     expectUserQuery(login, Arrays.asList(UserService.DEFAULT_LOGIN_FIELD),
         Collections.<DocumentReference>emptyList());
 
@@ -416,6 +422,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     Map<String, String> userData = new HashMap<>();
     userData.put("xwikiname", "msladek");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    userDoc.setNew(false);
 
     expect(getMock(ModelAccessStrategy.class).exists(userDocRef, "")).andReturn(false).times(2);
     expect(getMock(ModelAccessStrategy.class).createDocument(userDocRef, "")).andReturn(userDoc);
@@ -427,7 +434,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     expectInitialGroups(Collections.<String>emptyList());
     expectGroupAdd(XWIKI_ALL_GROUP_FN);
 
-    expect(getMock(ModelAccessStrategy.class).exists(userDocRef, "")).andReturn(true);
     expect(getMock(ModelAccessStrategy.class).getDocument(userDocRef, "")).andReturn(userDoc);
 
     replayDefault();
@@ -481,7 +487,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
   private static XWikiDocument expectDoc(DocumentReference docRef) {
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(getMock(ModelAccessStrategy.class).exists(docRef, "")).andReturn(true);
+    doc.setNew(false);
     expect(getMock(ModelAccessStrategy.class).getDocument(docRef, "")).andReturn(doc);
     return doc;
   }

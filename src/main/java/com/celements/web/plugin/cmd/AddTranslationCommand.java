@@ -106,9 +106,6 @@ public class AddTranslationCommand {
       LOGGER.debug("Translation document [{}], language [{}] already exists.",
           mainDoc.getDocumentReference(), language);
     }
-    transDoc.setTranslation(1);
-    // Make sure we have at least the meta data dirty status
-    transDoc.setMetaDataDirty(true);
     return transDoc;
   }
 

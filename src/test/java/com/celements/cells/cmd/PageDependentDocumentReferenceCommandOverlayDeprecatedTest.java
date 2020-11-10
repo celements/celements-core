@@ -137,6 +137,7 @@ public class PageDependentDocumentReferenceCommandOverlayDeprecatedTest extends
     XWikiDocument leftParentDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.getDocument(eq(expDepDocRef), same(context))).andReturn(
         leftParentDoc).atLeastOnce();
+    expect(leftParentDoc.isNew()).andReturn(false).atLeastOnce();
     expect(leftParentDoc.getContent()).andReturn("parent Content").atLeastOnce();
     expect(leftParentDoc.getDefaultLanguage()).andReturn("en");
     expect(leftParentDoc.getDocumentReference()).andReturn(expDepDocRef).atLeastOnce();
@@ -234,6 +235,7 @@ public class PageDependentDocumentReferenceCommandOverlayDeprecatedTest extends
         expDepDocRef).atLeastOnce();
     expect(xwiki.exists(eq(expDepDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument spaceDefaultDocument = new XWikiDocument(expDepDocRef);
+    spaceDefaultDocument.setNew(false);
     spaceDefaultDocument.setDefaultLanguage("en");
     spaceDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(expDepDocRef), same(context))).andReturn(spaceDefaultDocument);
@@ -294,6 +296,7 @@ public class PageDependentDocumentReferenceCommandOverlayDeprecatedTest extends
         pdcWikiDefaultDocRef).atLeastOnce();
     expect(xwiki.exists(eq(pdcWikiDefaultDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument wikiDefaultDocument = new XWikiDocument(pdcWikiDefaultDocRef);
+    wikiDefaultDocument.setNew(false);
     wikiDefaultDocument.setDefaultLanguage("en");
     wikiDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(pdcWikiDefaultDocRef), same(context))).andReturn(
@@ -364,6 +367,7 @@ public class PageDependentDocumentReferenceCommandOverlayDeprecatedTest extends
         expectedLayoutDefaultRef).atLeastOnce();
     expect(xwiki.exists(eq(expectedLayoutDefaultRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
+    layoutDefaultDocument.setNew(false);
     layoutDefaultDocument.setDefaultLanguage("en");
     layoutDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(expectedLayoutDefaultRef), same(context))).andReturn(
@@ -434,6 +438,7 @@ public class PageDependentDocumentReferenceCommandOverlayDeprecatedTest extends
         expectedLayoutDefaultRef).atLeastOnce();
     expect(xwiki.exists(eq(expectedLayoutDefaultRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
+    layoutDefaultDocument.setNew(false);
     layoutDefaultDocument.setDefaultLanguage("en");
     layoutDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(expectedLayoutDefaultRef), same(context))).andReturn(
