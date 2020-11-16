@@ -9,11 +9,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
+import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
@@ -73,19 +74,20 @@ public class Dom4JParser<D extends Document> {
     }
   }
 
-  public String writeXML(D document)
+  public String writeXML(Node node)
       throws IOException {
     try (Writer out = new StringWriter()) {
       XMLWriter writer = new XMLWriter(out, outFormat);
-      writer.write(document);
+      writer.write(node);
       return out.toString();
     }
   }
 
-  public Optional<String> readAndExecute(String xml, Predicate<D> executable) throws IOException {
+  public Optional<String> readAndExecute(String xml,
+      Function<D, Optional<? extends Node>> executable) throws IOException {
     return Optional.ofNullable(readDocument(xml))
         .map(docType::cast)
-        .filter(executable)
+        .flatMap(executable)
         .map(rethrowFunction(this::writeXML));
   }
 
