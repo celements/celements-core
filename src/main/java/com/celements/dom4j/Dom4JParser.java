@@ -1,6 +1,7 @@
 package com.celements.dom4j;
 
 import static com.celements.common.lambda.LambdaExceptionUtil.*;
+import static com.google.common.base.Predicates.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -20,6 +22,8 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.codepoetics.protonpack.StreamUtils;
 
 import io.sf.carte.doc.dom4j.XHTMLDocument;
 import io.sf.carte.doc.dom4j.XHTMLDocumentFactory;
@@ -74,21 +78,23 @@ public class Dom4JParser<D extends Document> {
     }
   }
 
-  public String writeXML(Node node)
-      throws IOException {
+  public String writeXML(Node node) throws IOException {
+    return writeXML(StreamUtils.ofSingleNullable(node));
+  }
+
+  public String writeXML(Stream<? extends Node> nodes) throws IOException {
     try (Writer out = new StringWriter()) {
       XMLWriter writer = new XMLWriter(out, outFormat);
-      writer.write(node);
+      nodes.forEach(rethrowConsumer(writer::write));
       return out.toString();
     }
   }
 
   public Optional<String> readAndExecute(String xml,
-      Function<D, Optional<? extends Node>> executable) throws IOException {
-    return Optional.ofNullable(readDocument(xml))
-        .map(docType::cast)
-        .flatMap(executable)
-        .map(rethrowFunction(this::writeXML));
+      Function<D, Stream<? extends Node>> executable) throws IOException {
+    D document = readDocument(xml);
+    return Optional.of(writeXML(executable.apply(document)))
+        .filter(not(String::isEmpty));
   }
 
 }
