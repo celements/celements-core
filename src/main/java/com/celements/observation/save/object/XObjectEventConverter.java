@@ -1,5 +1,7 @@
 package com.celements.observation.save.object;
 
+import static com.google.common.collect.ImmutableMap.*;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -79,8 +81,11 @@ public class XObjectEventConverter extends AbstractLocalEventListener<XWikiDocum
   }
 
   private Map<ImmutableObjectReference, BaseObject> getObjectMap(XWikiDocument doc) {
-    return XWikiObjectEditor.on(doc).fetch().iter().stream().collect(
-        ImmutableMap.toImmutableMap(ImmutableObjectReference::from, Function.identity()));
+    if (doc != null) {
+      return XWikiObjectEditor.on(doc).fetch().stream()
+          .collect(toImmutableMap(ImmutableObjectReference::from, Function.identity()));
+    }
+    return ImmutableMap.of();
   }
 
   private SaveEventOperation calculateOperation(Event sourceEvent, BaseObject newObj,
