@@ -28,7 +28,8 @@ public class Dom4JParser<D extends Document> {
 
   private final Class<D> docType;
   private final DocumentFactory factory;
-  private boolean disableDTDs = true;
+  private boolean disableDTDs;
+  private OutputFormat outFormat;
 
   public static Dom4JParser<Document> createParser(DocumentFactory factory) {
     return new Dom4JParser<>(Document.class, factory);
@@ -41,6 +42,8 @@ public class Dom4JParser<D extends Document> {
   private Dom4JParser(Class<D> docType, DocumentFactory factory) {
     this.docType = docType;
     this.factory = factory;
+    this.disableDTDs = true;
+    this.outFormat = new OutputFormat("", false, UTF_8.name());
   }
 
   /**
@@ -51,6 +54,10 @@ public class Dom4JParser<D extends Document> {
   public Dom4JParser<D> allowDTDs() {
     disableDTDs = false;
     return this;
+  }
+
+  public OutputFormat getOutputFormat() {
+    return outFormat;
   }
 
   public D readDocument(String xml) throws IOException {
@@ -66,14 +73,10 @@ public class Dom4JParser<D extends Document> {
     }
   }
 
-  public String writeXML(D document) throws IOException {
-    return writeXML(document, new OutputFormat("", false, UTF_8.name()));
-  }
-
-  public String writeXML(D document, OutputFormat format)
+  public String writeXML(D document)
       throws IOException {
     try (Writer out = new StringWriter()) {
-      XMLWriter writer = new XMLWriter(out, format);
+      XMLWriter writer = new XMLWriter(out, outFormat);
       writer.write(document);
       return out.toString();
     }
