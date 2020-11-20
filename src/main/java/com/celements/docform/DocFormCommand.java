@@ -19,7 +19,6 @@
  */
 package com.celements.docform;
 
-import static com.celements.logging.LogLevel.*;
 import static com.celements.logging.LogUtils.*;
 import static com.celements.model.util.References.*;
 import static com.google.common.base.Predicates.*;
@@ -38,6 +37,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -55,6 +55,7 @@ import com.celements.copydoc.ICopyDocumentRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.XDocumentFieldAccessor;
@@ -197,9 +198,10 @@ public class DocFormCommand implements IDocForm {
 
   private XWikiDocument setDocField(XWikiDocument tdoc, DocFormRequestParam param) {
     DocFormRequestKey key = param.getKey();
+    Predicate<ClassField<String>> setter = field -> xDocFieldAccessor.set(
+        tdoc, field, param.getValuesAsString());
     return xDocClassDef.getField(key.getFieldName(), String.class)
-        .filter(log(field -> xDocFieldAccessor.setValue(tdoc, field, param.getValuesAsString()),
-            LOGGER, DEBUG, TRACE, format("setDocField - [{0}]", param)))
+        .filter(log(setter).debug(LOGGER).msg(() -> format("setDocField - [{0}]", param)))
         .map(field -> tdoc)
         .orElse(null);
   }
