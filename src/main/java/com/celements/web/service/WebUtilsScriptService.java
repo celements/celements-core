@@ -11,10 +11,12 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.auth.AuthenticationScriptService;
 import com.celements.auth.IAuthenticationServiceRole;
+import com.celements.model.context.ModelContext;
 import com.celements.rights.access.EAccessLevel;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -35,6 +37,9 @@ public class WebUtilsScriptService implements ScriptService {
 
   @Requirement
   private Execution execution;
+
+  @Requirement
+  private ModelContext context;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -146,6 +151,11 @@ public class WebUtilsScriptService implements ScriptService {
 
   public String getParentSpace() {
     return webUtilsService.getParentSpace();
+  }
+
+  public boolean isCentralWiki() {
+    WikiReference centralWikiRef = webUtilsService.getCentralWikiRef();
+    return (context.getWikiRef().equals(centralWikiRef));
   }
 
   public String getJSONContent(Document contentDoc) {
