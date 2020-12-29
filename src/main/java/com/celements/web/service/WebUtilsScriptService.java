@@ -11,7 +11,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.auth.AuthenticationScriptService;
@@ -154,8 +153,7 @@ public class WebUtilsScriptService implements ScriptService {
   }
 
   public boolean isCentralWiki() {
-    WikiReference centralWikiRef = webUtilsService.getCentralWikiRef();
-    return (context.getWikiRef().equals(centralWikiRef));
+    return context.getWikiRef().equals(webUtilsService.getCentralWikiRef());
   }
 
   public String getJSONContent(Document contentDoc) {
