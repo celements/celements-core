@@ -169,7 +169,7 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
       Optional<String> lang = tag.getLangOpt();
       if (!lang.isPresent() || lang.get().equals(context.getLanguage().orElse(null)) || lang.get()
           .equals(context.getDefaultLanguage())) {
-        String key = tag.getKeyOpt().orElse(null);
+        String key = tag.getKeyOpt().orElse("");
         if (!finalTags.containsKey(key)) {
           finalTags.put(key, new ArrayList<MetaTag>());
         }

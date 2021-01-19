@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.metatag.enums.ENameStandard;
 import com.celements.model.context.ModelContext;
 import com.celements.web.classes.MetaTagClass;
 import com.google.common.collect.ImmutableList;
@@ -203,6 +204,38 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
     assertEquals(key, resultList.get(0).getKeyOpt().get());
     assertEquals(tag1value1 + "," + tag1value2 + "," + tag2value1 + "," + tag2value2, resultList
         .get(0).getValueOpt().get());
+  }
+
+  @Test
+  public void testAddMetaTagsFromList_emptySourceAndTarget() {
+    List<MetaTag> newTags = new ArrayList<>();
+    SortedMap<String, List<MetaTag>> finalTags = new TreeMap<>();
+    replayDefault();
+    bomtProvider.addMetaTagsFromList(newTags, finalTags);
+    verifyDefault();
+    assertEquals(0, finalTags.size());
+  }
+
+  @Test
+  public void testAddMetaTagsFromList_emptyTarget() {
+    List<MetaTag> newTags = new ArrayList<>();
+    newTags.add(new MetaTag(ENameStandard.DESCRIPTION, "some text."));
+    SortedMap<String, List<MetaTag>> finalTags = new TreeMap<>();
+    replayDefault();
+    bomtProvider.addMetaTagsFromList(newTags, finalTags);
+    verifyDefault();
+    assertEquals(1, finalTags.size());
+    List<List<MetaTag>> resultLists = ImmutableList.copyOf(finalTags.values());
+    System.out.println(resultLists.get(0).get(0));
+    System.out.println(resultLists.get(0).get(0).display());
+    System.out.println(resultLists.get(0).get(0).getKey());
+    System.out.println(resultLists.get(0).get(0).getKeyOpt());
+    System.out.println(resultLists.get(0).get(0).getLang());
+    System.out.println(resultLists.get(0).get(0).getLangOpt());
+    System.out.println(resultLists.get(0).get(0).getValue());
+    System.out.println(resultLists.get(0).get(0).getValueOpt());
+    assertTrue("expected tag name to be description", resultLists.get(0).get(0).display().contains(
+        ENameStandard.DESCRIPTION.toString().toLowerCase()));
   }
 
   // HELPER METHODS
