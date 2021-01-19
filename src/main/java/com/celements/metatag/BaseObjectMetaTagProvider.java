@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -179,8 +180,9 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
   }
 
   List<MetaTag> getMetaTagsForDoc(XWikiDocument doc) {
-    return XWikiObjectFetcher.on(doc).filter(metaTagClass).list().stream()
-        .parallel().map(
+    return XWikiObjectFetcher.on(doc).filter(metaTagClass).filterPresent(MetaTagClass.FIELD_KEY)
+        .list().stream().parallel()
+        .map(
             new Function<BaseObject, MetaTag>() {
 
               @Override

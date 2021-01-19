@@ -226,16 +226,24 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
     verifyDefault();
     assertEquals(1, finalTags.size());
     List<List<MetaTag>> resultLists = ImmutableList.copyOf(finalTags.values());
-    System.out.println(resultLists.get(0).get(0));
-    System.out.println(resultLists.get(0).get(0).display());
-    System.out.println(resultLists.get(0).get(0).getKey());
-    System.out.println(resultLists.get(0).get(0).getKeyOpt());
-    System.out.println(resultLists.get(0).get(0).getLang());
-    System.out.println(resultLists.get(0).get(0).getLangOpt());
-    System.out.println(resultLists.get(0).get(0).getValue());
-    System.out.println(resultLists.get(0).get(0).getValueOpt());
     assertTrue("expected tag name to be description", resultLists.get(0).get(0).display().contains(
         ENameStandard.DESCRIPTION.toString().toLowerCase()));
+  }
+
+  @Test
+  public void testGetMetaTagsForDoc_filterEmptyTag() {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Spc", "Doc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    doc.addXObject(createMetaTagBaseObject(docRef, "keywords", "test,schluessel,wort", "de",
+        null));
+    doc.addXObject(createMetaTagBaseObject(docRef, "", "", "", false));
+    doc.addXObject(createMetaTagBaseObject(docRef, "description", "", "en", null));
+    replayDefault();
+    List<MetaTag> tags = bomtProvider.getMetaTagsForDoc(doc);
+    verifyDefault();
+    assertEquals(2, tags.size());
+    assertEquals("de", tags.get(0).getLangOpt().get());
+    assertEquals("en", tags.get(1).getLangOpt().get());
   }
 
   // HELPER METHODS
