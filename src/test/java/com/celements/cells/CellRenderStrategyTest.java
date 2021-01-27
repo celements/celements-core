@@ -141,9 +141,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
 
   @Test
   public void test_isRenderCell() {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     assertFalse(renderer.isRenderCell(null));
-    assertTrue(renderer.isRenderCell(new TreeNode(docRef, null, 0)));
+    assertTrue(renderer.isRenderCell(new TreeNode(cellRef, null, 0)));
   }
 
   @Test
@@ -191,77 +191,80 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
 
   @Test
   public void test_startRenderCell() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = expectNewDoc(docRef);
+    TreeNode node = new TreeNode(cellRef, null, 0);
+    XWikiDocument doc = expectNewDoc(cellRef);
     BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String idname = "myDivId";
+    String cellFN = "Skin.MasterCell";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
     Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectNoCellTypeConfig(docRef);
+    expectNoCellTypeConfig(cellRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
+    assertDefaultAttributes(cssClasses, idname, cellFN, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
   @Test
   public void test_startRenderCell_noCssClasses() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = expectNewDoc(docRef);
+    TreeNode node = new TreeNode(cellRef, null, 0);
+    XWikiDocument doc = expectNewDoc(cellRef);
     BaseObject cellObj = addCellObj(doc);
     String idname = "myDivId";
+    String cellFN = "Skin.MasterCell";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
     Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectNoCellTypeConfig(docRef);
+    expectNoCellTypeConfig(cellRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    assertDefaultAttributes("", idname, cssStyles, capturedAttrList);
+    assertDefaultAttributes("", idname, cellFN, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
   @Test
   public void test_startRenderCell_auto_id_for_null() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = expectNewDoc(docRef);
+    TreeNode node = new TreeNode(cellRef, null, 0);
+    XWikiDocument doc = expectNewDoc(cellRef);
     BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("css_styles", cssStyles);
     String idname = "cell:Skin.MasterCell";
+    String cellFN = "Skin.MasterCell";
     Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectNoCellTypeConfig(docRef);
+    expectNoCellTypeConfig(cellRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
+    assertDefaultAttributes(cssClasses, idname, cellFN, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
   @Test
   public void test_startRenderCell_auto_id_forEmpty() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = expectNewDoc(docRef);
+    TreeNode node = new TreeNode(cellRef, null, 0);
+    XWikiDocument doc = expectNewDoc(cellRef);
     BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String cssStyles = "width:100px;\nheight:10px;\n";
@@ -269,22 +272,23 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("idname", "");
     cellObj.setStringValue("css_styles", cssStyles);
     String idname = "cell:Skin.MasterCell";
+    String cellFN = "Skin.MasterCell";
     Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectNoCellTypeConfig(docRef);
+    expectNoCellTypeConfig(cellRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
+    assertDefaultAttributes(cssClasses, idname, cellFN, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
   @Test
   public void test_startRenderCell_auto_id_forEmpty_diffdb() throws Exception {
-    DocumentReference docRef = new DocumentReference("layoutDb", "Skin", "MasterCell");
+    DocumentReference cellRef = new DocumentReference("layoutDb", "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = expectNewDoc(docRef);
+    TreeNode node = new TreeNode(cellRef, null, 0);
+    XWikiDocument doc = expectNewDoc(cellRef);
     BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String cssStyles = "width:100px;\nheight:10px;\n";
@@ -292,36 +296,38 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("idname", "");
     cellObj.setStringValue("css_styles", cssStyles);
     String idname = "cell:layoutDb..Skin.MasterCell";
+    String cellFN = "layoutDb:Skin.MasterCell";
     Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectNoCellTypeConfig(docRef);
+    expectNoCellTypeConfig(cellRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
+    assertDefaultAttributes(cssClasses, idname, cellFN, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
   @Test
   public void test_startRenderCell_otherDb() throws Exception {
     String masterCellDb = "theMasterCellDB";
-    DocumentReference docRef = new DocumentReference(masterCellDb, "Skin", "MasterCell");
+    DocumentReference cellRef = new DocumentReference(masterCellDb, "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, null, 0);
-    XWikiDocument doc = expectNewDoc(docRef);
+    TreeNode node = new TreeNode(cellRef, null, 0);
+    XWikiDocument doc = expectNewDoc(cellRef);
     BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String idname = "myDivId";
+    String cellFN = "theMasterCellDB:Skin.MasterCell";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
     Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
-    expectNoCellTypeConfig(docRef);
+    expectNoCellTypeConfig(cellRef);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
+    assertDefaultAttributes(cssClasses, idname, cellFN, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
@@ -336,6 +342,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String idname = "myDivId";
+    String cellFN = "Skin.MasterCell";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
@@ -346,7 +353,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     typeConfig.collectAttributes(isA(AttributeBuilder.class), eq(cellRef));
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
+    assertDefaultAttributes(cssClasses, idname, cellFN, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
@@ -455,8 +462,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         .andReturn(typeConfig).atLeastOnce();
   }
 
-  private void assertDefaultAttributes(String cssClasses, String idname, String cssStyles,
-      Capture<List<CellAttribute>> capturedAttrList) {
+  private void assertDefaultAttributes(String cssClasses, String idname, String cellFN,
+      String cssStyles, Capture<List<CellAttribute>> capturedAttrList) {
     List<CellAttribute> attrList = capturedAttrList.getValue();
     assertNotNull(attrList);
     assertFalse(attrList.isEmpty());
@@ -466,12 +473,16 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     }
     assertTrue("id attribute not found", attrMap.containsKey("id"));
     assertEquals("wrong id attribute", idname, attrMap.get("id").getValue().get());
+    assertTrue("cell-ref attribute not found", attrMap.containsKey("data-cell-ref"));
+    assertEquals("wrong cell-ref attribute", cellFN,
+        attrMap.get("data-cell-ref").getValue().get());
     assertTrue("cssClass attribute not found", attrMap.containsKey("class"));
-    assertEquals("wrong cssClass attribute", ("cel_cell " + cssClasses).trim(), attrMap.get(
-        "class").getValue().get());
+    assertEquals("wrong cssClass attribute", ("cel_cell " + cssClasses).trim(),
+        attrMap.get("class").getValue().get());
     assertTrue("styles attribute not found", attrMap.containsKey("style"));
-    assertEquals("wrong styles attribute", cssStyles.replaceAll("[\n\r]", ""), attrMap.get(
-        "style").getValue().get());
+    assertEquals("wrong styles attribute", cssStyles.replaceAll("[\n\r]", ""),
+        attrMap.get("style").getValue().get());
+
   }
 
 }

@@ -125,6 +125,7 @@ public class CellRenderStrategy implements IRenderStrategy {
       XWikiDocument cellDoc = modelAccess.getDocument(cellDocRef);
       XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(cellDoc).filter(CellClass.CLASS_REF);
       attrBuilder.addId(collectId(cellDocRef, fetcher));
+      attrBuilder.addAttribute("data-cell-ref", modelUtils.serializeRef(cellDocRef, COMPACT));
       fetcher.fetchField(CellClass.FIELD_CSS_CLASSES).stream().findFirst()
           .ifPresent(attrBuilder::addCssClasses);
       fetcher.fetchField(CellClass.FIELD_CSS_STYLES).stream().findFirst()
