@@ -4,11 +4,9 @@ import static com.celements.common.lambda.LambdaExceptionUtil.*;
 import static com.google.common.base.Predicates.*;
 import static java.nio.charset.StandardCharsets.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -66,12 +64,11 @@ public class Dom4JParser<D extends Document> {
   }
 
   public D readDocument(String xml) throws IOException {
-    try (Reader in = new StringReader(xml)) {
+    try (ByteArrayInputStream in = new ByteArrayInputStream(
+        xml.getBytes(outFormat.getEncoding()))) {
       SAXReader reader = new SAXReader(factory);
       reader.setEntityResolver(new DefaultEntityResolver());
-      if (disableDTDs) {
-        reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-      }
+      reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", disableDTDs);
       return docType.cast(reader.read(new InputSource(in)));
     } catch (DocumentException | SAXException exc) {
       throw new IOException(exc);
@@ -83,10 +80,10 @@ public class Dom4JParser<D extends Document> {
   }
 
   public String writeXML(Stream<? extends Node> nodes) throws IOException {
-    try (Writer out = new StringWriter()) {
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       XMLWriter writer = new XMLWriter(out, outFormat);
       nodes.forEach(rethrowConsumer(writer::write));
-      return out.toString();
+      return out.toString(outFormat.getEncoding());
     }
   }
 

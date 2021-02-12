@@ -19,12 +19,14 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
 import com.google.common.collect.Streams;
 
+import io.sf.carte.doc.dom4j.XHTMLDocument;
+
 public class Dom4JParserTest extends AbstractComponentTest {
 
   private Dom4JParser<Document> parser;
 
-  private String xmlContent = "<a>A</a><b>B</b><c>C</c>";
-  private String xml = format("<root>{0}</root>", xmlContent);
+  private final String xmlContent = "<a>A</a><b>B</b><c>C</c>";
+  private final String xml = format("<root>{0}</root>", xmlContent);
 
   @Before
   public void prepare() throws Exception {
@@ -69,7 +71,7 @@ public class Dom4JParserTest extends AbstractComponentTest {
 
   @Test
   public void test_disallowDTD() throws Exception {
-    xml = "<!DOCTYPE note SYSTEM \"note.dtd\">" + xml;
+    String xml = "<!DOCTYPE note SYSTEM \"note.dtd\">" + this.xml;
     new ExceptionAsserter<IOException>(IOException.class) {
 
       @Override
@@ -81,7 +83,7 @@ public class Dom4JParserTest extends AbstractComponentTest {
 
   @Test
   public void test_allowDTD() throws Exception {
-    xml = "<!DOCTYPE note SYSTEM \"note.dtd\">" + xml;
+    String xml = "<!DOCTYPE note SYSTEM \"note.dtd\">" + this.xml;
     Optional<String> ret = parser.allowDTDs().readAndExecute(xml, Stream::of);
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + xml, ret.orElse(""));
   }
@@ -97,6 +99,17 @@ public class Dom4JParserTest extends AbstractComponentTest {
     assertEquals("B", elems.get(1).getText());
     assertEquals("c", elems.get(2).getName());
     assertEquals("C", elems.get(2).getText());
+  }
+
+  @Test
+  public void test_xhtml_umlaute() throws Exception {
+    Dom4JParser<XHTMLDocument> parser = Dom4JParser.createXHtmlParser();
+    String xml = "<html><body><div>Aä</div><div>Bö</div><div>Cü</div></body></html>";
+    Optional<String> ret = parser.allowDTDs().readAndExecute("<!DOCTYPE html>"
+        + xml, document -> {
+          return Stream.of(document.getRootElement());
+        });
+    assertEquals(xml, ret.orElse(""));
   }
 
 }
