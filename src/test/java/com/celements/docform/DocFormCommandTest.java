@@ -50,6 +50,8 @@ import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -207,6 +209,19 @@ public class DocFormCommandTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_updateDoc_objField_list() throws Exception {
+    List<DocFormRequestParam> params = parseParamsArr(ImmutableMap.of(
+        "A.B_-1_hi", new String[] { "val1", "val2" }));
+
+    replayDefault();
+    assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(0)));
+    verifyDefault();
+
+    assertObj(params.get(0), xdoc);
+    assertEquals(1, XWikiObjectFetcher.on(xdoc).count());
+  }
+
+  @Test
   public void test_updateDoc_objRemove_none() throws Exception {
     DocFormRequestParam param = parseParam("A.B_^3", "");
 
@@ -271,6 +286,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
   @Test
   public void test_updateDocs_alreadySet() throws Exception {
     DocFormRequestParam param = parseParam("A.B_0_hi", "val");
+    System.err.println(param);
     expectDoc(xdoc);
     BaseObject obj = addXObject(xdoc, param.getKey());
     obj.setStringValue(param.getKey().getFieldName(), param.getValuesAsString());
@@ -468,23 +484,29 @@ public class DocFormCommandTest extends AbstractComponentTest {
   }
 
   private DocFormRequestParam parseParam(String key, String value) throws Exception {
-    return parseParams(ImmutableMap.of(key, value)).get(0);
+    return parseParamsArr(ImmutableMap.of(key, new String[] { value })).get(0);
   }
 
   private List<DocFormRequestParam> parseParams(Map<String, String> map) throws Exception {
+    return parseParamsArr(Maps.transformValues(map, val -> new String[] { val }));
+  }
+
+  private List<DocFormRequestParam> parseParamsArr(Map<String, String[]> map) throws Exception {
     List<DocFormRequestParam> requestParams = parser.parseParameterMap(map);
     requestParams.stream().map(DocFormRequestParam::getKey)
         .filter(key -> key.getClassRef() != null)
         .collect(Collectors.groupingBy(key -> key.getClassRef()))
         .forEach(rethrowBiConsumer((classRef, keys) -> {
           final BaseClass bClass = expectNewBaseObject(classRef.getDocRef(wiki));
-          keys.stream().map(DocFormRequestKey::getFieldName)
-              .forEach(field -> expect(bClass.get(field)).andReturn(new StringClass()).anyTimes());
+          keys.stream().forEach(key -> expect(bClass.get(key.getFieldName()))
+              .andReturn(new StringClass())
+              .anyTimes());
         }));
     return requestParams;
   }
 
-  private BaseObject assertObj(DocFormRequestParam param, XWikiDocument xdoc) {
+  private BaseObject assertObj(DocFormRequestParam param, XWikiDocument xdoc)
+      throws XWikiException {
     DocFormRequestKey key = param.getKey();
     int actualObjNb = docFormCmd.getChangedObjects().get(key.getObjHash());
     BaseObject obj = XWikiObjectEditor.on(xdoc)

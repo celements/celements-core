@@ -1,6 +1,5 @@
 package com.celements.docform;
 
-import static com.celements.common.MoreObjectsCel.*;
 import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Predicates.*;
 import static com.google.common.base.Strings.*;
@@ -8,6 +7,7 @@ import static com.google.common.collect.ImmutableList.*;
 import static java.util.stream.Collectors.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import javax.annotation.concurrent.Immutable;
@@ -35,11 +35,8 @@ public class DocFormRequestParam implements Comparable<DocFormRequestParam> {
   }
 
   private static ImmutableList<String> toStringList(Object obj) {
-    ImmutableList.Builder<String> builder = new ImmutableList.Builder<>();
-    tryCast(obj, String.class).ifPresent(builder::add);
-    tryCast(obj, String[].class).map(Stream::of).orElseGet(Stream::empty)
-        .forEach(builder::add);
-    return builder.build();
+    return ((obj instanceof Object[]) ? Stream.of((Object[]) obj) : Stream.of(obj))
+        .filter(Objects::nonNull).map(Objects::toString).collect(toImmutableList());
   }
 
   public DocFormRequestKey getKey() {
@@ -58,12 +55,8 @@ public class DocFormRequestParam implements Comparable<DocFormRequestParam> {
     return values.stream().collect(joining(" "));
   }
 
-  public Object getValueSingleOrList() {
-    if (values.size() < 2) {
-      return values.stream().findFirst().orElse("");
-    } else {
-      return values;
-    }
+  public Object getFirstValue() {
+    return values.stream().findFirst().orElse(null);
   }
 
   @Override
