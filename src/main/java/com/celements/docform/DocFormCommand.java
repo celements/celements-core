@@ -57,8 +57,11 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
+import com.celements.model.field.FieldAccessException;
 import com.celements.model.field.FieldAccessor;
+import com.celements.model.field.StringFieldAccessor;
 import com.celements.model.field.XDocumentFieldAccessor;
+import com.celements.model.field.XObjectStringFieldAccessor;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.ModelUtils;
 import com.celements.model.util.ReferenceSerializationMode;
@@ -69,6 +72,9 @@ import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 
 /**
  * DocFormCommand handles validation of a request with document/object fields and ensures
@@ -102,6 +108,9 @@ public class DocFormCommand implements IDocForm {
 
   @Requirement(XDocumentFieldAccessor.NAME)
   private FieldAccessor<XWikiDocument> xDocFieldAccessor;
+
+  @Requirement(XObjectStringFieldAccessor.NAME)
+  protected StringFieldAccessor<BaseObject> xObjStrFieldAccessor;
 
   private final Map<ResponseState, Set<DocumentReference>> responseMap;
   private final Map<Integer, Integer> changedObjects;
@@ -218,12 +227,31 @@ public class DocFormCommand implements IDocForm {
     }
     BaseObject obj = editor.createFirstIfNotExists();
     getChangedObjects().put(key.getObjHash(), obj.getNumber());
-    if (modelAccess.setProperty(obj, key.getFieldName(), param.getValueSingleOrList())) {
+    if (setObjField(obj, param)) {
       LOGGER.debug("setObjField: set value for [{}] on obj [{}]", param, obj.getNumber());
       return xdoc;
     } else {
       LOGGER.trace("setObjField: unchanged for [{}]", param);
       return null;
+    }
+  }
+
+  private boolean setObjField(BaseObject obj, DocFormRequestParam param) {
+    Object value;
+    PropertyInterface classProp = Optional.ofNullable(obj.getXClass(context.getXWikiContext()))
+        .map(bClass -> bClass.get(param.getKey().getFieldName())).orElse(null);
+    if (classProp instanceof ListClass) {
+      value = param.getValues();
+    } else if (classProp instanceof StringClass) {
+      value = param.getValuesAsString();
+    } else {
+      value = param.getFirstValue();
+    }
+    try {
+      return xObjStrFieldAccessor.set(obj, param.getKey().getFieldName(), value);
+    } catch (FieldAccessException exc) {
+      LOGGER.warn("setObjField: failed for [{}]", param, exc);
+      return false;
     }
   }
 

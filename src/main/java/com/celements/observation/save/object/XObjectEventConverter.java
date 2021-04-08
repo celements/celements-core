@@ -20,8 +20,6 @@ import org.xwiki.observation.event.Event;
 
 import com.celements.common.observation.listener.AbstractLocalEventListener;
 import com.celements.copydoc.ICopyDocumentRole;
-import com.celements.model.object.ObjectBridge;
-import com.celements.model.object.xwiki.XWikiObjectBridge;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.observation.save.SaveEventOperation;
 import com.google.common.collect.ImmutableMap;
@@ -34,9 +32,6 @@ import com.xpn.xwiki.objects.BaseObject;
 public class XObjectEventConverter extends AbstractLocalEventListener<XWikiDocument, XWikiContext> {
 
   public static final String NAME = "XObjectEventConverter";
-
-  @Requirement(XWikiObjectBridge.NAME)
-  private ObjectBridge<XWikiDocument, BaseObject> xObjBridge;
 
   @Requirement
   private ICopyDocumentRole copyDocService;
