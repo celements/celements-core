@@ -108,7 +108,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     List<Object> resultList = new ArrayList<>();
     resultList.add(new Object[] { "layout1Space", "Layout 1 pretty name" });
     resultList.add(new Object[] { "layout2Space", "Layout 2 pretty name" });
-    Capture<String> capturedHQL = new Capture<>();
+    Capture<String> capturedHQL = newCapture();
     expect(xwiki.search(capture(capturedHQL), same(context))).andReturn(resultList);
     replayDefault();
     Map<String, String> expectedPLmap = new HashMap<>();
@@ -125,7 +125,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     List<Object> resultList = new ArrayList<>();
     resultList.add(new Object[] { "layout1Space", "Layout 1 pretty name" });
     resultList.add(new Object[] { "layout2Space", "Layout 2 pretty name" });
-    Capture<String> capturedHQL = new Capture<>();
+    Capture<String> capturedHQL = newCapture();
     expect(xwiki.search(capture(capturedHQL), same(context))).andReturn(resultList);
     replayDefault();
     Map<String, String> expectedPLmap = new HashMap<>();

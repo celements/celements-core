@@ -73,7 +73,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
     expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theNewDoc);
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(""))).andReturn(null).once();
-    Capture<XWikiDocument> docCaptcher = new Capture<>();
+    Capture<XWikiDocument> docCaptcher = newCapture();
     getWikiMock().saveDocument(capture(docCaptcher), eq("init document"), eq(false), same(
         getContext()));
     expectLastCall().once();
@@ -97,9 +97,9 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
     expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theNewDoc);
     PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
-    Capture<XWikiDocument> docCaptcher = new Capture<>();
+    Capture<XWikiDocument> docCaptcher = newCapture();
     expect(pageTypeServiceMock.setPageType(capture(docCaptcher), eq(ptRef))).andReturn(true).once();
-    Capture<XWikiDocument> docCaptcher2 = new Capture<>();
+    Capture<XWikiDocument> docCaptcher2 = newCapture();
     getWikiMock().saveDocument(capture(docCaptcher2), eq("init RichText-document"), eq(false), same(
         getContext()));
     expectLastCall().once();
@@ -125,7 +125,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
     expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theNewDoc);
     PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
-    Capture<XWikiDocument> docCaptcher = new Capture<>();
+    Capture<XWikiDocument> docCaptcher = newCapture();
     expect(pageTypeServiceMock.setPageType(capture(docCaptcher), eq(ptRef))).andReturn(true).once();
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType, false);

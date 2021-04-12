@@ -68,7 +68,7 @@ public class LocalEventListenerTest extends AbstractComponentTest {
     Event event = AllEvent.ALLEVENT;
     Object source = createMockAndAddToDefault(Serializable.class);
     Object data = createMockAndAddToDefault(Serializable.class);
-    Capture<LocalEventData> localEvDataCapt = new Capture<>();
+    Capture<LocalEventData> localEvDataCapt = newCapture();
 
     getMock(RemoteObservationManager.class).notify(capture(localEvDataCapt));
     expectLastCall().once();

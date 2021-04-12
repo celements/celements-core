@@ -143,7 +143,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     TreeNode menuItem3 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 3);
     TreeNode menuItem5 = createTreeNode(spaceName, "myDoc5", spaceName, docName, 5);
     List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5), notMappedList = Arrays.asList(
-        menuItem2, menuItem3), expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3,
+        menuItem2, menuItem3),
+        expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3,
             menuItem5);
 
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
@@ -635,9 +636,11 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     EntityReference entRefCel = new EntityReference(celDocName, EntityType.DOCUMENT,
         new EntityReference(space, EntityType.SPACE, new EntityReference(db, EntityType.WIKI)));
     DocumentReference mItemDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myMenuItemDoc"), docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
-            "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
-                "DocNext");
+        "myMenuItemDoc"),
+        docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
+            "DocPrev"),
+        docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
+            "DocNext");
     XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev),
         docNext = new XWikiDocument(docRefNext);
     BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(),
@@ -764,9 +767,11 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     context.setDatabase(db);
 
     DocumentReference mItemDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myMenuItemDoc"), docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
-            "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
-                "DocNext");
+        "myMenuItemDoc"),
+        docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
+            "DocPrev"),
+        docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
+            "DocNext");
     XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev),
         docNext = new XWikiDocument(docRefNext);
     BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(),
@@ -820,9 +825,11 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     context.setDatabase(db);
 
     DocumentReference mItemDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myMenuItemDoc"), docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
-            "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
-                "DocNext");
+        "myMenuItemDoc"),
+        docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
+            "DocPrev"),
+        docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
+            "DocNext");
     XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev),
         docNext = new XWikiDocument(docRefNext);
     BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(),
@@ -880,9 +887,11 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     EntityReference entRefCel = new EntityReference(celDocName, EntityType.DOCUMENT,
         new EntityReference(space, EntityType.SPACE, new EntityReference(db, EntityType.WIKI)));
     DocumentReference mItemDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myMenuItemDoc"), docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
-            "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
-                "DocNext");
+        "myMenuItemDoc"),
+        docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
+            "DocPrev"),
+        docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
+            "DocNext");
     XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev),
         docNext = new XWikiDocument(docRefNext);
     BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(),
@@ -1189,13 +1198,13 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     XWikiDocument navDoc3 = createNavDoc(treeNode3);
     expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
     // expecting correct savings
-    Capture<XWikiDocument> capDoc1 = new Capture<>();
+    Capture<XWikiDocument> capDoc1 = newCapture();
     wiki.saveDocument(capture(capDoc1), isA(String.class), eq(false), same(context));
     expectLastCall().once();
-    Capture<XWikiDocument> capDoc2 = new Capture<>();
+    Capture<XWikiDocument> capDoc2 = newCapture();
     wiki.saveDocument(capture(capDoc2), isA(String.class), eq(false), same(context));
     expectLastCall().once();
-    Capture<XWikiDocument> capDoc3 = new Capture<>();
+    Capture<XWikiDocument> capDoc3 = newCapture();
     wiki.saveDocument(capture(capDoc3), isA(String.class), eq(false), same(context));
     expectLastCall().once();
     replayDefault();
@@ -1236,13 +1245,13 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     XWikiDocument navDoc3 = createNavDoc(treeNode3);
     expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
     // expecting correct savings
-    Capture<XWikiDocument> capDoc1 = new Capture<>();
+    Capture<XWikiDocument> capDoc1 = newCapture();
     wiki.saveDocument(capture(capDoc1), isA(String.class), eq(true), same(context));
     expectLastCall().once();
-    Capture<XWikiDocument> capDoc2 = new Capture<>();
+    Capture<XWikiDocument> capDoc2 = newCapture();
     wiki.saveDocument(capture(capDoc2), isA(String.class), eq(true), same(context));
     expectLastCall().once();
-    Capture<XWikiDocument> capDoc3 = new Capture<>();
+    Capture<XWikiDocument> capDoc3 = newCapture();
     wiki.saveDocument(capture(capDoc3), isA(String.class), eq(true), same(context));
     expectLastCall().once();
     replayDefault();
@@ -1283,10 +1292,10 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     XWikiDocument navDoc3 = createNavDoc(treeNode3);
     expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
     // expecting correct savings
-    Capture<XWikiDocument> capDoc1 = new Capture<>();
+    Capture<XWikiDocument> capDoc1 = newCapture();
     wiki.saveDocument(capture(capDoc1), isA(String.class), eq(true), same(context));
     expectLastCall().once();
-    Capture<XWikiDocument> capDoc2 = new Capture<>();
+    Capture<XWikiDocument> capDoc2 = newCapture();
     wiki.saveDocument(capture(capDoc2), isA(String.class), eq(true), same(context));
     expectLastCall().once();
     replayDefault();
@@ -1360,10 +1369,10 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     XWikiDocument navDoc3 = createNavDoc(treeNode3);
     expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3).once();
     // expecting correct savings
-    Capture<XWikiDocument> capDoc1 = new Capture<>();
+    Capture<XWikiDocument> capDoc1 = newCapture();
     wiki.saveDocument(capture(capDoc1), isA(String.class), eq(false), same(context));
     expectLastCall().once();
-    Capture<XWikiDocument> capDoc3 = new Capture<>();
+    Capture<XWikiDocument> capDoc3 = newCapture();
     wiki.saveDocument(capture(capDoc3), isA(String.class), eq(false), same(context));
     expectLastCall().once();
     replayDefault();
@@ -1400,13 +1409,13 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     XWikiDocument navDoc3 = createNavDoc(treeNode3);
     expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
     // expecting correct savings
-    Capture<XWikiDocument> capDoc1 = new Capture<>();
+    Capture<XWikiDocument> capDoc1 = newCapture();
     wiki.saveDocument(capture(capDoc1), isA(String.class), eq(false), same(context));
     expectLastCall().andThrow(new XWikiException());
-    Capture<XWikiDocument> capDoc2 = new Capture<>();
+    Capture<XWikiDocument> capDoc2 = newCapture();
     wiki.saveDocument(capture(capDoc2), isA(String.class), eq(false), same(context));
     expectLastCall().once();
-    Capture<XWikiDocument> capDoc3 = new Capture<>();
+    Capture<XWikiDocument> capDoc3 = newCapture();
     wiki.saveDocument(capture(capDoc3), isA(String.class), eq(false), same(context));
     expectLastCall().once();
     replayDefault();
@@ -1454,7 +1463,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         Collections.<TreeNode>emptyList());
     // expecting correct savings
-    Capture<XWikiDocument> capDoc2 = new Capture<>();
+    Capture<XWikiDocument> capDoc2 = newCapture();
     wiki.saveDocument(capture(capDoc2), isA(String.class), eq(false), same(context));
     expectLastCall().once();
     Capture<XWikiDocument> capDoc3 = new Capture<>();
