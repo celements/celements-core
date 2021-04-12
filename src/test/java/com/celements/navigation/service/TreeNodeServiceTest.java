@@ -1466,7 +1466,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     Capture<XWikiDocument> capDoc2 = newCapture();
     wiki.saveDocument(capture(capDoc2), isA(String.class), eq(false), same(context));
     expectLastCall().once();
-    Capture<XWikiDocument> capDoc3 = new Capture<>();
+    Capture<XWikiDocument> capDoc3 = newCapture();
     wiki.saveDocument(capture(capDoc3), isA(String.class), eq(false), same(context));
     expectLastCall().once();
     replayDefault();
@@ -1515,10 +1515,10 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         Collections.<TreeNode>emptyList());
     // expecting correct savings
-    Capture<XWikiDocument> capDoc1 = new Capture<>();
+    Capture<XWikiDocument> capDoc1 = newCapture();
     wiki.saveDocument(capture(capDoc1), isA(String.class), eq(false), same(context));
     expectLastCall().andThrow(new XWikiException());
-    Capture<XWikiDocument> capDoc2 = new Capture<>();
+    Capture<XWikiDocument> capDoc2 = newCapture();
     wiki.saveDocument(capture(capDoc2), isA(String.class), eq(false), same(context));
     expectLastCall().once();
     replayDefault();
