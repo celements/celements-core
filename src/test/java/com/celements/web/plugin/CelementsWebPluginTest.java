@@ -65,8 +65,8 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     List<String> userDocs = new Vector<>();
     userDocs.add("Doc.Fullname");
     expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = new Capture<>();
-    Capture<List<?>> captParams = new Capture<>();
+    Capture<String> captHQL = newCapture();
+    Capture<List<?>> captParams = newCapture();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
         context))).andReturn(userDocs).once();
     replay(xwiki, store);
@@ -87,9 +87,9 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     List<String> userDocs = new Vector<>();
     userDocs.add("Doc.Fullname");
     expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = new Capture<>();
-    Capture<String> captHQL2 = new Capture<>();
-    Capture<List<?>> captParams = new Capture<>();
+    Capture<String> captHQL = newCapture();
+    Capture<String> captHQL2 = newCapture();
+    Capture<List<?>> captParams = newCapture();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
         context))).andReturn(new ArrayList<String>()).once();
     expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), capture(captParams), same(
@@ -111,8 +111,8 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     String userToken = "123456789012345678901234";
     List<String> userDocs = new Vector<>();
     expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = new Capture<>();
-    Capture<List<?>> captParams = new Capture<>();
+    Capture<String> captHQL = newCapture();
+    Capture<List<?>> captParams = newCapture();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
         context))).andReturn(userDocs).times(2);
     replay(xwiki, store);
@@ -126,8 +126,8 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     List<String> userDocs = new Vector<>();
     userDocs.add("Doc.Fullname");
     expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = new Capture<>();
-    Capture<List<?>> captParams = new Capture<>();
+    Capture<String> captHQL = newCapture();
+    Capture<List<?>> captParams = newCapture();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
         context))).andReturn(userDocs).once();
     replay(xwiki, store);
@@ -152,13 +152,13 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetSupportedAdminLanguages() {
     assertNotNull(plugin.getSupportedAdminLanguages());
-    assertEquals(Arrays.asList(new String[] { "de", "fr", "en", "it" }),
+    assertEquals(Arrays.asList("de", "fr", "en", "it"),
         plugin.getSupportedAdminLanguages());
   }
 
   @Test
   public void testSetSupportedAdminLanguages() {
-    List<String> injectedLangList = Arrays.asList(new String[] { "bla", "bli", "blo" });
+    List<String> injectedLangList = Arrays.asList("bla", "bli", "blo");
     plugin.setSupportedAdminLanguages(injectedLangList);
     assertNotNull(plugin.getSupportedAdminLanguages());
     assertEquals(injectedLangList, plugin.getSupportedAdminLanguages());

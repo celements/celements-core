@@ -213,7 +213,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     BaseObject expectedMenuItemObj = new BaseObject();
     expectedMenuItemObj.setXClassReference(navClassConfig.getMenuItemClassRef());
     expect(menuItemBaseClass.newCustomClassInstance(same(context))).andReturn(expectedMenuItemObj);
-    Capture<XWikiDocument> savedDocCapture = new Capture<>();
+    Capture<XWikiDocument> savedDocCapture = newCapture();
     xwiki.saveDocument(capture(savedDocCapture), isA(String.class), eq(false), same(context));
     expectLastCall().once();
     expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(existingTagDoc).once();
@@ -308,7 +308,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     BaseObject expectedMenuItemObj = new BaseObject();
     expectedMenuItemObj.setXClassReference(navClassConfig.getMenuItemClassRef());
     expect(menuItemBaseClass.newCustomClassInstance(same(context))).andReturn(expectedMenuItemObj);
-    Capture<XWikiDocument> savedDocCapture = new Capture<>();
+    Capture<XWikiDocument> savedDocCapture = newCapture();
     xwiki.saveDocument(capture(savedDocCapture), isA(String.class), eq(false), same(context));
     expectLastCall().once();
     expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(existingTagDoc).once();
@@ -353,7 +353,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     BaseObject expectedMenuItemObj = new BaseObject();
     expectedMenuItemObj.setXClassReference(navClassConfig.getMenuItemClassRef());
     expect(menuItemBaseClass.newCustomClassInstance(same(context))).andReturn(expectedMenuItemObj);
-    Capture<XWikiDocument> savedDocCapture = new Capture<>();
+    Capture<XWikiDocument> savedDocCapture = newCapture();
     xwiki.saveDocument(capture(savedDocCapture), isA(String.class), eq(false), same(context));
     expectLastCall().once();
     replayDefault();

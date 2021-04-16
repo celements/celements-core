@@ -50,7 +50,7 @@ public class AbstractJobTest extends AbstractComponentTest {
   @Test
   public void testInitExecutionContext() throws Exception {
     assertNull(getContext().get("vcontext"));
-    Capture<XWikiContext> scontextCapture = new Capture<>();
+    Capture<XWikiContext> scontextCapture = newCapture();
     expectStoreCleanup(scontextCapture);
     expect(getWikiMock().Param(eq("xwiki.url.protocol"), (String) isNull())).andReturn(
         "http").atLeastOnce();
@@ -63,7 +63,7 @@ public class AbstractJobTest extends AbstractComponentTest {
 
   @Test
   public void testCreateJobContext_notSame() throws Exception {
-    Capture<XWikiContext> scontextCapture = new Capture<>();
+    Capture<XWikiContext> scontextCapture = newCapture();
     expectStoreCleanup(scontextCapture);
     expect(getWikiMock().Param(eq("xwiki.url.protocol"), (String) isNull())).andReturn(
         "http").atLeastOnce();
@@ -79,7 +79,7 @@ public class AbstractJobTest extends AbstractComponentTest {
 
   @Test
   public void testCreateJobContext_port() throws Exception {
-    expectStoreCleanup(new Capture<XWikiContext>());
+    expectStoreCleanup(newCapture());
     expect(getWikiMock().Param(eq("xwiki.url.protocol"), (String) isNull())).andReturn(
         "http").atLeastOnce();
     expect(modelAccess.getDocument(eq(testDocRef))).andReturn(new XWikiDocument(testDocRef));
@@ -128,8 +128,7 @@ public class AbstractJobTest extends AbstractComponentTest {
     }
 
     @Override
-    protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException {
-    }
+    protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException {}
 
   }
 
