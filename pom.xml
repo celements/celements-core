@@ -20,7 +20,9 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   *
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements</artifactId>
@@ -78,11 +80,11 @@
       <version>2.7.1</version>
       <scope>test</scope>
     </dependency>
-     <dependency>
-       <groupId>com.xpn.xwiki.platform.plugins</groupId>
-       <artifactId>xwiki-plugin-scheduler</artifactId>
-       <scope>provided</scope>
-     </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-scheduler</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <scm>
     <connection>scm:git:git@github.com:celements/celements-core.git</connection>
