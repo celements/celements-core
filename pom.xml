@@ -60,12 +60,10 @@
       <artifactId>commons-net</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- JTidy hasn't been released for ages (since 2001). A snapshot version exists at
-         http://jtidy.sourceforge.net/snapshots/ but Maven requires non-snapshots in order to
-         allow a release (this is for reproducibility). Thus we've had to upload JTidy into
-         our custom repository -->
+    <!-- JTidy Has been picked up at https://github.com/jtidy/jtidy and immediately was reabandoned.
+      However their release from Dec 2019 has at least some HTML5 support -->
     <dependency>
-      <groupId>jtidy</groupId>
+      <groupId>com.github.jtidy</groupId>
       <artifactId>jtidy</artifactId>
       <exclusions>
         <exclusion>
@@ -73,7 +71,6 @@
           <artifactId>dom3-xml-apis</artifactId>
         </exclusion>
       </exclusions>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.mockftpserver</groupId>
