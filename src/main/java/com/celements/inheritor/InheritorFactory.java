@@ -19,7 +19,6 @@
  */
 package com.celements.inheritor;
 
-import static com.celements.common.MoreFunctions.*;
 import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
 
@@ -34,14 +33,12 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.iterator.DocumentIterator;
-import com.celements.iterator.IIteratorFactory;
 import com.celements.iterator.XObjectIterator;
 import com.celements.model.context.ModelContext;
-import com.celements.model.util.ReferenceSerializationMode;
+import com.celements.model.util.ModelUtils;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
@@ -53,13 +50,11 @@ public class InheritorFactory {
   private IWebUtils _injectedWebUtils;
   private PageLayoutCommand injectedPageLayoutCmd;
 
-  private static final Function<EntityReference, String> SERIALIZE_FUNC = serializeRefFunction(
-      ReferenceSerializationMode.GLOBAL);
-
   public FieldInheritor getFieldInheritor(ClassReference classRef,
       Iterable<DocumentReference> docRefs) {
-    return getFieldInheritor(SERIALIZE_FUNC.apply(classRef), FluentIterable.from(docRefs).transform(
-        SERIALIZE_FUNC).toList(), getContext().getXWikiContext());
+    return getFieldInheritor(getModelUtils().serializeRef(classRef),
+        FluentIterable.from(docRefs).transform(getModelUtils()::serializeRef).toList(),
+        getContext().getXWikiContext());
   }
 
   /**
@@ -70,15 +65,11 @@ public class InheritorFactory {
   public FieldInheritor getFieldInheritor(final String className, final List<String> docList,
       final XWikiContext context) {
     FieldInheritor inheritor = new FieldInheritor();
-    inheritor.setIteratorFactory(new IIteratorFactory<XObjectIterator>() {
-
-      @Override
-      public XObjectIterator createIterator() {
-        XObjectIterator iterator = new XObjectIterator(context);
-        iterator.setClassName(className);
-        iterator.setDocList(docList);
-        return iterator;
-      }
+    inheritor.setIteratorFactory(() -> {
+      XObjectIterator iterator = new XObjectIterator(context);
+      iterator.setClassName(className);
+      iterator.setDocList(docList);
+      return iterator;
     });
     return inheritor;
   }
@@ -86,14 +77,10 @@ public class InheritorFactory {
   public ContentInheritor getContentInheritor(final List<String> docList, XWikiContext context) {
     final XWikiContext localContext = context;
     ContentInheritor inheritor = new ContentInheritor();
-    inheritor.setIteratorFactory(new IIteratorFactory<DocumentIterator>() {
-
-      @Override
-      public DocumentIterator createIterator() {
-        DocumentIterator iterator = new DocumentIterator(localContext);
-        iterator.setDocList(docList);
-        return iterator;
-      }
+    inheritor.setIteratorFactory(() -> {
+      DocumentIterator iterator = new DocumentIterator(localContext);
+      iterator.setDocList(docList);
+      return iterator;
     });
     return inheritor;
   }
@@ -193,6 +180,10 @@ public class InheritorFactory {
 
   private ModelContext getContext() {
     return Utils.getComponent(ModelContext.class);
+  }
+
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }
