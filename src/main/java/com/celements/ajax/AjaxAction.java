@@ -1,5 +1,6 @@
 package com.celements.ajax;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -17,8 +18,9 @@ import com.xpn.xwiki.web.XWikiAction;
 
 public class AjaxAction extends XWikiAction {
 
-  private static final String CEL_AJAX_CONTEXT_PROPERTY = "celAjax";
-  private static final String ACTION_SCRIPT_ACTION = "ajax_mode";
+  private static final String CEL_AJAX_CONTEXT_PROPERTY = "celAjaxScript";
+  private static final String CEL_AJAX_SCRIPT_DIR_PROPERTY = "celAjax";
+  private static final String AJAX_SCRIPT_ACTION = "ajax";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AjaxAction.class);
 
@@ -40,8 +42,11 @@ public class AjaxAction extends XWikiAction {
     String path = context.getRequest().getPathInfo();
     List<String> pathParts = Stream.of(path.split("/"))
         .filter(((Predicate<String>) String::isEmpty).negate()).collect(Collectors.toList());
-    if (pathParts.size() > 2) {
-      String celAjaxScript = Joiner.on("/").join(pathParts);
+    if ((pathParts.size() > 2) && pathParts.get(0).equals(AJAX_SCRIPT_ACTION)) {
+      List<String> scriptPathList = new ArrayList<>();
+      scriptPathList.add(CEL_AJAX_SCRIPT_DIR_PROPERTY);
+      scriptPathList.addAll(pathParts.subList(1, pathParts.size()));
+      String celAjaxScript = "/" + Joiner.on("/").join(scriptPathList);
       LOGGER.error("ajax: found script path '{}' from path '{}'.", celAjaxScript, path);
       context.put(CEL_AJAX_CONTEXT_PROPERTY, celAjaxScript);
       VelocityContext vcontext = (VelocityContext) context.get("vcontext");
@@ -57,7 +62,7 @@ public class AjaxAction extends XWikiAction {
    */
   @Override
   public String render(XWikiContext context) throws XWikiException {
-    String page = Utils.getPage(context.getRequest(), ACTION_SCRIPT_ACTION);
+    String page = Utils.getPage(context.getRequest(), AJAX_SCRIPT_ACTION);
     LOGGER.error("Ajax: render page '{}'", page);
     Utils.parseTemplate(page, !page.equals("direct"), context);
     return null;
