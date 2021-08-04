@@ -35,7 +35,7 @@ public class AjaxAction extends XWikiAction {
     String path = context.getRequest().getPathInfo();
     if (getAppScriptService().getStartIndex(path) > 0) {
       String celAjaxScript = getAppScriptService().getScriptNameFromURL();
-      LOGGER.debug("ajax: found script path '{}'.", celAjaxScript);
+      LOGGER.error("ajax: found script path '{}'.", celAjaxScript);
       context.put(CEL_AJAX_CONTEXT_PROPERTY, celAjaxScript);
       VelocityContext vcontext = (VelocityContext) context.get("vcontext");
       vcontext.put(CEL_AJAX_CONTEXT_PROPERTY, celAjaxScript);
