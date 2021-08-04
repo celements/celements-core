@@ -13,6 +13,7 @@ import com.xpn.xwiki.web.XWikiAction;
 public class AjaxAction extends XWikiAction {
 
   private static final String CEL_AJAX_CONTEXT_PROPERTY = "celAjax";
+  private static final String ACTION_SCRIPT_ACTION = "ajax";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AjaxAction.class);
 
@@ -49,7 +50,8 @@ public class AjaxAction extends XWikiAction {
    */
   @Override
   public String render(XWikiContext context) throws XWikiException {
-    String page = Utils.getPage(context.getRequest(), IAppScriptService.APP_SCRIPT_XPAGE);
+    String page = Utils.getPage(context.getRequest(), ACTION_SCRIPT_ACTION);
+    LOGGER.error("Ajax: render page '{}'", page);
     Utils.parseTemplate(page, !page.equals("direct"), context);
     return null;
   }
