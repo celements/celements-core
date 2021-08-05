@@ -2,6 +2,7 @@ package com.celements.ajax;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,15 +40,10 @@ public class AjaxAction extends XWikiAction {
     boolean shouldRender = true;
     context.put("action", VIEW_ACTION);
     context.put("ajaxAction", true);
-    String path = context.getRequest().getPathInfo();
-    List<String> pathParts = Stream.of(path.split("/"))
-        .filter(((Predicate<String>) String::isEmpty).negate()).collect(Collectors.toList());
-    if ((pathParts.size() > 2) && pathParts.get(0).equals(AJAX_SCRIPT_ACTION)) {
-      List<String> scriptPathList = new ArrayList<>();
-      scriptPathList.add(CEL_AJAX_SCRIPT_DIR_PROPERTY);
-      scriptPathList.addAll(pathParts.subList(1, pathParts.size()));
-      String celAjaxScript = "/" + Joiner.on("/").join(scriptPathList);
-      LOGGER.error("ajax: found script path '{}' from path '{}'.", celAjaxScript, path);
+    final Optional<String> celAjaxScriptOpt = getAjaxScript(context);
+    if (celAjaxScriptOpt.isPresent()) {
+      final String celAjaxScript = celAjaxScriptOpt.get();
+      LOGGER.error("ajax: found script path '{}'.", celAjaxScript);
       context.put(CEL_AJAX_CONTEXT_PROPERTY, celAjaxScript);
       VelocityContext vcontext = (VelocityContext) context.get("vcontext");
       vcontext.put(CEL_AJAX_CONTEXT_PROPERTY, celAjaxScript);
@@ -63,9 +59,26 @@ public class AjaxAction extends XWikiAction {
   @Override
   public String render(XWikiContext context) throws XWikiException {
     String page = Utils.getPage(context.getRequest(), AJAX_SCRIPT_ACTION);
-    LOGGER.error("Ajax: render page '{}'", page);
-    Utils.parseTemplate(page, !page.equals("direct"), context);
+    final Optional<String> celAjaxScriptOpt = getAjaxScript(context);
+    final String celAjaxScript = celAjaxScriptOpt.orElse(page);
+    LOGGER.error("Ajax: render page '{}', script: '{}'", page, celAjaxScript);
+    Utils.parseTemplate(celAjaxScript, !page.equals("direct"), context);
     return null;
+  }
+
+  private Optional<String> getAjaxScript(XWikiContext context) {
+    String path = context.getRequest().getPathInfo();
+    List<String> pathParts = Stream.of(path.split("/"))
+        .filter(((Predicate<String>) String::isEmpty).negate()).collect(Collectors.toList());
+    if ((pathParts.size() > 2) && pathParts.get(0).equals(AJAX_SCRIPT_ACTION)) {
+      List<String> scriptPathList = new ArrayList<>();
+      scriptPathList.add(CEL_AJAX_SCRIPT_DIR_PROPERTY);
+      scriptPathList.addAll(pathParts.subList(1, pathParts.size()));
+      String celAjaxScript = "/" + Joiner.on("/").join(scriptPathList);
+      LOGGER.debug("ajax: found script path '{}' from path '{}'.", celAjaxScript, path);
+      return Optional.of(celAjaxScript);
+    }
+    return Optional.empty();
   }
 
 }
