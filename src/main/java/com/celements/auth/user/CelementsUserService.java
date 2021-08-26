@@ -54,6 +54,7 @@ import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.SendValidationFailedException;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWiki;
@@ -384,7 +385,7 @@ public class CelementsUserService implements UserService {
       String defaultValue) {
     String prefValue = Strings.nullToEmpty(getXWiki().getXWikiPreference(prefName, cfgParam,
         defaultValue, context.getXWikiContext())).trim();
-    return StreamEx.split(prefValue, ',').map(String::trim).filter(not(String::isEmpty));
+    return StreamEx.of(Splitter.on(",").omitEmptyStrings().splitToStream(prefValue));
   }
 
   private String getMessage(String key) {
