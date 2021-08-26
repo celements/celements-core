@@ -45,6 +45,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
 public class CelementsUserServiceTest extends AbstractComponentTest {
@@ -395,9 +396,12 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     expectInitialGroups(groups);
     XWikiDocument admGrpDoc = expectGroupAdd(groups.get(0));
     XWikiDocument othGrpDoc = expectGroupAdd(groups.get(1));
+    User user = createMockAndAddToDefault(User.class);
+    expect(user.getDocRef()).andReturn(userDocRef).atLeastOnce();
+    expect(user.asXWikiUser()).andReturn(new XWikiUser("XWiki.msladek")).atLeastOnce();
 
     replayDefault();
-    service.addUserToDefaultGroups(userDocRef);
+    service.addUserToDefaultGroups(user);
     verifyDefault();
     List<BaseObject> admGrpObjs = XWikiObjectFetcher.on(admGrpDoc).filter(getGroupsClass()).list();
     assertEquals(1, admGrpObjs.size());
@@ -446,7 +450,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_createNewUser_Exception() throws Exception {
+  public void test_createNewUser_DocumentSaveException() throws Exception {
     Throwable cause = new DocumentSaveException(userDocRef);
     final Map<String, String> userData = new HashMap<>();
     userData.put("xwikiname", "msladek");
