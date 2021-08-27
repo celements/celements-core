@@ -18,11 +18,15 @@ import org.xwiki.script.service.ScriptService;
 public class StreamScriptService implements ScriptService {
 
   public Stream<?> of(Object... values) {
-    return (values != null) ? Stream.of(values).filter(Objects::nonNull) : Stream.of();
+    return (values != null)
+        ? Stream.of(values).filter(Objects::nonNull)
+        : Stream.empty();
   }
 
   public Stream<?> concat(Stream<?>... streams) {
-    return Stream.of(streams).map(this::nullGuard).reduce(this::concat).orElseGet(Stream::empty);
+    return (streams != null)
+        ? Stream.of(streams).map(this::nullGuard).reduce(this::concat).orElseGet(Stream::empty)
+        : Stream.empty();
   }
 
   /**
