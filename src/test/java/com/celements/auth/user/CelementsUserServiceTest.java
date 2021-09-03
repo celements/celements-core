@@ -45,7 +45,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
 public class CelementsUserServiceTest extends AbstractComponentTest {
@@ -398,7 +397,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     XWikiDocument othGrpDoc = expectGroupAdd(groups.get(1));
     User user = createMockAndAddToDefault(User.class);
     expect(user.getDocRef()).andReturn(userDocRef).atLeastOnce();
-    expect(user.asXWikiUser()).andReturn(new XWikiUser("XWiki.msladek")).atLeastOnce();
 
     replayDefault();
     service.addUserToDefaultGroups(user);
@@ -416,8 +414,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     expectClassWithNewObj(getGroupsClass(), userDocRef.getWikiReference());
     getMock(ModelAccessStrategy.class).saveDocument(same(grpDoc), anyObject(String.class), eq(
         false));
-    getMock(XWikiGroupService.class).addUserToGroup("XWiki.msladek",
-        userDocRef.getWikiReference().getName(), group, getContext());
     return grpDoc;
   }
 

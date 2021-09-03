@@ -61,7 +61,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
@@ -263,13 +262,6 @@ public class CelementsUserService implements UserService {
     } else {
       editor.createFirstIfNotExists();
       modelAccess.saveDocument(groupDoc, getMessage("core.comment.addedUserToGroup"));
-      try {
-        XWikiGroupService gservice = getXWiki().getGroupService(context.getXWikiContext());
-        gservice.addUserToGroup(user.asXWikiUser().getUser(), wikiRef.getName(),
-            groupRef.serialize(), context.getXWikiContext());
-      } catch (XWikiException xwe) {
-        LOGGER.warn("Failed to update group service cache", xwe);
-      }
       LOGGER.info("addUserToGroup - user [{}] to group [{}]", user, groupRef);
       return true;
     }
