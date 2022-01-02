@@ -40,6 +40,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.util.ModelUtils;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
@@ -47,7 +48,6 @@ import com.celements.sajson.Builder;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -188,26 +188,36 @@ public class ExternalJavaScriptFilesCommand {
         + "\"></script>";
   }
 
-  public String getAllExternalJavaScriptFiles() throws XWikiException {
+  public String getAllExternalJavaScriptFiles() {
     if ((context != null) && (context.getDoc() != null)) {
       VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
       if ((vcontext != null) && vcontext.containsKey("skin_doc")) {
-        addAllExtJSfilesFromDoc(context.getWiki().getDocument(
-            getWebUtils().resolveDocumentReference(((Document) vcontext.get(
-                "skin_doc")).getFullName()), context));
-      }
-      addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
-          context.getDatabase(), "XWiki", "XWikiPreferences"), context));
-      addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
-          context.getDatabase(),
-          context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
-          "WebPreferences"), context));
-      PageTypeReference pageTypeRef = getPageTypeResolver().getPageTypeRefForCurrentDoc();
-      try {
-        if (pageTypeRef != null) {
-          addAllExtJSfilesFromDoc(getModelAccess().getDocument(
-              getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef)));
+        try {
+          addAllExtJSfilesFromDoc(getModelAccess().getDocument(((Document) vcontext.get(
+              "skin_doc")).getDocumentReference()));
+        } catch (DocumentNotExistsException nExExp) {
+          LOGGER.info("addJSFiles from skin_doc failed.", nExExp);
         }
+      }
+      try {
+        addAllExtJSfilesFromDoc(getModelAccess().getDocument(new DocumentReference(
+            context.getDatabase(), "XWiki", "XWikiPreferences")));
+      } catch (DocumentNotExistsException nExExp) {
+        LOGGER.info("addJSFiles from XWiki.XWikiPreferences failed.", nExExp);
+      }
+      String curSpaceName = context.getDoc().getDocumentReference().getLastSpaceReference()
+          .getName();
+      try {
+        addAllExtJSfilesFromDoc(getModelAccess().getDocument(new DocumentReference(
+            context.getDatabase(), curSpaceName, "WebPreferences")));
+      } catch (DocumentNotExistsException nExExp) {
+        LOGGER.info("addJSFiles from current space '{}' WebPreferences failed.", curSpaceName,
+            nExExp);
+      }
+      PageTypeReference pageTypeRef = getPageTypeResolver().resolvePageTypeRefForCurrentDoc();
+      try {
+        addAllExtJSfilesFromDoc(getModelAccess()
+            .getDocument(getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef)));
       } catch (DocumentNotExistsException exp) {
         LOGGER.info("Could not get Document with docRef {} ",
             getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef), exp);
@@ -274,6 +284,10 @@ public class ExternalJavaScriptFilesCommand {
       }
     }
     return jsFiles;
+  }
+
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
   private IWebUtilsService getWebUtils() {

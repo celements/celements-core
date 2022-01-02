@@ -7,7 +7,6 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 @Component("javascript")
 public class JSScriptService implements ScriptService {
@@ -25,7 +24,7 @@ public class JSScriptService implements ScriptService {
    * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
    * write the exception in a log-file
    */
-  public String getAllExternalJavaScriptFiles() throws XWikiException {
+  public String getAllExternalJavaScriptFiles() {
     return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
   }
 
