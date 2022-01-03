@@ -20,10 +20,6 @@ public class JSScriptService implements ScriptService {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
-   */
   public String getAllExternalJavaScriptFiles() {
     return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
   }
@@ -33,6 +29,14 @@ public class JSScriptService implements ScriptService {
   }
 
   public String addExtJSfileOnce(String jsFile, String action) {
+    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
+  }
+
+  public String addExtJSfileOnceDefer(String jsFile) {
+    return getExtJavaScriptFileCmd().addExtJSfileOnceDefer(jsFile);
+  }
+
+  public String addExtJSfileOnceDefer(String jsFile, String action) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
   }
 

@@ -22,8 +22,10 @@ package com.celements.web.plugin.cmd;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -40,13 +42,13 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
-import com.celements.model.util.ModelUtils;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
-import com.celements.sajson.Builder;
+import com.celements.sajson.JsonBuilder;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -63,21 +65,43 @@ public class ExternalJavaScriptFilesCommand {
   private static final Logger LOGGER = LoggerFactory.getLogger(
       ExternalJavaScriptFilesCommand.class);
 
-  private XWikiContext context;
-  private Set<String> extJSfileSet;
-  private Set<String> extJSAttUrlSet;
-  private List<String> extJSfileList;
-  private List<String> extJSnotFoundList;
+  class JsFileEntry {
+
+    String jsFileUrl;
+    boolean defer = false;
+
+    JsFileEntry(String jsFileUrl) {
+      this.jsFileUrl = jsFileUrl;
+    }
+
+    JsFileEntry(String jsFileUrl, boolean defer) {
+      this.jsFileUrl = jsFileUrl;
+      this.defer = defer;
+    }
+
+    @Override
+    public int hashCode() {
+      return jsFileUrl.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return (obj instanceof JsFileEntry)
+          && Objects.equals(((JsFileEntry) obj).jsFileUrl, jsFileUrl);
+    }
+
+  }
+
+  private final XWikiContext context;
+  private final Set<JsFileEntry> extJSfileSet = new LinkedHashSet<>();
+  private final Set<String> extJSAttUrlSet = new HashSet<>();
+  private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
   private AttachmentURLCommand attUrlCmd_injected = null;
   private IPageTypeResolverRole ptResolver_injected = null;
 
   public ExternalJavaScriptFilesCommand(XWikiContext context) {
     this.context = context;
-    extJSfileSet = new HashSet<>();
-    extJSAttUrlSet = new HashSet<>();
-    extJSfileList = new ArrayList<>();
-    extJSnotFoundList = new ArrayList<>();
   }
 
   public String addLazyExtJSfile(String jsFile) {
@@ -102,14 +126,17 @@ public class ExternalJavaScriptFilesCommand {
         attUrl += "?" + params;
       }
     }
-    Builder jsonBuilder = new Builder();
+    JsonBuilder jsonBuilder = new JsonBuilder();
     jsonBuilder.openDictionary();
-    jsonBuilder.addStringProperty("fullURL", attUrl);
-    jsonBuilder.openProperty("initLoad");
-    jsonBuilder.addBoolean(true);
+    jsonBuilder.addProperty("fullURL", attUrl);
+    jsonBuilder.addProperty("initLoad", true);
     jsonBuilder.closeDictionary();
     return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
         + "</span>";
+  }
+
+  public String addExtJSfileOnceDefer(String jsFile) {
+    return addExtJSfileOnce(jsFile, null, true);
   }
 
   public String addExtJSfileOnce(String jsFile) {
@@ -117,10 +144,18 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String addExtJSfileOnce(String jsFile, String action) {
-    return addExtJSfileOnce(jsFile, action, null);
+    return addExtJSfileOnce(jsFile, action, false);
+  }
+
+  public String addExtJSfileOnce(String jsFile, String action, boolean defer) {
+    return addExtJSfileOnce(jsFile, action, defer, null);
   }
 
   public String addExtJSfileOnce(String jsFile, String action, String params) {
+    return addExtJSfileOnce(jsFile, action, false, params);
+  }
+
+  public String addExtJSfileOnce(String jsFile, String action, boolean defer, String params) {
     if (!extJSAttUrlSet.contains(jsFile)) {
       if (getAttUrlCmd().isAttachmentLink(jsFile) || getAttUrlCmd().isOnDiskLink(jsFile)) {
         extJSAttUrlSet.add(jsFile);
@@ -138,30 +173,38 @@ public class ExternalJavaScriptFilesCommand {
           attUrl += "?" + params;
         }
       }
-      return addExtJSfileOnce_internal(jsFile, attUrl);
+      return addExtJSfileOnceInternal(jsFile, attUrl, defer);
     }
     return "";
   }
 
-  private String addExtJSfileOnce_internal(String jsFile, String jsFileUrl) {
+  private String addExtJSfileOnceInternal(String jsFile, String jsFileUrl, boolean defer) {
     String jsIncludes2 = "";
     if (jsFileUrl == null) {
-      if (!extJSfileSet.contains(jsFile)) {
-        jsIncludes2 = "<!-- WARNING: js-file not found: " + jsFile + "-->";
-        extJSfileSet.add(jsFile);
-        extJSnotFoundList.add(jsIncludes2);
+      JsFileEntry jsFileEntry = new JsFileEntry(jsFile);
+      if (!jsFileHasBeenSeen(jsFileEntry)) {
+        extJSnotFoundSet.add(jsFile);
+        jsIncludes2 = buildNotFoundWarning(jsFile);
       }
     } else {
-      if (!extJSfileSet.contains(jsFileUrl)) {
-        jsIncludes2 = getExtStringForJsFile(jsFileUrl);
-        extJSfileSet.add(jsFileUrl);
-        extJSfileList.add(jsFileUrl);
+      JsFileEntry jsFileEntry = new JsFileEntry(jsFileUrl, defer);
+      if (!jsFileHasBeenSeen(jsFileEntry)) {
+        jsIncludes2 = getExtStringForJsFile(jsFileEntry);
+        extJSfileSet.add(jsFileEntry);
       }
     }
     if (!displayedAll) {
       jsIncludes2 = "";
     }
     return jsIncludes2;
+  }
+
+  private String buildNotFoundWarning(String jsFile) {
+    return "<!-- WARNING: js-file not found: " + jsFile + "-->";
+  }
+
+  private boolean jsFileHasBeenSeen(JsFileEntry jsFile) {
+    return extJSfileSet.contains(jsFile) || extJSnotFoundSet.contains(jsFile.jsFileUrl);
   }
 
   AttachmentURLCommand getAttUrlCmd() {
@@ -183,9 +226,9 @@ public class ExternalJavaScriptFilesCommand {
     this.displayedAll = displayedAll;
   }
 
-  String getExtStringForJsFile(String jsFile) {
-    return "<script type=\"text/javascript\" src=\"" + StringEscapeUtils.escapeHtml(jsFile)
-        + "\"></script>";
+  String getExtStringForJsFile(JsFileEntry jsFile) {
+    return "<script" + (jsFile.defer ? " defer" : "") + " type=\"text/javascript\" src=\""
+        + StringEscapeUtils.escapeHtml(jsFile.jsFileUrl) + "\"></script>";
   }
 
   public String getAllExternalJavaScriptFiles() {
@@ -227,11 +270,11 @@ public class ExternalJavaScriptFilesCommand {
     }
     notifyExtJavaScriptFileListener();
     String jsIncludes = "";
-    for (String jsFile : extJSfileList) {
+    for (JsFileEntry jsFile : extJSfileSet) {
       jsIncludes += getExtStringForJsFile(jsFile) + "\n";
     }
-    for (String jsFileWarning : extJSnotFoundList) {
-      jsIncludes += jsFileWarning + "\n";
+    for (String jsFile : extJSnotFoundSet) {
+      jsIncludes += buildNotFoundWarning(jsFile) + "\n";
     }
     displayedAll = true;
     return jsIncludes;
@@ -239,8 +282,8 @@ public class ExternalJavaScriptFilesCommand {
 
   private void notifyExtJavaScriptFileListener() {
     Map<String, IExtJSFilesListener> listenerMap = getListenerMap();
-    for (String jsfListenerKey : listenerMap.keySet()) {
-      listenerMap.get(jsfListenerKey).beforeAllExtFinish(this);
+    for (IExtJSFilesListener jsfListener : listenerMap.values()) {
+      jsfListener.beforeAllExtFinish(this);
     }
   }
 
@@ -274,24 +317,13 @@ public class ExternalJavaScriptFilesCommand {
             doc.getDocumentReference().getWikiReference().getName()));
     List<String> jsFiles = new ArrayList<>();
     if (javaScriptFiles != null) {
-      for (Object filepath : javaScriptFiles) {
-        if ((filepath != null) && (filepath instanceof BaseObject)) {
-          BaseObject filepathObj = (BaseObject) filepath;
-          if (!"".equals(filepathObj.getStringValue("filepath"))) {
-            jsFiles.add(filepathObj.getStringValue("filepath"));
-          }
+      for (BaseObject filepathObj : javaScriptFiles) {
+        if (!Strings.isNullOrEmpty(filepathObj.getStringValue("filepath"))) {
+          jsFiles.add(filepathObj.getStringValue("filepath"));
         }
       }
     }
     return jsFiles;
-  }
-
-  private ModelUtils getModelUtils() {
-    return Utils.getComponent(ModelUtils.class);
-  }
-
-  private IWebUtilsService getWebUtils() {
-    return Utils.getComponent(IWebUtilsService.class);
   }
 
   private IPageTypeResolverRole getPageTypeResolver() {
@@ -313,4 +345,5 @@ public class ExternalJavaScriptFilesCommand {
     return (OldCoreClasses) Utils.getComponent(IClassCollectionRole.class,
         "celements.oldCoreClasses");
   }
+
 }

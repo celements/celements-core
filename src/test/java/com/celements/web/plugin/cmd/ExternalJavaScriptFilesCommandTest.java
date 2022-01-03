@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.xpn.xwiki.XWiki;
@@ -37,7 +38,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponentTestCase {
+public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
 
   private ExternalJavaScriptFilesCommand command = null;
   private XWikiContext context = null;
@@ -158,7 +159,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
     String scriptStart = "<script type=\"text/javascript\" src=\"";
     String scriptEnd = "\"></script>";
-    assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(url));
+    ExternalJavaScriptFilesCommand.JsFileEntry jsFile = command.new JsFileEntry(url);
+    assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
   }
 
   @Test
@@ -222,8 +224,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     expect(xwiki.<String>search(eq(
         "select doc.fullName from XWikiDocument as doc, BaseObject as obj where "
             + "doc.space='PageTypes' and doc.translation=0 and obj.name=doc.fullName  and "
-            + "obj.className='Celements2.PageTypeProperties'"), same(context))).andReturn(
-                resultList).anyTimes();
+            + "obj.className='Celements2.PageTypeProperties'"),
+        same(context))).andReturn(
+            resultList).anyTimes();
     DocumentReference pageTypesName2DocRef = new DocumentReference(context.getDatabase(),
         "PageTypes", "Name2");
     XWikiDocument pageTypesName2Doc = new XWikiDocument(pageTypesName2DocRef);
