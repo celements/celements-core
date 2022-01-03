@@ -259,8 +259,8 @@ public class ExternalJavaScriptFilesCommand {
       }
       PageTypeReference pageTypeRef = getPageTypeResolver().resolvePageTypeRefForCurrentDoc();
       try {
-        addAllExtJSfilesFromDoc(getModelAccess()
-            .getDocument(getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef)));
+        addAllExtJSfilesFromDoc(getModelAccess().getDocument(getObjectPageTypeUtils()
+            .getDocRefForPageType(pageTypeRef)));
       } catch (DocumentNotExistsException exp) {
         LOGGER.info("Could not get Document with docRef {} ",
             getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef), exp);
