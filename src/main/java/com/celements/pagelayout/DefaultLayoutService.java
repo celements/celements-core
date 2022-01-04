@@ -112,7 +112,8 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       for (String[] resultRowObj : results) {
         Object[] resultRow = resultRowObj;
         plMapBuilder.put(
-            RefBuilder.create().space(resultRow[0].toString()).build(SpaceReference.class),
+            RefBuilder.create().with(modelContext.getWikiRef()).space(resultRow[0].toString())
+                .build(SpaceReference.class),
             resultRow[1].toString());
       }
     } catch (QueryException exp) {
@@ -414,7 +415,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     String defaultLayout = modelContext.getXWikiContext().getWiki().Param(
         XWIKICFG_CELEMENTS_LAYOUT_DEFAULT, SIMPLE_LAYOUT);
     final String requestAction = modelContext.getXWikiContext().getAction();
-    if (!"view".equals(requestAction)) {
+    if ((requestAction != null) && !"view".equals(requestAction)) {
       defaultLayout = modelContext.getXWikiContext().getWiki()
           .Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT + "." + requestAction, defaultLayout);
       LOGGER.debug("getDefaultLayout for action [{}] got [{}].", requestAction, defaultLayout);
