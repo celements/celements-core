@@ -123,8 +123,8 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
   @Test
   public void test_getActivePageLyouts() throws Exception {
     List<Object> resultList = new ArrayList<>();
-    resultList.add(new Object[] { "layout1Space", "Layout 1 pretty name" });
-    resultList.add(new Object[] { "layout2Space", "Layout 2 pretty name" });
+    resultList.add(new String[] { "layout1Space", "Layout 1 pretty name" });
+    resultList.add(new String[] { "layout2Space", "Layout 2 pretty name" });
     Query queryMock = createMockAndAddToDefault(Query.class);
     Capture<String> capturedHQL = newCapture();
     expect(queryManagerMock.createQuery(capture(capturedHQL), eq(Query.HQL))).andReturn(queryMock);
@@ -652,7 +652,6 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     SpaceReference layoutRef = new SpaceReference("MyPageLayout", new WikiReference(
         context.getDatabase()));
     DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
-    expect(modelAccessMock.exists(eq(webHomeDocRef))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
     layoutPropDoc.setNew(false);
     BaseObject layoutPropObj = new BaseObject();
