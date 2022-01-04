@@ -19,6 +19,8 @@
  */
 package com.celements.cells;
 
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -46,6 +48,7 @@ public interface IRenderStrategy {
 
   public boolean isRenderSubCells(EntityReference parentRef);
 
+  @NotNull
   public String getAsString();
 
   public void renderEmptyChildren(TreeNode node);
