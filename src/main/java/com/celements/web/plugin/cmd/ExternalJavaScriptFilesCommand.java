@@ -98,7 +98,6 @@ public class ExternalJavaScriptFilesCommand {
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
   private AttachmentURLCommand attUrlCmd_injected = null;
-  private IPageTypeResolverRole ptResolver_injected = null;
 
   public ExternalJavaScriptFilesCommand(XWikiContext context) {
     this.context = context;
@@ -218,10 +217,6 @@ public class ExternalJavaScriptFilesCommand {
     attUrlCmd_injected = attUrlCmd;
   }
 
-  void injectPageTypeResolver(IPageTypeResolverRole ptResolver) {
-    ptResolver_injected = ptResolver;
-  }
-
   void injectDisplayAll(boolean displayedAll) {
     this.displayedAll = displayedAll;
   }
@@ -327,9 +322,6 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   private IPageTypeResolverRole getPageTypeResolver() {
-    if (ptResolver_injected != null) {
-      return ptResolver_injected;
-    }
     return Utils.getComponent(IPageTypeResolverRole.class);
   }
 

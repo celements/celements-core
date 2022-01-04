@@ -52,13 +52,12 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   public void setUp_ExternalJavaScriptFilesCommandTest() throws Exception {
     context = getContext();
     context.put("vcontext", new VelocityContext());
-    modelAccessMock = createMockAndAddToDefault(IModelAccessFacade.class);
+    modelAccessMock = registerComponentMock(IModelAccessFacade.class);
+    pageTypeResolverMock = registerComponentMock(IPageTypeResolverRole.class);
     attUrlCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
-    pageTypeResolverMock = createMockAndAddToDefault(IPageTypeResolverRole.class);
     xwiki = getWikiMock();
     command = new ExternalJavaScriptFilesCommand(context);
     command.injectAttUrlCmd(attUrlCmd);
-    command.injectPageTypeResolver(pageTypeResolverMock);
   }
 
   @Test
@@ -212,17 +211,15 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
-    expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(
-        xwikiPrefDoc).atLeastOnce();
+    expect(modelAccessMock.getDocument(eq(xwikiPrefDocRef))).andReturn(xwikiPrefDoc).atLeastOnce();
     DocumentReference mainPrefDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebPreferences");
     XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
-    expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(mainPrefDoc)
-        .atLeastOnce();
+    expect(modelAccessMock.getDocument(eq(mainPrefDocRef))).andReturn(mainPrefDoc).atLeastOnce();
     DocumentReference webHomeDocRef = contextDocRef;
     XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
-    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(webHomeDoc).atLeastOnce();
+    expect(modelAccessMock.exists(eq(webHomeDocRef))).andReturn(true).atLeastOnce();
+    expect(modelAccessMock.getDocument(eq(webHomeDocRef))).andReturn(webHomeDoc).atLeastOnce();
     // String pageTypeDocName1 = "PageTypes.Name1";
     // String pageTypeDocName2 = "PageTypes.Name2";
     // List<String> resultList = Arrays.asList(pageTypeDocName1, pageTypeDocName2);
@@ -250,8 +247,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     DocumentReference pageTypesDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
         "TestPageType");
     XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
-    expect(xwiki.getDocument(eq(pageTypesDocRef), same(context))).andReturn(pageTypesDoc)
-        .atLeastOnce();
+    expect(modelAccessMock.getDocument(eq(pageTypesDocRef))).andReturn(pageTypesDoc).atLeastOnce();
     expect(xwiki.Param("celements.layout.default", "SimpleLayout")).andReturn(
         "SimpleLayout").once();
     DocumentReference simpleLayoutDocRef = new DocumentReference(context.getDatabase(),
