@@ -146,13 +146,13 @@ public final class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use {@link LayoutServiceRole#getLayoutPropDocRef()} and fetch the
-   *             document yourself using {@link IModelAccessFacade}.
+   * @deprecated since 5.3 instead use {@link LayoutServiceRole#getLayoutPropDocRefForCurrentDoc()}
+   *             and fetch the document yourself using {@link IModelAccessFacade}.
    */
   @Deprecated
   public XWikiDocument getLayoutPropDoc() {
     @NotNull
-    Optional<DocumentReference> layoutPropDocRef = layoutService.getLayoutPropDocRef();
+    Optional<DocumentReference> layoutPropDocRef = layoutService.getLayoutPropDocRefForCurrentDoc();
     if (layoutPropDocRef.isPresent()) {
       try {
         return getModelAccess().getDocument(layoutPropDocRef.get());

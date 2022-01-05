@@ -70,7 +70,7 @@ public interface LayoutServiceRole {
   boolean layoutExists(@Nullable SpaceReference layoutSpaceRef);
 
   @NotNull
-  Optional<DocumentReference> getLayoutPropDocRef();
+  Optional<DocumentReference> getLayoutPropDocRefForCurrentDoc();
 
   @NotNull
   Optional<DocumentReference> getLayoutPropDocRef(@Nullable SpaceReference layoutSpaceRef);

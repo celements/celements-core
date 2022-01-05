@@ -217,11 +217,13 @@ public final class DefaultLayoutService implements LayoutServiceRole {
 
   @Override
   public final boolean layoutExists(SpaceReference layoutSpaceRef) {
-    return (getLayoutPropDocRef(layoutSpaceRef).isPresent());
+    return getLayoutPropDocRef(layoutSpaceRef)
+        .map(propertyDocRef -> getLayoutPropertyBaseObject(propertyDocRef).orElse(null))
+        .isPresent();
   }
 
   @Override
-  public final Optional<DocumentReference> getLayoutPropDocRef() {
+  public final Optional<DocumentReference> getLayoutPropDocRefForCurrentDoc() {
     SpaceReference currDocPageLayout = getPageLayoutForCurrentDoc();
     if (currDocPageLayout != null) {
       LOGGER.debug("getLayoutPropDoc: found page layout [{}] for page [{}].", currDocPageLayout,
@@ -325,16 +327,23 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     layoutSpaceRef = resolveValidLayoutSpace(layoutSpaceRef).orElse(null);
     Optional<DocumentReference> layoutPropDocRef = getLayoutPropDocRef(layoutSpaceRef);
     if (layoutPropDocRef.isPresent()) {
-      XWikiDocument layoutPropDoc;
-      try {
-        layoutPropDoc = modelAccess.getDocument(layoutPropDocRef.get());
-        return layoutPropDoc.getXObject(getPageLayoutPropertiesClassRef(
-            layoutPropDoc.getDocumentReference().getWikiReference()));
-      } catch (DocumentNotExistsException exp) {
-        LOGGER.info("Layout property doc [{}] does not exist.", layoutPropDocRef.get(), exp);
-      }
+      return getLayoutPropertyBaseObject(layoutPropDocRef.get()).orElse(null);
     }
     return null;
+  }
+
+  @NotNull
+  private Optional<BaseObject> getLayoutPropertyBaseObject(
+      @NotNull DocumentReference layoutPropDocRef) {
+    XWikiDocument layoutPropDoc;
+    try {
+      layoutPropDoc = modelAccess.getDocument(layoutPropDocRef);
+      return Optional.ofNullable(layoutPropDoc.getXObject(getPageLayoutPropertiesClassRef(
+          layoutPropDoc.getDocumentReference().getWikiReference())));
+    } catch (DocumentNotExistsException exp) {
+      LOGGER.info("Layout property doc [{}] does not exist.", layoutPropDocRef, exp);
+    }
+    return Optional.empty();
   }
 
   @Override

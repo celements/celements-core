@@ -45,7 +45,9 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.inheritor.FieldInheritor;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.reference.RefBuilder;
+import com.celements.pagetype.IPageTypeClassConfig;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -184,7 +186,8 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))).andReturn(
         inheritor);
     String layoutName = "MyPageLayout";
-    expect(inheritor.getStringValue(eq("page_layout"), (String) isNull())).andReturn(layoutName);
+    expect(inheritor.getStringValue(eq(IPageTypeClassConfig.PAGE_TYPE_LAYOUT_FIELD),
+        (String) isNull())).andReturn(layoutName);
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "WebHome");
     expect(modelAccessMock.exists(eq(webHomeDocRef))).andReturn(true).atLeastOnce();
@@ -411,36 +414,186 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getLayoutPropDocRef() throws Exception {
+  public void test_layoutExists_noLayout() throws Exception {
     DocumentReference currDocRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyPage");
     XWikiDocument currDoc = new XWikiDocument(currDocRef);
     context.setDoc(currDoc);
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MySpace",
         "WebHome");
-    expect(modelAccessMock.exists(eq(webHomeDocRef))).andReturn(false);
-    expect(modelAccessMock.getDocument(eq(currDocRef))).andReturn(currDoc)
-        .atLeastOnce();
+    expect(modelAccessMock.getDocument(eq(webHomeDocRef)))
+        .andThrow(new DocumentNotExistsException(webHomeDocRef)).atLeastOnce();
+    replayDefault();
+    assertFalse("Current space is missing the WebHome document. Without LayoutProperties it is no "
+        + "valid Layout-Space", layoutService.layoutExists(currDocRef.getLastSpaceReference()));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_layoutExists_LayoutSpace() throws Exception {
+    DocumentReference currDocRef = new DocumentReference(context.getDatabase(), "MyTestLayout",
+        "MyPage");
+    XWikiDocument currDoc = new XWikiDocument(currDocRef);
+    context.setDoc(currDoc);
+    SpaceReference layoutSpaceRef = currDocRef.getLastSpaceReference();
+    expectLayoutDoc(layoutSpaceRef, true, true);
+    replayDefault();
+    assertTrue("Current space is a valid Layout-Space with an LayoutProperty object",
+        layoutService.layoutExists(layoutSpaceRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getPageLayoutForCurrentDoc_noLayout() throws Exception {
+    DocumentReference currDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyPage");
+    XWikiDocument currDoc = new XWikiDocument(currDocRef);
+    context.setDoc(currDoc);
+    expect(xwiki.getDocument(eq(currDocRef), same(context))).andReturn(currDoc).atLeastOnce();
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "WebHome");
+    expect(modelAccessMock.getDocument(eq(webHomeDocRef)))
+        .andThrow(new DocumentNotExistsException(webHomeDocRef)).atLeastOnce();
     DocumentReference mySpacePrefDocRef = new DocumentReference(context.getDatabase(), "MySpace",
         "WebPreferences");
     XWikiDocument mySpacePrefDoc = new XWikiDocument(mySpacePrefDocRef);
-    expect(modelAccessMock.getDocument(eq(mySpacePrefDocRef))).andReturn(
-        mySpacePrefDoc).atLeastOnce();
+    expect(xwiki.getDocument(eq(mySpacePrefDocRef), same(context))).andReturn(mySpacePrefDoc)
+        .atLeastOnce();
     DocumentReference xWikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
     XWikiDocument xWikiPrefDoc = new XWikiDocument(xWikiPrefDocRef);
-    expect(modelAccessMock.getDocument(eq(xWikiPrefDocRef))).andReturn(
-        xWikiPrefDoc).atLeastOnce();
-    expect(xwiki.Param(eq("celements.layout.default"), eq("SimpleLayout"))).andReturn(
-        "SimpleLayout").once();
-    expect(modelAccessMock
-        .exists(eq(new DocumentReference(context.getDatabase(), "SimpleLayout", "WebHome"))))
-            .andReturn(false);
-    expect(modelAccessMock
-        .exists(eq(new DocumentReference("celements2web", "SimpleLayout", "WebHome"))))
-            .andReturn(false);
+    expect(xwiki.getDocument(eq(xWikiPrefDocRef), same(context))).andReturn(xWikiPrefDoc)
+        .atLeastOnce();
+    expect(xwiki.Param(eq("celements.layout.default"), eq("SimpleLayout")))
+        .andReturn("SimpleLayout").once();
+    DocumentReference simpleLayoutLocalDocRef = new DocumentReference(context.getDatabase(),
+        "SimpleLayout", "WebHome");
+    expect(modelAccessMock.getDocument(eq(simpleLayoutLocalDocRef)))
+        .andThrow(new DocumentNotExistsException(simpleLayoutLocalDocRef)).atLeastOnce();
+    DocumentReference simpleLayoutCentralDocRef = new DocumentReference("celements2web",
+        "SimpleLayout", "WebHome");
+    expect(modelAccessMock.getDocument(eq(simpleLayoutCentralDocRef)))
+        .andThrow(new DocumentNotExistsException(simpleLayoutCentralDocRef)).atLeastOnce();
     replayDefault();
-    assertNull(layoutService.getLayoutPropDocRef());
+    assertNull(layoutService.getPageLayoutForCurrentDoc());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getPageLayoutForCurrentDoc_in_Layout_Space() throws Exception {
+    DocumentReference currDocRef = new DocumentReference(context.getDatabase(), "MyTestLayout",
+        "MyPage");
+    XWikiDocument currDoc = new XWikiDocument(currDocRef);
+    context.setDoc(currDoc);
+    SpaceReference layoutSpaceRef = currDocRef.getLastSpaceReference();
+    expectLayoutDoc(layoutSpaceRef, true, true);
+    SpaceReference layoutEditorSpaceRef = RefBuilder.create().wiki(context.getDatabase())
+        .space("CelLayoutEditor").build(SpaceReference.class);
+    expectLayoutDoc(layoutEditorSpaceRef, true, true);
+    replayDefault();
+    assertEquals(layoutEditorSpaceRef, layoutService.getPageLayoutForCurrentDoc());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getPageLayoutForCurrentDoc_withLayout() throws Exception {
+    DocumentReference currDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyPage");
+    XWikiDocument currDoc = new XWikiDocument(currDocRef);
+    context.setDoc(currDoc);
+    expect(xwiki.getDocument(eq(currDocRef), same(context))).andReturn(currDoc).atLeastOnce();
+    String layoutSpaceName = "MyTestLayout";
+    SpaceReference layoutSpaceRef = RefBuilder.create().wiki(context.getDatabase())
+        .space(layoutSpaceName).build(SpaceReference.class);
+    expectLayoutDoc(layoutSpaceRef, true, true);
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "WebHome");
+    expect(modelAccessMock.getDocument(eq(webHomeDocRef)))
+        .andThrow(new DocumentNotExistsException(webHomeDocRef)).atLeastOnce();
+    DocumentReference mySpacePrefDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "WebPreferences");
+    XWikiDocument mySpacePrefDoc = new XWikiDocument(mySpacePrefDocRef);
+    BaseObject webPrefPageTypeObj = new BaseObject();
+    DocumentReference pageTypeClassRef = Utils.getComponent(IPageTypeClassConfig.class)
+        .getPageTypeClassRef();
+    webPrefPageTypeObj.setStringValue(IPageTypeClassConfig.PAGE_TYPE_LAYOUT_FIELD, layoutSpaceName);
+    webPrefPageTypeObj.setXClassReference(pageTypeClassRef);
+    mySpacePrefDoc.addXObject(webPrefPageTypeObj);
+    expect(xwiki.getDocument(eq(mySpacePrefDocRef), same(context))).andReturn(mySpacePrefDoc)
+        .atLeastOnce();
+    replayDefault();
+    assertEquals(layoutSpaceRef, layoutService.getPageLayoutForCurrentDoc());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getLayoutPropDocRefForCurrentDoc_noLayout() throws Exception {
+    DocumentReference currDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyPage");
+    XWikiDocument currDoc = new XWikiDocument(currDocRef);
+    context.setDoc(currDoc);
+    expect(xwiki.getDocument(eq(currDocRef), same(context))).andReturn(currDoc).atLeastOnce();
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "WebHome");
+    expect(modelAccessMock.getDocument(eq(webHomeDocRef)))
+        .andThrow(new DocumentNotExistsException(webHomeDocRef)).atLeastOnce();
+    DocumentReference mySpacePrefDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "WebPreferences");
+    XWikiDocument mySpacePrefDoc = new XWikiDocument(mySpacePrefDocRef);
+    expect(xwiki.getDocument(eq(mySpacePrefDocRef), same(context))).andReturn(mySpacePrefDoc)
+        .atLeastOnce();
+    DocumentReference xWikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiPreferences");
+    XWikiDocument xWikiPrefDoc = new XWikiDocument(xWikiPrefDocRef);
+    expect(xwiki.getDocument(eq(xWikiPrefDocRef), same(context))).andReturn(xWikiPrefDoc)
+        .atLeastOnce();
+    expect(xwiki.Param(eq("celements.layout.default"), eq("SimpleLayout")))
+        .andReturn("SimpleLayout").once();
+    DocumentReference simpleLayoutLocalDocRef = new DocumentReference(context.getDatabase(),
+        "SimpleLayout", "WebHome");
+    expect(modelAccessMock.getDocument(eq(simpleLayoutLocalDocRef)))
+        .andThrow(new DocumentNotExistsException(simpleLayoutLocalDocRef)).atLeastOnce();
+    DocumentReference simpleLayoutCentralDocRef = new DocumentReference("celements2web",
+        "SimpleLayout", "WebHome");
+    expect(modelAccessMock.getDocument(eq(simpleLayoutCentralDocRef)))
+        .andThrow(new DocumentNotExistsException(simpleLayoutCentralDocRef)).atLeastOnce();
+    replayDefault();
+    assertFalse("no Layout defined for current doc",
+        layoutService.getLayoutPropDocRefForCurrentDoc().isPresent());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getLayoutPropDocRefForCurrentDoc_withLayout() throws Exception {
+    DocumentReference currDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyPage");
+    XWikiDocument currDoc = new XWikiDocument(currDocRef);
+    context.setDoc(currDoc);
+    expect(xwiki.getDocument(eq(currDocRef), same(context))).andReturn(currDoc).atLeastOnce();
+    String layoutSpaceName = "MyTestLayout";
+    SpaceReference layoutSpaceRef = RefBuilder.create().wiki(context.getDatabase())
+        .space(layoutSpaceName).build(SpaceReference.class);
+    XWikiDocument layoutWebHomeDoc = expectLayoutDoc(layoutSpaceRef, true, true);
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "WebHome");
+    expect(modelAccessMock.getDocument(eq(webHomeDocRef)))
+        .andThrow(new DocumentNotExistsException(webHomeDocRef)).atLeastOnce();
+    DocumentReference mySpacePrefDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "WebPreferences");
+    XWikiDocument mySpacePrefDoc = new XWikiDocument(mySpacePrefDocRef);
+    BaseObject webPrefPageTypeObj = new BaseObject();
+    DocumentReference pageTypeClassRef = Utils.getComponent(IPageTypeClassConfig.class)
+        .getPageTypeClassRef();
+    webPrefPageTypeObj.setStringValue(IPageTypeClassConfig.PAGE_TYPE_LAYOUT_FIELD, layoutSpaceName);
+    webPrefPageTypeObj.setXClassReference(pageTypeClassRef);
+    mySpacePrefDoc.addXObject(webPrefPageTypeObj);
+    expect(xwiki.getDocument(eq(mySpacePrefDocRef), same(context))).andReturn(mySpacePrefDoc)
+        .atLeastOnce();
+    replayDefault();
+    Optional<DocumentReference> layoutPropDocRefOptional = layoutService
+        .getLayoutPropDocRefForCurrentDoc();
+    assertTrue(layoutPropDocRefOptional.isPresent());
+    assertEquals(layoutWebHomeDoc.getDocumentReference(), layoutPropDocRefOptional.get());
     verifyDefault();
   }
 
@@ -620,10 +773,12 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
   public void test__getLayoutPropDocRef_standardPropDocRef() throws Exception {
     SpaceReference layoutSpaceRef = new SpaceReference(
         LayoutServiceRole.CEL_LAYOUT_EDITOR_PL_NAME, getWikiRef());
+    replayDefault();
     Optional<DocumentReference> ret = layoutService.getLayoutPropDocRef(layoutSpaceRef);
     assertTrue(ret.isPresent());
     assertEquals(layoutSpaceRef, ret.get().getParent());
     assertEquals("WebHome", ret.get().getName());
+    verifyDefault();
   }
 
   @Test

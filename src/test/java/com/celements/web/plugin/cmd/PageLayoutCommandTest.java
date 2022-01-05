@@ -125,7 +125,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_getLayoutPropDoc_absent() throws Exception {
-    expect(layoutServiceMock.getLayoutPropDocRef()).andReturn(Optional.empty());
+    expect(layoutServiceMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.empty());
     replayDefault();
     assertNull(plCmd.getLayoutPropDoc());
     verifyDefault();
@@ -136,7 +136,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MyPageLayout",
         "WebHome");
     XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
-    expect(layoutServiceMock.getLayoutPropDocRef()).andReturn(Optional.of(webHomeDocRef));
+    expect(layoutServiceMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(webHomeDocRef));
     expect(modelAccessMock.getDocument(eq(webHomeDocRef))).andReturn(webHomeDoc);
     replayDefault();
     assertSame(webHomeDoc, plCmd.getLayoutPropDoc());
@@ -147,7 +147,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
   public void test_getLayoutPropDoc_proxyCheck_DocNotExist() throws Exception {
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MyPageLayout",
         "WebHome");
-    expect(layoutServiceMock.getLayoutPropDocRef()).andReturn(Optional.of(webHomeDocRef));
+    expect(layoutServiceMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(webHomeDocRef));
     expect(modelAccessMock.getDocument(eq(webHomeDocRef)))
         .andThrow(new DocumentNotExistsException(webHomeDocRef)).anyTimes();
     replayDefault();
