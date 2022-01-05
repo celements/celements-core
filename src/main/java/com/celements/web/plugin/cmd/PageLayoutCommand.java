@@ -50,7 +50,7 @@ import com.xpn.xwiki.web.Utils;
  * @deprecated since 5.3 instead use {@link LayoutServiceRole}
  */
 @Deprecated
-public final class PageLayoutCommand {
+public class PageLayoutCommand {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PageLayoutCommand.class);
 

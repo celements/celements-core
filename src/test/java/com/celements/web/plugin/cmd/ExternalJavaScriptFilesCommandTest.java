@@ -222,8 +222,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     expect(xwiki.<String>search(eq(
         "select doc.fullName from XWikiDocument as doc, BaseObject as obj where "
             + "doc.space='PageTypes' and doc.translation=0 and obj.name=doc.fullName  and "
-            + "obj.className='Celements2.PageTypeProperties'"), same(context))).andReturn(
-                resultList).anyTimes();
+            + "obj.className='Celements2.PageTypeProperties'"),
+        same(context))).andReturn(
+            resultList).anyTimes();
     DocumentReference pageTypesName2DocRef = new DocumentReference(context.getDatabase(),
         "PageTypes", "Name2");
     XWikiDocument pageTypesName2Doc = new XWikiDocument(pageTypesName2DocRef);
@@ -310,7 +311,6 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     DocumentReference mainWebHomeDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebHome");
     XWikiDocument mainWebHomeDoc = new XWikiDocument(pageTypesDocRef);
-    expect(xwiki.exists(eq(mainWebHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(mainWebHomeDocRef), same(context))).andReturn(
         mainWebHomeDoc).atLeastOnce();
     expect(xwiki.Param("celements.layout.default", "SimpleLayout")).andReturn(
@@ -324,7 +324,6 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     DocumentReference simpleLayoutCentralDocRef = new DocumentReference("celements2web",
         "SimpleLayout", "WebHome");
     XWikiDocument simpleLayoutCentralDoc = new XWikiDocument(simpleLayoutDocRef);
-    expect(xwiki.exists(eq(simpleLayoutCentralDocRef), same(context))).andReturn(true).anyTimes();
     expect(xwiki.getDocument(eq(simpleLayoutCentralDocRef), same(context))).andReturn(
         simpleLayoutCentralDoc).anyTimes();
 
