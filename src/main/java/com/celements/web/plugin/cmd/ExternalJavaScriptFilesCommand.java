@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
 
@@ -55,7 +57,6 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class ExternalJavaScriptFilesCommand {
@@ -111,7 +112,8 @@ public class ExternalJavaScriptFilesCommand {
   private final Set<String> extJSAttUrlSet = new HashSet<>();
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
-  private AttachmentURLCommand attUrlCmd_injected = null;
+  private Optional<AttachmentURLCommand> attUrlCmd_injected = Optional.empty();
+  private Optional<PageLayoutCommand> pageLayoutCmd_injected = Optional.empty();
 
   public ExternalJavaScriptFilesCommand() {}
 
@@ -231,17 +233,6 @@ public class ExternalJavaScriptFilesCommand {
     return extJSfileSet.contains(jsFile) || extJSnotFoundSet.contains(jsFile.jsFileUrl);
   }
 
-  AttachmentURLCommand getAttUrlCmd() {
-    if (attUrlCmd_injected != null) {
-      return attUrlCmd_injected;
-    }
-    return new AttachmentURLCommand();
-  }
-
-  void injectAttUrlCmd(AttachmentURLCommand attUrlCmd) {
-    attUrlCmd_injected = attUrlCmd;
-  }
-
   void injectDisplayAll(boolean displayedAll) {
     this.displayedAll = displayedAll;
   }
@@ -264,19 +255,19 @@ public class ExternalJavaScriptFilesCommand {
             RefBuilder.from(spaceRef).doc("WebPreferences").build(DocumentReference.class)));
     PageTypeReference pageTypeRef = getPageTypeResolver().resolvePageTypeRefForCurrentDoc();
     addAllExtJSfilesFromDocRef(getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef));
-    final XWikiDocument layoutPropDoc = new PageLayoutCommand().getLayoutPropDoc();
-    if (layoutPropDoc != null) {
-      addAllExtJSfilesFromDoc(layoutPropDoc);
-    }
-    getModelContext().getCurrentDoc().toJavaUtil().ifPresent(this::addAllExtJSfilesFromDoc);
+    Optional.ofNullable(getLayoutService().getLayoutPropDoc())
+        .ifPresent(
+            layoutPropDoc -> addAllExtJSfilesFromDocRef(layoutPropDoc.getDocumentReference()));
+    getModelContext().getCurrentDocRef().toJavaUtil()
+        .ifPresent(this::addAllExtJSfilesFromDocRef);
     notifyExtJavaScriptFileListener();
+
     final StringBuilder jsIncludesBuilder = new StringBuilder();
-    for (JsFileEntry jsFile : extJSfileSet) {
-      jsIncludesBuilder.append(getExtStringForJsFile(jsFile)).append("\n");
-    }
-    for (String jsFile : extJSnotFoundSet) {
-      jsIncludesBuilder.append(buildNotFoundWarning(jsFile)).append("\n");
-    }
+    jsIncludesBuilder.append(Stream.concat(
+        extJSfileSet.stream().map(this::getExtStringForJsFile),
+        extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
+        .collect(Collectors.joining("\n")));
+    jsIncludesBuilder.append("\n");
     displayedAll = true;
     return jsIncludesBuilder.toString();
   }
@@ -300,21 +291,32 @@ public class ExternalJavaScriptFilesCommand {
   private void addAllExtJSfilesFromDocRef(@NotNull DocumentReference docRef) {
     checkNotNull(docRef);
     try {
-      addAllExtJSfilesFromDoc(getModelAccess().getDocument(docRef));
+      XWikiObjectFetcher.on(getModelAccess().getDocument(docRef))
+          .filter(new ClassReference(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE,
+              IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC))
+          .stream()
+          .map(filepathObj -> filepathObj.getStringValue("filepath"))
+          .filter(Predicates.not(Strings::isNullOrEmpty))
+          .forEachOrdered(this::addExtJSfileOnce);
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addJSFiles from [{}] failed.", docRef, nExExp);
     }
   }
 
-  @NotNull
-  private void addAllExtJSfilesFromDoc(@NotNull XWikiDocument doc) {
-    XWikiObjectFetcher.on(doc)
-        .filter(new ClassReference(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE,
-            IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC))
-        .stream()
-        .map(filepathObj -> filepathObj.getStringValue("filepath"))
-        .filter(Predicates.not(Strings::isNullOrEmpty))
-        .forEachOrdered(this::addExtJSfileOnce);
+  AttachmentURLCommand getAttUrlCmd() {
+    return attUrlCmd_injected.orElse(new AttachmentURLCommand());
+  }
+
+  void injectAttUrlCmd(AttachmentURLCommand attUrlCmd) {
+    attUrlCmd_injected = Optional.ofNullable(attUrlCmd);
+  }
+
+  private PageLayoutCommand getLayoutService() {
+    return pageLayoutCmd_injected.orElse(new PageLayoutCommand());
+  }
+
+  void injectPageLayoutCmd(PageLayoutCommand pageLayoutCmd) {
+    pageLayoutCmd_injected = Optional.ofNullable(pageLayoutCmd);
   }
 
   private IPageTypeResolverRole getPageTypeResolver() {

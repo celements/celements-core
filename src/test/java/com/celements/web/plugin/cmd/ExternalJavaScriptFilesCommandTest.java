@@ -196,6 +196,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
 
   @Test
   public void testAddExtJSfileOnce_beforeGetAll_double() throws Exception {
+    PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
+    command.injectPageLayoutCmd(pageLayoutCmdMock);
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -218,29 +220,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(modelAccessMock.getDocument(eq(mainPrefDocRef))).andReturn(mainPrefDoc).atLeastOnce();
     DocumentReference webHomeDocRef = contextDocRef;
     XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
-    expect(modelAccessMock.exists(eq(webHomeDocRef))).andReturn(true).atLeastOnce();
     expect(modelAccessMock.getDocument(eq(webHomeDocRef))).andReturn(webHomeDoc).atLeastOnce();
-    // String pageTypeDocName1 = "PageTypes.Name1";
-    // String pageTypeDocName2 = "PageTypes.Name2";
-    // List<String> resultList = Arrays.asList(pageTypeDocName1, pageTypeDocName2);
-    // expect(xwiki.<String>search(eq(
-    // "select doc.fullName from XWikiDocument as doc, BaseObject as obj where "
-    // + "doc.space='PageTypes' and doc.translation=0 and obj.name=doc.fullName and "
-    // + "obj.className='Celements2.PageTypeProperties'"),
-    // same(context))).andReturn(
-    // resultList).atLeastOnce();
-    // DocumentReference pageTypesName2DocRef = new DocumentReference(context.getDatabase(),
-    // "PageTypes", "Name2");
-    // XWikiDocument pageTypesName2Doc = new XWikiDocument(pageTypesName2DocRef);
-    // expect(xwiki.exists(eq(pageTypeDocName2), same(context))).andReturn(true).atLeastOnce();
-    // expect(xwiki.getDocument(eq(pageTypeDocName2), same(context))).andReturn(
-    // pageTypesName2Doc).atLeastOnce();
-    // DocumentReference pageTypesName1DocRef = new DocumentReference(context.getDatabase(),
-    // "PageTypes", "Name1");
-    // XWikiDocument pageTypesName1Doc = new XWikiDocument(pageTypesName1DocRef);
-    // expect(xwiki.exists(eq(pageTypeDocName1), same(context))).andReturn(true).atLeastOnce();
-    // expect(xwiki.getDocument(eq(pageTypeDocName1), same(context))).andReturn(
-    // pageTypesName1Doc).atLeastOnce();
     PageTypeReference pageTypeRef = new PageTypeReference("TestPageType", "providerHint",
         Arrays.asList(""));
     expect(pageTypeResolverMock.resolvePageTypeRefForCurrentDoc()).andReturn(pageTypeRef);
@@ -248,22 +228,12 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         "TestPageType");
     XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
     expect(modelAccessMock.getDocument(eq(pageTypesDocRef))).andReturn(pageTypesDoc).atLeastOnce();
-    expect(xwiki.Param("celements.layout.default", "SimpleLayout")).andReturn(
-        "SimpleLayout").once();
     DocumentReference simpleLayoutDocRef = new DocumentReference(context.getDatabase(),
         "SimpleLayout", "WebHome");
     XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
-    expect(xwiki.exists(eq(simpleLayoutDocRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(simpleLayoutDocRef), same(context))).andReturn(
-        simpleLayoutDoc).atLeastOnce();
-    DocumentReference simpleLayoutCentralDocRef = new DocumentReference("celements2web",
-        "SimpleLayout", "WebHome");
-    XWikiDocument simpleLayoutCentralDoc = new XWikiDocument(simpleLayoutDocRef);
-    expect(xwiki.exists(eq(simpleLayoutCentralDocRef), same(context))).andReturn(true)
+    expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
         .atLeastOnce();
-    expect(xwiki.getDocument(eq(simpleLayoutCentralDocRef), same(context))).andReturn(
-        simpleLayoutCentralDoc).atLeastOnce();
-
+    expect(pageLayoutCmdMock.getLayoutPropDoc()).andReturn(simpleLayoutDoc).atLeastOnce();
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(file));
@@ -276,6 +246,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
 
   @Test
   public void testAddExtJSfileOnce_beforeGetAll_explicitAndImplicit_double() throws Exception {
+    PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
+    command.injectPageLayoutCmd(pageLayoutCmdMock);
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -295,13 +267,11 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
-    expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(
-        xwikiPrefDoc).atLeastOnce();
+    expect(modelAccessMock.getDocument(eq(xwikiPrefDocRef))).andReturn(xwikiPrefDoc).atLeastOnce();
     DocumentReference mainPrefDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebPreferences");
     XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
-    expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(mainPrefDoc)
-        .atLeastOnce();
+    expect(modelAccessMock.getDocument(eq(mainPrefDocRef))).andReturn(mainPrefDoc).atLeastOnce();
 
     PageTypeReference pageTypeRef = new PageTypeReference("TestPageType", "providerHint",
         Arrays.asList(""));
@@ -310,30 +280,18 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         "TestPageType");
     XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
     pageTypesDoc.setNew(false);
-    expect(xwiki.getDocument(eq(pageTypesDocRef), same(context))).andReturn(
-        pageTypesDoc).atLeastOnce();
+    expect(modelAccessMock.getDocument(eq(pageTypesDocRef))).andReturn(pageTypesDoc).atLeastOnce();
     DocumentReference mainWebHomeDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebHome");
     XWikiDocument mainWebHomeDoc = new XWikiDocument(pageTypesDocRef);
-    expect(xwiki.exists(eq(mainWebHomeDocRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(mainWebHomeDocRef), same(context))).andReturn(
-        mainWebHomeDoc).atLeastOnce();
-    expect(xwiki.Param("celements.layout.default", "SimpleLayout")).andReturn(
-        "SimpleLayout").once();
+    expect(modelAccessMock.getDocument(eq(mainWebHomeDocRef))).andReturn(mainWebHomeDoc)
+        .atLeastOnce();
     DocumentReference simpleLayoutDocRef = new DocumentReference(context.getDatabase(),
         "SimpleLayout", "WebHome");
     XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
-    expect(xwiki.exists(eq(simpleLayoutDocRef), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(simpleLayoutDocRef), same(context))).andReturn(
-        simpleLayoutDoc).atLeastOnce();
-    DocumentReference simpleLayoutCentralDocRef = new DocumentReference("celements2web",
-        "SimpleLayout", "WebHome");
-    XWikiDocument simpleLayoutCentralDoc = new XWikiDocument(simpleLayoutDocRef);
-    expect(xwiki.exists(eq(simpleLayoutCentralDocRef), same(context))).andReturn(true)
+    expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
         .atLeastOnce();
-    expect(xwiki.getDocument(eq(simpleLayoutCentralDocRef), same(context))).andReturn(
-        simpleLayoutCentralDoc).atLeastOnce();
-
+    expect(pageLayoutCmdMock.getLayoutPropDoc()).andReturn(simpleLayoutDoc).atLeastOnce();
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(attFileURL, "file"));
     assertEquals("", command.addExtJSfileOnce(attFileURL));
