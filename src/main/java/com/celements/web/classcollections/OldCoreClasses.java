@@ -184,10 +184,19 @@ public class OldCoreClasses extends AbstractClassCollection {
   @Deprecated
   public static final String USER_CSS_CLASS = USER_CSS_CLASS_SPACE + "." + USER_CSS_CLASS_DOC;
 
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC
+   */
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC = "ExternalFiles";
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
+   */
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE = "JavaScript";
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS
+   */
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS = JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
       + "." + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC;

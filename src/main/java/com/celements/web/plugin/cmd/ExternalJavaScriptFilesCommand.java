@@ -19,16 +19,16 @@
  */
 package com.celements.web.plugin.cmd;
 
-import java.util.ArrayList;
+import static com.google.common.base.Preconditions.*;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -37,28 +37,43 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.classes.IClassCollectionRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.context.ModelContext;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.model.reference.RefBuilder;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.JsonBuilder;
-import com.celements.web.classcollections.OldCoreClasses;
+import com.celements.web.classcollections.IOldCoreClassConfig;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class ExternalJavaScriptFilesCommand {
 
+  /**
+   * @deprecated since 5.4 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC
+   */
+  @Deprecated
   public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC = "ExternalFiles";
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
+   */
+  @Deprecated
   public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE = "JavaScript";
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS
+   */
+  @Deprecated
   public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS = JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE
       + "." + JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC;
 
@@ -92,16 +107,19 @@ public class ExternalJavaScriptFilesCommand {
 
   }
 
-  private final XWikiContext context;
   private final Set<JsFileEntry> extJSfileSet = new LinkedHashSet<>();
   private final Set<String> extJSAttUrlSet = new HashSet<>();
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
   private AttachmentURLCommand attUrlCmd_injected = null;
 
-  public ExternalJavaScriptFilesCommand(XWikiContext context) {
-    this.context = context;
-  }
+  public ExternalJavaScriptFilesCommand() {}
+
+  /**
+   * @deprecated since 5.4 instead use {@link ExternalJavaScriptFilesCommand()}
+   */
+  @Deprecated
+  public ExternalJavaScriptFilesCommand(XWikiContext context) {}
 
   public String addLazyExtJSfile(String jsFile) {
     return addLazyExtJSfile(jsFile, null);
@@ -114,9 +132,9 @@ public class ExternalJavaScriptFilesCommand {
   public String addLazyExtJSfile(String jsFile, String action, String params) {
     String attUrl;
     if (!StringUtils.isEmpty(action)) {
-      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, context);
+      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, getModelContext().getXWikiContext());
     } else {
-      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, context);
+      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, getModelContext().getXWikiContext());
     }
     if (!StringUtils.isEmpty(params)) {
       if (attUrl.indexOf("?") > -1) {
@@ -134,26 +152,32 @@ public class ExternalJavaScriptFilesCommand {
         + "</span>";
   }
 
+  @NotNull
   public String addExtJSfileOnceDefer(String jsFile) {
     return addExtJSfileOnce(jsFile, null, true);
   }
 
+  @NotNull
   public String addExtJSfileOnce(String jsFile) {
     return addExtJSfileOnce(jsFile, null);
   }
 
+  @NotNull
   public String addExtJSfileOnce(String jsFile, String action) {
     return addExtJSfileOnce(jsFile, action, false);
   }
 
+  @NotNull
   public String addExtJSfileOnce(String jsFile, String action, boolean defer) {
     return addExtJSfileOnce(jsFile, action, defer, null);
   }
 
+  @NotNull
   public String addExtJSfileOnce(String jsFile, String action, String params) {
     return addExtJSfileOnce(jsFile, action, false, params);
   }
 
+  @NotNull
   public String addExtJSfileOnce(String jsFile, String action, boolean defer, String params) {
     if (!extJSAttUrlSet.contains(jsFile)) {
       if (getAttUrlCmd().isAttachmentLink(jsFile) || getAttUrlCmd().isOnDiskLink(jsFile)) {
@@ -161,9 +185,10 @@ public class ExternalJavaScriptFilesCommand {
       }
       String attUrl;
       if (!StringUtils.isEmpty(action)) {
-        attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, context);
+        attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action,
+            getModelContext().getXWikiContext());
       } else {
-        attUrl = getAttUrlCmd().getAttachmentURL(jsFile, context);
+        attUrl = getAttUrlCmd().getAttachmentURL(jsFile, getModelContext().getXWikiContext());
       }
       if (!StringUtils.isEmpty(params)) {
         if (attUrl.indexOf("?") > -1) {
@@ -172,7 +197,7 @@ public class ExternalJavaScriptFilesCommand {
           attUrl += "?" + params;
         }
       }
-      return addExtJSfileOnceInternal(jsFile, attUrl, defer);
+      return Strings.nullToEmpty(addExtJSfileOnceInternal(jsFile, attUrl, defer));
     }
     return "";
   }
@@ -227,52 +252,33 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String getAllExternalJavaScriptFiles() {
-    if ((context != null) && (context.getDoc() != null)) {
-      VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
-      if ((vcontext != null) && vcontext.containsKey("skin_doc")) {
-        try {
-          addAllExtJSfilesFromDoc(getModelAccess().getDocument(((Document) vcontext.get(
-              "skin_doc")).getDocumentReference()));
-        } catch (DocumentNotExistsException nExExp) {
-          LOGGER.info("addJSFiles from skin_doc failed.", nExExp);
-        }
-      }
-      try {
-        addAllExtJSfilesFromDoc(getModelAccess().getDocument(new DocumentReference(
-            context.getDatabase(), "XWiki", "XWikiPreferences")));
-      } catch (DocumentNotExistsException nExExp) {
-        LOGGER.info("addJSFiles from XWiki.XWikiPreferences failed.", nExExp);
-      }
-      String curSpaceName = context.getDoc().getDocumentReference().getLastSpaceReference()
-          .getName();
-      try {
-        addAllExtJSfilesFromDoc(getModelAccess().getDocument(new DocumentReference(
-            context.getDatabase(), curSpaceName, "WebPreferences")));
-      } catch (DocumentNotExistsException nExExp) {
-        LOGGER.info("addJSFiles from current space '{}' WebPreferences failed.", curSpaceName,
-            nExExp);
-      }
-      PageTypeReference pageTypeRef = getPageTypeResolver().resolvePageTypeRefForCurrentDoc();
-      try {
-        addAllExtJSfilesFromDoc(getModelAccess().getDocument(getObjectPageTypeUtils()
-            .getDocRefForPageType(pageTypeRef)));
-      } catch (DocumentNotExistsException exp) {
-        LOGGER.info("Could not get Document with docRef {} ",
-            getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef), exp);
-      }
-      addAllExtJSfilesFromDoc(new PageLayoutCommand().getLayoutPropDoc());
-      addAllExtJSfilesFromDoc(context.getDoc());
+    Optional.ofNullable(getModelContext().getXWikiContext())
+        .map(xcontext -> (VelocityContext) xcontext.get("vcontext"))
+        .filter(vcontext -> vcontext.containsKey("skin_doc"))
+        .ifPresent(vcontext -> addAllExtJSfilesFromDocRef(
+            ((Document) vcontext.get("skin_doc")).getDocumentReference()));
+    addAllExtJSfilesFromDocRef(RefBuilder.from(getModelContext().getWikiRef()).space("XWiki")
+        .doc("XWikiPreferences").build(DocumentReference.class));
+    getModelContext().getCurrentSpaceRef().toJavaUtil()
+        .ifPresent(spaceRef -> addAllExtJSfilesFromDocRef(
+            RefBuilder.from(spaceRef).doc("WebPreferences").build(DocumentReference.class)));
+    PageTypeReference pageTypeRef = getPageTypeResolver().resolvePageTypeRefForCurrentDoc();
+    addAllExtJSfilesFromDocRef(getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef));
+    final XWikiDocument layoutPropDoc = new PageLayoutCommand().getLayoutPropDoc();
+    if (layoutPropDoc != null) {
+      addAllExtJSfilesFromDoc(layoutPropDoc);
     }
+    getModelContext().getCurrentDoc().toJavaUtil().ifPresent(this::addAllExtJSfilesFromDoc);
     notifyExtJavaScriptFileListener();
-    String jsIncludes = "";
+    final StringBuilder jsIncludesBuilder = new StringBuilder();
     for (JsFileEntry jsFile : extJSfileSet) {
-      jsIncludes += getExtStringForJsFile(jsFile) + "\n";
+      jsIncludesBuilder.append(getExtStringForJsFile(jsFile)).append("\n");
     }
     for (String jsFile : extJSnotFoundSet) {
-      jsIncludes += buildNotFoundWarning(jsFile) + "\n";
+      jsIncludesBuilder.append(buildNotFoundWarning(jsFile)).append("\n");
     }
     displayedAll = true;
-    return jsIncludes;
+    return jsIncludesBuilder.toString();
   }
 
   private void notifyExtJavaScriptFileListener() {
@@ -291,34 +297,24 @@ public class ExternalJavaScriptFilesCommand {
     return Collections.emptyMap();
   }
 
-  private String addAllExtJSfilesFromDoc(XWikiDocument doc) {
-    String jsIncludes2 = "";
-    for (String jsFile : getJavaScriptExternalFilePaths(doc)) {
-      String addJSinclude = addExtJSfileOnce(jsFile);
-      if (!"".equals(addJSinclude)) {
-        jsIncludes2 = jsIncludes2 + addJSinclude + "\n";
-      }
+  private void addAllExtJSfilesFromDocRef(@NotNull DocumentReference docRef) {
+    checkNotNull(docRef);
+    try {
+      addAllExtJSfilesFromDoc(getModelAccess().getDocument(docRef));
+    } catch (DocumentNotExistsException nExExp) {
+      LOGGER.info("addJSFiles from [{}] failed.", docRef, nExExp);
     }
-    return jsIncludes2;
   }
 
   @NotNull
-  private List<String> getJavaScriptExternalFilePaths(@Nullable XWikiDocument doc) {
-    if (doc == null) {
-      return Collections.emptyList();
-    }
-    List<BaseObject> javaScriptFiles = doc.getXObjects(
-        getOldCoreClasses().getJavaScriptExternalFilesClassRef(
-            doc.getDocumentReference().getWikiReference().getName()));
-    List<String> jsFiles = new ArrayList<>();
-    if (javaScriptFiles != null) {
-      for (BaseObject filepathObj : javaScriptFiles) {
-        if (!Strings.isNullOrEmpty(filepathObj.getStringValue("filepath"))) {
-          jsFiles.add(filepathObj.getStringValue("filepath"));
-        }
-      }
-    }
-    return jsFiles;
+  private void addAllExtJSfilesFromDoc(@NotNull XWikiDocument doc) {
+    XWikiObjectFetcher.on(doc)
+        .filter(new ClassReference(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE,
+            IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC))
+        .stream()
+        .map(filepathObj -> filepathObj.getStringValue("filepath"))
+        .filter(Predicates.not(Strings::isNullOrEmpty))
+        .forEachOrdered(this::addExtJSfileOnce);
   }
 
   private IPageTypeResolverRole getPageTypeResolver() {
@@ -329,13 +325,12 @@ public class ExternalJavaScriptFilesCommand {
     return Utils.getComponent(IModelAccessFacade.class);
   }
 
-  private XObjectPageTypeUtilsRole getObjectPageTypeUtils() {
-    return Utils.getComponent(XObjectPageTypeUtilsRole.class);
+  private ModelContext getModelContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
-  private OldCoreClasses getOldCoreClasses() {
-    return (OldCoreClasses) Utils.getComponent(IClassCollectionRole.class,
-        "celements.oldCoreClasses");
+  private XObjectPageTypeUtilsRole getObjectPageTypeUtils() {
+    return Utils.getComponent(XObjectPageTypeUtilsRole.class);
   }
 
 }
