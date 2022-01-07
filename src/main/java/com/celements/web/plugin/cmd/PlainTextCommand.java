@@ -19,6 +19,8 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.google.common.base.Strings.*;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -55,7 +57,7 @@ public class PlainTextCommand {
   }
 
   private String internalConvert(String htmlContent) throws IOException {
-    Reader in = new StringReader(htmlContent);
+    Reader in = new StringReader(nullToEmpty(htmlContent));
     Html2Text parser = new Html2Text();
     parser.parse(in);
     in.close();
