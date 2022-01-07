@@ -414,10 +414,9 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       @Nullable SpaceReference layoutSpaceRef) {
     checkNotNull(docRef);
     final XWikiDocument oldContextDoc = modelContext.getCurrentDoc().orNull();
-    LOGGER.debug(
-        "renderCelementsDocumentWithLayout for docRef [{}] and layoutSpaceRef [{}] overwrite "
-            + "oldContextDoc [{}].",
-        docRef, layoutSpaceRef, oldContextDoc.getDocumentReference());
+    LOGGER.debug("renderCelementsDocumentWithLayout for docRef [{}] and layoutSpaceRef [{}]"
+        + " overwrite oldContextDoc [{}].", docRef, layoutSpaceRef,
+        oldContextDoc.getDocumentReference());
     final XWikiContext xWikiContext = modelContext.getXWikiContext();
     final VelocityContext vcontext = (VelocityContext) xWikiContext.get("vcontext");
     try {
