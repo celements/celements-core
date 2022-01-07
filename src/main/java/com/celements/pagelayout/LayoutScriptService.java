@@ -22,7 +22,9 @@ package com.celements.pagelayout;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.velocity.VelocityContext;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -39,8 +41,6 @@ import com.celements.web.plugin.api.PageLayoutApi;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 @Component("layout")
@@ -70,7 +70,8 @@ public class LayoutScriptService implements ScriptService {
     return layoutService.renderPageLayout();
   }
 
-  public String renderPageLayout(SpaceReference spaceRef) {
+  @NotNull
+  public String renderPageLayout(@Nullable SpaceReference spaceRef) {
     return layoutService.renderPageLayout(spaceRef);
   }
 
@@ -90,10 +91,12 @@ public class LayoutScriptService implements ScriptService {
     return getPageLayoutCmd().getAllPageLayouts();
   }
 
+  @NotNull
   public Map<SpaceReference, String> getActivePageLayoutSpaceRefs() {
     return layoutService.getActivePageLayouts();
   }
 
+  @NotNull
   public Map<SpaceReference, String> getAllPageLayoutSpaceRefs() {
     return layoutService.getAllPageLayouts();
   }
@@ -102,11 +105,15 @@ public class LayoutScriptService implements ScriptService {
    * @deprecated since 5.4 instead use {@link #createNewLayout(SpaceReference)}
    */
   @Deprecated
-  public String createNewLayout(String layoutSpaceName) {
-    return createNewLayout(modelUtils.resolveRef(layoutSpaceName, SpaceReference.class));
+  @NotNull
+  public String createNewLayout(@Nullable String layoutSpaceName) {
+    SpaceReference layoutSpaceRef = Optional
+        .ofNullable(modelUtils.resolveRef(layoutSpaceName, SpaceReference.class)).orElse(null);
+    return createNewLayout(layoutSpaceRef);
   }
 
-  public String createNewLayout(SpaceReference layoutSpaceRef) {
+  @NotNull
+  public String createNewLayout(@Nullable SpaceReference layoutSpaceRef) {
     return layoutService.createNew(layoutSpaceRef);
   }
 
@@ -114,16 +121,17 @@ public class LayoutScriptService implements ScriptService {
    * @deprecated since 5.4 instead use {@link #deleteLayout(SpaceReference)}
    */
   @Deprecated
-  public boolean deleteLayout(String layoutSpaceName) {
+  public boolean deleteLayout(@Nullable String layoutSpaceName) {
     SpaceReference layoutSpaceRef = modelUtils.resolveRef(layoutSpaceName, SpaceReference.class);
     return deleteLayout(layoutSpaceRef);
   }
 
-  public boolean deleteLayout(SpaceReference layoutSpaceRef) {
+  public boolean deleteLayout(@Nullable SpaceReference layoutSpaceRef) {
     Optional<DocumentReference> layoutPropDocRef = layoutService
         .getLayoutPropDocRef(layoutSpaceRef);
     if (layoutPropDocRef.isPresent()
         && rightsAccess.hasAccessLevel(layoutPropDocRef.get(), EAccessLevel.DELETE)) {
+      // layoutPropDocRef is Optional.empty for layoutSpaceRef == null
       return layoutService.deleteLayout(layoutSpaceRef);
     } else {
       LOGGER.warn("NO delete rights on [{}] for user [{}].", layoutPropDocRef.orElse(null),
@@ -132,7 +140,7 @@ public class LayoutScriptService implements ScriptService {
     return false;
   }
 
-  public PageLayoutApi getPageLayoutApiForRef(SpaceReference layoutSpaceRef) {
+  public PageLayoutApi getPageLayoutApiForRef(@Nullable SpaceReference layoutSpaceRef) {
     return layoutService.resolveValidLayoutSpace(layoutSpaceRef)
         .map(PageLayoutApi::new)
         .orElse(null);
@@ -143,7 +151,7 @@ public class LayoutScriptService implements ScriptService {
    *
    * @return PageLayoutApi for the layoutSpaceRef computed
    */
-  public PageLayoutApi getPageLayoutApiForDocRef(DocumentReference docRef) {
+  public PageLayoutApi getPageLayoutApiForDocRef(@Nullable DocumentReference docRef) {
     SpaceReference pageLayoutForDoc = layoutService.getPageLayoutForDoc(docRef);
     if (pageLayoutForDoc != null) {
       return new PageLayoutApi(pageLayoutForDoc, getContext());
@@ -156,12 +164,12 @@ public class LayoutScriptService implements ScriptService {
    *             since 2.86 : or {@link #getPageLayoutApiForDocRef(DocumentReference)}
    */
   @Deprecated
-  public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
+  public PageLayoutApi getPageLayoutApiForName(@Nullable String layoutSpaceName) {
     return new PageLayoutApi(getWebUtilsService().resolveSpaceReference(layoutSpaceName),
         getContext());
   }
 
-  public String getPageLayoutForDoc(DocumentReference docRef) {
+  public String getPageLayoutForDoc(@Nullable DocumentReference docRef) {
     SpaceReference pageLayoutForDoc = layoutService.getPageLayoutForDoc(docRef);
     if (pageLayoutForDoc != null) {
       return pageLayoutForDoc.getName();
@@ -169,11 +177,11 @@ public class LayoutScriptService implements ScriptService {
     return "";
   }
 
-  public boolean layoutExists(SpaceReference layoutSpaceRef) {
+  public boolean layoutExists(@Nullable SpaceReference layoutSpaceRef) {
     return layoutService.layoutExists(layoutSpaceRef);
   }
 
-  public boolean canRenderLayout(SpaceReference spaceRef) {
+  public boolean canRenderLayout(@Nullable SpaceReference spaceRef) {
     return layoutService.canRenderLayout(spaceRef);
   }
 
@@ -186,24 +194,10 @@ public class LayoutScriptService implements ScriptService {
     return layoutService.isLayoutEditorAvailable();
   }
 
-  public String renderCelementsDocumentWithLayout(DocumentReference docRef,
-      SpaceReference layoutSpaceRef) {
-    XWikiDocument oldContextDoc = getContext().getDoc();
-    LOGGER.debug(
-        "renderCelementsDocumentWithLayout for docRef [{}] and layoutSpaceRef [{}] overwrite "
-            + "oldContextDoc [{}].",
-        docRef, layoutSpaceRef, oldContextDoc.getDocumentReference());
-    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-    try {
-      XWikiDocument newContextDoc = getContext().getWiki().getDocument(docRef, getContext());
-      getContext().setDoc(newContextDoc);
-      vcontext.put("doc", newContextDoc.newDocument(getContext()));
-      return layoutService.renderPageLayout(layoutSpaceRef);
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.", exp);
-    } finally {
-      getContext().setDoc(oldContextDoc);
-      vcontext.put("doc", oldContextDoc.newDocument(getContext()));
+  public String renderCelementsDocumentWithLayout(@Nullable DocumentReference docRef,
+      @Nullable SpaceReference layoutSpaceRef) {
+    if (docRef != null) {
+      return layoutService.renderCelementsDocumentWithLayout(docRef, layoutSpaceRef);
     }
     return "";
   }
@@ -220,6 +214,7 @@ public class LayoutScriptService implements ScriptService {
     return (PageLayoutCommand) getContext().get(CELEMENTS_PAGE_LAYOUT_COMMAND);
   }
 
+  @Deprecated
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }

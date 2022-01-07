@@ -72,6 +72,12 @@ public interface LayoutServiceRole {
   @NotNull
   Optional<DocumentReference> getLayoutPropDocRefForCurrentDoc();
 
+  /**
+   * getLayoutPropDocRef
+   *
+   * @param layoutSpaceRef
+   * @return optional DocumentReference for Layout property document or Optional.empty for null
+   */
   @NotNull
   Optional<DocumentReference> getLayoutPropDocRef(@Nullable SpaceReference layoutSpaceRef);
 
@@ -136,7 +142,11 @@ public interface LayoutServiceRole {
    * @throws IOException
    *           error when apply export.
    */
-  boolean exportLayoutXAR(SpaceReference layoutSpaceRef, boolean withDocHistory)
+  boolean exportLayoutXAR(@NotNull SpaceReference layoutSpaceRef, boolean withDocHistory)
       throws XWikiException, IOException;
+
+  @NotNull
+  String renderCelementsDocumentWithLayout(@NotNull DocumentReference docRef,
+      @Nullable SpaceReference layoutSpaceRef);
 
 }

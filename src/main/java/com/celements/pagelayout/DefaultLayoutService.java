@@ -183,7 +183,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public final String renderPageLayout(SpaceReference layoutSpaceRef) {
+  public final String renderPageLayout(@Nullable SpaceReference layoutSpaceRef) {
     LOGGER.info("renderPageLayout: for layoutRef '{}'", layoutSpaceRef);
     layoutSpaceRef = resolveValidLayoutSpace(layoutSpaceRef).orElse(null);
     LOGGER.debug("renderPageLayout: after decideLocalOrCentral layoutRef '{}'", layoutSpaceRef);
@@ -191,7 +191,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public final String renderPageLayoutLocal(SpaceReference layoutSpaceRef) {
+  public final String renderPageLayoutLocal(@Nullable SpaceReference layoutSpaceRef) {
     if (layoutSpaceRef == null) {
       return "";
     }
@@ -406,6 +406,33 @@ public final class DefaultLayoutService implements LayoutServiceRole {
         .allMatch(Predicates.alwaysTrue());
     export.export();
     return result;
+  }
+
+  @Override
+  @NotNull
+  public String renderCelementsDocumentWithLayout(@NotNull DocumentReference docRef,
+      @Nullable SpaceReference layoutSpaceRef) {
+    checkNotNull(docRef);
+    final XWikiDocument oldContextDoc = modelContext.getCurrentDoc().orNull();
+    LOGGER.debug(
+        "renderCelementsDocumentWithLayout for docRef [{}] and layoutSpaceRef [{}] overwrite "
+            + "oldContextDoc [{}].",
+        docRef, layoutSpaceRef, oldContextDoc.getDocumentReference());
+    final XWikiContext xWikiContext = modelContext.getXWikiContext();
+    final VelocityContext vcontext = (VelocityContext) xWikiContext.get("vcontext");
+    try {
+      final XWikiDocument newContextDoc = modelAccess.getDocument(docRef);
+      xWikiContext.setDoc(newContextDoc);
+      vcontext.put("doc", newContextDoc.newDocument(xWikiContext));
+      return renderPageLayout(layoutSpaceRef);
+    } catch (DocumentNotExistsException exp) {
+      LOGGER.error("Failed to get '{}' document to renderCelementsDocumentWithLayout.", docRef,
+          exp);
+    } finally {
+      xWikiContext.setDoc(oldContextDoc);
+      vcontext.put("doc", oldContextDoc.newDocument(xWikiContext));
+    }
+    return "";
   }
 
   private Optional<HtmlDoctype> getHtmlDoctype(BaseObject layoutPropertyObj, String fieldName) {
