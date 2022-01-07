@@ -109,12 +109,13 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       Query theQuery = queryManager.createQuery(getPageLayoutHQL(onlyActive), Query.HQL);
 
       List<String[]> results = theQuery.execute();
-      for (String[] resultRowObj : results) {
-        Object[] resultRow = resultRowObj;
-        plMapBuilder.put(
-            RefBuilder.create().with(modelContext.getWikiRef()).space(resultRow[0].toString())
+      for (String[] resultRow : results) {
+        plMapBuilder.put(RefBuilder.create()
+                .with(modelContext.getWikiRef())
+                .space(resultRow[0])
                 .build(SpaceReference.class),
-            resultRow[1].toString());
+            Strings.nullToEmpty(resultRow[1]));
+
       }
     } catch (QueryException exp) {
       LOGGER.error("Failed to get all page layouts", exp);
