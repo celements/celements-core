@@ -36,6 +36,7 @@ import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.DefaultRightsAccessFacade;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.plugin.api.PageLayoutApi;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -73,11 +74,27 @@ public class LayoutScriptService implements ScriptService {
     return layoutService.renderPageLayout(spaceRef);
   }
 
-  public Map<SpaceReference, String> getActivePageLayouts() {
+  /**
+   * @deprecated since 5.4 instead use {@link #getActivePageLayoutSpaceRefs()}
+   */
+  @Deprecated
+  public Map<String, String> getActivePageLayouts() {
+    return getPageLayoutCmd().getActivePageLyouts();
+  }
+
+  /**
+   * @deprecated since 5.4 instead use {@link #getAllPageLayouts()}
+   */
+  @Deprecated
+  public Map<String, String> getAllPageLayouts() {
+    return getPageLayoutCmd().getAllPageLayouts();
+  }
+
+  public Map<SpaceReference, String> getActivePageLayoutSpaceRefs() {
     return layoutService.getActivePageLayouts();
   }
 
-  public Map<SpaceReference, String> getAllPageLayouts() {
+  public Map<SpaceReference, String> getAllPageLayoutSpaceRefs() {
     return layoutService.getAllPageLayouts();
   }
 
@@ -193,6 +210,14 @@ public class LayoutScriptService implements ScriptService {
 
   public SpaceReference getCurrentRenderingLayout() {
     return layoutService.getCurrentRenderingLayout();
+  }
+
+  @Deprecated
+  private PageLayoutCommand getPageLayoutCmd() {
+    if (!getContext().containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
+      getContext().put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
+    }
+    return (PageLayoutCommand) getContext().get(CELEMENTS_PAGE_LAYOUT_COMMAND);
   }
 
   private IWebUtilsService getWebUtilsService() {
