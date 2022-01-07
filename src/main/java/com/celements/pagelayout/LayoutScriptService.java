@@ -99,7 +99,7 @@ public class LayoutScriptService implements ScriptService {
   }
 
   /**
-   * @deprecated since 5.3 instead use {@link #createNewLayout(SpaceReference)}
+   * @deprecated since 5.4 instead use {@link #createNewLayout(SpaceReference)}
    */
   @Deprecated
   public String createNewLayout(String layoutSpaceName) {
@@ -111,7 +111,7 @@ public class LayoutScriptService implements ScriptService {
   }
 
   /**
-   * @deprecated since 5.3 instead use {@link #deleteLayout(SpaceReference)}
+   * @deprecated since 5.4 instead use {@link #deleteLayout(SpaceReference)}
    */
   @Deprecated
   public boolean deleteLayout(String layoutSpaceName) {

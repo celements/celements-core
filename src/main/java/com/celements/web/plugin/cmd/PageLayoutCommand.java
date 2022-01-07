@@ -47,7 +47,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * @deprecated since 5.3 instead use {@link LayoutServiceRole}
+ * @deprecated since 5.4 instead use {@link LayoutServiceRole}
  */
 @Deprecated
 public class PageLayoutCommand {
@@ -82,7 +82,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getAllPageLayouts()}
    */
   @Deprecated
@@ -92,7 +92,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getActivePageLyouts()}
    */
   @Deprecated
@@ -101,7 +101,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#createNew(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -110,7 +110,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#deleteLayout(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -119,7 +119,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#layoutExists(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -128,7 +128,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#canRenderLayout(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -137,7 +137,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getLayoutPropertyObj(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -146,7 +146,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use {@link LayoutServiceRole#getLayoutPropDocRefForCurrentDoc()}
+   * @deprecated since 5.4 instead use {@link LayoutServiceRole#getLayoutPropDocRefForCurrentDoc()}
    *             and fetch the document yourself using {@link IModelAccessFacade}.
    */
   @Deprecated
@@ -164,7 +164,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getLayoutPropDocRef(SpaceReference layoutSpaceRef)}
    *             and fetch the document yourself using {@link IModelAccessFacade}.
    */
@@ -187,7 +187,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getLayoutPropDocRef(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -198,7 +198,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use {@link LayoutServiceRole#renderPageLayout()}
+   * @deprecated since 5.4 instead use {@link LayoutServiceRole#renderPageLayout()}
    */
   @Deprecated
   public String renderPageLayout() {
@@ -206,7 +206,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#renderPageLayout(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -215,7 +215,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#renderPageLayoutLocal(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -228,7 +228,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use {@link LayoutServiceRole#getPageLayoutForCurrentDoc()}
+   * @deprecated since 5.4 instead use {@link LayoutServiceRole#getPageLayoutForCurrentDoc()}
    */
   @Deprecated
   public SpaceReference getPageLayoutForCurrentDoc() {
@@ -254,7 +254,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#resolveValidLayoutSpace(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -264,7 +264,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getPageLayoutForDoc(DocumentReference documentReference)}
    */
   @Deprecated
@@ -273,7 +273,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#checkLayoutAccess(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -282,7 +282,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getDefaultLayoutSpaceReference()}
    */
   @Deprecated
@@ -291,7 +291,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#isActive(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -300,7 +300,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getPrettyName(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -309,7 +309,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getLayoutType(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -318,7 +318,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getHTMLType(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -328,7 +328,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#getVersion(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
@@ -337,7 +337,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use {@link LayoutServiceRole#isLayoutEditorAvailable()}
+   * @deprecated since 5.4 instead use {@link LayoutServiceRole#isLayoutEditorAvailable()}
    */
   @Deprecated
   public boolean layoutEditorAvailable() {
@@ -345,7 +345,7 @@ public class PageLayoutCommand {
   }
 
   /**
-   * @deprecated since 5.3 instead use
+   * @deprecated since 5.4 instead use
    *             {@link LayoutServiceRole#exportLayoutXAR(SpaceReference layoutSpaceRef,
    *             boolean withDocHistory)}
    */
