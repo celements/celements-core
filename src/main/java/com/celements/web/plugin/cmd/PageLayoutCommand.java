@@ -38,13 +38,13 @@ import com.celements.model.context.ModelContext;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
 import com.celements.pagelayout.LayoutServiceRole;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
+
+import one.util.streamex.EntryStream;
 
 /**
  * @deprecated since 5.4 instead use {@link LayoutServiceRole}
@@ -74,11 +74,9 @@ public class PageLayoutCommand {
   private LayoutServiceRole layoutService = Utils.getComponent(LayoutServiceRole.class);
 
   private Map<String, String> convertMap(Map<SpaceReference, String> pageLayoutMap) {
-    Builder<String, String> resultMap = ImmutableMap.<String, String>builder();
-    for (Map.Entry<SpaceReference, String> entry : pageLayoutMap.entrySet()) {
-      resultMap.put(entry.getKey().getName(), entry.getValue());
-    }
-    return resultMap.build();
+    return EntryStream.of(pageLayoutMap)
+        .mapKeys(SpaceReference::getName)
+        .toImmutableMap();
   }
 
   /**
@@ -155,7 +153,6 @@ public class PageLayoutCommand {
    */
   @Deprecated
   public XWikiDocument getLayoutPropDoc() {
-    @NotNull
     Optional<DocumentReference> layoutPropDocRef = layoutService.getLayoutPropDocRefForCurrentDoc();
     if (layoutPropDocRef.isPresent()) {
       try {
@@ -174,8 +171,8 @@ public class PageLayoutCommand {
    */
   @Deprecated
   public XWikiDocument getLayoutPropDoc(SpaceReference layoutSpaceRef) {
-    Optional<DocumentReference> layoutPropDocRef = layoutService
-        .getLayoutPropDocRef(layoutSpaceRef);
+    Optional<DocumentReference> layoutPropDocRef = layoutService.getLayoutPropDocRef(
+        layoutSpaceRef);
     if (layoutPropDocRef.isPresent()) {
       try {
         XWikiDocument layoutPropDoc = getModelAccess().getDocument(layoutPropDocRef.get());
