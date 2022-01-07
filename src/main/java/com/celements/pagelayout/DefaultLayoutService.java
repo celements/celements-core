@@ -107,12 +107,13 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       Query theQuery = queryManager.createQuery(getPageLayoutHQL(onlyActive), Query.HQL);
 
       List<String[]> results = theQuery.execute();
-      for (String[] resultRowObj : results) {
-        Object[] resultRow = resultRowObj;
-        plMapBuilder.put(
-            RefBuilder.create().with(modelContext.getWikiRef()).space(resultRow[0].toString())
+      for (String[] resultRow : results) {
+        plMapBuilder.put(RefBuilder.create()
+                .with(modelContext.getWikiRef())
+                .space(resultRow[0])
                 .build(SpaceReference.class),
-            resultRow[1].toString());
+            Strings.nullToEmpty(resultRow[1]));
+
       }
     } catch (QueryException exp) {
       LOGGER.error("Failed to get all page layouts", exp);
@@ -165,7 +166,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
         modelAccess.deleteDocument(modelUtils.resolveRef(docName, DocumentReference.class),
             moveToTrash);
       }
-      return moveToTrash;
+      return true;
     } catch (QueryException exp) {
       LOGGER.warn("Failed to get the list of documents while trying to delete space [{}]",
           layoutSpaceRef, exp);
@@ -329,11 +330,9 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   @Override
   public final BaseObject getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
     layoutSpaceRef = resolveValidLayoutSpace(layoutSpaceRef).orElse(null);
-    Optional<DocumentReference> layoutPropDocRef = getLayoutPropDocRef(layoutSpaceRef);
-    if (layoutPropDocRef.isPresent()) {
-      return getLayoutPropertyBaseObject(layoutPropDocRef.get()).orElse(null);
-    }
-    return null;
+    return getLayoutPropDocRef(layoutSpaceRef)
+      .map(this::getLayoutPropertyBaseObject)
+      .orElse(null);
   }
 
   @NotNull
