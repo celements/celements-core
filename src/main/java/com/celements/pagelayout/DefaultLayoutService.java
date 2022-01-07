@@ -326,11 +326,9 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   @Override
   public final BaseObject getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
     layoutSpaceRef = resolveValidLayoutSpace(layoutSpaceRef).orElse(null);
-    Optional<DocumentReference> layoutPropDocRef = getLayoutPropDocRef(layoutSpaceRef);
-    if (layoutPropDocRef.isPresent()) {
-      return getLayoutPropertyBaseObject(layoutPropDocRef.get()).orElse(null);
-    }
-    return null;
+    return getLayoutPropDocRef(layoutSpaceRef)
+      .map(this::getLayoutPropertyBaseObject)
+      .orElse(null);
   }
 
   @NotNull
