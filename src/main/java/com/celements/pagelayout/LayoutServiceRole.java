@@ -85,10 +85,10 @@ public interface LayoutServiceRole {
 
   /**
    * prohibit layout access in different db except central celements2web (or default
-   * layout configured on disk). TODO add allowedDBs to layout properties
+   * layout configured on disk).
    *
    * @param layoutSpaceRef
-   * @return
+   * @return boolean for access allowed
    */
   boolean checkLayoutAccess(@NotNull SpaceReference layoutSpaceRef);
 
