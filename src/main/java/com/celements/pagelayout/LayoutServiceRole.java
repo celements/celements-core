@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -96,7 +97,7 @@ public interface LayoutServiceRole {
 
   boolean canRenderLayout(@Nullable SpaceReference layoutSpaceRef);
 
-  @Nullable
+  @NotNull
   Optional<BaseObject> getLayoutPropertyObj(@Nullable SpaceReference layoutSpaceRef);
 
   @NotNull
@@ -113,7 +114,7 @@ public interface LayoutServiceRole {
   @NotNull
   Optional<String> getPrettyName(@Nullable SpaceReference layoutSpaceRef);
 
-  @NotNull
+  @NotEmpty
   String getLayoutType(@Nullable SpaceReference layoutSpaceRef);
 
   @NotNull

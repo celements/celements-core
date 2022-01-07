@@ -369,6 +369,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   public final String getLayoutType(SpaceReference layoutSpaceRef) {
     return getLayoutPropertyObj(layoutSpaceRef)
         .map(propObj -> propObj.getStringValue(ICellsClassConfig.LAYOUT_TYPE_FIELD))
+        .filter(not(Strings::isNullOrEmpty))
         .orElse(ICellsClassConfig.PAGE_LAYOUT_VALUE);
   }
 
