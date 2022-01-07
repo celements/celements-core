@@ -47,7 +47,6 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
-import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.JsonBuilder;
@@ -115,13 +114,15 @@ public class ExternalJavaScriptFilesCommand {
   private Optional<AttachmentURLCommand> attUrlCmd_injected = Optional.empty();
   private Optional<PageLayoutCommand> pageLayoutCmd_injected = Optional.empty();
 
-  public ExternalJavaScriptFilesCommand() {}
+  public ExternalJavaScriptFilesCommand() {
+  }
 
   /**
    * @deprecated since 5.4 instead use {@link ExternalJavaScriptFilesCommand()}
    */
   @Deprecated
-  public ExternalJavaScriptFilesCommand(XWikiContext context) {}
+  public ExternalJavaScriptFilesCommand(XWikiContext context) {
+  }
 
   public String addLazyExtJSfile(String jsFile) {
     return addLazyExtJSfile(jsFile, null);
@@ -243,23 +244,12 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String getAllExternalJavaScriptFiles() {
-    Optional.ofNullable(getModelContext().getXWikiContext())
-        .map(xcontext -> (VelocityContext) xcontext.get("vcontext"))
-        .filter(vcontext -> vcontext.containsKey("skin_doc"))
-        .ifPresent(vcontext -> addAllExtJSfilesFromDocRef(
-            ((Document) vcontext.get("skin_doc")).getDocumentReference()));
-    addAllExtJSfilesFromDocRef(RefBuilder.from(getModelContext().getWikiRef()).space("XWiki")
-        .doc("XWikiPreferences").build(DocumentReference.class));
-    getModelContext().getCurrentSpaceRef().toJavaUtil()
-        .ifPresent(spaceRef -> addAllExtJSfilesFromDocRef(
-            RefBuilder.from(spaceRef).doc("WebPreferences").build(DocumentReference.class)));
-    PageTypeReference pageTypeRef = getPageTypeResolver().resolvePageTypeRefForCurrentDoc();
-    addAllExtJSfilesFromDocRef(getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef));
-    Optional.ofNullable(getLayoutService().getLayoutPropDoc())
-        .ifPresent(
-            layoutPropDoc -> addAllExtJSfilesFromDocRef(layoutPropDoc.getDocumentReference()));
-    getModelContext().getCurrentDocRef().toJavaUtil()
-        .ifPresent(this::addAllExtJSfilesFromDocRef);
+    getSkinDocRef().ifPresent(this::addAllExtJSfilesFromDocRef);
+    addAllExtJSfilesFromDocRef(getXWikiPreferencesDocRef());
+    getCurrentSpacePreferencesDocRef().ifPresent(this::addAllExtJSfilesFromDocRef);
+    addAllExtJSfilesFromDocRef(getCurrentPageTypeDocRef());
+    getLayoutPropDocRef().ifPresent(this::addAllExtJSfilesFromDocRef);
+    getCurrentDocRef().ifPresent(this::addAllExtJSfilesFromDocRef);
     notifyExtJavaScriptFileListener();
 
     final StringBuilder jsIncludesBuilder = new StringBuilder();
@@ -270,6 +260,38 @@ public class ExternalJavaScriptFilesCommand {
     jsIncludesBuilder.append("\n");
     displayedAll = true;
     return jsIncludesBuilder.toString();
+  }
+
+  private Optional<DocumentReference> getCurrentDocRef() {
+    return getModelContext().getCurrentDocRef().toJavaUtil();
+  }
+
+  private Optional<DocumentReference> getLayoutPropDocRef() {
+    return Optional.ofNullable(getLayoutService().getLayoutPropDoc())
+        .map(layoutPropDoc -> layoutPropDoc.getDocumentReference());
+  }
+
+  private @NotNull DocumentReference getCurrentPageTypeDocRef() {
+    return getObjectPageTypeUtils().getDocRefForPageType(
+        getPageTypeResolver().resolvePageTypeRefForCurrentDoc());
+  }
+
+  private Optional<DocumentReference> getCurrentSpacePreferencesDocRef() {
+    return getModelContext().getCurrentSpaceRef().toJavaUtil()
+        .map(spaceRef -> RefBuilder.from(spaceRef).doc("WebPreferences").build(
+            DocumentReference.class));
+  }
+
+  private @NotNull DocumentReference getXWikiPreferencesDocRef() {
+    return RefBuilder.from(getModelContext().getWikiRef()).space("XWiki")
+        .doc("XWikiPreferences").build(DocumentReference.class);
+  }
+
+  private Optional<DocumentReference> getSkinDocRef() {
+    return Optional.ofNullable(getModelContext().getXWikiContext())
+        .map(xcontext -> (VelocityContext) xcontext.get("vcontext"))
+        .filter(vcontext -> vcontext.containsKey("skin_doc"))
+        .map(vcontext -> ((Document) vcontext.get("skin_doc")).getDocumentReference());
   }
 
   private void notifyExtJavaScriptFileListener() {
