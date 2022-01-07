@@ -91,8 +91,6 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   @Requirement
   ConfigurationSource cfgSrc;
 
-  private InheritorFactory injectedInheritorFactory;
-
   @Override
   public final Map<SpaceReference, String> getAllPageLayouts() {
     return getPageLayoutMap(false);
@@ -243,6 +241,12 @@ public final class DefaultLayoutService implements LayoutServiceRole {
 
   @Override
   public final SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
+    InheritorFactory inheritorFactory = new InheritorFactory();
+    return getPageLayoutForDoc(documentReference, inheritorFactory);
+  }
+
+  SpaceReference getPageLayoutForDoc(DocumentReference documentReference,
+      InheritorFactory inheritorFactory) {
     long millisec = System.currentTimeMillis();
     LOGGER.debug("getPageLayoutForDoc: for [{}].", documentReference);
     if (documentReference == null) {
@@ -252,7 +256,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     if (layoutExists(documentReference.getLastSpaceReference())) {
       layoutSpaceRef = getCelLayoutEditorSpaceRef();
     } else {
-      String spaceName = getInheritorFactory().getPageLayoutInheritor(modelUtils.serializeRefLocal(
+      String spaceName = inheritorFactory.getPageLayoutInheritor(modelUtils.serializeRefLocal(
           documentReference), modelContext.getXWikiContext()).getStringValue("page_layout", null);
       if (spaceName != null) {
         layoutSpaceRef = modelUtils.resolveRef(spaceName, SpaceReference.class);
@@ -493,22 +497,6 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     } else {
       vcontext.remove(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY);
     }
-  }
-
-  /**
-   * For TESTS ONLY!!!
-   *
-   * @param injectedInheritorFactory
-   */
-  void inject_TEST_InheritorFactory(InheritorFactory injectedInheritorFactory) {
-    this.injectedInheritorFactory = injectedInheritorFactory;
-  }
-
-  private InheritorFactory getInheritorFactory() {
-    if (injectedInheritorFactory != null) {
-      return injectedInheritorFactory;
-    }
-    return new InheritorFactory();
   }
 
 }
