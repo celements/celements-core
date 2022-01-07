@@ -168,7 +168,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
         modelAccess.deleteDocument(modelUtils.resolveRef(docName, DocumentReference.class),
             moveToTrash);
       }
-      return moveToTrash;
+      return true;
     } catch (QueryException exp) {
       LOGGER.warn("Failed to get the list of documents while trying to delete space [{}]",
           layoutSpaceRef, exp);
