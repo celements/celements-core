@@ -422,7 +422,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
         .andThrow(new DocumentNotExistsException(webHomeDocRef)).atLeastOnce();
     replayDefault();
     assertFalse("Current space is missing the WebHome document. Without LayoutProperties it is no "
-        + "valid Layout-Space", layoutService.layoutExists(currDocRef.getLastSpaceReference()));
+        + "valid Layout-Space", layoutService.existsLayout(currDocRef.getLastSpaceReference()));
     verifyDefault();
   }
 
@@ -436,7 +436,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     expectLayoutDoc(layoutSpaceRef, true, true);
     replayDefault();
     assertTrue("Current space is a valid Layout-Space with an LayoutProperty object",
-        layoutService.layoutExists(layoutSpaceRef));
+        layoutService.existsLayout(layoutSpaceRef));
     verifyDefault();
   }
 

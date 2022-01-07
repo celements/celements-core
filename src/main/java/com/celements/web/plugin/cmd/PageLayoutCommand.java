@@ -124,11 +124,11 @@ public class PageLayoutCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link LayoutServiceRole#layoutExists(SpaceReference layoutSpaceRef)}
+   *             {@link LayoutServiceRole#existsLayout(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
   public boolean layoutExists(SpaceReference layoutSpaceRef) {
-    return layoutService.layoutExists(layoutSpaceRef);
+    return layoutService.existsLayout(layoutSpaceRef);
   }
 
   /**

@@ -141,7 +141,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   @Override
   public final boolean createLayout(SpaceReference layoutSpaceRef) {
     if (layoutSpaceRef != null) {
-      if (!layoutExists(layoutSpaceRef)) {
+      if (!existsLayout(layoutSpaceRef)) {
         try {
           XWikiDocument propXdoc = modelAccess
               .getOrCreateDocument(getLayoutPropDocRef(layoutSpaceRef).get());
@@ -219,7 +219,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public final boolean layoutExists(SpaceReference layoutSpaceRef) {
+  public final boolean existsLayout(SpaceReference layoutSpaceRef) {
     return getLayoutPropDocRef(layoutSpaceRef)
         .map(propertyDocRef -> getLayoutPropertyBaseObject(propertyDocRef).orElse(null))
         .isPresent();
@@ -258,7 +258,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       return null;
     }
     SpaceReference layoutSpaceRef = null;
-    if (layoutExists(documentReference.getLastSpaceReference())) {
+    if (existsLayout(documentReference.getLastSpaceReference())) {
       layoutSpaceRef = getCelLayoutEditorSpaceRef();
     } else {
       String spaceName = inheritorFactory.getPageLayoutInheritor(modelUtils.serializeRefLocal(
@@ -288,11 +288,11 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   @Override
   public final Optional<SpaceReference> resolveValidLayoutSpace(
       @Nullable SpaceReference layoutSpaceRef) {
-    if ((layoutSpaceRef != null) && !layoutExists(layoutSpaceRef)) {
+    if ((layoutSpaceRef != null) && !existsLayout(layoutSpaceRef)) {
       SpaceReference centralLayoutSpaceRef = RefBuilder.from(layoutSpaceRef)
           .with(getCentralWikiRef())
           .build(SpaceReference.class);
-      if (!layoutSpaceRef.equals(centralLayoutSpaceRef) && layoutExists(centralLayoutSpaceRef)) {
+      if (!layoutSpaceRef.equals(centralLayoutSpaceRef) && existsLayout(centralLayoutSpaceRef)) {
         layoutSpaceRef = centralLayoutSpaceRef;
       } else {
         layoutSpaceRef = null;

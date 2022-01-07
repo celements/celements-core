@@ -265,7 +265,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     String layoutName = "TestLayout";
     SpaceReference layoutSpaceRef = new SpaceReference(layoutName, new WikiReference(
         context.getDatabase()));
-    expect(layoutServiceMock.layoutExists(layoutSpaceRef)).andReturn(true);
+    expect(layoutServiceMock.existsLayout(layoutSpaceRef)).andReturn(true);
     replayDefault();
     assertTrue(plCmd.layoutExists(layoutSpaceRef));
     verifyDefault();
@@ -276,7 +276,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     String layoutName = "TestLayout";
     SpaceReference layoutSpaceRef = new SpaceReference(layoutName, new WikiReference(
         context.getDatabase()));
-    expect(layoutServiceMock.layoutExists(layoutSpaceRef)).andReturn(false);
+    expect(layoutServiceMock.existsLayout(layoutSpaceRef)).andReturn(false);
     replayDefault();
     assertFalse(plCmd.layoutExists(layoutSpaceRef));
     verifyDefault();

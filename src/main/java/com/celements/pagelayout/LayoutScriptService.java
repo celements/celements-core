@@ -182,7 +182,7 @@ public class LayoutScriptService implements ScriptService {
   }
 
   public boolean layoutExists(@Nullable SpaceReference layoutSpaceRef) {
-    return layoutService.layoutExists(layoutSpaceRef);
+    return layoutService.existsLayout(layoutSpaceRef);
   }
 
   public boolean canRenderLayout(@Nullable SpaceReference spaceRef) {

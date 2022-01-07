@@ -67,7 +67,7 @@ public interface LayoutServiceRole {
    * @param layoutSpaceRef
    * @return true if layout exists
    */
-  boolean layoutExists(@Nullable SpaceReference layoutSpaceRef);
+  boolean existsLayout(@Nullable SpaceReference layoutSpaceRef);
 
   @NotNull
   Optional<DocumentReference> getLayoutPropDocRefForCurrentDoc();
