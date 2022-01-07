@@ -105,9 +105,9 @@ public final class DefaultLayoutService implements LayoutServiceRole {
 
   private ImmutableMap<SpaceReference, String> getPageLayoutMap(boolean onlyActive) {
     Builder<SpaceReference, String> plMapBuilder = ImmutableMap.<SpaceReference, String>builder();
-    Query theQuery;
     try {
-      theQuery = queryManager.createQuery(getPageLayoutHQL(onlyActive), Query.HQL);
+      Query theQuery = queryManager.createQuery(getPageLayoutHQL(onlyActive), Query.HQL);
+
       List<String[]> results = theQuery.execute();
       for (String[] resultRowObj : results) {
         Object[] resultRow = resultRowObj;
