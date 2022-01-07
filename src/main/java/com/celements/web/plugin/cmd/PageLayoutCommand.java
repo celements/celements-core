@@ -102,11 +102,15 @@ public class PageLayoutCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link LayoutServiceRole#createNew(SpaceReference layoutSpaceRef)}
+   *             {@link LayoutServiceRole#createLayout(SpaceReference layoutSpaceRef)}
    */
   @Deprecated
   public String createNew(SpaceReference layoutSpaceRef) {
-    return layoutService.createNew(layoutSpaceRef);
+    if (layoutService.createLayout(layoutSpaceRef)) {
+      return "cel_layout_create_successful";
+    } else {
+      return "cel_layout_empty_name_msg";
+    }
   }
 
   /**
@@ -142,7 +146,7 @@ public class PageLayoutCommand {
    */
   @Deprecated
   public BaseObject getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
-    return layoutService.getLayoutPropertyObj(layoutSpaceRef);
+    return layoutService.getLayoutPropertyObj(layoutSpaceRef).orElse(null);
   }
 
   /**
@@ -305,7 +309,7 @@ public class PageLayoutCommand {
    */
   @Deprecated
   public String getPrettyName(SpaceReference layoutSpaceRef) {
-    return layoutService.getPrettyName(layoutSpaceRef);
+    return layoutService.getPrettyName(layoutSpaceRef).orElse("");
   }
 
   /**

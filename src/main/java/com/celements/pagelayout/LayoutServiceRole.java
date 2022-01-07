@@ -25,8 +25,7 @@ public interface LayoutServiceRole {
 
   public static final String CEL_LAYOUT_EDITOR_PL_NAME = "CelLayoutEditor";
 
-  @NotNull
-  String createNew(@Nullable SpaceReference layoutSpaceRef);
+  boolean createLayout(@Nullable SpaceReference layoutSpaceRef);
 
   boolean deleteLayout(@NotNull SpaceReference layoutSpaceRef);
 
@@ -98,7 +97,7 @@ public interface LayoutServiceRole {
   boolean canRenderLayout(@Nullable SpaceReference layoutSpaceRef);
 
   @Nullable
-  BaseObject getLayoutPropertyObj(@Nullable SpaceReference layoutSpaceRef);
+  Optional<BaseObject> getLayoutPropertyObj(@Nullable SpaceReference layoutSpaceRef);
 
   @NotNull
   Map<SpaceReference, String> getActivePageLayouts();
@@ -112,7 +111,7 @@ public interface LayoutServiceRole {
   boolean isActive(@Nullable SpaceReference layoutSpaceRef);
 
   @NotNull
-  String getPrettyName(@Nullable SpaceReference layoutSpaceRef);
+  Optional<String> getPrettyName(@Nullable SpaceReference layoutSpaceRef);
 
   @NotNull
   String getLayoutType(@Nullable SpaceReference layoutSpaceRef);

@@ -2,6 +2,7 @@ package com.celements.pagelayout;
 
 import static com.celements.common.lambda.LambdaExceptionUtil.*;
 import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Predicates.*;
 
 import java.io.IOException;
 import java.util.Deque;
@@ -22,6 +23,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -41,6 +43,8 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.context.ModelContext;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
@@ -109,9 +113,9 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       List<String[]> results = theQuery.execute();
       for (String[] resultRow : results) {
         plMapBuilder.put(RefBuilder.create()
-                .with(modelContext.getWikiRef())
-                .space(resultRow[0])
-                .build(SpaceReference.class),
+            .with(modelContext.getWikiRef())
+            .space(resultRow[0])
+            .build(SpaceReference.class),
             Strings.nullToEmpty(resultRow[1]));
 
       }
@@ -135,24 +139,24 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public final String createNew(SpaceReference layoutSpaceRef) {
+  public final boolean createLayout(SpaceReference layoutSpaceRef) {
     if (layoutSpaceRef != null) {
       if (!layoutExists(layoutSpaceRef)) {
         try {
           XWikiDocument propXdoc = modelAccess
               .getOrCreateDocument(getLayoutPropDocRef(layoutSpaceRef).get());
-          BaseObject layoutPropObj = modelAccess.newXObject(propXdoc,
-              getPageLayoutPropertiesClassRef(propXdoc.getDocumentReference().getWikiReference()));
+          BaseObject layoutPropObj = XWikiObjectEditor.on(propXdoc)
+              .filter(getPageLayoutPropertiesClassRef()).createFirst();
           layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName() + " Layout");
           layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, getDocType());
           modelAccess.saveDocument(propXdoc, "Creating page layout", false);
-          return "cel_layout_create_successful";
+          return true;
         } catch (DocumentSaveException exp) {
           LOGGER.error("createNew: failed to create new page layout.", exp);
         }
       }
     }
-    return "cel_layout_empty_name_msg";
+    return false;
   }
 
   @Override
@@ -328,21 +332,19 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public final BaseObject getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
+  public final Optional<BaseObject> getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
     layoutSpaceRef = resolveValidLayoutSpace(layoutSpaceRef).orElse(null);
     return getLayoutPropDocRef(layoutSpaceRef)
-      .map(this::getLayoutPropertyBaseObject)
-      .orElse(null);
+        .flatMap(this::getLayoutPropertyBaseObject);
   }
 
   @NotNull
   private Optional<BaseObject> getLayoutPropertyBaseObject(
       @NotNull DocumentReference layoutPropDocRef) {
-    XWikiDocument layoutPropDoc;
     try {
-      layoutPropDoc = modelAccess.getDocument(layoutPropDocRef);
-      return Optional.ofNullable(layoutPropDoc.getXObject(getPageLayoutPropertiesClassRef(
-          layoutPropDoc.getDocumentReference().getWikiReference())));
+      return XWikiObjectFetcher.on(modelAccess.getDocument(layoutPropDocRef))
+          .filter(getPageLayoutPropertiesClassRef())
+          .stream().findFirst();
     } catch (DocumentNotExistsException exp) {
       LOGGER.info("Layout property doc [{}] does not exist.", layoutPropDocRef, exp);
     }
@@ -351,49 +353,39 @@ public final class DefaultLayoutService implements LayoutServiceRole {
 
   @Override
   public final boolean isActive(SpaceReference layoutSpaceRef) {
-    BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
-    if (layoutPropertyObj != null) {
-      return layoutPropertyObj.getIntValue("isActive", 0) > 0;
-    }
-    return false;
+    return getLayoutPropertyObj(layoutSpaceRef)
+        .filter(propObj -> (propObj.getIntValue("isActive", 0) > 0))
+        .isPresent();
   }
 
   @Override
-  public final String getPrettyName(SpaceReference layoutSpaceRef) {
-    BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
-    if ((layoutPropertyObj != null) && (layoutPropertyObj.getStringValue("prettyname") != null)) {
-      return layoutPropertyObj.getStringValue("prettyname");
-    }
-    return "";
+  public final Optional<String> getPrettyName(SpaceReference layoutSpaceRef) {
+    return getLayoutPropertyObj(layoutSpaceRef)
+        .map(propObj -> propObj.getStringValue("prettyname"))
+        .filter(not(Strings::isNullOrEmpty));
   }
 
   @Override
   public final String getLayoutType(SpaceReference layoutSpaceRef) {
-    BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
-    if (layoutPropertyObj != null) {
-      return layoutPropertyObj.getStringValue(ICellsClassConfig.LAYOUT_TYPE_FIELD);
-    }
-    return ICellsClassConfig.PAGE_LAYOUT_VALUE;
+    return getLayoutPropertyObj(layoutSpaceRef)
+        .map(propObj -> propObj.getStringValue(ICellsClassConfig.LAYOUT_TYPE_FIELD))
+        .orElse(ICellsClassConfig.PAGE_LAYOUT_VALUE);
   }
 
   @NotNull
   @Override
   public final HtmlDoctype getHTMLType(@NotNull SpaceReference layoutSpaceRef) {
-    BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
-    Optional<HtmlDoctype> stringValue = Optional.empty();
-    if (layoutPropertyObj != null) {
-      stringValue = getHtmlDoctype(layoutPropertyObj, ICellsClassConfig.LAYOUT_DOCTYPE_FIELD);
-    }
-    return stringValue.orElse(HtmlDoctype.XHTML);
+    return getLayoutPropertyObj(layoutSpaceRef)
+        .map(propObj -> propObj.getStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD))
+        .flatMap(docTypeStr -> HtmlDoctype.getHtmlDoctype(docTypeStr).toJavaUtil())
+        .orElse(HtmlDoctype.XHTML);
   }
 
   @Override
   public final String getVersion(SpaceReference layoutSpaceRef) {
-    BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
-    if ((layoutPropertyObj != null) && (layoutPropertyObj.getStringValue("version") != null)) {
-      return layoutPropertyObj.getStringValue("version");
-    }
-    return "";
+    return getLayoutPropertyObj(layoutSpaceRef)
+        .map(propObj -> propObj.getStringValue("version"))
+        .orElse("");
   }
 
   @Override
@@ -401,7 +393,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       boolean withDocHistory) throws XWikiException, IOException {
     final XWikiContext context = modelContext.getXWikiContext();
     PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi(PACKAGEPLUGIN_NAME, context));
-    export.setName(getPrettyName(layoutSpaceRef) + "-" + getVersion(layoutSpaceRef));
+    export.setName(getPrettyName(layoutSpaceRef).orElse("") + "-" + getVersion(layoutSpaceRef));
     export.setWithVersions(withDocHistory);
     boolean result = modelUtils.getAllDocsForSpace(layoutSpaceRef)
         .map(rethrowFunction(documentName -> export.add(modelUtils.serializeRefLocal(documentName),
@@ -442,11 +434,8 @@ public final class DefaultLayoutService implements LayoutServiceRole {
         fieldName))).toJavaUtil();
   }
 
-  final DocumentReference getPageLayoutPropertiesClassRef(WikiReference wikiRef) {
-    return RefBuilder.from(wikiRef)
-        .space(PAGE_LAYOUT_PROPERTIES_CLASS_SPACE)
-        .doc(PAGE_LAYOUT_PROPERTIES_CLASS_DOC)
-        .build(DocumentReference.class);
+  final ClassReference getPageLayoutPropertiesClassRef() {
+    return new ClassReference(PAGE_LAYOUT_PROPERTIES_CLASS_SPACE, PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
   }
 
   final String getDefaultLayout() {

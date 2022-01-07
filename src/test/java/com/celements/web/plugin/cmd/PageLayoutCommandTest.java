@@ -136,7 +136,8 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MyPageLayout",
         "WebHome");
     XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
-    expect(layoutServiceMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(webHomeDocRef));
+    expect(layoutServiceMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
+        webHomeDocRef));
     expect(modelAccessMock.getDocument(eq(webHomeDocRef))).andReturn(webHomeDoc);
     replayDefault();
     assertSame(webHomeDoc, plCmd.getLayoutPropDoc());
@@ -147,7 +148,8 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
   public void test_getLayoutPropDoc_proxyCheck_DocNotExist() throws Exception {
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MyPageLayout",
         "WebHome");
-    expect(layoutServiceMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(webHomeDocRef));
+    expect(layoutServiceMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
+        webHomeDocRef));
     expect(modelAccessMock.getDocument(eq(webHomeDocRef)))
         .andThrow(new DocumentNotExistsException(webHomeDocRef)).anyTimes();
     replayDefault();
@@ -173,7 +175,8 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     expect(layoutServiceMock.getLayoutPropDocRef(layoutSpaceRef))
         .andReturn(Optional.of(webHomeDocRef));
     expect(modelAccessMock.getDocument(eq(webHomeDocRef))).andReturn(webHomeDoc);
-    expect(layoutServiceMock.getLayoutPropertyObj(layoutSpaceRef)).andReturn(new BaseObject());
+    expect(layoutServiceMock.getLayoutPropertyObj(layoutSpaceRef)).andReturn(
+        Optional.of(new BaseObject()));
     replayDefault();
     assertSame(webHomeDoc, plCmd.getLayoutPropDoc(layoutSpaceRef));
     verifyDefault();
@@ -284,13 +287,13 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     SpaceReference layoutSpaceRef = new SpaceReference(
         PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, getWikiRef());
     @NotNull
-    String respMsg = "response_dict";
-    expect(layoutServiceMock.createNew(eq(layoutSpaceRef))).andReturn(respMsg);
+    boolean response = true;
+    expect(layoutServiceMock.createLayout(eq(layoutSpaceRef))).andReturn(response);
     replayDefault();
     String ret = plCmd.createNew(layoutSpaceRef);
     verifyDefault();
 
-    assertEquals(ret, respMsg);
+    assertEquals(ret, "cel_layout_create_successful");
   }
 
   @Test
@@ -298,7 +301,8 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     SpaceReference layoutSpaceRef = new SpaceReference(
         PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, getWikiRef());
     BaseObject propObj = new BaseObject();
-    expect(layoutServiceMock.getLayoutPropertyObj(eq(layoutSpaceRef))).andReturn(propObj);
+    expect(layoutServiceMock.getLayoutPropertyObj(eq(layoutSpaceRef))).andReturn(Optional.of(
+        propObj));
     replayDefault();
     BaseObject ret = plCmd.getLayoutPropertyObj(layoutSpaceRef);
     verifyDefault();

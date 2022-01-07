@@ -902,7 +902,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
           .once();
       if (withObject) {
         BaseObject layoutPropObj = new BaseObject();
-        layoutPropObj.setXClassReference(layoutService.getPageLayoutPropertiesClassRef(
+        layoutPropObj.setXClassReference(layoutService.getPageLayoutPropertiesClassRef().getDocRef(
             (WikiReference) layoutSpaceRef.getParent()));
         layoutDoc.addXObject(layoutPropObj);
       }

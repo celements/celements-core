@@ -102,19 +102,23 @@ public class LayoutScriptService implements ScriptService {
   }
 
   /**
-   * @deprecated since 5.4 instead use {@link #createNewLayout(SpaceReference)}
+   * @deprecated since 5.4 instead use {@link #createLayout(SpaceReference)}
    */
   @Deprecated
   @NotNull
   public String createNewLayout(@Nullable String layoutSpaceName) {
     SpaceReference layoutSpaceRef = Optional
         .ofNullable(modelUtils.resolveRef(layoutSpaceName, SpaceReference.class)).orElse(null);
-    return createNewLayout(layoutSpaceRef);
+    return createLayout(layoutSpaceRef);
   }
 
   @NotNull
-  public String createNewLayout(@Nullable SpaceReference layoutSpaceRef) {
-    return layoutService.createNew(layoutSpaceRef);
+  public String createLayout(@Nullable SpaceReference layoutSpaceRef) {
+    if (layoutService.createLayout(layoutSpaceRef)) {
+      return "cel_layout_create_successful";
+    } else {
+      return "cel_layout_empty_name_msg";
+    }
   }
 
   /**
