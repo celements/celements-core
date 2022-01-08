@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
 
 import javax.validation.constraints.NotNull;
 
@@ -114,15 +115,13 @@ public class ExternalJavaScriptFilesCommand {
   private Optional<AttachmentURLCommand> attUrlCmd_injected = Optional.empty();
   private Optional<PageLayoutCommand> pageLayoutCmd_injected = Optional.empty();
 
-  public ExternalJavaScriptFilesCommand() {
-  }
+  public ExternalJavaScriptFilesCommand() {}
 
   /**
    * @deprecated since 5.4 instead use {@link ExternalJavaScriptFilesCommand()}
    */
   @Deprecated
-  public ExternalJavaScriptFilesCommand(XWikiContext context) {
-  }
+  public ExternalJavaScriptFilesCommand(XWikiContext context) {}
 
   public String addLazyExtJSfile(String jsFile) {
     return addLazyExtJSfile(jsFile, null);
@@ -244,12 +243,7 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String getAllExternalJavaScriptFiles() {
-    getSkinDocRef().ifPresent(this::addAllExtJSfilesFromDocRef);
-    addAllExtJSfilesFromDocRef(getXWikiPreferencesDocRef());
-    getCurrentSpacePreferencesDocRef().ifPresent(this::addAllExtJSfilesFromDocRef);
-    addAllExtJSfilesFromDocRef(getCurrentPageTypeDocRef());
-    getLayoutPropDocRef().ifPresent(this::addAllExtJSfilesFromDocRef);
-    getCurrentDocRef().ifPresent(this::addAllExtJSfilesFromDocRef);
+    getDocRefsStream().forEachOrdered(this::addAllExtJSfilesFromDocRef);
     notifyExtJavaScriptFileListener();
 
     final StringBuilder jsIncludesBuilder = new StringBuilder();
@@ -260,6 +254,17 @@ public class ExternalJavaScriptFilesCommand {
     jsIncludesBuilder.append("\n");
     displayedAll = true;
     return jsIncludesBuilder.toString();
+  }
+
+  private Stream<DocumentReference> getDocRefsStream() {
+    Builder<DocumentReference> docRefStreamBuilder = Stream.builder();
+    getSkinDocRef().ifPresent(docRefStreamBuilder::accept);
+    docRefStreamBuilder.add(getXWikiPreferencesDocRef());
+    getCurrentSpacePreferencesDocRef().ifPresent(docRefStreamBuilder::accept);
+    docRefStreamBuilder.add(getCurrentPageTypeDocRef());
+    getLayoutPropDocRef().ifPresent(docRefStreamBuilder::accept);
+    getCurrentDocRef().ifPresent(docRefStreamBuilder::accept);
+    return docRefStreamBuilder.build();
   }
 
   private Optional<DocumentReference> getCurrentDocRef() {
