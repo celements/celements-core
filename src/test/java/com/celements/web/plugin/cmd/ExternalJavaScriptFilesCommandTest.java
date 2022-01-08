@@ -167,6 +167,17 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testGetExtStringForJsFile_defer() {
+    String url = "http://www.xyz.com?hi=yes&by=no";
+    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
+    String scriptStart = "<script defer type=\"text/javascript\" src=\"";
+    String scriptEnd = "\"></script>";
+    ExternalJavaScriptFilesCommand.JsFileEntry jsFile = command.new JsFileEntry(url);
+    jsFile.defer = true;
+    assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
+  }
+
+  @Test
   public void testAddExtJSfileOnce_afterGetAll_fileNotFound_url() throws XWikiException {
     String fileNotFound = "/download/Content/WebHome/blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).times(2);
