@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -43,6 +44,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
@@ -57,6 +59,7 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class ExternalJavaScriptFilesCommand {
@@ -81,18 +84,18 @@ public class ExternalJavaScriptFilesCommand {
   private static final Logger LOGGER = LoggerFactory.getLogger(
       ExternalJavaScriptFilesCommand.class);
 
-  class JsFileEntry {
+  static final class JsFileEntry {
 
     String jsFileUrl;
-    boolean defer = false;
+    JsLoadMode loadMode = JsLoadMode.SYNC;
 
     JsFileEntry(String jsFileUrl) {
       this.jsFileUrl = jsFileUrl;
     }
 
-    JsFileEntry(String jsFileUrl, boolean defer) {
+    JsFileEntry(String jsFileUrl, JsLoadMode loadMode) {
       this.jsFileUrl = jsFileUrl;
-      this.defer = defer;
+      this.loadMode = loadMode;
     }
 
     @Override
@@ -108,12 +111,50 @@ public class ExternalJavaScriptFilesCommand {
 
   }
 
+  static final class ExtJsFileParameter {
+
+    @NotNull
+    private String jsFile;
+    @Nullable
+    private String action = null;
+    @Nullable
+    private String params = null;
+    @Nullable
+    private AttachmentURLCommand attUrlCmd = null;
+    private JsLoadMode loadMode = JsLoadMode.SYNC;
+
+    public ExtJsFileParameter setJsFile(@NotNull String jsFile) {
+      checkNotNull(jsFile);
+      this.jsFile = jsFile;
+      return this;
+    }
+
+    public ExtJsFileParameter setAction(String action) {
+      this.action = action;
+      return this;
+    }
+
+    public ExtJsFileParameter setParams(String params) {
+      this.params = params;
+      return this;
+    }
+
+    public ExtJsFileParameter setAttUrlCmd(AttachmentURLCommand attUrlCmd) {
+      this.attUrlCmd = attUrlCmd;
+      return this;
+    }
+
+    public ExtJsFileParameter setLoadMode(JsLoadMode loadMode) {
+      this.loadMode = loadMode;
+      return this;
+    }
+
+  }
+
   private final Set<JsFileEntry> extJSfileSet = new LinkedHashSet<>();
   private final Set<String> extJSAttUrlSet = new HashSet<>();
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
-  private Optional<AttachmentURLCommand> attUrlCmd_injected = Optional.empty();
-  private Optional<PageLayoutCommand> pageLayoutCmd_injected = Optional.empty();
 
   public ExternalJavaScriptFilesCommand() {}
 
@@ -124,25 +165,37 @@ public class ExternalJavaScriptFilesCommand {
   public ExternalJavaScriptFilesCommand(XWikiContext context) {}
 
   public String addLazyExtJSfile(String jsFile) {
-    return addLazyExtJSfile(jsFile, null);
+    return addLazyExtJSfile(new ExtJsFileParameter()
+        .setJsFile(jsFile));
   }
 
   public String addLazyExtJSfile(String jsFile, String action) {
-    return addLazyExtJSfile(jsFile, action, null);
+    return addLazyExtJSfile(new ExtJsFileParameter()
+        .setJsFile(jsFile)
+        .setAction(action));
   }
 
   public String addLazyExtJSfile(String jsFile, String action, String params) {
+    return addLazyExtJSfile(new ExtJsFileParameter()
+        .setJsFile(jsFile)
+        .setAction(action)
+        .setParams(params));
+  }
+
+  String addLazyExtJSfile(ExtJsFileParameter extJsFileParams) {
     String attUrl;
-    if (!StringUtils.isEmpty(action)) {
-      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, getModelContext().getXWikiContext());
+    if (!StringUtils.isEmpty(extJsFileParams.action)) {
+      attUrl = getAttUrlCmd(extJsFileParams.attUrlCmd).getAttachmentURL(extJsFileParams.jsFile,
+          extJsFileParams.action, getModelContext().getXWikiContext());
     } else {
-      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, getModelContext().getXWikiContext());
+      attUrl = getAttUrlCmd(extJsFileParams.attUrlCmd).getAttachmentURL(extJsFileParams.jsFile,
+          getModelContext().getXWikiContext());
     }
-    if (!StringUtils.isEmpty(params)) {
+    if (!StringUtils.isEmpty(extJsFileParams.params)) {
       if (attUrl.indexOf("?") > -1) {
-        attUrl += "&" + params;
+        attUrl += "&" + extJsFileParams.params;
       } else {
-        attUrl += "?" + params;
+        attUrl += "?" + extJsFileParams.params;
       }
     }
     JsonBuilder jsonBuilder = new JsonBuilder();
@@ -181,30 +234,43 @@ public class ExternalJavaScriptFilesCommand {
 
   @NotNull
   public String addExtJSfileOnce(String jsFile, String action, boolean defer, String params) {
-    if (!extJSAttUrlSet.contains(jsFile)) {
-      if (getAttUrlCmd().isAttachmentLink(jsFile) || getAttUrlCmd().isOnDiskLink(jsFile)) {
-        extJSAttUrlSet.add(jsFile);
+    return addExtJSfileOnce(new ExtJsFileParameter()
+        .setJsFile(jsFile)
+        .setAction(action)
+        .setLoadMode(JsLoadMode.DEFER)
+        .setParams(params));
+  }
+
+  @NotNull
+  String addExtJSfileOnce(ExtJsFileParameter extJsFileParams) {
+    if (!extJSAttUrlSet.contains(extJsFileParams.jsFile)) {
+      if (getAttUrlCmd(extJsFileParams.attUrlCmd).isAttachmentLink(extJsFileParams.jsFile)
+          || getAttUrlCmd(extJsFileParams.attUrlCmd).isOnDiskLink(extJsFileParams.jsFile)) {
+        extJSAttUrlSet.add(extJsFileParams.jsFile);
       }
       String attUrl;
-      if (!StringUtils.isEmpty(action)) {
-        attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action,
+      if (!StringUtils.isEmpty(extJsFileParams.action)) {
+        attUrl = getAttUrlCmd(extJsFileParams.attUrlCmd).getAttachmentURL(extJsFileParams.jsFile,
+            extJsFileParams.action,
             getModelContext().getXWikiContext());
       } else {
-        attUrl = getAttUrlCmd().getAttachmentURL(jsFile, getModelContext().getXWikiContext());
+        attUrl = getAttUrlCmd(extJsFileParams.attUrlCmd).getAttachmentURL(extJsFileParams.jsFile,
+            getModelContext().getXWikiContext());
       }
-      if (!StringUtils.isEmpty(params)) {
+      if (!StringUtils.isEmpty(extJsFileParams.params)) {
         if (attUrl.indexOf("?") > -1) {
-          attUrl += "&" + params;
+          attUrl += "&" + extJsFileParams.params;
         } else {
-          attUrl += "?" + params;
+          attUrl += "?" + extJsFileParams.params;
         }
       }
-      return Strings.nullToEmpty(addExtJSfileOnceInternal(jsFile, attUrl, defer));
+      return Strings.nullToEmpty(addExtJSfileOnceInternal(extJsFileParams.jsFile,
+          attUrl, extJsFileParams.loadMode));
     }
     return "";
   }
 
-  private String addExtJSfileOnceInternal(String jsFile, String jsFileUrl, boolean defer) {
+  private String addExtJSfileOnceInternal(String jsFile, String jsFileUrl, JsLoadMode loadMode) {
     String jsIncludes2 = "";
     if (jsFileUrl == null) {
       JsFileEntry jsFileEntry = new JsFileEntry(jsFile);
@@ -213,7 +279,7 @@ public class ExternalJavaScriptFilesCommand {
         jsIncludes2 = buildNotFoundWarning(jsFile);
       }
     } else {
-      JsFileEntry jsFileEntry = new JsFileEntry(jsFileUrl, defer);
+      JsFileEntry jsFileEntry = new JsFileEntry(jsFileUrl, loadMode);
       if (!jsFileHasBeenSeen(jsFileEntry)) {
         jsIncludes2 = getExtStringForJsFile(jsFileEntry);
         extJSfileSet.add(jsFileEntry);
@@ -238,12 +304,21 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   String getExtStringForJsFile(JsFileEntry jsFile) {
-    return "<script" + (jsFile.defer ? " defer" : "") + " type=\"text/javascript\" src=\""
-        + StringEscapeUtils.escapeHtml(jsFile.jsFileUrl) + "\"></script>";
+    return "<script"
+        + ((jsFile.loadMode != JsLoadMode.SYNC) ? " " + jsFile.loadMode.toString().toLowerCase()
+            : "")
+        + " type=\"text/javascript\" src=\"" + StringEscapeUtils.escapeHtml(jsFile.jsFileUrl)
+        + "\"></script>";
   }
 
   public String getAllExternalJavaScriptFiles() {
-    getDocRefsStream().forEachOrdered(this::addAllExtJSfilesFromDocRef);
+    return getAllExternalJavaScriptFiles(null, null);
+  }
+
+  String getAllExternalJavaScriptFiles(@Nullable PageLayoutCommand pageLayoutCmdMock,
+      @Nullable AttachmentURLCommand attUrlCmd) {
+    getDocRefsStream(pageLayoutCmdMock)
+        .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmd));
     notifyExtJavaScriptFileListener();
 
     final StringBuilder jsIncludesBuilder = new StringBuilder();
@@ -256,13 +331,14 @@ public class ExternalJavaScriptFilesCommand {
     return jsIncludesBuilder.toString();
   }
 
-  private Stream<DocumentReference> getDocRefsStream() {
+  private Stream<DocumentReference> getDocRefsStream(
+      @Nullable PageLayoutCommand pageLayoutCmdMock) {
     Builder<DocumentReference> docRefStreamBuilder = Stream.builder();
     getSkinDocRef().ifPresent(docRefStreamBuilder::accept);
     docRefStreamBuilder.add(getXWikiPreferencesDocRef());
     getCurrentSpacePreferencesDocRef().ifPresent(docRefStreamBuilder::accept);
     docRefStreamBuilder.add(getCurrentPageTypeDocRef());
-    getLayoutPropDocRef().ifPresent(docRefStreamBuilder::accept);
+    getLayoutPropDocRef(pageLayoutCmdMock).ifPresent(docRefStreamBuilder::accept);
     getCurrentDocRef().ifPresent(docRefStreamBuilder::accept);
     return docRefStreamBuilder.build();
   }
@@ -271,9 +347,10 @@ public class ExternalJavaScriptFilesCommand {
     return getModelContext().getCurrentDocRef().toJavaUtil();
   }
 
-  private Optional<DocumentReference> getLayoutPropDocRef() {
-    return Optional.ofNullable(getLayoutService().getLayoutPropDoc())
-        .map(layoutPropDoc -> layoutPropDoc.getDocumentReference());
+  private @NotNull Optional<DocumentReference> getLayoutPropDocRef(
+      @Nullable PageLayoutCommand pageLayoutCmd) {
+    return Optional.ofNullable(getLayoutService(pageLayoutCmd).getLayoutPropDoc())
+        .map(XWikiDocument::getDocumentReference);
   }
 
   private @NotNull DocumentReference getCurrentPageTypeDocRef() {
@@ -315,7 +392,8 @@ public class ExternalJavaScriptFilesCommand {
     return Collections.emptyMap();
   }
 
-  private void addAllExtJSfilesFromDocRef(@NotNull DocumentReference docRef) {
+  private void addAllExtJSfilesFromDocRef(@NotNull DocumentReference docRef,
+      @Nullable AttachmentURLCommand attUrlCmd) {
     checkNotNull(docRef);
     try {
       XWikiObjectFetcher.on(getModelAccess().getDocument(docRef))
@@ -324,26 +402,20 @@ public class ExternalJavaScriptFilesCommand {
           .stream()
           .map(filepathObj -> filepathObj.getStringValue("filepath"))
           .filter(Predicates.not(Strings::isNullOrEmpty))
-          .forEachOrdered(this::addExtJSfileOnce);
+          .forEachOrdered(jsFileUrl -> addExtJSfileOnce(
+              new ExtJsFileParameter().setJsFile(jsFileUrl).setAttUrlCmd(attUrlCmd)));
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addJSFiles from [{}] failed.", docRef, nExExp);
     }
   }
 
-  AttachmentURLCommand getAttUrlCmd() {
-    return attUrlCmd_injected.orElse(new AttachmentURLCommand());
+  @NotNull
+  AttachmentURLCommand getAttUrlCmd(@Nullable AttachmentURLCommand attUrlCmd) {
+    return Optional.ofNullable(attUrlCmd).orElse(new AttachmentURLCommand());
   }
 
-  void injectAttUrlCmd(AttachmentURLCommand attUrlCmd) {
-    attUrlCmd_injected = Optional.ofNullable(attUrlCmd);
-  }
-
-  private PageLayoutCommand getLayoutService() {
-    return pageLayoutCmd_injected.orElse(new PageLayoutCommand());
-  }
-
-  void injectPageLayoutCmd(PageLayoutCommand pageLayoutCmd) {
-    pageLayoutCmd_injected = Optional.ofNullable(pageLayoutCmd);
+  private @NotNull PageLayoutCommand getLayoutService(@Nullable PageLayoutCommand pageLayoutCmd) {
+    return Optional.ofNullable(pageLayoutCmd).orElse(new PageLayoutCommand());
   }
 
   private IPageTypeResolverRole getPageTypeResolver() {
