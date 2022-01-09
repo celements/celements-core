@@ -37,7 +37,6 @@ import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand.ExtJsFileParameter;
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand.JsFileEntry;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -47,7 +46,6 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   private ExternalJavaScriptFilesCommand command = null;
   private XWikiContext context = null;
   private AttachmentURLCommand attUrlCmd = null;
-  private XWiki xwiki;
   private IPageTypeResolverRole pageTypeResolverMock;
   private IModelAccessFacade modelAccessMock;
 
@@ -58,8 +56,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     modelAccessMock = registerComponentMock(IModelAccessFacade.class);
     pageTypeResolverMock = registerComponentMock(IPageTypeResolverRole.class);
     attUrlCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
-    xwiki = getWikiMock();
-    command = new ExternalJavaScriptFilesCommand(context);
+    command = new ExternalJavaScriptFilesCommand();
   }
 
   @Test
@@ -202,8 +199,17 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
     String scriptStart = "<script defer type=\"text/javascript\" src=\"";
     String scriptEnd = "\"></script>";
-    JsFileEntry jsFile = new JsFileEntry(url);
-    jsFile.loadMode = JsLoadMode.DEFER;
+    JsFileEntry jsFile = new JsFileEntry(url, JsLoadMode.DEFER);
+    assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
+  }
+
+  @Test
+  public void testGetExtStringForJsFile_async() {
+    String url = "http://www.xyz.com?hi=yes&by=no";
+    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
+    String scriptStart = "<script async type=\"text/javascript\" src=\"";
+    String scriptEnd = "\"></script>";
+    JsFileEntry jsFile = new JsFileEntry(url, JsLoadMode.ASYNC);
     assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
   }
 

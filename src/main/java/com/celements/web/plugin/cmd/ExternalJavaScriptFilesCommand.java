@@ -57,6 +57,7 @@ import com.celements.web.classcollections.IOldCoreClassConfig;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
+import com.google.errorprone.annotations.Immutable;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -84,18 +85,19 @@ public class ExternalJavaScriptFilesCommand {
   private static final Logger LOGGER = LoggerFactory.getLogger(
       ExternalJavaScriptFilesCommand.class);
 
+  @Immutable
   static final class JsFileEntry {
 
-    String jsFileUrl;
-    JsLoadMode loadMode = JsLoadMode.SYNC;
+    private final String jsFileUrl;
+    private final JsLoadMode loadMode;
 
     JsFileEntry(String jsFileUrl) {
-      this.jsFileUrl = jsFileUrl;
+      this(jsFileUrl, null);
     }
 
-    JsFileEntry(String jsFileUrl, JsLoadMode loadMode) {
+    JsFileEntry(String jsFileUrl, @Nullable JsLoadMode loadMode) {
       this.jsFileUrl = jsFileUrl;
-      this.loadMode = loadMode;
+      this.loadMode = Optional.ofNullable(loadMode).orElse(JsLoadMode.SYNC);
     }
 
     @Override
