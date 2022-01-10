@@ -30,7 +30,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.Stream.Builder;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -62,6 +61,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
+
+import one.util.streamex.StreamEx;
 
 public class ExternalJavaScriptFilesCommand {
 
@@ -335,24 +336,22 @@ public class ExternalJavaScriptFilesCommand {
 
   private Stream<DocumentReference> getDocRefsStream(
       @Nullable PageLayoutCommand pageLayoutCmdMock) {
-    Builder<DocumentReference> docRefStreamBuilder = Stream.builder();
-    getSkinDocRef().ifPresent(docRefStreamBuilder::accept);
-    docRefStreamBuilder.add(getXWikiPreferencesDocRef());
-    getCurrentSpacePreferencesDocRef().ifPresent(docRefStreamBuilder::accept);
-    docRefStreamBuilder.add(getCurrentPageTypeDocRef());
-    getLayoutPropDocRef(pageLayoutCmdMock).ifPresent(docRefStreamBuilder::accept);
-    getCurrentDocRef().ifPresent(docRefStreamBuilder::accept);
-    return docRefStreamBuilder.build();
+    return StreamEx.of(getSkinDocRef())
+        .append(getXWikiPreferencesDocRef())
+        .append(getCurrentSpacePreferencesDocRef())
+        .append(getCurrentPageTypeDocRef())
+        .append(getLayoutPropDocRef(pageLayoutCmdMock))
+        .append(getCurrentDocRef());
   }
 
-  private Optional<DocumentReference> getCurrentDocRef() {
-    return getModelContext().getCurrentDocRef().toJavaUtil();
+  private Stream<DocumentReference> getCurrentDocRef() {
+    return StreamEx.of(getModelContext().getCurrentDocRef().toJavaUtil());
   }
 
-  private @NotNull Optional<DocumentReference> getLayoutPropDocRef(
+  private @NotNull Stream<DocumentReference> getLayoutPropDocRef(
       @Nullable PageLayoutCommand pageLayoutCmd) {
-    return Optional.ofNullable(getLayoutService(pageLayoutCmd).getLayoutPropDoc())
-        .map(XWikiDocument::getDocumentReference);
+    return StreamEx.of(Optional.ofNullable(getLayoutService(pageLayoutCmd).getLayoutPropDoc())
+        .map(XWikiDocument::getDocumentReference));
   }
 
   private @NotNull DocumentReference getCurrentPageTypeDocRef() {
@@ -360,10 +359,10 @@ public class ExternalJavaScriptFilesCommand {
         getPageTypeResolver().resolvePageTypeRefForCurrentDoc());
   }
 
-  private Optional<DocumentReference> getCurrentSpacePreferencesDocRef() {
-    return getModelContext().getCurrentSpaceRef().toJavaUtil()
+  private Stream<DocumentReference> getCurrentSpacePreferencesDocRef() {
+    return StreamEx.of(getModelContext().getCurrentSpaceRef().toJavaUtil()
         .map(spaceRef -> RefBuilder.from(spaceRef).doc("WebPreferences").build(
-            DocumentReference.class));
+            DocumentReference.class)));
   }
 
   private @NotNull DocumentReference getXWikiPreferencesDocRef() {
@@ -371,11 +370,11 @@ public class ExternalJavaScriptFilesCommand {
         .doc("XWikiPreferences").build(DocumentReference.class);
   }
 
-  private Optional<DocumentReference> getSkinDocRef() {
-    return Optional.ofNullable(getModelContext().getXWikiContext())
+  private Stream<DocumentReference> getSkinDocRef() {
+    return StreamEx.of(Optional.ofNullable(getModelContext().getXWikiContext())
         .map(xcontext -> (VelocityContext) xcontext.get("vcontext"))
         .filter(vcontext -> vcontext.containsKey("skin_doc"))
-        .map(vcontext -> ((Document) vcontext.get("skin_doc")).getDocumentReference());
+        .map(vcontext -> ((Document) vcontext.get("skin_doc")).getDocumentReference()));
   }
 
   private void notifyExtJavaScriptFileListener() {
