@@ -113,6 +113,8 @@ public interface IOldCoreClassConfig {
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE = "JavaScript";
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS = JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
       + "." + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC;
+  public static final String JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH = "filepath";
+  public static final String JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE = "load_mode";
 
   public DocumentReference getFromStorageClassRef(WikiReference wikiRef);
 

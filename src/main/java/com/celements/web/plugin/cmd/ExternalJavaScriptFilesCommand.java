@@ -54,7 +54,6 @@ import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.JsonBuilder;
 import com.celements.web.classcollections.IOldCoreClassConfig;
 import com.celements.web.service.IWebUtilsService;
-import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Immutable;
 import com.xpn.xwiki.XWikiContext;
@@ -93,12 +92,20 @@ public class ExternalJavaScriptFilesCommand {
     private final JsLoadMode loadMode;
 
     JsFileEntry(String jsFileUrl) {
-      this(jsFileUrl, null);
+      this(jsFileUrl, (JsLoadMode) null);
     }
 
     JsFileEntry(String jsFileUrl, @Nullable JsLoadMode loadMode) {
       this.jsFileUrl = jsFileUrl;
       this.loadMode = Optional.ofNullable(loadMode).orElse(JsLoadMode.SYNC);
+    }
+
+    JsFileEntry(String jsFileUrl, @Nullable String loadModeStr) {
+      this(jsFileUrl, JsLoadMode.valueOf(loadModeStr));
+    }
+
+    boolean isValid() {
+      return !Strings.isNullOrEmpty(jsFileUrl);
     }
 
     @Override
@@ -401,10 +408,18 @@ public class ExternalJavaScriptFilesCommand {
           .filter(new ClassReference(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE,
               IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC))
           .stream()
-          .map(filepathObj -> filepathObj.getStringValue("filepath"))
-          .filter(Predicates.not(Strings::isNullOrEmpty))
-          .forEachOrdered(jsFileUrl -> addExtJSfileOnce(
-              new ExtJsFileParameter().setJsFile(jsFileUrl).setAttUrlCmd(attUrlCmd)));
+          .map(
+              jsExtFileObj -> new JsFileEntry(jsExtFileObj
+                  .getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH),
+                  jsExtFileObj
+                      .getStringValue(
+                          IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE)))
+          .filter(JsFileEntry::isValid)
+          .forEachOrdered(jsFile -> addExtJSfileOnce(
+              new ExtJsFileParameter()
+                  .setJsFile(jsFile.jsFileUrl)
+                  .setLoadMode(jsFile.loadMode)
+                  .setAttUrlCmd(attUrlCmd)));
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addJSFiles from [{}] failed.", docRef, nExExp);
     }

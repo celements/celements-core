@@ -730,7 +730,12 @@ public class OldCoreClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("filepath", "filepath", 50);
+    needsUpdate |= bclass.addTextField(
+        IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH,
+        IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH, 50);
+    needsUpdate |= bclass.addStaticListField(
+        IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE,
+        IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE, "|DEFER|ASYNC");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
