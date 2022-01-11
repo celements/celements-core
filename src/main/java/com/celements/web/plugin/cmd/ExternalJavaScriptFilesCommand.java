@@ -180,12 +180,20 @@ public class ExternalJavaScriptFilesCommand {
         + "</span>";
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link addExtJSfileOnce(ExtJsFileParameter)}
+   */
+  @Deprecated
   @NotNull
   public String addExtJSfileOnce(String jsFile) {
     return addExtJSfileOnce(new ExtJsFileParameter()
         .setJsFile(jsFile));
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link addExtJSfileOnce(ExtJsFileParameter)}
+   */
+  @Deprecated
   @NotNull
   public String addExtJSfileOnce(String jsFile, String action) {
     return addExtJSfileOnce(new ExtJsFileParameter()
@@ -193,6 +201,10 @@ public class ExternalJavaScriptFilesCommand {
         .setAction(action));
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link addExtJSfileOnce(ExtJsFileParameter)}
+   */
+  @Deprecated
   @NotNull
   public String addExtJSfileOnce(String jsFile, String action, String params) {
     return addExtJSfileOnce(new ExtJsFileParameter()

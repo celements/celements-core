@@ -24,19 +24,19 @@ public class JSScriptService implements ScriptService {
     return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link addExtJSfileOnce(ExtJsFileParameter)}
+   */
+  @Deprecated
   public String addExtJSfileOnce(String jsFile) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile);
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link addExtJSfileOnce(ExtJsFileParameter)}
+   */
+  @Deprecated
   public String addExtJSfileOnce(String jsFile, String action) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
-  }
-
-  public ExtJsFileParameter getExtJSParamBuilder() {
-    return new ExtJsFileParameter();
-  }
-
-  public String addExtJSfileOnceDelayed(String jsFile, String action) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
   }
 
@@ -48,9 +48,19 @@ public class JSScriptService implements ScriptService {
    *          use empty string for default action
    * @param params
    * @return
+   * @deprecated since 5.4 instead use {@link addExtJSfileOnce(ExtJsFileParameter)}
    */
+  @Deprecated
   public String addExtJSfileOnce(String jsFile, String action, String params) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action, params);
+  }
+
+  public ExtJsFileParameter createExtJSParam() {
+    return new ExtJsFileParameter();
+  }
+
+  public String addExtJSfileOnce(ExtJsFileParameter extJsFileParams) {
+    return getExtJavaScriptFileCmd().addExtJSfileOnce(extJsFileParams);
   }
 
   public String addLazyExtJSfile(String jsFile) {
