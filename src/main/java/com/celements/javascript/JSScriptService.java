@@ -32,11 +32,11 @@ public class JSScriptService implements ScriptService {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
   }
 
-  public String addExtJSfileOnceDefer(String jsFile) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnceDefer(jsFile);
+  public ExtJsFileParameter getExtJSParamBuilder() {
+    return new ExtJsFileParameter();
   }
 
-  public String addExtJSfileOnceDefer(String jsFile, String action) {
+  public String addExtJSfileOnceDelayed(String jsFile, String action) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
   }
 

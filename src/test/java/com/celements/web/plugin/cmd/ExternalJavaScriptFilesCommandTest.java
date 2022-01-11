@@ -32,13 +32,13 @@ import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.javascript.ExtJsFileParameter;
 import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.web.classcollections.IOldCoreClassConfig;
-import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand.ExtJsFileParameter;
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand.JsFileEntry;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

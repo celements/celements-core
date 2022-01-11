@@ -43,6 +43,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.javascript.ExtJsFileParameter;
 import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
@@ -121,46 +122,6 @@ public class ExternalJavaScriptFilesCommand {
 
   }
 
-  static final class ExtJsFileParameter {
-
-    @NotNull
-    private String jsFile;
-    @Nullable
-    private String action = null;
-    @Nullable
-    private String params = null;
-    @Nullable
-    private AttachmentURLCommand attUrlCmd = null;
-    private JsLoadMode loadMode = JsLoadMode.SYNC;
-
-    public ExtJsFileParameter setJsFile(@NotNull String jsFile) {
-      checkNotNull(jsFile);
-      this.jsFile = jsFile;
-      return this;
-    }
-
-    public ExtJsFileParameter setAction(String action) {
-      this.action = action;
-      return this;
-    }
-
-    public ExtJsFileParameter setParams(String params) {
-      this.params = params;
-      return this;
-    }
-
-    public ExtJsFileParameter setAttUrlCmd(AttachmentURLCommand attUrlCmd) {
-      this.attUrlCmd = attUrlCmd;
-      return this;
-    }
-
-    public ExtJsFileParameter setLoadMode(JsLoadMode loadMode) {
-      this.loadMode = loadMode;
-      return this;
-    }
-
-  }
-
   private final Set<JsFileEntry> extJSfileSet = new LinkedHashSet<>();
   private final Set<String> extJSAttUrlSet = new HashSet<>();
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
@@ -194,18 +155,20 @@ public class ExternalJavaScriptFilesCommand {
 
   String addLazyExtJSfile(ExtJsFileParameter extJsFileParams) {
     String attUrl;
-    if (!StringUtils.isEmpty(extJsFileParams.action)) {
-      attUrl = getAttUrlCmd(extJsFileParams.attUrlCmd).getAttachmentURL(extJsFileParams.jsFile,
-          extJsFileParams.action, getModelContext().getXWikiContext());
+    if (!StringUtils.isEmpty(extJsFileParams.getAction())) {
+      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
+          extJsFileParams.getJsFile(),
+          extJsFileParams.getAction(), getModelContext().getXWikiContext());
     } else {
-      attUrl = getAttUrlCmd(extJsFileParams.attUrlCmd).getAttachmentURL(extJsFileParams.jsFile,
+      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
+          extJsFileParams.getJsFile(),
           getModelContext().getXWikiContext());
     }
-    if (!StringUtils.isEmpty(extJsFileParams.params)) {
+    if (!StringUtils.isEmpty(extJsFileParams.getParams())) {
       if (attUrl.indexOf("?") > -1) {
-        attUrl += "&" + extJsFileParams.params;
+        attUrl += "&" + extJsFileParams.getParams();
       } else {
-        attUrl += "?" + extJsFileParams.params;
+        attUrl += "?" + extJsFileParams.getParams();
       }
     }
     JsonBuilder jsonBuilder = new JsonBuilder();
@@ -218,64 +181,54 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   @NotNull
-  public String addExtJSfileOnceDefer(String jsFile) {
-    return addExtJSfileOnce(jsFile, null, true);
-  }
-
-  @NotNull
   public String addExtJSfileOnce(String jsFile) {
-    return addExtJSfileOnce(jsFile, null);
+    return addExtJSfileOnce(new ExtJsFileParameter()
+        .setJsFile(jsFile));
   }
 
   @NotNull
   public String addExtJSfileOnce(String jsFile, String action) {
-    return addExtJSfileOnce(jsFile, action, false);
-  }
-
-  @NotNull
-  public String addExtJSfileOnce(String jsFile, String action, boolean defer) {
-    return addExtJSfileOnce(jsFile, action, defer, null);
+    return addExtJSfileOnce(new ExtJsFileParameter()
+        .setJsFile(jsFile)
+        .setAction(action));
   }
 
   @NotNull
   public String addExtJSfileOnce(String jsFile, String action, String params) {
-    return addExtJSfileOnce(jsFile, action, false, params);
-  }
-
-  @NotNull
-  public String addExtJSfileOnce(String jsFile, String action, boolean defer, String params) {
     return addExtJSfileOnce(new ExtJsFileParameter()
         .setJsFile(jsFile)
         .setAction(action)
-        .setLoadMode(JsLoadMode.DEFER)
         .setParams(params));
   }
 
   @NotNull
-  String addExtJSfileOnce(ExtJsFileParameter extJsFileParams) {
-    if (!extJSAttUrlSet.contains(extJsFileParams.jsFile)) {
-      if (getAttUrlCmd(extJsFileParams.attUrlCmd).isAttachmentLink(extJsFileParams.jsFile)
-          || getAttUrlCmd(extJsFileParams.attUrlCmd).isOnDiskLink(extJsFileParams.jsFile)) {
-        extJSAttUrlSet.add(extJsFileParams.jsFile);
+  public String addExtJSfileOnce(ExtJsFileParameter extJsFileParams) {
+    if (!extJSAttUrlSet.contains(extJsFileParams.getJsFile())) {
+      if (getAttUrlCmd(extJsFileParams.getAttUrlCmd()).isAttachmentLink(extJsFileParams.getJsFile())
+          || getAttUrlCmd(extJsFileParams.getAttUrlCmd())
+              .isOnDiskLink(extJsFileParams.getJsFile())) {
+        extJSAttUrlSet.add(extJsFileParams.getJsFile());
       }
       String attUrl;
-      if (!StringUtils.isEmpty(extJsFileParams.action)) {
-        attUrl = getAttUrlCmd(extJsFileParams.attUrlCmd).getAttachmentURL(extJsFileParams.jsFile,
-            extJsFileParams.action,
+      if (!StringUtils.isEmpty(extJsFileParams.getAction())) {
+        attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
+            extJsFileParams.getJsFile(),
+            extJsFileParams.getAction(),
             getModelContext().getXWikiContext());
       } else {
-        attUrl = getAttUrlCmd(extJsFileParams.attUrlCmd).getAttachmentURL(extJsFileParams.jsFile,
+        attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
+            extJsFileParams.getJsFile(),
             getModelContext().getXWikiContext());
       }
-      if (!StringUtils.isEmpty(extJsFileParams.params)) {
+      if (!StringUtils.isEmpty(extJsFileParams.getParams())) {
         if (attUrl.indexOf("?") > -1) {
-          attUrl += "&" + extJsFileParams.params;
+          attUrl += "&" + extJsFileParams.getParams();
         } else {
-          attUrl += "?" + extJsFileParams.params;
+          attUrl += "?" + extJsFileParams.getParams();
         }
       }
-      return Strings.nullToEmpty(addExtJSfileOnceInternal(extJsFileParams.jsFile,
-          attUrl, extJsFileParams.loadMode));
+      return Strings.nullToEmpty(addExtJSfileOnceInternal(extJsFileParams.getJsFile(),
+          attUrl, extJsFileParams.getLoadMode()));
     }
     return "";
   }
