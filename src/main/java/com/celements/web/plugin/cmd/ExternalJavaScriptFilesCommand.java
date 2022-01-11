@@ -101,7 +101,7 @@ public class ExternalJavaScriptFilesCommand {
     }
 
     JsFileEntry(String jsFileUrl, @Nullable String loadModeStr) {
-      this(jsFileUrl, JsLoadMode.valueOf(loadModeStr));
+      this(jsFileUrl, JsLoadMode.convertStoreValue(loadModeStr));
     }
 
     boolean isValid() {
@@ -400,7 +400,7 @@ public class ExternalJavaScriptFilesCommand {
     return Collections.emptyMap();
   }
 
-  private void addAllExtJSfilesFromDocRef(@NotNull DocumentReference docRef,
+  void addAllExtJSfilesFromDocRef(@NotNull DocumentReference docRef,
       @Nullable AttachmentURLCommand attUrlCmd) {
     checkNotNull(docRef);
     try {

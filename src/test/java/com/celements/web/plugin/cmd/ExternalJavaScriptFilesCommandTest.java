@@ -28,6 +28,7 @@ import java.util.Arrays;
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
@@ -35,11 +36,13 @@ import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.web.classcollections.IOldCoreClassConfig;
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand.ExtJsFileParameter;
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand.JsFileEntry;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
 
@@ -250,6 +253,104 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_addAllExtJSfilesFromDocRef_emptyDoc() throws Exception {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "TestPage");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    expect(modelAccessMock.getDocument(eq(contextDocRef))).andReturn(contextDoc).atLeastOnce();
+    context.setDoc(contextDoc);
+    replayDefault();
+    command.addAllExtJSfilesFromDocRef(contextDocRef, attUrlCmd);
+    verifyDefault();
+  }
+
+  @Test
+  public void test_addAllExtJSfilesFromDocRef_sync() throws Exception {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "TestPage");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    BaseObject extJsFileObj = new BaseObject();
+    extJsFileObj.setXClassReference(getExtJsFileClassRef());
+    String filePath = "/skin/resources/celJS/prototype.js?version=20220401120000";
+    expect(attUrlCmd.isAttachmentLink(eq(filePath))).andReturn(false).atLeastOnce();
+    expect(attUrlCmd.isOnDiskLink(eq(filePath))).andReturn(false).atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(eq(filePath), same(context))).andReturn(filePath)
+        .atLeastOnce();
+    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH,
+        filePath);
+    contextDoc.addXObject(extJsFileObj);
+    expect(modelAccessMock.getDocument(eq(contextDocRef))).andReturn(contextDoc).atLeastOnce();
+    context.setDoc(contextDoc);
+    replayDefault();
+    command.addAllExtJSfilesFromDocRef(contextDocRef, attUrlCmd);
+    assertEquals("must be already added by addAllExtJSfilesFromDocRef", "",
+        command.addExtJSfileOnce(new ExtJsFileParameter()
+            .setJsFile(filePath)
+            .setAttUrlCmd(attUrlCmd)));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_addAllExtJSfilesFromDocRef_defer() throws Exception {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "TestPage");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    BaseObject extJsFileObj = new BaseObject();
+    extJsFileObj.setXClassReference(getExtJsFileClassRef());
+    String filePath = "/skin/resources/celJS/prototype.js?version=20220401120000";
+    expect(attUrlCmd.isAttachmentLink(eq(filePath))).andReturn(false).atLeastOnce();
+    expect(attUrlCmd.isOnDiskLink(eq(filePath))).andReturn(false).atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(eq(filePath), same(context))).andReturn(filePath)
+        .atLeastOnce();
+    JsLoadMode loadMode = JsLoadMode.DEFER;
+    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH,
+        filePath);
+    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE,
+        loadMode.toString());
+    contextDoc.addXObject(extJsFileObj);
+    expect(modelAccessMock.getDocument(eq(contextDocRef))).andReturn(contextDoc).atLeastOnce();
+    context.setDoc(contextDoc);
+    replayDefault();
+    command.addAllExtJSfilesFromDocRef(contextDocRef, attUrlCmd);
+    assertEquals("must be already added by addAllExtJSfilesFromDocRef", "",
+        command.addExtJSfileOnce(new ExtJsFileParameter()
+            .setJsFile(filePath)
+            .setLoadMode(loadMode)
+            .setAttUrlCmd(attUrlCmd)));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_addAllExtJSfilesFromDocRef_async() throws Exception {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "TestPage");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    BaseObject extJsFileObj = new BaseObject();
+    extJsFileObj.setXClassReference(getExtJsFileClassRef());
+    String filePath = "/skin/resources/celJS/prototype.js?version=20220401120000";
+    expect(attUrlCmd.isAttachmentLink(eq(filePath))).andReturn(false).atLeastOnce();
+    expect(attUrlCmd.isOnDiskLink(eq(filePath))).andReturn(false).atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(eq(filePath), same(context))).andReturn(filePath)
+        .atLeastOnce();
+    JsLoadMode loadMode = JsLoadMode.ASYNC;
+    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH,
+        filePath);
+    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE,
+        loadMode.toString());
+    contextDoc.addXObject(extJsFileObj);
+    expect(modelAccessMock.getDocument(eq(contextDocRef))).andReturn(contextDoc).atLeastOnce();
+    context.setDoc(contextDoc);
+    replayDefault();
+    command.addAllExtJSfilesFromDocRef(contextDocRef, attUrlCmd);
+    assertEquals("must be already added by addAllExtJSfilesFromDocRef", "",
+        command.addExtJSfileOnce(new ExtJsFileParameter()
+            .setJsFile(filePath)
+            .setLoadMode(loadMode)
+            .setAttUrlCmd(attUrlCmd)));
+    verifyDefault();
+  }
+
+  @Test
   public void testAddExtJSfileOnce_beforeGetAll_double() throws Exception {
     PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
@@ -435,5 +536,10 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
             .setParams("me=blu")
             .setAttUrlCmd(attUrlCmd)));
     verifyDefault();
+  }
+
+  private ClassReference getExtJsFileClassRef() {
+    return new ClassReference(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE,
+        IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC);
   }
 }
