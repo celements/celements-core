@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.web.classcollections.IOldCoreClassConfig;
@@ -347,6 +348,17 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
             .setJsFile(filePath)
             .setLoadMode(loadMode)
             .setAttUrlCmd(attUrlCmd)));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_addAllExtJSfilesFromDocRef_notExists() throws Exception {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "TestPage");
+    expect(modelAccessMock.getDocument(eq(contextDocRef)))
+        .andThrow(new DocumentNotExistsException(contextDocRef)).atLeastOnce();
+    replayDefault();
+    command.addAllExtJSfilesFromDocRef(contextDocRef, attUrlCmd);
     verifyDefault();
   }
 
