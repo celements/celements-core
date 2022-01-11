@@ -540,32 +540,6 @@ public class OldCoreClasses extends AbstractClassCollection {
     return new DocumentReference(wikiName, USER_CSS_CLASS_SPACE, USER_CSS_CLASS_DOC);
   }
 
-  private BaseClass getUserCSSClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = getUserCssClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + USER_CSS_CLASS + " class document. ", exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("cssname", "CSS Filename", 30);
-    needsUpdate |= bclass.addBooleanField("alternate", "alternate", "yesno");
-    needsUpdate |= bclass.addTextField("title", "Title", 30);
-    needsUpdate |= bclass.addBooleanField("is_rte_content", "Is RTE-Content", "yesno");
-    needsUpdate |= bclass.addStaticListField("media", "Media",
-        "all|aural|braille|embossed|handheld|print|projection|screen|tty|tv");
-
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
-  }
-
   public DocumentReference getFormActionClassRef(String wikiName) {
     return new DocumentReference(wikiName, FORM_ACTION_CLASS_SPACE, FORM_ACTION_CLASS_DOC);
   }
@@ -735,7 +709,7 @@ public class OldCoreClasses extends AbstractClassCollection {
         IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH, 50);
     needsUpdate |= bclass.addStaticListField(
         IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE,
-        IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE, "|DEFER|ASYNC");
+        IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE, "SYNC|DEFER|ASYNC");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
