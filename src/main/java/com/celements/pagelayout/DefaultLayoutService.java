@@ -316,8 +316,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
 
   @Override
   public final boolean checkLayoutAccess(@NotNull SpaceReference layoutSpaceRef) {
-    WikiReference layoutWikiRef = References.extractRef(checkNotNull(layoutSpaceRef),
-        WikiReference.class).get();
+    WikiReference layoutWikiRef = RefBuilder.from(layoutSpaceRef).build(WikiReference.class);
     return modelContext.getWikiRef().equals(layoutWikiRef)
         || getCentralWikiRef().equals(layoutWikiRef);
   }
