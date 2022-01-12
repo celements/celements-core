@@ -50,6 +50,7 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.JsonBuilder;
@@ -59,7 +60,6 @@ import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Immutable;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 import one.util.streamex.StreamEx;
@@ -127,13 +127,15 @@ public class ExternalJavaScriptFilesCommand {
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
 
-  public ExternalJavaScriptFilesCommand() {}
+  public ExternalJavaScriptFilesCommand() {
+  }
 
   /**
    * @deprecated since 5.4 instead use {@link ExternalJavaScriptFilesCommand()}
    */
   @Deprecated
-  public ExternalJavaScriptFilesCommand(XWikiContext context) {}
+  public ExternalJavaScriptFilesCommand(XWikiContext context) {
+  }
 
   public String addLazyExtJSfile(String jsFile) {
     return addLazyExtJSfile(new ExtJsFileParameter()
@@ -287,12 +289,11 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String getAllExternalJavaScriptFiles() {
-    return getAllExternalJavaScriptFiles(null, null);
+    return getAllExternalJavaScriptFiles(null);
   }
 
-  String getAllExternalJavaScriptFiles(@Nullable PageLayoutCommand pageLayoutCmdMock,
-      @Nullable AttachmentURLCommand attUrlCmd) {
-    getDocRefsStream(pageLayoutCmdMock)
+  String getAllExternalJavaScriptFiles(@Nullable AttachmentURLCommand attUrlCmd) {
+    getDocRefsStream()
         .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmd));
     notifyExtJavaScriptFileListener();
 
@@ -306,13 +307,12 @@ public class ExternalJavaScriptFilesCommand {
     return jsIncludesBuilder.toString();
   }
 
-  private Stream<DocumentReference> getDocRefsStream(
-      @Nullable PageLayoutCommand pageLayoutCmdMock) {
+  private Stream<DocumentReference> getDocRefsStream() {
     return StreamEx.of(getSkinDocRef())
         .append(getXWikiPreferencesDocRef())
         .append(getCurrentSpacePreferencesDocRef())
         .append(getCurrentPageTypeDocRef())
-        .append(getLayoutPropDocRef(pageLayoutCmdMock))
+        .append(getLayoutPropDocRef())
         .append(getCurrentDocRef());
   }
 
@@ -320,10 +320,8 @@ public class ExternalJavaScriptFilesCommand {
     return StreamEx.of(getModelContext().getCurrentDocRef().toJavaUtil());
   }
 
-  private @NotNull Stream<DocumentReference> getLayoutPropDocRef(
-      @Nullable PageLayoutCommand pageLayoutCmd) {
-    return StreamEx.of(Optional.ofNullable(getLayoutService(pageLayoutCmd).getLayoutPropDoc())
-        .map(XWikiDocument::getDocumentReference));
+  private @NotNull Stream<DocumentReference> getLayoutPropDocRef() {
+    return StreamEx.of(getLayoutService().getLayoutPropDocRefForCurrentDoc());
   }
 
   private @NotNull DocumentReference getCurrentPageTypeDocRef() {
@@ -395,8 +393,8 @@ public class ExternalJavaScriptFilesCommand {
     return Optional.ofNullable(attUrlCmd).orElse(new AttachmentURLCommand());
   }
 
-  private @NotNull PageLayoutCommand getLayoutService(@Nullable PageLayoutCommand pageLayoutCmd) {
-    return Optional.ofNullable(pageLayoutCmd).orElse(new PageLayoutCommand());
+  private @NotNull LayoutServiceRole getLayoutService() {
+    return Utils.getComponent(LayoutServiceRole.class);
   }
 
   private IPageTypeResolverRole getPageTypeResolver() {

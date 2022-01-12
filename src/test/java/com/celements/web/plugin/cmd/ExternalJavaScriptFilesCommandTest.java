@@ -24,6 +24,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
@@ -36,6 +37,7 @@ import com.celements.javascript.ExtJsFileParameter;
 import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.web.classcollections.IOldCoreClassConfig;
@@ -52,6 +54,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   private AttachmentURLCommand attUrlCmd = null;
   private IPageTypeResolverRole pageTypeResolverMock;
   private IModelAccessFacade modelAccessMock;
+  private LayoutServiceRole pageLayoutCmdMock;
 
   @Before
   public void setUp_ExternalJavaScriptFilesCommandTest() throws Exception {
@@ -59,6 +62,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     context.put("vcontext", new VelocityContext());
     modelAccessMock = registerComponentMock(IModelAccessFacade.class);
     pageTypeResolverMock = registerComponentMock(IPageTypeResolverRole.class);
+    pageLayoutCmdMock = registerComponentMock(LayoutServiceRole.class);
     attUrlCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
     command = new ExternalJavaScriptFilesCommand();
   }
@@ -364,7 +368,6 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
 
   @Test
   public void testAddExtJSfileOnce_beforeGetAll_double() throws Exception {
-    PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -400,7 +403,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
     expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
         .atLeastOnce();
-    expect(pageLayoutCmdMock.getLayoutPropDoc()).andReturn(simpleLayoutDoc).atLeastOnce();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
+        simpleLayoutDocRef)).atLeastOnce();
     final ExtJsFileParameter fileParams = new ExtJsFileParameter()
         .setJsFile(file)
         .setAttUrlCmd(attUrlCmd);
@@ -411,7 +415,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     assertEquals("", command.addExtJSfileOnce(fileParams));
     assertEquals("", command.addExtJSfileOnce(fileParams));
     assertEquals("", command.addExtJSfileOnce(fileNotFoundParams));
-    String allStr = command.getAllExternalJavaScriptFiles(pageLayoutCmdMock, attUrlCmd);
+    String allStr = command.getAllExternalJavaScriptFiles(attUrlCmd);
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>\n"
         + "<!-- WARNING: js-file not found: " + fileNotFound + "-->\n", allStr);
     verifyDefault();
@@ -419,7 +423,6 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
 
   @Test
   public void testAddExtJSfileOnce_beforeGetAll_explicitAndImplicit_double() throws Exception {
-    PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -463,7 +466,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
     expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
         .atLeastOnce();
-    expect(pageLayoutCmdMock.getLayoutPropDoc()).andReturn(simpleLayoutDoc).atLeastOnce();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
+        simpleLayoutDocRef)).atLeastOnce();
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter()
         .setJsFile(attFileURL)
@@ -475,7 +479,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter()
         .setJsFile(fileNotFound)
         .setAttUrlCmd(attUrlCmd)));
-    String allStr = command.getAllExternalJavaScriptFiles(pageLayoutCmdMock, attUrlCmd);
+    String allStr = command.getAllExternalJavaScriptFiles(attUrlCmd);
     assertEquals("<script type=\"text/javascript\""
         + " src=\"/file/celJS/prototype.js?version=20110401120000\"></script>\n"
         + "<!-- WARNING: js-file not found: " + fileNotFound + "-->\n", allStr);

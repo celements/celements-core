@@ -20,25 +20,27 @@
 package com.celements.pagelayout;
 
 import java.util.Map;
+import java.util.Optional;
 
-import org.apache.velocity.VelocityContext;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
+import com.celements.rights.access.DefaultRightsAccessFacade;
+import com.celements.rights.access.EAccessLevel;
 import com.celements.web.plugin.api.PageLayoutApi;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 @Component("layout")
@@ -49,54 +51,105 @@ public class LayoutScriptService implements ScriptService {
   public static final String CELEMENTS_PAGE_LAYOUT_COMMAND = "com.celements.web.PageLayoutCommand";
 
   @Requirement
-  private Execution execution;
+  private LayoutServiceRole layoutService;
+
+  @Requirement
+  private ModelContext modelContext;
+
+  @Requirement
+  private ModelUtils modelUtils;
+
+  @Requirement
+  private DefaultRightsAccessFacade rightsAccess;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    return modelContext.getXWikiContext();
   }
 
   public String renderPageLayout() {
-    return getPageLayoutCmd().renderPageLayout();
+    return layoutService.renderPageLayout();
   }
 
-  public String renderPageLayout(SpaceReference spaceRef) {
-    return getPageLayoutCmd().renderPageLayout(spaceRef);
+  @NotNull
+  public String renderPageLayout(@Nullable SpaceReference spaceRef) {
+    return layoutService.renderPageLayout(spaceRef);
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link #getActivePageLayoutSpaceRefs()}
+   */
+  @Deprecated
   public Map<String, String> getActivePageLayouts() {
     return getPageLayoutCmd().getActivePageLyouts();
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link #getAllPageLayouts()}
+   */
+  @Deprecated
   public Map<String, String> getAllPageLayouts() {
     return getPageLayoutCmd().getAllPageLayouts();
   }
 
-  public String createNewLayout(String layoutSpaceName) {
-    return getPageLayoutCmd().createNew(getWebUtilsService().resolveSpaceReference(
-        layoutSpaceName));
+  @NotNull
+  public Map<SpaceReference, String> getActivePageLayoutSpaceRefs() {
+    return layoutService.getActivePageLayouts();
   }
 
-  public boolean deleteLayout(String layoutSpaceName) {
-    SpaceReference layoutSpaceRef = getWebUtilsService().resolveSpaceReference(layoutSpaceName);
-    String layoutPropDocName = getEntitySerializer().serialize(
-        getPageLayoutCmd().standardPropDocRef(layoutSpaceRef));
-    try {
-      if (getContext().getWiki().getRightService().hasAccessLevel("delete", getContext().getUser(),
-          layoutPropDocName, getContext())) {
-        return getPageLayoutCmd().deleteLayout(layoutSpaceRef);
+  @NotNull
+  public Map<SpaceReference, String> getAllPageLayoutSpaceRefs() {
+    return layoutService.getAllPageLayouts();
+  }
+
+  /**
+   * @deprecated since 5.4 instead use {@link #createLayout(SpaceReference)}
+   */
+  @Deprecated
+  @NotNull
+  public String createNewLayout(@Nullable String layoutSpaceName) {
+    SpaceReference layoutSpaceRef = Optional
+        .ofNullable(modelUtils.resolveRef(layoutSpaceName, SpaceReference.class)).orElse(null);
+    return createLayout(layoutSpaceRef);
+  }
+
+  @NotNull
+  public String createLayout(@Nullable SpaceReference layoutSpaceRef) {
+    if ((layoutSpaceRef != null) && rightsAccess.hasAccessLevel(layoutSpaceRef,
+        EAccessLevel.EDIT)) {
+      if (layoutService.createLayout(layoutSpaceRef)) {
+        return "cel_layout_create_successful";
       } else {
-        LOGGER.warn("NO delete rights on [" + layoutPropDocName + "] for user ["
-            + getContext().getUser() + "].");
+        return "cel_layout_empty_name_msg";
       }
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to check delete rights on [" + layoutSpaceName + "] for user ["
-          + getContext().getUser() + "].");
+    }
+    return "cel_layout_no_rights_or_empty_msg";
+  }
+
+  /**
+   * @deprecated since 5.4 instead use {@link #deleteLayout(SpaceReference)}
+   */
+  @Deprecated
+  public boolean deleteLayout(@Nullable String layoutSpaceName) {
+    SpaceReference layoutSpaceRef = modelUtils.resolveRef(layoutSpaceName, SpaceReference.class);
+    return deleteLayout(layoutSpaceRef);
+  }
+
+  public boolean deleteLayout(@Nullable SpaceReference layoutSpaceRef) {
+    Optional<DocumentReference> layoutPropDocRef = layoutService
+        .getLayoutPropDocRef(layoutSpaceRef);
+    if (layoutPropDocRef.isPresent()
+        && rightsAccess.hasAccessLevel(layoutPropDocRef.get(), EAccessLevel.DELETE)) {
+      // layoutPropDocRef is Optional.empty for layoutSpaceRef == null
+      return layoutService.deleteLayout(layoutSpaceRef);
+    } else {
+      LOGGER.warn("NO delete rights on [{}] for user [{}].", layoutPropDocRef.orElse(null),
+          getContext().getUser());
     }
     return false;
   }
 
-  public PageLayoutApi getPageLayoutApiForRef(SpaceReference layoutSpaceRef) {
-    return getPageLayoutCmd().resolveValidLayoutSpace(layoutSpaceRef)
+  public PageLayoutApi getPageLayoutApiForRef(@Nullable SpaceReference layoutSpaceRef) {
+    return layoutService.resolveValidLayoutSpace(layoutSpaceRef)
         .map(PageLayoutApi::new)
         .orElse(null);
   }
@@ -106,8 +159,8 @@ public class LayoutScriptService implements ScriptService {
    *
    * @return PageLayoutApi for the layoutSpaceRef computed
    */
-  public PageLayoutApi getPageLayoutApiForDocRef(DocumentReference docRef) {
-    SpaceReference pageLayoutForDoc = getPageLayoutCmd().getPageLayoutForDoc(docRef);
+  public PageLayoutApi getPageLayoutApiForDocRef(@Nullable DocumentReference docRef) {
+    SpaceReference pageLayoutForDoc = layoutService.getPageLayoutForDoc(docRef);
     if (pageLayoutForDoc != null) {
       return new PageLayoutApi(pageLayoutForDoc, getContext());
     }
@@ -119,25 +172,25 @@ public class LayoutScriptService implements ScriptService {
    *             since 2.86 : or {@link #getPageLayoutApiForDocRef(DocumentReference)}
    */
   @Deprecated
-  public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
+  public PageLayoutApi getPageLayoutApiForName(@Nullable String layoutSpaceName) {
     return new PageLayoutApi(getWebUtilsService().resolveSpaceReference(layoutSpaceName),
         getContext());
   }
 
-  public String getPageLayoutForDoc(DocumentReference docRef) {
-    SpaceReference pageLayoutForDoc = getPageLayoutCmd().getPageLayoutForDoc(docRef);
+  public String getPageLayoutForDoc(@Nullable DocumentReference docRef) {
+    SpaceReference pageLayoutForDoc = layoutService.getPageLayoutForDoc(docRef);
     if (pageLayoutForDoc != null) {
       return pageLayoutForDoc.getName();
     }
     return "";
   }
 
-  public boolean layoutExists(SpaceReference layoutSpaceRef) {
-    return getPageLayoutCmd().layoutExists(layoutSpaceRef);
+  public boolean layoutExists(@Nullable SpaceReference layoutSpaceRef) {
+    return layoutService.existsLayout(layoutSpaceRef);
   }
 
-  public boolean canRenderLayout(SpaceReference spaceRef) {
-    return getPageLayoutCmd().canRenderLayout(spaceRef);
+  public boolean canRenderLayout(@Nullable SpaceReference spaceRef) {
+    return layoutService.canRenderLayout(spaceRef);
   }
 
   public boolean useXWikiLoginLayout() {
@@ -146,37 +199,22 @@ public class LayoutScriptService implements ScriptService {
   }
 
   public boolean layoutEditorAvailable() {
-    return getPageLayoutCmd().layoutEditorAvailable();
+    return layoutService.isLayoutEditorAvailable();
   }
 
-  public String renderCelementsDocumentWithLayout(DocumentReference docRef,
-      SpaceReference layoutSpaceRef) {
-    XWikiDocument oldContextDoc = getContext().getDoc();
-    LOGGER.debug("renderCelementsDocumentWithLayout for docRef [" + docRef
-        + "] and layoutSpaceRef [" + layoutSpaceRef + "] overwrite oldContextDoc ["
-        + oldContextDoc.getDocumentReference() + "].");
-    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-    try {
-      XWikiDocument newContextDoc = getContext().getWiki().getDocument(docRef, getContext());
-      getContext().setDoc(newContextDoc);
-      vcontext.put("doc", newContextDoc.newDocument(getContext()));
-      return getPageLayoutCmd().renderPageLayout(layoutSpaceRef);
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.", exp);
-    } finally {
-      getContext().setDoc(oldContextDoc);
-      vcontext.put("doc", oldContextDoc.newDocument(getContext()));
+  public String renderCelementsDocumentWithLayout(@Nullable DocumentReference docRef,
+      @Nullable SpaceReference layoutSpaceRef) {
+    if (docRef != null) {
+      return layoutService.renderCelementsDocumentWithLayout(docRef, layoutSpaceRef);
     }
     return "";
   }
 
   public SpaceReference getCurrentRenderingLayout() {
-    return getPageLayoutCmd().getCurrentRenderingLayout();
+    return layoutService.getCurrentRenderingLayout();
   }
 
-  /**
-   * TODO: Probably use TreeNodeService directly
-   */
+  @Deprecated
   private PageLayoutCommand getPageLayoutCmd() {
     if (!getContext().containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
       getContext().put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
@@ -184,12 +222,8 @@ public class LayoutScriptService implements ScriptService {
     return (PageLayoutCommand) getContext().get(CELEMENTS_PAGE_LAYOUT_COMMAND);
   }
 
+  @Deprecated
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
-  }
-
-  private DefaultStringEntityReferenceSerializer getEntitySerializer() {
-    return ((DefaultStringEntityReferenceSerializer) Utils.getComponent(
-        EntityReferenceSerializer.class));
   }
 }
