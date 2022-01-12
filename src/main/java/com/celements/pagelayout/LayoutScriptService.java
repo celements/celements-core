@@ -114,11 +114,15 @@ public class LayoutScriptService implements ScriptService {
 
   @NotNull
   public String createLayout(@Nullable SpaceReference layoutSpaceRef) {
-    if (layoutService.createLayout(layoutSpaceRef)) {
-      return "cel_layout_create_successful";
-    } else {
-      return "cel_layout_empty_name_msg";
+    if ((layoutSpaceRef != null) && rightsAccess.hasAccessLevel(layoutSpaceRef,
+        EAccessLevel.EDIT)) {
+      if (layoutService.createLayout(layoutSpaceRef)) {
+        return "cel_layout_create_successful";
+      } else {
+        return "cel_layout_empty_name_msg";
+      }
     }
+    return "cel_layout_no_rights_or_empty_msg";
   }
 
   /**

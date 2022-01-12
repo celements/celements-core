@@ -140,7 +140,8 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public final boolean createLayout(SpaceReference layoutSpaceRef) {
+  public final boolean createLayout(@NotNull SpaceReference layoutSpaceRef) {
+    checkNotNull(layoutSpaceRef);
     final Optional<DocumentReference> layoutPropDocRef = getLayoutPropDocRef(layoutSpaceRef);
     if (!existsLayout(layoutSpaceRef) && layoutPropDocRef.isPresent()) {
       try {

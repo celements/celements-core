@@ -26,7 +26,7 @@ public interface LayoutServiceRole {
 
   public static final String CEL_LAYOUT_EDITOR_PL_NAME = "CelLayoutEditor";
 
-  boolean createLayout(@Nullable SpaceReference layoutSpaceRef);
+  boolean createLayout(@NotNull SpaceReference layoutSpaceRef);
 
   boolean deleteLayout(@NotNull SpaceReference layoutSpaceRef);
 
