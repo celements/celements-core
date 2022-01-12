@@ -138,20 +138,18 @@ public final class DefaultLayoutService implements LayoutServiceRole {
 
   @Override
   public final boolean createLayout(SpaceReference layoutSpaceRef) {
-    if (layoutSpaceRef != null) {
-      if (!existsLayout(layoutSpaceRef)) {
-        try {
-          XWikiDocument propXdoc = modelAccess
-              .getOrCreateDocument(getLayoutPropDocRef(layoutSpaceRef).get());
-          BaseObject layoutPropObj = XWikiObjectEditor.on(propXdoc)
-              .filter(getPageLayoutPropertiesClassRef()).createFirst();
-          layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName() + " Layout");
-          layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, getDocType());
-          modelAccess.saveDocument(propXdoc, "Creating page layout", false);
-          return true;
-        } catch (DocumentSaveException exp) {
-          LOGGER.error("createNew: failed to create new page layout.", exp);
-        }
+    final Optional<DocumentReference> layoutPropDocRef = getLayoutPropDocRef(layoutSpaceRef);
+    if (!existsLayout(layoutSpaceRef) && layoutPropDocRef.isPresent()) {
+      try {
+        final XWikiDocument propXdoc = modelAccess.getOrCreateDocument(layoutPropDocRef.get());
+        final BaseObject layoutPropObj = XWikiObjectEditor.on(propXdoc)
+            .filter(getPageLayoutPropertiesClassRef()).createFirst();
+        layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName() + " Layout");
+        layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, getDocType());
+        modelAccess.saveDocument(propXdoc, "Creating page layout", false);
+        return true;
+      } catch (DocumentSaveException exp) {
+        LOGGER.error("createNew: failed to create new page layout.", exp);
       }
     }
     return false;
