@@ -217,7 +217,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   @Override
   public final boolean existsLayout(SpaceReference layoutSpaceRef) {
     return getLayoutPropDocRef(layoutSpaceRef)
-        .map(propertyDocRef -> getLayoutPropertyBaseObject(propertyDocRef).orElse(null))
+        .flatMap(this::getLayoutPropertyBaseObject)
         .isPresent();
   }
 
