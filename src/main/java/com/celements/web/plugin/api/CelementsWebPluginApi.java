@@ -329,7 +329,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @Deprecated since 2.59 instead use
-   *             {@link WebUtilsService #getAttachmentListSortedSpace(String, String, boolean, int, int)}
+   *             {@link WebUtilsService #getAttachmentListSortedSpace(String, String, boolean, int,
+   *             int)}
    */
   @Deprecated
   public List<Attachment> getAttachmentListSortedSpace(String spaceName, String comparator,
@@ -356,7 +357,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.33.0 instead use
-   *             {@link WebUtilsService #getAttachmentListSorted(Document, String, boolean, int, int)}
+   *             {@link WebUtilsService #getAttachmentListSorted(Document, String, boolean, int,
+   *             int)}
    */
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
@@ -383,7 +385,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.33.0 use instead use
-   *             {@link WebUtilsService #getAttachmentListSortedAsJSON(Document, String, boolean, int, int)}
+   *             {@link WebUtilsService #getAttachmentListSortedAsJSON(Document, String, boolean,
+   *             int, int)}
    */
   @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly,
@@ -483,7 +486,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link CelementsWebScriptService #getNextObjPageId(SpaceReference, DocumentReference, String)}
+   *             {@link CelementsWebScriptService #getNextObjPageId(SpaceReference,
+   *             DocumentReference, String)}
    */
   @Deprecated
   public int getNextObjPageId(String spacename, String classname, String propertyName)
@@ -525,7 +529,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #sendNewValidation(String, String, DocumentReference)}
+   *             {@link AuthenticationScriptService #sendNewValidation(String, String,
+   *             DocumentReference)}
    */
   @Deprecated
   public void sendNewValidation(String user, String possibleFields,
@@ -687,7 +692,8 @@ public class CelementsWebPluginApi extends Api {
    * @param includeDoc
    * @return List of all parents, starting at the specified doc (bottom up)
    * @deprecated since 2.41.0 instead use
-   *             {@link WebUtilsScriptService #getDocumentParentsDocRefList(DocumentReference, boolean)}
+   *             {@link WebUtilsScriptService #getDocumentParentsDocRefList(DocumentReference,
+   *             boolean)}
    */
   @Deprecated
   public List<String> getDocumentParentsList(String fullName, boolean includeDoc) {
@@ -696,7 +702,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link WebUtilsScriptService #getDocumentParentsDocRefList(DocumentReference, boolean)}
+   *             {@link WebUtilsScriptService #getDocumentParentsDocRefList(DocumentReference,
+   *             boolean)}
    *             Returns a list of all parent for a specified doc
    * @param fullName
    * @param includeDoc
@@ -736,7 +743,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link CelMailScriptService #sendMail(String, String, String, String, String, String, String, String, List, Map)}
+   *             {@link CelMailScriptService #sendMail(String, String, String, String, String,
+   *             String, String, String, List, Map)}
    */
   @Deprecated
   public int sendMail(String from, String replyTo, String to, String cc, String bcc, String subject,
@@ -1164,7 +1172,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #checkAuth(String, String, String, String, boolean)}
+   *             {@link AuthenticationScriptService #checkAuth(String, String, String, String,
+   *             boolean)}
    *             Check authentication from logincredential and password and set according
    *             persitent login information If it fails user is unlogged
    * @param username
@@ -1232,7 +1241,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link LayoutScriptService #renderCelementsDocumentWithLayout(DocumentReference, SpaceReference)}
+   *             {@link LayoutScriptService #renderCelementsDocumentWithLayout(DocumentReference,
+   *             SpaceReference)}
    */
   @Deprecated
   public String renderCelementsDocumentWithLayout(DocumentReference docRef,
@@ -1410,7 +1420,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public Map<String, String> getActivePageLayouts() {
-    return getLayoutScriptService().getActivePageLayouts();
+    return new PageLayoutCommand().getActivePageLyouts();
   }
 
   /**
@@ -1418,7 +1428,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public Map<String, String> getAllPageLayouts() {
-    return getLayoutScriptService().getAllPageLayouts();
+    return new PageLayoutCommand().getAllPageLayouts();
   }
 
   /**
@@ -1577,7 +1587,8 @@ public class CelementsWebPluginApi extends Api {
    * @param renderMode
    * @return
    * @deprecated since 2.11.2 use
-   *             {@link CelementsWebScriptService #renderCelementsDocument(DocumentReference, String)}
+   *             {@link CelementsWebScriptService #renderCelementsDocument(DocumentReference,
+   *             String)}
    */
   @Deprecated
   public String renderCelementsDocument(String elementFullName, String renderMode) {
@@ -1596,7 +1607,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.11.7 instead use
-   *             {@link CelementsWebScriptService #renderCelementsDocument(DocumentReference, String)}
+   *             {@link CelementsWebScriptService #renderCelementsDocument(DocumentReference,
+   *             String)}
    */
   @Deprecated
   public String renderCelementsDocument(DocumentReference elementDocRef, String renderMode) {
@@ -1826,7 +1838,8 @@ public class CelementsWebPluginApi extends Api {
    * API to check rights on a document for a given user or group
    *
    * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #hasAccessLevel(String, String, boolean, String)}
+   *             {@link AuthenticationScriptService #hasAccessLevel(String, String, boolean,
+   *             String)}
    * @param level
    *          right to check (view, edit, comment, delete)
    * @param user
@@ -1870,7 +1883,8 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link EditorSupportScriptService #getSuggestList(DocumentReference, String, String)}
+   *             {@link EditorSupportScriptService #getSuggestList(DocumentReference, String,
+   *             String)}
    */
   @Deprecated
   public List<Object> getSuggestList(DocumentReference classRef, String fieldname, String input) {
