@@ -48,7 +48,7 @@ import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
-import com.celements.web.CelConstant;
+import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -90,10 +90,13 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   private IModelAccessFacade modelAccess;
 
   @Requirement
-  QueryManager queryManager;
+  private QueryManager queryManager;
 
   @Requirement
-  ConfigurationSource cfgSrc;
+  private ConfigurationSource cfgSrc;
+
+  @Requirement
+  private IWebUtilsService webUtilsSrv;
 
   @Override
   public final Map<SpaceReference, String> getAllPageLayouts() {
@@ -286,7 +289,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       @Nullable SpaceReference layoutSpaceRef) {
     if ((layoutSpaceRef != null) && !existsLayout(layoutSpaceRef)) {
       SpaceReference centralLayoutSpaceRef = RefBuilder.from(layoutSpaceRef)
-          .with(getCentralWikiRef())
+          .with(webUtilsSrv.getCentralWikiRef())
           .build(SpaceReference.class);
       if (!layoutSpaceRef.equals(centralLayoutSpaceRef) && existsLayout(centralLayoutSpaceRef)) {
         layoutSpaceRef = centralLayoutSpaceRef;
@@ -318,7 +321,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   public final boolean checkLayoutAccess(@NotNull SpaceReference layoutSpaceRef) {
     WikiReference layoutWikiRef = RefBuilder.from(layoutSpaceRef).build(WikiReference.class);
     return modelContext.getWikiRef().equals(layoutWikiRef)
-        || getCentralWikiRef().equals(layoutWikiRef);
+        || webUtilsSrv.getCentralWikiRef().equals(layoutWikiRef);
   }
 
   @Override
@@ -453,10 +456,6 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     return RefBuilder.from(modelContext.getWikiRef())
         .space(CEL_LAYOUT_EDITOR_PL_NAME)
         .build(SpaceReference.class);
-  }
-
-  final WikiReference getCentralWikiRef() {
-    return RefBuilder.create().wiki(CelConstant.CENTRAL_WIKI_NAME).build(WikiReference.class);
   }
 
   private String getDocType() {
