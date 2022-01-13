@@ -154,3 +154,4 @@ com.celements.collections.service.DateScriptService
 com.celements.docform.DocFormCommand
 com.celements.init.TimeZoneInit
 com.celements.pagelayout.DefaultLayoutService
+com.celements.javascript.JavaScriptExternalFilesClass

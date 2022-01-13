@@ -34,6 +34,8 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.javascript.ExtJsFileParameter;
+import com.celements.javascript.JavaScriptExternalFilesClass;
+import com.celements.javascript.JsFileEntry;
 import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
@@ -41,7 +43,6 @@ import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.web.classcollections.IOldCoreClassConfig;
-import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand.JsFileEntry;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -197,7 +198,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
     String scriptStart = "<script type=\"text/javascript\" src=\"";
     String scriptEnd = "\"></script>";
-    JsFileEntry jsFile = new JsFileEntry(url);
+    JsFileEntry jsFile = new JsFileEntry().addFilepath(url);
     assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
   }
 
@@ -207,7 +208,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
     String scriptStart = "<script defer type=\"text/javascript\" src=\"";
     String scriptEnd = "\"></script>";
-    JsFileEntry jsFile = new JsFileEntry(url, JsLoadMode.DEFER);
+    JsFileEntry jsFile = new JsFileEntry().addFilepath(url).addLoadMode(JsLoadMode.DEFER);
     assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
   }
 
@@ -217,7 +218,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
     String scriptStart = "<script async type=\"text/javascript\" src=\"";
     String scriptEnd = "\"></script>";
-    JsFileEntry jsFile = new JsFileEntry(url, JsLoadMode.ASYNC);
+    JsFileEntry jsFile = new JsFileEntry().addFilepath(url).addLoadMode(JsLoadMode.ASYNC);
     assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
   }
 
@@ -281,8 +282,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.isOnDiskLink(eq(filePath))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.getAttachmentURL(eq(filePath), same(context))).andReturn(filePath)
         .atLeastOnce();
-    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH,
-        filePath);
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(), filePath);
     contextDoc.addXObject(extJsFileObj);
     expect(modelAccessMock.getDocument(eq(contextDocRef))).andReturn(contextDoc).atLeastOnce();
     context.setDoc(contextDoc);
@@ -308,9 +308,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.getAttachmentURL(eq(filePath), same(context))).andReturn(filePath)
         .atLeastOnce();
     JsLoadMode loadMode = JsLoadMode.DEFER;
-    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH,
-        filePath);
-    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE,
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(), filePath);
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_LOAD_MODE.getName(),
         loadMode.toString());
     contextDoc.addXObject(extJsFileObj);
     expect(modelAccessMock.getDocument(eq(contextDocRef))).andReturn(contextDoc).atLeastOnce();
@@ -338,9 +337,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.getAttachmentURL(eq(filePath), same(context))).andReturn(filePath)
         .atLeastOnce();
     JsLoadMode loadMode = JsLoadMode.ASYNC;
-    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH,
-        filePath);
-    extJsFileObj.setStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE,
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(), filePath);
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_LOAD_MODE.getName(),
         loadMode.toString());
     contextDoc.addXObject(extJsFileObj);
     expect(modelAccessMock.getDocument(eq(contextDocRef))).andReturn(contextDoc).atLeastOnce();

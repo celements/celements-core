@@ -25,9 +25,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,7 +43,12 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.common.reflect.ReflectiveInstanceSupplier;
+import com.celements.convert.bean.BeanClassDefConverter;
+import com.celements.convert.bean.XObjectBeanConverter;
 import com.celements.javascript.ExtJsFileParameter;
+import com.celements.javascript.JavaScriptExternalFilesClass;
+import com.celements.javascript.JsFileEntry;
 import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
@@ -54,10 +59,10 @@ import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.JsonBuilder;
-import com.celements.web.classcollections.IOldCoreClassConfig;
+import com.celements.web.classes.CelementsClassDefinition;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
-import com.google.errorprone.annotations.Immutable;
+import com.google.common.base.Suppliers;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.objects.BaseObject;
@@ -87,56 +92,30 @@ public class ExternalJavaScriptFilesCommand {
   private static final Logger LOGGER = LoggerFactory
       .getLogger(ExternalJavaScriptFilesCommand.class);
 
-  @Immutable
-  static final class JsFileEntry {
-
-    private final String jsFileUrl;
-    private final JsLoadMode loadMode;
-
-    JsFileEntry(String jsFileUrl) {
-      this(jsFileUrl, (JsLoadMode) null);
-    }
-
-    JsFileEntry(String jsFileUrl, @Nullable JsLoadMode loadMode) {
-      this.jsFileUrl = jsFileUrl;
-      this.loadMode = Optional.ofNullable(loadMode).orElse(JsLoadMode.SYNC);
-    }
-
-    JsFileEntry(String jsFileUrl, @Nullable String loadModeStr) {
-      this(jsFileUrl, JsLoadMode.convertStoreValue(loadModeStr));
-      LOGGER.debug("JsFileEntry constructor with jsFileUrl [{}] and loadModeStr [{}] using [{}]",
-          jsFileUrl, loadModeStr, this.loadMode);
-    }
-
-    boolean isValid() {
-      return !Strings.isNullOrEmpty(jsFileUrl);
-    }
-
-    @Override
-    public int hashCode() {
-      return jsFileUrl.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      return (obj instanceof JsFileEntry)
-          && Objects.equals(((JsFileEntry) obj).jsFileUrl, jsFileUrl);
-    }
-
-  }
-
   private final Set<JsFileEntry> extJSfileSet = new LinkedHashSet<>();
   private final Set<String> extJSAttUrlSet = new HashSet<>();
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
-
-  public ExternalJavaScriptFilesCommand() {}
+  private static final Supplier<BeanClassDefConverter<BaseObject, JsFileEntry>> JS_FILE_ENTRY_CONVERTER = Suppliers
+      .memoize(ExternalJavaScriptFilesCommand::jsFileEntryConverter);
 
   /**
    * @deprecated since 5.4 instead use {@link ExternalJavaScriptFilesCommand()}
    */
   @Deprecated
   public ExternalJavaScriptFilesCommand(XWikiContext context) {}
+
+  public ExternalJavaScriptFilesCommand() {}
+
+  private static BeanClassDefConverter<BaseObject, JsFileEntry> jsFileEntryConverter() {
+    @SuppressWarnings("unchecked")
+    BeanClassDefConverter<BaseObject, JsFileEntry> converter = Utils.getComponent(
+        BeanClassDefConverter.class, XObjectBeanConverter.NAME);
+    converter.initialize(Utils.getComponent(CelementsClassDefinition.class,
+        JavaScriptExternalFilesClass.CLASS_DEF_HINT));
+    converter.initialize(new ReflectiveInstanceSupplier<>(JsFileEntry.class));
+    return converter;
+  }
 
   public String addLazyExtJSfile(String jsFile) {
     return addLazyExtJSfile(new ExtJsFileParameter()
@@ -253,13 +232,14 @@ public class ExternalJavaScriptFilesCommand {
         jsFileUrl, loadMode);
     String jsIncludes2 = "";
     if (jsFileUrl == null) {
-      JsFileEntry jsFileEntry = new JsFileEntry(jsFile);
+      JsFileEntry jsFileEntry = new JsFileEntry().addFilepath(jsFile);
       if (!jsFileHasBeenSeen(jsFileEntry)) {
         extJSnotFoundSet.add(jsFile);
         jsIncludes2 = buildNotFoundWarning(jsFile);
       }
     } else {
-      JsFileEntry jsFileEntry = new JsFileEntry(jsFileUrl, loadMode);
+      JsFileEntry jsFileEntry = new JsFileEntry().addFilepath(jsFileUrl)
+          .addLoadMode(loadMode);
       if (!jsFileHasBeenSeen(jsFileEntry)) {
         jsIncludes2 = getExtStringForJsFile(jsFileEntry);
         extJSfileSet.add(jsFileEntry);
@@ -276,7 +256,7 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   private boolean jsFileHasBeenSeen(JsFileEntry jsFile) {
-    return extJSfileSet.contains(jsFile) || extJSnotFoundSet.contains(jsFile.jsFileUrl);
+    return extJSfileSet.contains(jsFile) || extJSnotFoundSet.contains(jsFile.getFilepath());
   }
 
   void injectDisplayAll(boolean displayedAll) {
@@ -285,9 +265,10 @@ public class ExternalJavaScriptFilesCommand {
 
   String getExtStringForJsFile(JsFileEntry jsFile) {
     return "<script"
-        + ((jsFile.loadMode != JsLoadMode.SYNC) ? " " + jsFile.loadMode.toString().toLowerCase()
+        + ((jsFile.getLoadMode() != JsLoadMode.SYNC)
+            ? " " + jsFile.getLoadMode().toString().toLowerCase()
             : "")
-        + " type=\"text/javascript\" src=\"" + StringEscapeUtils.escapeHtml(jsFile.jsFileUrl)
+        + " type=\"text/javascript\" src=\"" + StringEscapeUtils.escapeHtml(jsFile.getFilepath())
         + "\"></script>";
   }
 
@@ -371,28 +352,18 @@ public class ExternalJavaScriptFilesCommand {
     checkNotNull(docRef);
     try {
       XWikiObjectFetcher.on(getModelAccess().getDocument(docRef))
-          .filter(new ClassReference(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE,
-              IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC))
+          .filter(getJavaScriptExternalFilesClassRef())
           .stream()
-          .map(this::convertToJsFileEntry)
+          .map(ExternalJavaScriptFilesCommand.JS_FILE_ENTRY_CONVERTER.get())
           .filter(JsFileEntry::isValid)
           .forEachOrdered(jsFile -> addExtJSfileOnce(
               new ExtJsFileParameter()
-                  .setJsFile(jsFile.jsFileUrl)
-                  .setLoadMode(jsFile.loadMode)
+                  .setJsFile(jsFile.getFilepath())
+                  .setLoadMode(jsFile.getLoadMode())
                   .setAttUrlCmd(attUrlCmd)));
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addJSFiles from [{}] failed.", docRef, nExExp);
     }
-  }
-
-  private JsFileEntry convertToJsFileEntry(BaseObject jsExtFileObj) {
-    String filePath = jsExtFileObj
-        .getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH);
-    String loadModeStr = jsExtFileObj
-        .getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE);
-    LOGGER.info("convertToJsFileEntry with filePath [{}] loadModeStr [{}]", filePath, loadModeStr);
-    return new JsFileEntry(filePath, loadModeStr);
   }
 
   @NotNull
@@ -420,4 +391,9 @@ public class ExternalJavaScriptFilesCommand {
     return Utils.getComponent(XObjectPageTypeUtilsRole.class);
   }
 
+  private ClassReference getJavaScriptExternalFilesClassRef() {
+    return Utils
+        .getComponent(CelementsClassDefinition.class, JavaScriptExternalFilesClass.CLASS_DEF_HINT)
+        .getClassReference();
+  }
 }

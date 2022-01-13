@@ -86,8 +86,7 @@ public class JSScriptService implements ScriptService {
 
   private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
     if (getContext().get(JAVA_SCRIPT_FILES_COMMAND_KEY) == null) {
-      getContext().put(JAVA_SCRIPT_FILES_COMMAND_KEY, new ExternalJavaScriptFilesCommand(
-          getContext()));
+      getContext().put(JAVA_SCRIPT_FILES_COMMAND_KEY, new ExternalJavaScriptFilesCommand());
     }
     return (ExternalJavaScriptFilesCommand) getContext().get(JAVA_SCRIPT_FILES_COMMAND_KEY);
   }
