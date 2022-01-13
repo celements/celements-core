@@ -345,7 +345,11 @@ public final class DefaultLayoutService implements LayoutServiceRole {
           .filter(getPageLayoutPropertiesClassRef())
           .stream().findFirst();
     } catch (DocumentNotExistsException exp) {
-      LOGGER.info("Layout property doc [{}] does not exist.", layoutPropDocRef, exp);
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("Layout property doc [{}] does not exist.", layoutPropDocRef, exp);
+      } else {
+        LOGGER.info("Layout property doc [{}] does not exist.", layoutPropDocRef);
+      }
     }
     return Optional.empty();
   }
