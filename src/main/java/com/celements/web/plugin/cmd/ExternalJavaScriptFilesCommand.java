@@ -250,6 +250,8 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   private String addExtJSfileOnceInternal(String jsFile, String jsFileUrl, JsLoadMode loadMode) {
+    LOGGER.info("addExtJSfileOnceInternal: jsFile [{}] jsFileUrl [{}] loadMode [{}]", jsFile,
+        jsFileUrl, loadMode);
     String jsIncludes2 = "";
     if (jsFileUrl == null) {
       JsFileEntry jsFileEntry = new JsFileEntry(jsFile);
