@@ -348,7 +348,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace("Layout property doc [{}] does not exist.", layoutPropDocRef, exp);
       } else {
-        LOGGER.info("Layout property doc [{}] does not exist.", layoutPropDocRef);
+        LOGGER.debug("Layout property doc [{}] does not exist.", layoutPropDocRef);
       }
     }
     return Optional.empty();
