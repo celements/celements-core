@@ -48,6 +48,7 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.configuration.ConfigSourceUtils;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
@@ -673,6 +674,8 @@ public class Navigation implements INavigation {
     SpaceReference pageLayoutRef = getPresentationType().getPageLayoutForDoc(docRef);
     if (pageLayoutRef == null) {
       pageLayoutRef = pageLayoutCmd.getPageLayoutForDoc(docRef);
+      LOGGER.info("getPageLayoutName: no presentation layout found for [{}] now using layout [{}]",
+          docRef, pageLayoutRef);
     }
     if (pageLayoutRef != null) {
       return "layout_" + pageLayoutRef.getName();
@@ -1074,6 +1077,10 @@ public class Navigation implements INavigation {
       return injected_TreeNodeService;
     }
     return Utils.getComponent(ITreeNodeService.class);
+  }
+
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
   IPageTypeResolverRole getPageTypeResolverService() {
