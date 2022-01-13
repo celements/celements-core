@@ -105,8 +105,7 @@ public class ExternalJavaScriptFilesCommand {
     JsFileEntry(String jsFileUrl, @Nullable String loadModeStr) {
       this(jsFileUrl, JsLoadMode.convertStoreValue(loadModeStr));
       LOGGER.debug("JsFileEntry constructor with jsFileUrl [{}] and loadModeStr [{}] using [{}]",
-          jsFileUrl,
-          loadModeStr, this.loadMode);
+          jsFileUrl, loadModeStr, this.loadMode);
     }
 
     boolean isValid() {
@@ -388,10 +387,12 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   private JsFileEntry convertToJsFileEntry(BaseObject jsExtFileObj) {
-    return new JsFileEntry(
-        jsExtFileObj.getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH),
-        jsExtFileObj
-            .getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE));
+    String filePath = jsExtFileObj
+        .getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH);
+    String loadModeStr = jsExtFileObj
+        .getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE);
+    LOGGER.info("convertToJsFileEntry with filePath [{}] loadModeStr [{}]", filePath, loadModeStr);
+    return new JsFileEntry(filePath, loadModeStr);
   }
 
   @NotNull
