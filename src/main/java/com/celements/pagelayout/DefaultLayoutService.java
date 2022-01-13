@@ -429,11 +429,6 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     return "";
   }
 
-  private Optional<HtmlDoctype> getHtmlDoctype(BaseObject layoutPropertyObj, String fieldName) {
-    return HtmlDoctype.getHtmlDoctype(Strings.emptyToNull(layoutPropertyObj.getStringValue(
-        fieldName))).toJavaUtil();
-  }
-
   final ClassReference getPageLayoutPropertiesClassRef() {
     return new ClassReference(PAGE_LAYOUT_PROPERTIES_CLASS_SPACE, PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
   }
