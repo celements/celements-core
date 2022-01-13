@@ -35,8 +35,8 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
-import com.celements.rights.access.DefaultRightsAccessFacade;
 import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.web.plugin.api.PageLayoutApi;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -60,7 +60,7 @@ public class LayoutScriptService implements ScriptService {
   private ModelUtils modelUtils;
 
   @Requirement
-  private DefaultRightsAccessFacade rightsAccess;
+  private IRightsAccessFacadeRole rightsAccess;
 
   private XWikiContext getContext() {
     return modelContext.getXWikiContext();
