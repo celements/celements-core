@@ -60,6 +60,7 @@ import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Immutable;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 import one.util.streamex.StreamEx;
@@ -83,8 +84,8 @@ public class ExternalJavaScriptFilesCommand {
   public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS = JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE
       + "." + JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      ExternalJavaScriptFilesCommand.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(ExternalJavaScriptFilesCommand.class);
 
   @Immutable
   static final class JsFileEntry {
@@ -103,6 +104,9 @@ public class ExternalJavaScriptFilesCommand {
 
     JsFileEntry(String jsFileUrl, @Nullable String loadModeStr) {
       this(jsFileUrl, JsLoadMode.convertStoreValue(loadModeStr));
+      LOGGER.debug("JsFileEntry constructor with jsFileUrl [{}] and loadModeStr [{}] using [{}]",
+          jsFileUrl,
+          loadModeStr, this.loadMode);
     }
 
     boolean isValid() {
@@ -127,15 +131,13 @@ public class ExternalJavaScriptFilesCommand {
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
 
-  public ExternalJavaScriptFilesCommand() {
-  }
+  public ExternalJavaScriptFilesCommand() {}
 
   /**
    * @deprecated since 5.4 instead use {@link ExternalJavaScriptFilesCommand()}
    */
   @Deprecated
-  public ExternalJavaScriptFilesCommand(XWikiContext context) {
-  }
+  public ExternalJavaScriptFilesCommand(XWikiContext context) {}
 
   public String addLazyExtJSfile(String jsFile) {
     return addLazyExtJSfile(new ExtJsFileParameter()
@@ -371,12 +373,7 @@ public class ExternalJavaScriptFilesCommand {
           .filter(new ClassReference(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE,
               IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC))
           .stream()
-          .map(
-              jsExtFileObj -> new JsFileEntry(jsExtFileObj
-                  .getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH),
-                  jsExtFileObj
-                      .getStringValue(
-                          IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE)))
+          .map(this::convertToJsFileEntry)
           .filter(JsFileEntry::isValid)
           .forEachOrdered(jsFile -> addExtJSfileOnce(
               new ExtJsFileParameter()
@@ -386,6 +383,13 @@ public class ExternalJavaScriptFilesCommand {
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addJSFiles from [{}] failed.", docRef, nExExp);
     }
+  }
+
+  private JsFileEntry convertToJsFileEntry(BaseObject jsExtFileObj) {
+    return new JsFileEntry(
+        jsExtFileObj.getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_FILEPATH),
+        jsExtFileObj
+            .getStringValue(IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_FIELD_LOAD_MODE));
   }
 
   @NotNull
