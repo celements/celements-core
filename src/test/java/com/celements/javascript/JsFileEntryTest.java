@@ -189,7 +189,13 @@ public class JsFileEntryTest extends AbstractComponentTest {
         jsFileEntry.getLoadMode().toString());
     try {
       JsFileEntry jsFileEntryBean = jsFileEntryConverter.get().apply(jsExtFileObj);
-      assertEquals(jsFileEntry, jsFileEntryBean);
+      assertEquals(jsFileEntry.getFilepath(), jsFileEntryBean.getFilepath());
+      assertEquals(jsFileEntry.getLoadMode(), jsFileEntryBean.getLoadMode());
+      assertEquals(docRef, jsFileEntryBean.getDocumentReference());
+      assertEquals(new ClassReference(jsExtFileObj.getXClassReference()),
+          jsFileEntryBean.getClassReference());
+      assertEquals(jsExtFileObj.getNumber(), jsFileEntryBean.getNumber().intValue());
+      assertEquals(jsExtFileObj.getId(), jsFileEntryBean.getId().longValue());
     } catch (ConversionException exp) {
       fail();
     }
