@@ -118,7 +118,7 @@ public class MetaTag extends ObjectBean implements MetaTagRole {
 
   @Override
   public boolean getOverridable() {
-    return (overridable != null) && overridable;
+    return Optional.ofNullable(overridable).orElse(false);
   }
 
   @Override
