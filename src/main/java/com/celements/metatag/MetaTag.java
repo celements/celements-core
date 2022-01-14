@@ -43,12 +43,13 @@ import com.celements.metatag.enums.EViewport;
 import com.celements.metatag.enums.opengraph.EOpenGraph;
 import com.celements.metatag.enums.twitter.ETwitter;
 import com.celements.metatag.enums.twitter.ETwitterCardType;
+import com.celements.model.object.ObjectBean;
 import com.google.common.collect.ImmutableMap;
 
 /* ComponentInstanceSupplier in BaseObjectMetaTagProvider needs this to be a component */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class MetaTag extends AbstractCelPoJo implements MetaTagRole {
+public class MetaTag extends ObjectBean implements MetaTagRole {
 
   private Map<String, String> attribs;
   private String content;
