@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
@@ -304,11 +303,9 @@ public class ExternalJavaScriptFilesCommand {
 
   private StringBuilder generateJsImportString() {
     final StringBuilder jsIncludesBuilder = new StringBuilder();
-    jsIncludesBuilder.append(Stream.concat(
-        extJSfileSet.stream().map(this::getExtStringForJsFile),
-        extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
-        .collect(Collectors.joining("\n")));
-    jsIncludesBuilder.append("\n");
+    StreamEx.of(extJSfileSet.stream().map(this::getExtStringForJsFile))
+        .append(extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
+        .forEach(tag -> jsIncludesBuilder.append(tag).append("\n"));
     return jsIncludesBuilder;
   }
 
