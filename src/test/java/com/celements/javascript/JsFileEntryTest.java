@@ -128,7 +128,7 @@ public class JsFileEntryTest extends AbstractComponentTest {
     @NotNull
     JsFileEntry jsFileEntry2 = new JsFileEntry().addFilepath(":space.doc:attachment2.js");
     assertNotEquals(jsFileEntry, jsFileEntry2);
-    assertEquals(jsFileEntry.hashCode(), jsFileEntry2.hashCode());
+    assertNotEquals(jsFileEntry.hashCode(), jsFileEntry2.hashCode());
   }
 
   @Test
