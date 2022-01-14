@@ -10,9 +10,9 @@ import com.google.common.base.Strings;
 
 public final class JsFileEntry {
 
-  private int id;
+  private Long id;
   private DocumentReference documentReference;
-  private int objNumber;
+  private Integer objNumber;
   private ClassReference classReference;
   private String jsFileUrl;
   private JsLoadMode loadMode;
@@ -47,11 +47,11 @@ public final class JsFileEntry {
     return Optional.ofNullable(loadMode).orElse(JsLoadMode.SYNC);
   }
 
-  public int getNumber() {
+  public Integer getNumber() {
     return objNumber;
   }
 
-  public void setNumber(int objNumber) {
+  public void setNumber(Integer objNumber) {
     this.objNumber = objNumber;
   }
 
@@ -71,11 +71,11 @@ public final class JsFileEntry {
     this.documentReference = documentReference;
   }
 
-  public int getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
