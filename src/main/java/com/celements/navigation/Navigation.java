@@ -48,7 +48,6 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.configuration.ConfigSourceUtils;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
@@ -1075,10 +1074,6 @@ public class Navigation implements INavigation {
       return injected_TreeNodeService;
     }
     return Utils.getComponent(ITreeNodeService.class);
-  }
-
-  private ModelUtils getModelUtils() {
-    return Utils.getComponent(ModelUtils.class);
   }
 
   IPageTypeResolverRole getPageTypeResolverService() {
