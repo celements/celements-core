@@ -147,4 +147,28 @@ public class JsFileEntryTest {
         + "]", jsFileEntry.toString());
   }
 
+  // @Test
+  // public void test_bean() {
+  // DocumentReference docRef = new DocumentReference("wikiName", "space", "document");
+  // tag.setKey("description");
+  // tag.setLang("de");
+  // tag.setValue("the most fabulous thing ever");
+  // tag.setOverridable(false);
+  // BaseObject metaTagObj = new BaseObject();
+  // metaTagObj.setXClassReference(metaTagClass.getClassReference());
+  // metaTagObj.setDocumentReference(docRef);
+  // metaTagObj.setId(2342423, IdVersion.CELEMENTS_3);
+  // metaTagObj.setNumber(1);
+  // metaTagObj.setStringValue(MetaTagClass.FIELD_KEY.getName(), tag.getKey());
+  // metaTagObj.setStringValue(MetaTagClass.FIELD_LANGUAGE.getName(), tag.getLang());
+  // metaTagObj.setStringValue(MetaTagClass.FIELD_VALUE.getName(), tag.getValue());
+  // metaTagObj.setIntValue(MetaTagClass.FIELD_OVERRIDABLE.getName(), tag.getOverridable() ? 1 : 0);
+  // try {
+  // MetaTag metaTagBean = metaTagConverter.get().apply(metaTagObj);
+  // assertEquals(tag, metaTagBean);
+  // } catch (ConversionException exp) {
+  // fail();
+  // }
+  // }
+
 }

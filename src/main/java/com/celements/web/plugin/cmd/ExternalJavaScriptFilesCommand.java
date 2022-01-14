@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -226,7 +225,7 @@ public class ExternalJavaScriptFilesCommand {
     return "";
   }
 
-  @NotEmpty
+  @NotNull
   private String addExtJSfileOnceInternal(JsFileEntry jsFileEntry, String jsFileUrl) {
     LOGGER.info("addExtJSfileOnceInternal: jsFileEntry [{}] jsFileUrl [{}]", jsFileEntry,
         jsFileUrl);
@@ -237,9 +236,10 @@ public class ExternalJavaScriptFilesCommand {
         jsIncludes2 = buildNotFoundWarning(jsFileEntry.getFilepath());
       }
     } else {
-      if (!jsFileHasBeenSeen(jsFileEntry)) {
-        jsIncludes2 = getExtStringForJsFile(jsFileEntry);
-        extJSfileSet.add(jsFileEntry);
+      JsFileEntry jsFileEntry2 = new JsFileEntry(jsFileEntry).addFilepath(jsFileUrl);
+      if (!jsFileHasBeenSeen(jsFileEntry2)) {
+        jsIncludes2 = getExtStringForJsFile(jsFileEntry2);
+        extJSfileSet.add(jsFileEntry2);
       }
     }
     if (!displayedAll) {

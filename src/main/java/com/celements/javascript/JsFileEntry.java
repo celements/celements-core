@@ -25,6 +25,15 @@ public final class JsFileEntry {
     // Bean needs default constructor
   }
 
+  public JsFileEntry(JsFileEntry jsFileEntry) {
+    this.id = jsFileEntry.getId();
+    this.documentReference = jsFileEntry.getDocumentReference();
+    this.objNumber = jsFileEntry.getNumber();
+    this.classReference = jsFileEntry.getClassReference();
+    this.jsFileUrl = jsFileEntry.getFilepath();
+    this.loadMode = jsFileEntry.getLoadMode();
+  }
+
   @NotNull
   public JsFileEntry addFilepath(@Nullable String jsFile) {
     setFilepath(jsFile);
