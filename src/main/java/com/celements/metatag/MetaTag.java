@@ -22,10 +22,13 @@ package com.celements.metatag;
 import static com.google.common.base.Strings.*;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -173,8 +176,8 @@ public class MetaTag implements MetaTagRole {
     StringBuilder sb = new StringBuilder();
     sb.append("<meta ");
     if (attribs != null) {
-      for (String attrib : attribs.keySet()) {
-        sb.append(attrib).append("=\"").append(attribs.get(attrib)).append("\" ");
+      for (Entry<String, String> attribEntry : attribs.entrySet()) {
+        sb.append(attribEntry.getKey()).append("=\"").append(attribEntry.getValue()).append("\" ");
       }
     }
     if (key != null) {
@@ -189,14 +192,20 @@ public class MetaTag implements MetaTagRole {
 
   @Override
   public boolean equals(Object tag) {
-    return (tag instanceof MetaTag) && equalsLang((MetaTag) tag) && display().equals(((MetaTag) tag)
-        .display());
+    if (!(tag instanceof MetaTag)) {
+      return false;
+    }
+    final MetaTag theTag = (MetaTag) tag;
+    return Objects.equals(getLangOpt(), theTag.getLangOpt())
+        && Objects.equals(display(), theTag.display());
   }
 
-  private boolean equalsLang(MetaTag tag) {
-    return (getLangOpt().orElse(null) == tag.getLangOpt().orElse(null)) || ((getLangOpt()
-        .isPresent()) && getLangOpt().get().equals(tag
-            .getLangOpt().get()));
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(43, 57)
+        .append(getLangOpt())
+        .append(display())
+        .toHashCode();
   }
 
 }
