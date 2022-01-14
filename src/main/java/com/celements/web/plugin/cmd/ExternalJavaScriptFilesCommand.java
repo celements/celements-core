@@ -293,7 +293,7 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   String getAllExternalJavaScriptFiles(@Nullable AttachmentURLCommand attUrlCmd) {
-    getJsExtFileObjCollectDocRefsStream()
+    streamDocRefs2CollectJsExtFileObj()
         .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmd));
     notifyExtJavaScriptFileListener();
     final StringBuilder jsIncludesBuilder = generateJsImportString();
@@ -309,7 +309,7 @@ public class ExternalJavaScriptFilesCommand {
     return jsIncludesBuilder;
   }
 
-  private Stream<DocumentReference> getJsExtFileObjCollectDocRefsStream() {
+  private Stream<DocumentReference> streamDocRefs2CollectJsExtFileObj() {
     return StreamEx.of(getSkinDocRef())
         .append(getXWikiPreferencesDocRef())
         .append(getCurrentSpacePreferencesDocRef())
