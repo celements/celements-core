@@ -7,6 +7,8 @@ import com.google.common.base.Strings;
 
 public final class JsFileEntry {
 
+  private int objNumber;
+
   private String jsFileUrl;
   private JsLoadMode loadMode;
 
@@ -34,6 +36,14 @@ public final class JsFileEntry {
 
   public JsLoadMode getLoadMode() {
     return Optional.ofNullable(loadMode).orElse(JsLoadMode.SYNC);
+  }
+
+  public int getNumber() {
+    return objNumber;
+  }
+
+  public void setNumber(int objNumber) {
+    this.objNumber = objNumber;
   }
 
   public boolean isValid() {
