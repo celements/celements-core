@@ -66,12 +66,12 @@ public class MetaTagTest extends AbstractComponentTest {
 
   @Test
   public void testEqualsObject_null() {
-    assertFalse(new MetaTag().equals(null));
+    assertNotEquals(null, new MetaTag());
   }
 
   @Test
   public void testEqualsObject_empty() {
-    assertTrue(new MetaTag().equals(new MetaTag()));
+    assertEquals(new MetaTag(), new MetaTag());
   }
 
   @Test
@@ -81,9 +81,9 @@ public class MetaTagTest extends AbstractComponentTest {
     m1.setLang("de");
     MetaTag m2 = new MetaTag();
     m2.setLang("en");
-    assertFalse(m0.equals(m1));
-    assertTrue(m1.equals(m1));
-    assertFalse(m1.equals(m2));
+    assertNotEquals(m0, m1);
+    assertEquals(m1, m1);
+    assertNotEquals(m1, m2);
   }
 
   @Test
@@ -93,9 +93,9 @@ public class MetaTagTest extends AbstractComponentTest {
     m1.setValue("content tag1");
     MetaTag m2 = new MetaTag();
     m2.setValue("content tag2");
-    assertFalse(m0.equals(m1));
-    assertTrue(m1.equals(m1));
-    assertFalse(m1.equals(m2));
+    assertNotEquals(m0, m1);
+    assertEquals(m1, m1);
+    assertNotEquals(m1, m2);
   }
 
   @Test
@@ -105,9 +105,9 @@ public class MetaTagTest extends AbstractComponentTest {
     m1.setKey("description");
     MetaTag m2 = new MetaTag();
     m2.setKey("keywords");
-    assertFalse(m0.equals(m1));
-    assertTrue(m1.equals(m1));
-    assertFalse(m1.equals(m2));
+    assertNotEquals(m0, m1);
+    assertEquals(m1, m1);
+    assertNotEquals(m1, m2);
   }
 
   @Test
@@ -117,9 +117,9 @@ public class MetaTagTest extends AbstractComponentTest {
     m1.setOverridable(true);
     MetaTag m2 = new MetaTag();
     m2.setOverridable(false);
-    assertTrue(m0.equals(m1));
-    assertTrue(m1.equals(m1));
-    assertTrue(m1.equals(m2));
+    assertEquals(m0, m1);
+    assertEquals(m1, m1);
+    assertEquals(m1, m2);
   }
 
 }
