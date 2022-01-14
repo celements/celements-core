@@ -3,24 +3,70 @@ package com.celements.javascript;
 import static com.google.common.base.Preconditions.*;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
+import com.google.errorprone.annotations.Immutable;
 
-@NotThreadSafe
+@Immutable
 public final class ExtJsFileParameter {
 
-  private String action;
-  private String params;
-  private AttachmentURLCommand attUrlCmd;
-  private JsFileEntry jsFileEntry = new JsFileEntry();
+  public static final class Builder {
 
-  @NotNull
-  public ExtJsFileParameter setJsFileEntry(@NotNull JsFileEntry jsFileEntry) {
-    checkNotNull(jsFileEntry);
-    this.jsFileEntry = jsFileEntry;
-    return this;
+    private String action;
+    private String params;
+    private AttachmentURLCommand attUrlCmd;
+    private JsFileEntry jsFileEntry = new JsFileEntry();
+
+    @NotNull
+    public Builder setJsFileEntry(@NotNull JsFileEntry jsFileEntry) {
+      checkNotNull(jsFileEntry);
+      this.jsFileEntry = jsFileEntry;
+      return this;
+    }
+
+    public Builder setJsFile(@NotNull String jsFile) {
+      checkNotNull(jsFile);
+      this.jsFileEntry.setFilepath(jsFile);
+      return this;
+    }
+
+    public Builder setAction(String action) {
+      this.action = action;
+      return this;
+    }
+
+    public Builder setParams(String params) {
+      this.params = params;
+      return this;
+    }
+
+    public Builder setAttUrlCmd(AttachmentURLCommand attUrlCmd) {
+      this.attUrlCmd = attUrlCmd;
+      return this;
+    }
+
+    public Builder setLoadMode(JsLoadMode loadMode) {
+      this.jsFileEntry.setLoadMode(loadMode);
+      return this;
+    }
+
+    public ExtJsFileParameter build() {
+      return new ExtJsFileParameter(this);
+    }
+
+  }
+
+  private final String action;
+  private final String params;
+  private final AttachmentURLCommand attUrlCmd;
+  private final JsFileEntry jsFileEntry;
+
+  private ExtJsFileParameter(Builder buildParams) {
+    action = buildParams.action;
+    params = buildParams.params;
+    attUrlCmd = buildParams.attUrlCmd;
+    jsFileEntry = buildParams.jsFileEntry;
   }
 
   @NotNull
@@ -51,32 +97,6 @@ public final class ExtJsFileParameter {
   @Nullable
   public JsLoadMode getLoadMode() {
     return jsFileEntry.getLoadMode();
-  }
-
-  public ExtJsFileParameter setJsFile(@NotNull String jsFile) {
-    checkNotNull(jsFile);
-    this.jsFileEntry.setFilepath(jsFile);
-    return this;
-  }
-
-  public ExtJsFileParameter setAction(String action) {
-    this.action = action;
-    return this;
-  }
-
-  public ExtJsFileParameter setParams(String params) {
-    this.params = params;
-    return this;
-  }
-
-  public ExtJsFileParameter setAttUrlCmd(AttachmentURLCommand attUrlCmd) {
-    this.attUrlCmd = attUrlCmd;
-    return this;
-  }
-
-  public ExtJsFileParameter setLoadMode(JsLoadMode loadMode) {
-    this.jsFileEntry.setLoadMode(loadMode);
-    return this;
   }
 
 }

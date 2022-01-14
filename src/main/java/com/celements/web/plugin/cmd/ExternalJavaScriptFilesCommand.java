@@ -117,21 +117,24 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String addLazyExtJSfile(String jsFile) {
-    return addLazyExtJSfile(new ExtJsFileParameter()
-        .setJsFile(jsFile));
+    return addLazyExtJSfile(new ExtJsFileParameter.Builder()
+        .setJsFile(jsFile)
+        .build());
   }
 
   public String addLazyExtJSfile(String jsFile, String action) {
-    return addLazyExtJSfile(new ExtJsFileParameter()
+    return addLazyExtJSfile(new ExtJsFileParameter.Builder()
         .setJsFile(jsFile)
-        .setAction(action));
+        .setAction(action)
+        .build());
   }
 
   public String addLazyExtJSfile(String jsFile, String action, String params) {
-    return addLazyExtJSfile(new ExtJsFileParameter()
+    return addLazyExtJSfile(new ExtJsFileParameter.Builder()
         .setJsFile(jsFile)
         .setAction(action)
-        .setParams(params));
+        .setParams(params)
+        .build());
   }
 
   String addLazyExtJSfile(ExtJsFileParameter extJsFileParams) {
@@ -167,8 +170,9 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   @NotNull
   public String addExtJSfileOnce(String jsFile) {
-    return addExtJSfileOnce(new ExtJsFileParameter()
-        .setJsFile(jsFile));
+    return addExtJSfileOnce(new ExtJsFileParameter.Builder()
+        .setJsFile(jsFile)
+        .build());
   }
 
   /**
@@ -177,9 +181,10 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   @NotNull
   public String addExtJSfileOnce(String jsFile, String action) {
-    return addExtJSfileOnce(new ExtJsFileParameter()
+    return addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(jsFile)
-        .setAction(action));
+        .setAction(action)
+        .build());
   }
 
   /**
@@ -188,10 +193,11 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   @NotNull
   public String addExtJSfileOnce(String jsFile, String action, String params) {
-    return addExtJSfileOnce(new ExtJsFileParameter()
+    return addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(jsFile)
         .setAction(action)
-        .setParams(params));
+        .setParams(params)
+        .build());
   }
 
   @NotNull
@@ -354,9 +360,10 @@ public class ExternalJavaScriptFilesCommand {
           .map(ExternalJavaScriptFilesCommand.JS_FILE_ENTRY_CONVERTER.get())
           .filter(JsFileEntry::isValid)
           .forEachOrdered(jsFile -> addExtJSfileOnce(
-              new ExtJsFileParameter()
+              new ExtJsFileParameter.Builder()
                   .setJsFileEntry(jsFile)
-                  .setAttUrlCmd(attUrlCmd)));
+                  .setAttUrlCmd(attUrlCmd)
+                  .build()));
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addAllExtJSfilesFromDocRef skipping [{}] because: not exist.", docRef);
     }
