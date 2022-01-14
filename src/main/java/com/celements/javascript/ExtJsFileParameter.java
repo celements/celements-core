@@ -2,10 +2,13 @@ package com.celements.javascript;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.util.Optional;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
+import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Immutable;
 
 @Immutable
@@ -46,7 +49,7 @@ public final class ExtJsFileParameter {
       return this;
     }
 
-    public Builder setLoadMode(JsLoadMode loadMode) {
+    public Builder setLoadMode(@Nullable JsLoadMode loadMode) {
       this.jsFileEntry.setLoadMode(loadMode);
       return this;
     }
@@ -66,6 +69,7 @@ public final class ExtJsFileParameter {
     action = buildParams.action;
     params = buildParams.params;
     attUrlCmd = buildParams.attUrlCmd;
+    checkNotNull(buildParams.jsFileEntry);
     jsFileEntry = buildParams.jsFileEntry;
   }
 
@@ -79,9 +83,9 @@ public final class ExtJsFileParameter {
     return jsFileEntry.getFilepath();
   }
 
-  @Nullable
-  public String getAction() {
-    return action;
+  @NotNull
+  public Optional<String> getAction() {
+    return Optional.ofNullable(Strings.emptyToNull(action));
   }
 
   @Nullable

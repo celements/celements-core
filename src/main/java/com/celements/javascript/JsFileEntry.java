@@ -14,24 +14,26 @@ import com.google.common.base.Strings;
 
 public final class JsFileEntry {
 
+  private static final JsLoadMode LOAD_MODE_DEFAULT = JsLoadMode.SYNC;
+
   private Long id;
   private DocumentReference documentReference;
   private Integer objNumber;
   private ClassReference classReference;
   private String jsFileUrl = "";
-  private JsLoadMode loadMode;
+  private JsLoadMode loadMode = LOAD_MODE_DEFAULT;
 
   public JsFileEntry() {
     // Bean needs default constructor
   }
 
   public JsFileEntry(JsFileEntry jsFileEntry) {
-    this.id = jsFileEntry.getId();
-    this.documentReference = jsFileEntry.getDocumentReference();
-    this.objNumber = jsFileEntry.getNumber();
-    this.classReference = jsFileEntry.getClassReference();
-    this.jsFileUrl = jsFileEntry.getFilepath();
-    this.loadMode = jsFileEntry.getLoadMode();
+    this.id = jsFileEntry.id;
+    this.documentReference = jsFileEntry.documentReference;
+    this.objNumber = jsFileEntry.objNumber;
+    this.classReference = jsFileEntry.classReference;
+    this.jsFileUrl = jsFileEntry.jsFileUrl;
+    this.loadMode = jsFileEntry.loadMode;
   }
 
   @NotNull
@@ -51,7 +53,7 @@ public final class JsFileEntry {
   }
 
   public void setLoadMode(@Nullable JsLoadMode loadMode) {
-    this.loadMode = loadMode;
+    this.loadMode = Optional.ofNullable(loadMode).orElse(LOAD_MODE_DEFAULT);
   }
 
   @NotNull
@@ -61,7 +63,7 @@ public final class JsFileEntry {
 
   @NotNull
   public JsLoadMode getLoadMode() {
-    return Optional.ofNullable(loadMode).orElse(JsLoadMode.SYNC);
+    return Optional.ofNullable(loadMode).orElse(LOAD_MODE_DEFAULT);
   }
 
   public @Nullable Integer getNumber() {
