@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableMap;
 /* ComponentInstanceSupplier in BaseObjectMetaTagProvider needs this to be a component */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class MetaTag implements MetaTagRole {
+public class MetaTag extends AbstractCelPoJo implements MetaTagRole {
 
   private Map<String, String> attribs;
   private String content;
