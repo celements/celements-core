@@ -215,13 +215,14 @@ public class ExternalJavaScriptFilesCommand {
 
   private String generateUrl(ExtJsFileParameter extJsFileParams) {
     String attUrl;
+    final AttachmentURLCommand attUrlCmd = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock());
     final Optional<String> action = extJsFileParams.getAction();
     if (action.isPresent()) {
-      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
-          extJsFileParams.getJsFile(), action.get(), getModelContext().getXWikiContext());
+      attUrl = attUrlCmd.getAttachmentURL(extJsFileParams.getJsFile(), action.get(),
+          getModelContext().getXWikiContext());
     } else {
-      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
-          extJsFileParams.getJsFile(), getModelContext().getXWikiContext());
+      attUrl = attUrlCmd.getAttachmentURL(extJsFileParams.getJsFile(),
+          getModelContext().getXWikiContext());
     }
     final Optional<String> params = extJsFileParams.getQueryString();
     if (params.isPresent()) {
@@ -292,9 +293,9 @@ public class ExternalJavaScriptFilesCommand {
     return getAllExternalJavaScriptFiles(null);
   }
 
-  String getAllExternalJavaScriptFiles(@Nullable AttachmentURLCommand attUrlCmd) {
+  String getAllExternalJavaScriptFiles(@Nullable AttachmentURLCommand attUrlCmdMock) {
     streamDocRefs2CollectJsExtFileObj()
-        .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmd));
+        .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmdMock));
     notifyExtJavaScriptFileListener();
     final StringBuilder jsIncludesBuilder = generateJsImportString();
     displayedAll = true;
@@ -366,7 +367,7 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   void addAllExtJSfilesFromDocRef(@NotNull DocumentReference docRef,
-      @Nullable AttachmentURLCommand attUrlCmd) {
+      @Nullable AttachmentURLCommand attUrlCmdMock) {
     checkNotNull(docRef);
     try {
       XWikiObjectFetcher.on(getModelAccess().getDocument(docRef))
@@ -377,7 +378,7 @@ public class ExternalJavaScriptFilesCommand {
           .forEachOrdered(jsFile -> addExtJSfileOnce(
               new ExtJsFileParameter.Builder()
                   .setJsFileEntry(jsFile)
-                  .setAttUrlCmdMock(attUrlCmd)
+                  .setAttUrlCmdMock(attUrlCmdMock)
                   .build()));
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addAllExtJSfilesFromDocRef skipping [{}] because: not exist.", docRef);
