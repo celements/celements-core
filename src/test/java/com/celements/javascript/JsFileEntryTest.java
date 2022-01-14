@@ -43,127 +43,104 @@ public class JsFileEntryTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testHashCode() {
+  public void test_hashCode() {
     String fileUrl = ":space.doc:attachment.js";
     jsFileEntry.setFilepath(fileUrl);
     assertEquals(fileUrl.hashCode(), jsFileEntry.hashCode());
   }
 
   @Test
-  public void testAddFilepath() {
+  public void test_addFilepath() {
     String fileUrl = ":space.doc:attachment.js";
     assertSame(jsFileEntry, jsFileEntry.addFilepath(fileUrl));
     assertEquals(fileUrl, jsFileEntry.getFilepath());
   }
 
   @Test
-  public void testAddLoadMode_DEFER() {
+  public void test_addLoadMode_DEFER() {
     assertSame(jsFileEntry, jsFileEntry.addLoadMode(JsLoadMode.DEFER));
     assertEquals(JsLoadMode.DEFER, jsFileEntry.getLoadMode());
   }
 
   @Test
-  public void testAddLoadMode_ASYNC() {
+  public void test_addLoadMode_ASYNC() {
     assertSame(jsFileEntry, jsFileEntry.addLoadMode(JsLoadMode.ASYNC));
     assertEquals(JsLoadMode.ASYNC, jsFileEntry.getLoadMode());
   }
 
   @Test
-  public void testSetFilepath() {
+  public void test_setFilepath() {
     String fileUrl = ":space.doc:attachment.js";
     jsFileEntry.setFilepath(fileUrl);
     assertEquals(fileUrl, jsFileEntry.getFilepath());
   }
 
   @Test
-  public void testGetFilepath_null() {
+  public void test_getFilepath_null() {
     jsFileEntry.setFilepath(null);
     assertNotNull(jsFileEntry.getFilepath());
     assertEquals("", jsFileEntry.getFilepath());
   }
 
   @Test
-  public void testSetLoadMode() {
+  public void test_setLoadMode() {
     jsFileEntry.setLoadMode(JsLoadMode.ASYNC);
     assertEquals(JsLoadMode.ASYNC, jsFileEntry.getLoadMode());
   }
 
   @Test
-  public void testGetLoadMode_null() {
+  public void test_getLoadMode_null() {
     jsFileEntry.setLoadMode(null);
     assertNotNull(jsFileEntry.getLoadMode());
     assertEquals(JsLoadMode.SYNC, jsFileEntry.getLoadMode());
   }
 
   @Test
-  public void testSetNumber() {
-    Integer num = 123;
-    jsFileEntry.setNumber(num);
-    assertEquals("Number field is needed for bean", num, jsFileEntry.getNumber());
-  }
-
-  @Test
-  public void testSetClassReference() {
-    ClassReference classRef = new ClassReference("space", "classname");
-    jsFileEntry.setClassReference(classRef);
-    assertEquals("ClassReference field is needed for bean", classRef,
-        jsFileEntry.getClassReference());
-  }
-
-  @Test
-  public void testSetDocumentReference() {
-    DocumentReference docRef = new DocumentReference("wikiName", "space", "classname");
-    jsFileEntry.setDocumentReference(docRef);
-    assertEquals("ClassReference field is needed for bean", docRef,
-        jsFileEntry.getDocumentReference());
-  }
-
-  @Test
-  public void testIsValid_valid() {
+  public void test_isValid_valid() {
     jsFileEntry.setFilepath(":space.doc:attachment.js");
     assertTrue(jsFileEntry.isValid());
   }
 
   @Test
-  public void testIsValid_null() {
+  public void test_isValid_null() {
     jsFileEntry.setFilepath(null);
     assertFalse(jsFileEntry.isValid());
   }
 
   @Test
-  public void testIsValid_empty() {
+  public void test_isValid_empty() {
     jsFileEntry.setFilepath("");
     assertFalse(jsFileEntry.isValid());
   }
 
   @Test
-  public void testIsValid_nothingSet() {
+  public void test_isValid_nothingSet() {
     assertFalse(jsFileEntry.isValid());
   }
 
   @Test
-  public void testEqualsObject_equal() {
+  public void test_equals_equal() {
     String fileUrl = ":space.doc:attachment.js";
     jsFileEntry.setFilepath(fileUrl);
     assertEquals(jsFileEntry, new JsFileEntry().addFilepath(fileUrl));
   }
 
   @Test
-  public void testEqualsObject_NotEqual() {
+  public void test_equals_NotEqual() {
     jsFileEntry.setFilepath(":space.doc:attachment.js");
     assertNotEquals(jsFileEntry, new JsFileEntry().addFilepath(":space.doc:attachment2.js"));
   }
 
   @Test
-  public void testToString() {
+  public void test_toString() {
     String fileUrl = ":space.doc:attachment.js";
     jsFileEntry.setFilepath(fileUrl);
     JsLoadMode loadMode = JsLoadMode.ASYNC;
     jsFileEntry.setLoadMode(loadMode);
     DocumentReference docRef = new DocumentReference("wikiName", "space", "classname");
     jsFileEntry.setDocumentReference(docRef);
-    assertEquals("jsFileUrl [" + fileUrl + "], loadMode [" + loadMode + "] from docRef [" + docRef
-        + "]", jsFileEntry.toString());
+    assertTrue(jsFileEntry.toString().startsWith("JsFileEntry [jsFileUrl=" + fileUrl
+        + ", loadMode=" + loadMode + ", "));
   }
 
   @Test
