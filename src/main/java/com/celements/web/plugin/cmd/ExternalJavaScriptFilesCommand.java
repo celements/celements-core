@@ -283,12 +283,10 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   String getExtStringForJsFile(JsFileEntry jsFile) {
-    return "<script"
-        + ((jsFile.getLoadMode() != JsLoadMode.SYNC)
-            ? " " + jsFile.getLoadMode().toString().toLowerCase()
-            : "")
-        + " type=\"text/javascript\" src=\"" + StringEscapeUtils.escapeHtml(jsFile.getFilepath())
-        + "\"></script>";
+    return "<script" + ((jsFile.getLoadMode() != JsLoadMode.SYNC)
+        ? " " + jsFile.getLoadMode().toString().toLowerCase()
+        : "") + " type=\"text/javascript\" src=\""
+        + StringEscapeUtils.escapeHtml(jsFile.getFilepath()) + "\"></script>";
   }
 
   public String getAllExternalJavaScriptFiles() {
