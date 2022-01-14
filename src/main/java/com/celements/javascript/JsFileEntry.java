@@ -4,11 +4,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import com.celements.model.object.ObjectBean;
 import com.google.common.base.Strings;
 
+@NotThreadSafe
 public final class JsFileEntry extends ObjectBean {
 
   private static final JsLoadMode LOAD_MODE_DEFAULT = JsLoadMode.SYNC;
