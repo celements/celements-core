@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -68,6 +69,7 @@ import com.xpn.xwiki.web.Utils;
 
 import one.util.streamex.StreamEx;
 
+@NotThreadSafe
 public class ExternalJavaScriptFilesCommand {
 
   /**
@@ -89,13 +91,13 @@ public class ExternalJavaScriptFilesCommand {
 
   private static final Logger LOGGER = LoggerFactory
       .getLogger(ExternalJavaScriptFilesCommand.class);
+  private static final Supplier<BeanClassDefConverter<BaseObject, JsFileEntry>> JS_FILE_ENTRY_CONVERTER = Suppliers
+      .memoize(ExternalJavaScriptFilesCommand::jsFileEntryConverter);
 
   private final Set<JsFileEntry> extJSfileSet = new LinkedHashSet<>();
   private final Set<String> extJSAttUrlSet = new HashSet<>();
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
-  private static final Supplier<BeanClassDefConverter<BaseObject, JsFileEntry>> JS_FILE_ENTRY_CONVERTER = Suppliers
-      .memoize(ExternalJavaScriptFilesCommand::jsFileEntryConverter);
 
   /**
    * @deprecated since 5.4 instead use {@link ExternalJavaScriptFilesCommand()}
