@@ -28,32 +28,38 @@ public final class ExtJsFileParameter {
       return this;
     }
 
+    @NotNull
     public Builder setJsFile(@NotNull String jsFile) {
       checkNotNull(jsFile);
       this.jsFileEntry.setFilepath(jsFile);
       return this;
     }
 
-    public Builder setAction(String action) {
+    @NotNull
+    public Builder setAction(@Nullable String action) {
       this.action = action;
       return this;
     }
 
-    public Builder setParams(String params) {
+    @NotNull
+    public Builder setParams(@Nullable String params) {
       this.params = params;
       return this;
     }
 
-    public Builder setAttUrlCmd(AttachmentURLCommand attUrlCmd) {
+    @NotNull
+    public Builder setAttUrlCmd(@Nullable AttachmentURLCommand attUrlCmd) {
       this.attUrlCmd = attUrlCmd;
       return this;
     }
 
+    @NotNull
     public Builder setLoadMode(@Nullable JsLoadMode loadMode) {
       this.jsFileEntry.setLoadMode(loadMode);
       return this;
     }
 
+    @NotNull
     public ExtJsFileParameter build() {
       return new ExtJsFileParameter(this);
     }
@@ -70,6 +76,7 @@ public final class ExtJsFileParameter {
     params = buildParams.params;
     attUrlCmd = buildParams.attUrlCmd;
     checkNotNull(buildParams.jsFileEntry);
+    checkNotNull(Strings.nullToEmpty(buildParams.jsFileEntry.getFilepath()));
     jsFileEntry = buildParams.jsFileEntry;
   }
 
@@ -78,7 +85,7 @@ public final class ExtJsFileParameter {
     return jsFileEntry;
   }
 
-  @Nullable
+  @NotNull
   public String getJsFile() {
     return jsFileEntry.getFilepath();
   }
@@ -88,17 +95,17 @@ public final class ExtJsFileParameter {
     return Optional.ofNullable(Strings.emptyToNull(action));
   }
 
-  @Nullable
-  public String getParams() {
-    return params;
+  @NotNull
+  public Optional<String> getParams() {
+    return Optional.ofNullable(Strings.emptyToNull(params));
   }
 
-  @Nullable
-  public AttachmentURLCommand getAttUrlCmd() {
-    return attUrlCmd;
+  @NotNull
+  public Optional<AttachmentURLCommand> getAttUrlCmd() {
+    return Optional.ofNullable(attUrlCmd);
   }
 
-  @Nullable
+  @NotNull
   public JsLoadMode getLoadMode() {
     return jsFileEntry.getLoadMode();
   }

@@ -35,7 +35,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,20 +138,20 @@ public class ExternalJavaScriptFilesCommand {
 
   String addLazyExtJSfile(ExtJsFileParameter extJsFileParams) {
     String attUrl;
-    if (!StringUtils.isEmpty(extJsFileParams.getAction())) {
+    final Optional<String> action = extJsFileParams.getAction();
+    if (action.isPresent()) {
       attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
-          extJsFileParams.getJsFile(),
-          extJsFileParams.getAction(), getModelContext().getXWikiContext());
+          extJsFileParams.getJsFile(), action.get(), getModelContext().getXWikiContext());
     } else {
       attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
-          extJsFileParams.getJsFile(),
-          getModelContext().getXWikiContext());
+          extJsFileParams.getJsFile(), getModelContext().getXWikiContext());
     }
-    if (!StringUtils.isEmpty(extJsFileParams.getParams())) {
+    final Optional<String> params = extJsFileParams.getParams();
+    if (params.isPresent()) {
       if (attUrl.indexOf("?") > -1) {
-        attUrl += "&" + extJsFileParams.getParams();
+        attUrl += "&" + params.get();
       } else {
-        attUrl += "?" + extJsFileParams.getParams();
+        attUrl += "?" + params.get();
       }
     }
     JsonBuilder jsonBuilder = new JsonBuilder();
@@ -209,21 +208,21 @@ public class ExternalJavaScriptFilesCommand {
         extJSAttUrlSet.add(extJsFileParams.getJsFile());
       }
       String attUrl;
-      if (!StringUtils.isEmpty(extJsFileParams.getAction())) {
+      final Optional<String> action = extJsFileParams.getAction();
+      if (action.isPresent()) {
         attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
-            extJsFileParams.getJsFile(),
-            extJsFileParams.getAction(),
-            getModelContext().getXWikiContext());
+            extJsFileParams.getJsFile(), action.get(), getModelContext().getXWikiContext());
       } else {
         attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
             extJsFileParams.getJsFile(),
             getModelContext().getXWikiContext());
       }
-      if (!StringUtils.isEmpty(extJsFileParams.getParams())) {
+      final Optional<String> params = extJsFileParams.getParams();
+      if (params.isPresent()) {
         if (attUrl.indexOf("?") > -1) {
-          attUrl += "&" + extJsFileParams.getParams();
+          attUrl += "&" + params.get();
         } else {
-          attUrl += "?" + extJsFileParams.getParams();
+          attUrl += "?" + params.get();
         }
       }
       return addExtJSfileOnceInternal(extJsFileParams.getJsFileEntry(), attUrl);
@@ -370,8 +369,8 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   @NotNull
-  AttachmentURLCommand getAttUrlCmd(@Nullable AttachmentURLCommand attUrlCmd) {
-    return Optional.ofNullable(attUrlCmd).orElse(new AttachmentURLCommand());
+  AttachmentURLCommand getAttUrlCmd(@NotNull Optional<AttachmentURLCommand> attUrlCmdMock) {
+    return attUrlCmdMock.orElse(new AttachmentURLCommand());
   }
 
   private @NotNull LayoutServiceRole getLayoutService() {

@@ -119,13 +119,6 @@ public class JsFileEntryTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetId() {
-    Long num = 123L;
-    jsFileEntry.setId(num);
-    assertEquals("Id field is needed for bean", num, jsFileEntry.getId());
-  }
-
-  @Test
   public void testIsValid_valid() {
     jsFileEntry.setFilepath(":space.doc:attachment.js");
     assertTrue(jsFileEntry.isValid());
@@ -195,7 +188,6 @@ public class JsFileEntryTest extends AbstractComponentTest {
       assertEquals(new ClassReference(jsExtFileObj.getXClassReference()),
           jsFileEntryBean.getClassReference());
       assertEquals(jsExtFileObj.getNumber(), jsFileEntryBean.getNumber().intValue());
-      assertEquals(jsExtFileObj.getId(), jsFileEntryBean.getId().longValue());
     } catch (ConversionException exp) {
       fail();
     }
