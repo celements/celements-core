@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.function.Supplier;
 
+import javax.validation.constraints.NotNull;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.ClassReference;
@@ -40,13 +42,6 @@ public class JsFileEntryTest extends AbstractComponentTest {
   @Before
   public void setUp_JsFileEntryTest() throws Exception {
     jsFileEntry = new JsFileEntry();
-  }
-
-  @Test
-  public void test_hashCode() {
-    String fileUrl = ":space.doc:attachment.js";
-    jsFileEntry.setFilepath(fileUrl);
-    assertEquals(fileUrl.hashCode(), jsFileEntry.hashCode());
   }
 
   @Test
@@ -122,13 +117,18 @@ public class JsFileEntryTest extends AbstractComponentTest {
   public void test_equals_equal() {
     String fileUrl = ":space.doc:attachment.js";
     jsFileEntry.setFilepath(fileUrl);
-    assertEquals(jsFileEntry, new JsFileEntry().addFilepath(fileUrl));
+    JsFileEntry jsFileEntry2 = new JsFileEntry().addFilepath(fileUrl);
+    assertEquals(jsFileEntry, jsFileEntry2);
+    assertEquals(jsFileEntry.hashCode(), jsFileEntry2.hashCode());
   }
 
   @Test
   public void test_equals_NotEqual() {
     jsFileEntry.setFilepath(":space.doc:attachment.js");
-    assertNotEquals(jsFileEntry, new JsFileEntry().addFilepath(":space.doc:attachment2.js"));
+    @NotNull
+    JsFileEntry jsFileEntry2 = new JsFileEntry().addFilepath(":space.doc:attachment2.js");
+    assertNotEquals(jsFileEntry, jsFileEntry2);
+    assertEquals(jsFileEntry.hashCode(), jsFileEntry2.hashCode());
   }
 
   @Test

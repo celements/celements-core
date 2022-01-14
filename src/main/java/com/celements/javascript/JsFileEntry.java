@@ -66,7 +66,7 @@ public final class JsFileEntry extends ObjectBean {
 
   @Override
   public int hashCode() {
-    return jsFileUrl.hashCode();
+    return Objects.hash(jsFileUrl);
   }
 
   @Override
