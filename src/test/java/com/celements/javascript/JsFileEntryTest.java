@@ -2,17 +2,43 @@ package com.celements.javascript;
 
 import static org.junit.Assert.*;
 
+import java.util.function.Supplier;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
-public class JsFileEntryTest {
+import com.celements.common.reflect.ReflectiveInstanceSupplier;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.convert.ConversionException;
+import com.celements.convert.bean.BeanClassDefConverter;
+import com.celements.convert.bean.XObjectBeanConverter;
+import com.celements.store.id.IdVersion;
+import com.celements.web.classes.CelementsClassDefinition;
+import com.google.common.base.Suppliers;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
+
+public class JsFileEntryTest extends AbstractComponentTest {
+
+  private final Supplier<BeanClassDefConverter<BaseObject, JsFileEntry>> jsFileEntryConverter = Suppliers
+      .memoize(this::jsFileEntryConverter);
 
   private JsFileEntry jsFileEntry;
 
+  private BeanClassDefConverter<BaseObject, JsFileEntry> jsFileEntryConverter() {
+    @SuppressWarnings("unchecked")
+    BeanClassDefConverter<BaseObject, JsFileEntry> converter = Utils.getComponent(
+        BeanClassDefConverter.class, XObjectBeanConverter.NAME);
+    converter.initialize(Utils.getComponent(CelementsClassDefinition.class,
+        JavaScriptExternalFilesClass.CLASS_DEF_HINT));
+    converter.initialize(new ReflectiveInstanceSupplier<>(JsFileEntry.class));
+    return converter;
+  }
+
   @Before
-  public void setUp() throws Exception {
+  public void setUp_JsFileEntryTest() throws Exception {
     jsFileEntry = new JsFileEntry();
   }
 
@@ -147,28 +173,31 @@ public class JsFileEntryTest {
         + "]", jsFileEntry.toString());
   }
 
-  // @Test
-  // public void test_bean() {
-  // DocumentReference docRef = new DocumentReference("wikiName", "space", "document");
-  // tag.setKey("description");
-  // tag.setLang("de");
-  // tag.setValue("the most fabulous thing ever");
-  // tag.setOverridable(false);
-  // BaseObject metaTagObj = new BaseObject();
-  // metaTagObj.setXClassReference(metaTagClass.getClassReference());
-  // metaTagObj.setDocumentReference(docRef);
-  // metaTagObj.setId(2342423, IdVersion.CELEMENTS_3);
-  // metaTagObj.setNumber(1);
-  // metaTagObj.setStringValue(MetaTagClass.FIELD_KEY.getName(), tag.getKey());
-  // metaTagObj.setStringValue(MetaTagClass.FIELD_LANGUAGE.getName(), tag.getLang());
-  // metaTagObj.setStringValue(MetaTagClass.FIELD_VALUE.getName(), tag.getValue());
-  // metaTagObj.setIntValue(MetaTagClass.FIELD_OVERRIDABLE.getName(), tag.getOverridable() ? 1 : 0);
-  // try {
-  // MetaTag metaTagBean = metaTagConverter.get().apply(metaTagObj);
-  // assertEquals(tag, metaTagBean);
-  // } catch (ConversionException exp) {
-  // fail();
-  // }
-  // }
+  @Test
+  public void test_JsExtFileObj_bean() {
+    DocumentReference docRef = new DocumentReference("wikiName", "space", "document");
+    jsFileEntry.addFilepath(":space.doc:attachment.js")
+        .addLoadMode(JsLoadMode.ASYNC);
+    BaseObject jsExtFileObj = new BaseObject();
+    jsExtFileObj.setXClassReference(getJavaScriptExternalFilesClassRef());
+    jsExtFileObj.setDocumentReference(docRef);
+    jsExtFileObj.setId(2342423, IdVersion.CELEMENTS_3);
+    jsExtFileObj.setNumber(1);
+    jsExtFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(),
+        jsFileEntry.getFilepath());
+    jsExtFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_LOAD_MODE.getName(),
+        jsFileEntry.getLoadMode().toString());
+    try {
+      JsFileEntry jsFileEntryBean = jsFileEntryConverter.get().apply(jsExtFileObj);
+      assertEquals(jsFileEntry, jsFileEntryBean);
+    } catch (ConversionException exp) {
+      fail();
+    }
+  }
 
+  private ClassReference getJavaScriptExternalFilesClassRef() {
+    return Utils
+        .getComponent(CelementsClassDefinition.class, JavaScriptExternalFilesClass.CLASS_DEF_HINT)
+        .getClassReference();
+  }
 }
