@@ -31,18 +31,16 @@ public class MetaTagTest extends AbstractComponentTest {
     @SuppressWarnings("unchecked")
     BeanClassDefConverter<BaseObject, MetaTag> converter = Utils.getComponent(
         BeanClassDefConverter.class, XObjectBeanConverter.NAME);
-    converter.initialize(metaTagClass);
+    converter.initialize(Utils.getComponent(CelementsClassDefinition.class,
+        MetaTagClass.CLASS_DEF_HINT));
     converter.initialize(new ReflectiveInstanceSupplier<>(MetaTag.class));
     return converter;
   }
 
-  private MetaTagClass metaTagClass;
   private MetaTag tag;
 
   @Before
   public void setup_MetaTagTest() throws Exception {
-    metaTagClass = (MetaTagClass) Utils.getComponent(CelementsClassDefinition.class,
-        MetaTagClass.CLASS_DEF_HINT);
     tag = new MetaTag();
   }
 
@@ -162,10 +160,12 @@ public class MetaTagTest extends AbstractComponentTest {
     tag.setValue("the most fabulous thing ever");
     tag.setOverridable(false);
     BaseObject metaTagObj = new BaseObject();
-    metaTagObj.setXClassReference(metaTagClass.getClassReference());
+    metaTagObj.setXClassReference(MetaTagClass.CLASS_REF);
     metaTagObj.setDocumentReference(docRef);
-    metaTagObj.setId(2342423, IdVersion.CELEMENTS_3);
-    metaTagObj.setNumber(1);
+    Long objId = 2342423L;
+    metaTagObj.setId(objId, IdVersion.CELEMENTS_3);
+    Integer objNum = 2;
+    metaTagObj.setNumber(objNum);
     metaTagObj.setStringValue(MetaTagClass.FIELD_KEY.getName(), tag.getKey());
     metaTagObj.setStringValue(MetaTagClass.FIELD_LANGUAGE.getName(), tag.getLang());
     metaTagObj.setStringValue(MetaTagClass.FIELD_VALUE.getName(), tag.getValue());
@@ -173,6 +173,10 @@ public class MetaTagTest extends AbstractComponentTest {
     try {
       MetaTag metaTagBean = metaTagConverter.get().apply(metaTagObj);
       assertEquals(tag, metaTagBean);
+      assertEquals(docRef, metaTagBean.getDocumentReference());
+      assertEquals(MetaTagClass.CLASS_REF, metaTagBean.getClassReference());
+      assertEquals(objNum, metaTagBean.getNumber());
+      assertEquals(objId, metaTagBean.getId());
     } catch (ConversionException exp) {
       fail();
     }

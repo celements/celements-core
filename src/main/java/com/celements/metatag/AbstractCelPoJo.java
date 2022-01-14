@@ -7,7 +7,7 @@ public abstract class AbstractCelPoJo {
 
   private Long id;
   private DocumentReference documentReference;
-  private Integer objNumber;
+  private Integer objNum;
   private ClassReference classReference;
 
   public Long getId() {
@@ -26,12 +26,12 @@ public abstract class AbstractCelPoJo {
     this.documentReference = documentReference;
   }
 
-  public Integer getObjNumber() {
-    return objNumber;
+  public Integer getNumber() {
+    return objNum;
   }
 
-  public void setObjNumber(Integer objNumber) {
-    this.objNumber = objNumber;
+  public void setNumber(Integer number) {
+    this.objNum = number;
   }
 
   public ClassReference getClassReference() {
