@@ -297,15 +297,19 @@ public class ExternalJavaScriptFilesCommand {
     getDocRefsStream()
         .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmd));
     notifyExtJavaScriptFileListener();
+    final StringBuilder jsIncludesBuilder = generateJsImportString();
+    displayedAll = true;
+    return jsIncludesBuilder.toString();
+  }
 
+  private StringBuilder generateJsImportString() {
     final StringBuilder jsIncludesBuilder = new StringBuilder();
     jsIncludesBuilder.append(Stream.concat(
         extJSfileSet.stream().map(this::getExtStringForJsFile),
         extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
         .collect(Collectors.joining("\n")));
     jsIncludesBuilder.append("\n");
-    displayedAll = true;
-    return jsIncludesBuilder.toString();
+    return jsIncludesBuilder;
   }
 
   private Stream<DocumentReference> getDocRefsStream() {
