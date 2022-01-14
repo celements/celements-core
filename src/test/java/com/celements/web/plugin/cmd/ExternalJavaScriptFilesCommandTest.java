@@ -509,7 +509,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.getAttachmentURL(eq(jsFile), same(context))).andReturn(jsFileURL).once();
     replayDefault();
     assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
-        command.addLazyExtJSfile(new ExtJsFileParameter.Builder()
+        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAttUrlCmdMock(attUrlCmd)
             .build()));
@@ -526,7 +526,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
-        command.addLazyExtJSfile(new ExtJsFileParameter.Builder()
+        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
             .setAttUrlCmdMock(attUrlCmd)
@@ -544,7 +544,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
-        command.addLazyExtJSfile(new ExtJsFileParameter.Builder()
+        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
             .setQueryString("me=blu")
@@ -564,7 +564,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
-        command.addLazyExtJSfile(new ExtJsFileParameter.Builder()
+        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
             .setQueryString("me=blu")

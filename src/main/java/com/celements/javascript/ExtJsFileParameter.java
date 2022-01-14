@@ -16,10 +16,11 @@ public final class ExtJsFileParameter {
 
   public static final class Builder {
 
+    private JsFileEntry jsFileEntry = new JsFileEntry();
     private String action;
     private String queryString;
+    private boolean lazyLoad = false;
     private AttachmentURLCommand attUrlCmdMock;
-    private JsFileEntry jsFileEntry = new JsFileEntry();
 
     @NotNull
     public Builder setJsFileEntry(@NotNull JsFileEntry jsFileEntry) {
@@ -53,6 +54,11 @@ public final class ExtJsFileParameter {
       return this;
     }
 
+    public Builder setLazyLoad(boolean lazyLoad) {
+      this.lazyLoad = lazyLoad;
+      return this;
+    }
+
     @NotNull
     public Builder setLoadMode(@Nullable JsLoadMode loadMode) {
       this.jsFileEntry.setLoadMode(loadMode);
@@ -67,13 +73,15 @@ public final class ExtJsFileParameter {
   }
 
   private final String action;
-  private final String queryString;
-  private final AttachmentURLCommand attUrlCmdMock;
   private final JsFileEntry jsFileEntry;
+  private final String queryString;
+  private final boolean lazyLoad;
+  private final AttachmentURLCommand attUrlCmdMock;
 
   private ExtJsFileParameter(Builder buildParams) {
     action = buildParams.action;
     queryString = buildParams.queryString;
+    lazyLoad = buildParams.lazyLoad;
     attUrlCmdMock = buildParams.attUrlCmdMock;
     checkNotNull(buildParams.jsFileEntry);
     checkNotNull(Strings.nullToEmpty(buildParams.jsFileEntry.getFilepath()));
@@ -98,6 +106,10 @@ public final class ExtJsFileParameter {
   @NotNull
   public Optional<String> getQueryString() {
     return Optional.ofNullable(Strings.emptyToNull(queryString));
+  }
+
+  public boolean isLazyLoad() {
+    return lazyLoad;
   }
 
   @NotNull

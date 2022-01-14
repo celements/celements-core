@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -117,52 +118,40 @@ public class ExternalJavaScriptFilesCommand {
     return converter;
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link getLazySpanTag(ExtJsFileParameter)}
+   */
+  @Deprecated
   public String addLazyExtJSfile(String jsFile) {
-    return addLazyExtJSfile(new ExtJsFileParameter.Builder()
+    return getLazyLoadTag(new ExtJsFileParameter.Builder()
         .setJsFile(jsFile)
+        .setLazyLoad(true)
         .build());
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link getLazySpanTag(ExtJsFileParameter)}
+   */
+  @Deprecated
   public String addLazyExtJSfile(String jsFile, String action) {
-    return addLazyExtJSfile(new ExtJsFileParameter.Builder()
+    return getLazyLoadTag(new ExtJsFileParameter.Builder()
         .setJsFile(jsFile)
         .setAction(action)
+        .setLazyLoad(true)
         .build());
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link getLazySpanTag(ExtJsFileParameter)}
+   */
+  @Deprecated
   public String addLazyExtJSfile(String jsFile, String action, String params) {
-    return addLazyExtJSfile(new ExtJsFileParameter.Builder()
+    return getLazyLoadTag(new ExtJsFileParameter.Builder()
         .setJsFile(jsFile)
         .setAction(action)
         .setQueryString(params)
+        .setLazyLoad(true)
         .build());
-  }
-
-  String addLazyExtJSfile(ExtJsFileParameter extJsFileParams) {
-    String attUrl;
-    final Optional<String> action = extJsFileParams.getAction();
-    if (action.isPresent()) {
-      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
-          extJsFileParams.getJsFile(), action.get(), getModelContext().getXWikiContext());
-    } else {
-      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
-          extJsFileParams.getJsFile(), getModelContext().getXWikiContext());
-    }
-    final Optional<String> params = extJsFileParams.getQueryString();
-    if (params.isPresent()) {
-      if (attUrl.indexOf("?") > -1) {
-        attUrl += "&" + params.get();
-      } else {
-        attUrl += "?" + params.get();
-      }
-    }
-    JsonBuilder jsonBuilder = new JsonBuilder();
-    jsonBuilder.openDictionary();
-    jsonBuilder.addProperty("fullURL", attUrl);
-    jsonBuilder.addProperty("initLoad", true);
-    jsonBuilder.closeDictionary();
-    return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
-        + "</span>";
   }
 
   /**
@@ -201,42 +190,67 @@ public class ExternalJavaScriptFilesCommand {
         .build());
   }
 
+  /**
+   * @param extJsFileParams
+   * @return span-tag or script-tag (once) depending on lazyLoad parameter
+   */
+  @NotNull
+  public String includeExtJsFile(@NotNull ExtJsFileParameter extJsFileParams) {
+    if (extJsFileParams.isLazyLoad()) {
+      return getLazyLoadTag(extJsFileParams);
+    } else {
+      return addExtJSfileOnce(extJsFileParams);
+    }
+  }
+
+  @NotEmpty
+  public String getLazyLoadTag(@NotNull ExtJsFileParameter extJsFileParams) {
+    final JsonBuilder jsonBuilder = new JsonBuilder();
+    jsonBuilder.openDictionary();
+    jsonBuilder.addProperty("fullURL", generateUrl(extJsFileParams));
+    jsonBuilder.addProperty("initLoad", true);
+    jsonBuilder.closeDictionary();
+    return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
+        + "</span>";
+  }
+
+  private String generateUrl(ExtJsFileParameter extJsFileParams) {
+    String attUrl;
+    final Optional<String> action = extJsFileParams.getAction();
+    if (action.isPresent()) {
+      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
+          extJsFileParams.getJsFile(), action.get(), getModelContext().getXWikiContext());
+    } else {
+      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
+          extJsFileParams.getJsFile(), getModelContext().getXWikiContext());
+    }
+    final Optional<String> params = extJsFileParams.getQueryString();
+    if (params.isPresent()) {
+      if (attUrl.indexOf("?") > -1) {
+        attUrl += "&" + params.get();
+      } else {
+        attUrl += "?" + params.get();
+      }
+    }
+    return attUrl;
+  }
+
   @NotNull
   public String addExtJSfileOnce(ExtJsFileParameter extJsFileParams) {
     if (!extJSAttUrlSet.contains(extJsFileParams.getJsFile())) {
-      if (getAttUrlCmd(extJsFileParams.getAttUrlCmdMock())
-          .isAttachmentLink(extJsFileParams.getJsFile())
-          || getAttUrlCmd(extJsFileParams.getAttUrlCmdMock())
-              .isOnDiskLink(extJsFileParams.getJsFile())) {
+      final AttachmentURLCommand attUrlCmd = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock());
+      if (attUrlCmd.isAttachmentLink(extJsFileParams.getJsFile())
+          || attUrlCmd.isOnDiskLink(extJsFileParams.getJsFile())) {
         extJSAttUrlSet.add(extJsFileParams.getJsFile());
       }
-      String attUrl;
-      final Optional<String> action = extJsFileParams.getAction();
-      if (action.isPresent()) {
-        attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
-            extJsFileParams.getJsFile(), action.get(), getModelContext().getXWikiContext());
-      } else {
-        attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
-            extJsFileParams.getJsFile(),
-            getModelContext().getXWikiContext());
-      }
-      final Optional<String> params = extJsFileParams.getQueryString();
-      if (params.isPresent()) {
-        if (attUrl.indexOf("?") > -1) {
-          attUrl += "&" + params.get();
-        } else {
-          attUrl += "?" + params.get();
-        }
-      }
-      return addExtJSfileOnceInternal(extJsFileParams.getJsFileEntry(), attUrl);
+      return generateScriptTagOnce(extJsFileParams.getJsFileEntry(), generateUrl(extJsFileParams));
     }
     return "";
   }
 
   @NotNull
-  private String addExtJSfileOnceInternal(JsFileEntry jsFileEntry, String jsFileUrl) {
-    LOGGER.info("addExtJSfileOnceInternal: jsFileEntry [{}] jsFileUrl [{}]", jsFileEntry,
-        jsFileUrl);
+  private String generateScriptTagOnce(JsFileEntry jsFileEntry, String jsFileUrl) {
+    LOGGER.info("generateScriptTagOnce: jsFileEntry [{}] jsFileUrl [{}]", jsFileEntry, jsFileUrl);
     String jsIncludes2 = "";
     if (jsFileUrl == null) {
       if (!jsFileHasBeenSeen(jsFileEntry)) {
