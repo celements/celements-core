@@ -2,8 +2,6 @@ package com.celements.metatag;
 
 import static org.junit.Assert.*;
 
-import java.util.function.Supplier;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -15,27 +13,12 @@ import com.celements.convert.bean.BeanClassDefConverter;
 import com.celements.convert.bean.XObjectBeanConverter;
 import com.celements.metatag.enums.ENameStandard;
 import com.celements.metatag.enums.twitter.ETwitterCardType;
-import com.celements.store.id.IdVersion;
 import com.celements.web.classes.CelementsClassDefinition;
 import com.celements.web.classes.MetaTagClass;
-import com.google.common.base.Suppliers;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class MetaTagTest extends AbstractComponentTest {
-
-  private final Supplier<BeanClassDefConverter<BaseObject, MetaTag>> metaTagConverter = Suppliers
-      .memoize(this::createMetaTagConverter);
-
-  private BeanClassDefConverter<BaseObject, MetaTag> createMetaTagConverter() {
-    @SuppressWarnings("unchecked")
-    BeanClassDefConverter<BaseObject, MetaTag> converter = Utils.getComponent(
-        BeanClassDefConverter.class, XObjectBeanConverter.NAME);
-    converter.initialize(Utils.getComponent(CelementsClassDefinition.class,
-        MetaTagClass.CLASS_DEF_HINT));
-    converter.initialize(new ReflectiveInstanceSupplier<>(MetaTag.class));
-    return converter;
-  }
 
   private MetaTag tag;
 
@@ -162,8 +145,6 @@ public class MetaTagTest extends AbstractComponentTest {
     BaseObject metaTagObj = new BaseObject();
     metaTagObj.setXClassReference(MetaTagClass.CLASS_REF);
     metaTagObj.setDocumentReference(docRef);
-    Long objId = 2342423L;
-    metaTagObj.setId(objId, IdVersion.CELEMENTS_3);
     Integer objNum = 2;
     metaTagObj.setNumber(objNum);
     metaTagObj.setStringValue(MetaTagClass.FIELD_KEY.getName(), tag.getKey());
@@ -171,15 +152,24 @@ public class MetaTagTest extends AbstractComponentTest {
     metaTagObj.setStringValue(MetaTagClass.FIELD_VALUE.getName(), tag.getValue());
     metaTagObj.setIntValue(MetaTagClass.FIELD_OVERRIDABLE.getName(), tag.getOverridable() ? 1 : 0);
     try {
-      MetaTag metaTagBean = metaTagConverter.get().apply(metaTagObj);
+      MetaTag metaTagBean = createMetaTagConverter().apply(metaTagObj);
       assertEquals(tag, metaTagBean);
       assertEquals(docRef, metaTagBean.getDocumentReference());
       assertEquals(MetaTagClass.CLASS_REF, metaTagBean.getClassReference());
       assertEquals(objNum, metaTagBean.getNumber());
-      assertEquals(objId, metaTagBean.getId());
     } catch (ConversionException exp) {
       fail();
     }
+  }
+
+  private BeanClassDefConverter<BaseObject, MetaTag> createMetaTagConverter() {
+    @SuppressWarnings("unchecked")
+    BeanClassDefConverter<BaseObject, MetaTag> converter = Utils.getComponent(
+        BeanClassDefConverter.class, XObjectBeanConverter.NAME);
+    converter.initialize(Utils.getComponent(CelementsClassDefinition.class,
+        MetaTagClass.CLASS_DEF_HINT));
+    converter.initialize(new ReflectiveInstanceSupplier<>(MetaTag.class));
+    return converter;
   }
 
 }

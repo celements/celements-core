@@ -28,7 +28,6 @@ import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -119,7 +118,7 @@ public class MetaTag extends ObjectBean implements MetaTagRole {
 
   @Override
   public boolean getOverridable() {
-    return (overridable != null) ? overridable : false;
+    return (overridable != null) && overridable;
   }
 
   @Override
@@ -193,20 +192,13 @@ public class MetaTag extends ObjectBean implements MetaTagRole {
 
   @Override
   public boolean equals(Object tag) {
-    if (!(tag instanceof MetaTag)) {
-      return false;
-    }
-    final MetaTag theTag = (MetaTag) tag;
-    return Objects.equals(getLangOpt(), theTag.getLangOpt())
-        && Objects.equals(display(), theTag.display());
+    return (tag instanceof MetaTag) && Objects.equals(getLangOpt(), ((MetaTag) tag).getLangOpt())
+        && Objects.equals(display(), ((MetaTag) tag).display());
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(43, 57)
-        .append(getLangOpt())
-        .append(display())
-        .toHashCode();
+    return Objects.hash(getLangOpt(), display());
   }
 
 }
