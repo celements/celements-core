@@ -362,7 +362,7 @@ public class ExternalJavaScriptFilesCommand {
                   .setLoadMode(jsFile.getLoadMode())
                   .setAttUrlCmd(attUrlCmd)));
     } catch (DocumentNotExistsException nExExp) {
-      LOGGER.info("addJSFiles from [{}] failed.", docRef, nExExp);
+      LOGGER.info("addAllExtJSfilesFromDocRef skipping [{}] because: not exist.", docRef);
     }
   }
 
