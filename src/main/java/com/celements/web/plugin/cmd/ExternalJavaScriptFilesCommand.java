@@ -204,7 +204,8 @@ public class ExternalJavaScriptFilesCommand {
   @NotNull
   public String addExtJSfileOnce(ExtJsFileParameter extJsFileParams) {
     if (!extJSAttUrlSet.contains(extJsFileParams.getJsFile())) {
-      if (getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).isAttachmentLink(extJsFileParams.getJsFile())
+      if (getAttUrlCmd(extJsFileParams.getAttUrlCmdMock())
+          .isAttachmentLink(extJsFileParams.getJsFile())
           || getAttUrlCmd(extJsFileParams.getAttUrlCmdMock())
               .isOnDiskLink(extJsFileParams.getJsFile())) {
         extJSAttUrlSet.add(extJsFileParams.getJsFile());
