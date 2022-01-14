@@ -2,17 +2,52 @@ package com.celements.metatag;
 
 import static org.junit.Assert.*;
 
-import org.junit.Test;
+import java.util.function.Supplier;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
+
+import com.celements.common.reflect.ReflectiveInstanceSupplier;
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.convert.ConversionException;
+import com.celements.convert.bean.BeanClassDefConverter;
+import com.celements.convert.bean.XObjectBeanConverter;
 import com.celements.metatag.enums.ENameStandard;
 import com.celements.metatag.enums.twitter.ETwitterCardType;
+import com.celements.store.id.IdVersion;
+import com.celements.web.classes.CelementsClassDefinition;
+import com.celements.web.classes.MetaTagClass;
+import com.google.common.base.Suppliers;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class MetaTagTest extends AbstractComponentTest {
 
+  private final Supplier<BeanClassDefConverter<BaseObject, MetaTag>> metaTagConverter = Suppliers
+      .memoize(this::createMetaTagConverter);
+
+  private BeanClassDefConverter<BaseObject, MetaTag> createMetaTagConverter() {
+    @SuppressWarnings("unchecked")
+    BeanClassDefConverter<BaseObject, MetaTag> converter = Utils.getComponent(
+        BeanClassDefConverter.class, XObjectBeanConverter.NAME);
+    converter.initialize(metaTagClass);
+    converter.initialize(new ReflectiveInstanceSupplier<>(MetaTag.class));
+    return converter;
+  }
+
+  private MetaTagClass metaTagClass;
+  private MetaTag tag;
+
+  @Before
+  public void setup_MetaTagTest() throws Exception {
+    metaTagClass = (MetaTagClass) Utils.getComponent(CelementsClassDefinition.class,
+        MetaTagClass.CLASS_DEF_HINT);
+    tag = new MetaTag();
+  }
+
   @Test
   public void testGetSetOverridable() {
-    MetaTag tag = new MetaTag();
     assertFalse(tag.getOverridable());
     tag.setOverridable(true);
     assertTrue(tag.getOverridable());
@@ -22,7 +57,6 @@ public class MetaTagTest extends AbstractComponentTest {
 
   @Test
   public void testGetSetKey() {
-    MetaTag tag = new MetaTag();
     assertFalse(tag.getKeyOpt().isPresent());
     tag.setKey("tagname");
     assertEquals("tagname", tag.getKeyOpt().get());
@@ -32,7 +66,6 @@ public class MetaTagTest extends AbstractComponentTest {
 
   @Test
   public void testGetSetValue() {
-    MetaTag tag = new MetaTag();
     assertFalse(tag.getValueOpt().isPresent());
     tag.setValue("value1");
     assertEquals("value1", tag.getValueOpt().get());
@@ -42,7 +75,6 @@ public class MetaTagTest extends AbstractComponentTest {
 
   @Test
   public void testGetSetLang() {
-    MetaTag tag = new MetaTag();
     assertFalse(tag.getLangOpt().isPresent());
     tag.setLang("fr");
     assertEquals("fr", tag.getLangOpt().get());
@@ -120,6 +152,30 @@ public class MetaTagTest extends AbstractComponentTest {
     assertEquals(m0, m1);
     assertEquals(m1, m1);
     assertEquals(m1, m2);
+  }
+
+  @Test
+  public void test_bean() {
+    DocumentReference docRef = new DocumentReference("wikiName", "space", "document");
+    tag.setKey("description");
+    tag.setLang("de");
+    tag.setValue("the most fabulous thing ever");
+    tag.setOverridable(false);
+    BaseObject metaTagObj = new BaseObject();
+    metaTagObj.setXClassReference(metaTagClass.getClassReference());
+    metaTagObj.setDocumentReference(docRef);
+    metaTagObj.setId(2342423, IdVersion.CELEMENTS_3);
+    metaTagObj.setNumber(1);
+    metaTagObj.setStringValue(MetaTagClass.FIELD_KEY.getName(), tag.getKey());
+    metaTagObj.setStringValue(MetaTagClass.FIELD_LANGUAGE.getName(), tag.getLang());
+    metaTagObj.setStringValue(MetaTagClass.FIELD_VALUE.getName(), tag.getValue());
+    metaTagObj.setIntValue(MetaTagClass.FIELD_OVERRIDABLE.getName(), tag.getOverridable() ? 1 : 0);
+    try {
+      MetaTag metaTagBean = metaTagConverter.get().apply(metaTagObj);
+      assertEquals(tag, metaTagBean);
+    } catch (ConversionException exp) {
+      fail();
+    }
   }
 
 }
