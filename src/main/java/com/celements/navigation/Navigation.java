@@ -674,8 +674,6 @@ public class Navigation implements INavigation {
     SpaceReference pageLayoutRef = getPresentationType().getPageLayoutForDoc(docRef);
     if (pageLayoutRef == null) {
       pageLayoutRef = pageLayoutCmd.getPageLayoutForDoc(docRef);
-      LOGGER.info("getPageLayoutName: no presentation layout found for [{}] now using layout [{}]",
-          docRef, pageLayoutRef);
     }
     if (pageLayoutRef != null) {
       return "layout_" + pageLayoutRef.getName();
