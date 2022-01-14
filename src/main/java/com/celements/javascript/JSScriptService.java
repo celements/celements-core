@@ -59,6 +59,10 @@ public class JSScriptService implements ScriptService {
     return new ExtJsFileParameter.Builder();
   }
 
+  public String addExtJSfileOnce(ExtJsFileParameter.Builder extJsFileParams) {
+    return getExtJavaScriptFileCmd().addExtJSfileOnce(extJsFileParams.build());
+  }
+
   public String addExtJSfileOnce(ExtJsFileParameter extJsFileParams) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(extJsFileParams);
   }
