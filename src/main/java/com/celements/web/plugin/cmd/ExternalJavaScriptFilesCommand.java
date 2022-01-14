@@ -142,10 +142,10 @@ public class ExternalJavaScriptFilesCommand {
     String attUrl;
     final Optional<String> action = extJsFileParams.getAction();
     if (action.isPresent()) {
-      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
+      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
           extJsFileParams.getJsFile(), action.get(), getModelContext().getXWikiContext());
     } else {
-      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
+      attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
           extJsFileParams.getJsFile(), getModelContext().getXWikiContext());
     }
     final Optional<String> params = extJsFileParams.getQueryString();
@@ -204,18 +204,18 @@ public class ExternalJavaScriptFilesCommand {
   @NotNull
   public String addExtJSfileOnce(ExtJsFileParameter extJsFileParams) {
     if (!extJSAttUrlSet.contains(extJsFileParams.getJsFile())) {
-      if (getAttUrlCmd(extJsFileParams.getAttUrlCmd()).isAttachmentLink(extJsFileParams.getJsFile())
-          || getAttUrlCmd(extJsFileParams.getAttUrlCmd())
+      if (getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).isAttachmentLink(extJsFileParams.getJsFile())
+          || getAttUrlCmd(extJsFileParams.getAttUrlCmdMock())
               .isOnDiskLink(extJsFileParams.getJsFile())) {
         extJSAttUrlSet.add(extJsFileParams.getJsFile());
       }
       String attUrl;
       final Optional<String> action = extJsFileParams.getAction();
       if (action.isPresent()) {
-        attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
+        attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
             extJsFileParams.getJsFile(), action.get(), getModelContext().getXWikiContext());
       } else {
-        attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
+        attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock()).getAttachmentURL(
             extJsFileParams.getJsFile(),
             getModelContext().getXWikiContext());
       }
@@ -363,7 +363,7 @@ public class ExternalJavaScriptFilesCommand {
           .forEachOrdered(jsFile -> addExtJSfileOnce(
               new ExtJsFileParameter.Builder()
                   .setJsFileEntry(jsFile)
-                  .setAttUrlCmd(attUrlCmd)
+                  .setAttUrlCmdMock(attUrlCmd)
                   .build()));
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addAllExtJSfilesFromDocRef skipping [{}] because: not exist.", docRef);

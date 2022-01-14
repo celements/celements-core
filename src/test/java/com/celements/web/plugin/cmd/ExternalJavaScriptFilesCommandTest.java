@@ -76,7 +76,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(file)
-        .setAttUrlCmd(attUrlCmd)
+        .setAttUrlCmdMock(attUrlCmd)
         .build()));
     verifyDefault();
   }
@@ -90,7 +90,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(fileNotFound)
-        .setAttUrlCmd(attUrlCmd)
+        .setAttUrlCmdMock(attUrlCmd)
         .build()));
     verifyDefault();
   }
@@ -105,7 +105,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     command.injectDisplayAll(true);
     final ExtJsFileParameter extJsFileParam = new ExtJsFileParameter.Builder()
         .setJsFile(file)
-        .setAttUrlCmd(attUrlCmd).build();
+        .setAttUrlCmdMock(attUrlCmd).build();
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>",
         command.addExtJSfileOnce(extJsFileParam));
     assertEquals("", command.addExtJSfileOnce(extJsFileParam));
@@ -124,7 +124,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     final ExtJsFileParameter extJsFile = new ExtJsFileParameter.Builder()
         .setJsFile(file)
         .setAction("file")
-        .setAttUrlCmd(attUrlCmd)
+        .setAttUrlCmdMock(attUrlCmd)
         .build();
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>",
         command.addExtJSfileOnce(extJsFile));
@@ -146,13 +146,13 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
             .setJsFile(file)
             .setAction("file")
             .setQueryString("me=blu")
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(file)
         .setAction("file")
         .setQueryString("me=blu")
-        .setAttUrlCmd(attUrlCmd)
+        .setAttUrlCmdMock(attUrlCmd)
         .build()));
     verifyDefault();
   }
@@ -171,7 +171,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         .setJsFile(file)
         .setAction("file")
         .setQueryString("me=blu")
-        .setAttUrlCmd(attUrlCmd)
+        .setAttUrlCmdMock(attUrlCmd)
         .build();
     assertEquals("<script type=\"text/javascript\" src=\"" + fileURL + "&amp;me=blu\"></script>",
         command.addExtJSfileOnce(extJsFileParam));
@@ -190,11 +190,11 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>",
         command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
             .setJsFile(file)
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(file)
-        .setAttUrlCmd(attUrlCmd).build()));
+        .setAttUrlCmdMock(attUrlCmd).build()));
     verifyDefault();
   }
 
@@ -239,11 +239,11 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     assertEquals("<!-- WARNING: js-file not found: " + fileNotFound + "-->",
         command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
             .setJsFile(fileNotFound)
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(fileNotFound)
-        .setAttUrlCmd(attUrlCmd)
+        .setAttUrlCmdMock(attUrlCmd)
         .build()));
     verifyDefault();
   }
@@ -259,11 +259,11 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     assertEquals("<!-- WARNING: js-file not found: " + fileNotFound + "-->",
         command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
             .setJsFile(fileNotFound)
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(fileNotFound)
-        .setAttUrlCmd(attUrlCmd)
+        .setAttUrlCmdMock(attUrlCmd)
         .build()));
     verifyDefault();
   }
@@ -301,7 +301,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     assertEquals("must be already added by addAllExtJSfilesFromDocRef", "",
         command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
             .setJsFile(filePath)
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     verifyDefault();
   }
@@ -331,7 +331,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
             .setJsFile(filePath)
             .setLoadMode(loadMode)
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     verifyDefault();
   }
@@ -361,7 +361,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
             .setJsFile(filePath)
             .setLoadMode(loadMode)
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     verifyDefault();
   }
@@ -418,11 +418,11 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         simpleLayoutDocRef)).atLeastOnce();
     final ExtJsFileParameter fileParams = new ExtJsFileParameter.Builder()
         .setJsFile(file)
-        .setAttUrlCmd(attUrlCmd)
+        .setAttUrlCmdMock(attUrlCmd)
         .build();
     final ExtJsFileParameter fileNotFoundParams = new ExtJsFileParameter.Builder()
         .setJsFile(fileNotFound)
-        .setAttUrlCmd(attUrlCmd)
+        .setAttUrlCmdMock(attUrlCmd)
         .build();
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(fileParams));
@@ -485,9 +485,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(attFileURL)
         .setAction("file")
-        .setAttUrlCmd(attUrlCmd).build()));
+        .setAttUrlCmdMock(attUrlCmd).build()));
     Builder paramBuilder = new ExtJsFileParameter.Builder()
-        .setAttUrlCmd(attUrlCmd);
+        .setAttUrlCmdMock(attUrlCmd);
     assertEquals("", command.addExtJSfileOnce(paramBuilder
         .setJsFile(attFileURL)
         .build()));
@@ -511,7 +511,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
         command.addLazyExtJSfile(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     verifyDefault();
   }
@@ -529,7 +529,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         command.addLazyExtJSfile(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     verifyDefault();
   }
@@ -548,7 +548,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
             .setJsFile(jsFile)
             .setAction(action)
             .setQueryString("me=blu")
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     verifyDefault();
   }
@@ -568,7 +568,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
             .setJsFile(jsFile)
             .setAction(action)
             .setQueryString("me=blu")
-            .setAttUrlCmd(attUrlCmd)
+            .setAttUrlCmdMock(attUrlCmd)
             .build()));
     verifyDefault();
   }

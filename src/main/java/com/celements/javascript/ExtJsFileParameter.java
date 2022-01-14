@@ -18,7 +18,7 @@ public final class ExtJsFileParameter {
 
     private String action;
     private String queryString;
-    private AttachmentURLCommand attUrlCmd;
+    private AttachmentURLCommand attUrlCmdMock;
     private JsFileEntry jsFileEntry = new JsFileEntry();
 
     @NotNull
@@ -48,8 +48,8 @@ public final class ExtJsFileParameter {
     }
 
     @NotNull
-    public Builder setAttUrlCmd(@Nullable AttachmentURLCommand attUrlCmd) {
-      this.attUrlCmd = attUrlCmd;
+    public Builder setAttUrlCmdMock(@Nullable AttachmentURLCommand attUrlCmd) {
+      this.attUrlCmdMock = attUrlCmd;
       return this;
     }
 
@@ -68,13 +68,13 @@ public final class ExtJsFileParameter {
 
   private final String action;
   private final String queryString;
-  private final AttachmentURLCommand attUrlCmd;
+  private final AttachmentURLCommand attUrlCmdMock;
   private final JsFileEntry jsFileEntry;
 
   private ExtJsFileParameter(Builder buildParams) {
     action = buildParams.action;
     queryString = buildParams.queryString;
-    attUrlCmd = buildParams.attUrlCmd;
+    attUrlCmdMock = buildParams.attUrlCmdMock;
     checkNotNull(buildParams.jsFileEntry);
     checkNotNull(Strings.nullToEmpty(buildParams.jsFileEntry.getFilepath()));
     jsFileEntry = buildParams.jsFileEntry;
@@ -101,8 +101,8 @@ public final class ExtJsFileParameter {
   }
 
   @NotNull
-  public Optional<AttachmentURLCommand> getAttUrlCmd() {
-    return Optional.ofNullable(attUrlCmd);
+  public Optional<AttachmentURLCommand> getAttUrlCmdMock() {
+    return Optional.ofNullable(attUrlCmdMock);
   }
 
   @NotNull
