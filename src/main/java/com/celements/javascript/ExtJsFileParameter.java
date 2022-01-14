@@ -6,25 +6,31 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 
 @NotThreadSafe
 public final class ExtJsFileParameter {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ExtJsFileParameter.class);
-
-  private String jsFile;
   private String action;
   private String params;
   private AttachmentURLCommand attUrlCmd;
-  private JsLoadMode loadMode = JsLoadMode.SYNC;
+  private JsFileEntry jsFileEntry = new JsFileEntry();
+
+  @NotNull
+  public ExtJsFileParameter setJsFileEntry(@NotNull JsFileEntry jsFileEntry) {
+    checkNotNull(jsFileEntry);
+    this.jsFileEntry = jsFileEntry;
+    return this;
+  }
+
+  @NotNull
+  public JsFileEntry getJsFileEntry() {
+    return jsFileEntry;
+  }
 
   @Nullable
   public String getJsFile() {
-    return jsFile;
+    return jsFileEntry.getFilepath();
   }
 
   @Nullable
@@ -44,12 +50,12 @@ public final class ExtJsFileParameter {
 
   @Nullable
   public JsLoadMode getLoadMode() {
-    return loadMode;
+    return jsFileEntry.getLoadMode();
   }
 
   public ExtJsFileParameter setJsFile(@NotNull String jsFile) {
     checkNotNull(jsFile);
-    this.jsFile = jsFile;
+    this.jsFileEntry.setFilepath(jsFile);
     return this;
   }
 
@@ -69,13 +75,7 @@ public final class ExtJsFileParameter {
   }
 
   public ExtJsFileParameter setLoadMode(JsLoadMode loadMode) {
-    LOGGER.debug("setLoadMode: [{}] for js file [{}].", loadMode, jsFile);
-    this.loadMode = loadMode;
-    return this;
-  }
-
-  public ExtJsFileParameter setLoadMode(String loadMode) {
-    this.loadMode = JsLoadMode.convertStoreValue(loadMode);
+    this.jsFileEntry.setLoadMode(loadMode);
     return this;
   }
 

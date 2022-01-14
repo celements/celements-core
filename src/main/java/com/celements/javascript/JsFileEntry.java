@@ -3,6 +3,10 @@ package com.celements.javascript;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -14,68 +18,72 @@ public final class JsFileEntry {
   private DocumentReference documentReference;
   private Integer objNumber;
   private ClassReference classReference;
-  private String jsFileUrl;
+  private String jsFileUrl = "";
   private JsLoadMode loadMode;
 
   public JsFileEntry() {
     // Bean needs default constructor
   }
 
-  public JsFileEntry addFilepath(String jsFile) {
+  @NotNull
+  public JsFileEntry addFilepath(@Nullable String jsFile) {
     setFilepath(jsFile);
     return this;
   }
 
-  public JsFileEntry addLoadMode(JsLoadMode loadMode) {
+  @NotNull
+  public JsFileEntry addLoadMode(@Nullable JsLoadMode loadMode) {
     setLoadMode(loadMode);
     return this;
   }
 
-  public void setFilepath(String jsFile) {
-    jsFileUrl = jsFile;
+  public void setFilepath(@Nullable String jsFile) {
+    jsFileUrl = Strings.nullToEmpty(jsFile);
   }
 
-  public void setLoadMode(JsLoadMode loadMode) {
+  public void setLoadMode(@Nullable JsLoadMode loadMode) {
     this.loadMode = loadMode;
   }
 
+  @NotNull
   public String getFilepath() {
     return jsFileUrl;
   }
 
+  @NotNull
   public JsLoadMode getLoadMode() {
     return Optional.ofNullable(loadMode).orElse(JsLoadMode.SYNC);
   }
 
-  public Integer getNumber() {
+  public @Nullable Integer getNumber() {
     return objNumber;
   }
 
-  public void setNumber(Integer objNumber) {
+  public void setNumber(@Nullable Integer objNumber) {
     this.objNumber = objNumber;
   }
 
-  public ClassReference getClassReference() {
+  public @Nullable ClassReference getClassReference() {
     return classReference;
   }
 
-  public void setClassReference(ClassReference classReference) {
+  public void setClassReference(@Nullable ClassReference classReference) {
     this.classReference = classReference;
   }
 
-  public DocumentReference getDocumentReference() {
+  public @Nullable DocumentReference getDocumentReference() {
     return documentReference;
   }
 
-  public void setDocumentReference(DocumentReference documentReference) {
+  public void setDocumentReference(@Nullable DocumentReference documentReference) {
     this.documentReference = documentReference;
   }
 
-  public Long getId() {
+  public @Nullable Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(@Nullable Long id) {
     this.id = id;
   }
 
@@ -91,7 +99,14 @@ public final class JsFileEntry {
   @Override
   public boolean equals(Object obj) {
     return (obj instanceof JsFileEntry)
-        && Objects.equals(((JsFileEntry) obj).jsFileUrl, jsFileUrl);
+        && Objects.equals(((JsFileEntry) obj).jsFileUrl, this.jsFileUrl);
+  }
+
+  @Override
+  @NotEmpty
+  public String toString() {
+    return "jsFileUrl [" + jsFileUrl + "], loadMode [" + loadMode + "] from docRef ["
+        + documentReference + "]";
   }
 
 }

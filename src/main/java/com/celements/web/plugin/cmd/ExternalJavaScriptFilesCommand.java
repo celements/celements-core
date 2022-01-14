@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -61,7 +62,6 @@ import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.JsonBuilder;
 import com.celements.web.classes.CelementsClassDefinition;
 import com.celements.web.service.IWebUtilsService;
-import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -221,25 +221,22 @@ public class ExternalJavaScriptFilesCommand {
           attUrl += "?" + extJsFileParams.getParams();
         }
       }
-      return Strings.nullToEmpty(addExtJSfileOnceInternal(extJsFileParams.getJsFile(),
-          attUrl, extJsFileParams.getLoadMode()));
+      return addExtJSfileOnceInternal(extJsFileParams.getJsFileEntry(), attUrl);
     }
     return "";
   }
 
-  private String addExtJSfileOnceInternal(String jsFile, String jsFileUrl, JsLoadMode loadMode) {
-    LOGGER.info("addExtJSfileOnceInternal: jsFile [{}] jsFileUrl [{}] loadMode [{}]", jsFile,
-        jsFileUrl, loadMode);
+  @NotEmpty
+  private String addExtJSfileOnceInternal(JsFileEntry jsFileEntry, String jsFileUrl) {
+    LOGGER.info("addExtJSfileOnceInternal: jsFileEntry [{}] jsFileUrl [{}]", jsFileEntry,
+        jsFileUrl);
     String jsIncludes2 = "";
     if (jsFileUrl == null) {
-      JsFileEntry jsFileEntry = new JsFileEntry().addFilepath(jsFile);
       if (!jsFileHasBeenSeen(jsFileEntry)) {
-        extJSnotFoundSet.add(jsFile);
-        jsIncludes2 = buildNotFoundWarning(jsFile);
+        extJSnotFoundSet.add(jsFileEntry.getFilepath());
+        jsIncludes2 = buildNotFoundWarning(jsFileEntry.getFilepath());
       }
     } else {
-      JsFileEntry jsFileEntry = new JsFileEntry().addFilepath(jsFileUrl)
-          .addLoadMode(loadMode);
       if (!jsFileHasBeenSeen(jsFileEntry)) {
         jsIncludes2 = getExtStringForJsFile(jsFileEntry);
         extJSfileSet.add(jsFileEntry);
@@ -358,8 +355,7 @@ public class ExternalJavaScriptFilesCommand {
           .filter(JsFileEntry::isValid)
           .forEachOrdered(jsFile -> addExtJSfileOnce(
               new ExtJsFileParameter()
-                  .setJsFile(jsFile.getFilepath())
-                  .setLoadMode(jsFile.getLoadMode())
+                  .setJsFileEntry(jsFile)
                   .setAttUrlCmd(attUrlCmd)));
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addAllExtJSfilesFromDocRef skipping [{}] because: not exist.", docRef);
