@@ -17,7 +17,7 @@ public final class ExtJsFileParameter {
   public static final class Builder {
 
     private String action;
-    private String params;
+    private String queryString;
     private AttachmentURLCommand attUrlCmd;
     private JsFileEntry jsFileEntry = new JsFileEntry();
 
@@ -42,8 +42,8 @@ public final class ExtJsFileParameter {
     }
 
     @NotNull
-    public Builder setParams(@Nullable String params) {
-      this.params = params;
+    public Builder setQueryString(@Nullable String params) {
+      this.queryString = params;
       return this;
     }
 
@@ -67,13 +67,13 @@ public final class ExtJsFileParameter {
   }
 
   private final String action;
-  private final String params;
+  private final String queryString;
   private final AttachmentURLCommand attUrlCmd;
   private final JsFileEntry jsFileEntry;
 
   private ExtJsFileParameter(Builder buildParams) {
     action = buildParams.action;
-    params = buildParams.params;
+    queryString = buildParams.queryString;
     attUrlCmd = buildParams.attUrlCmd;
     checkNotNull(buildParams.jsFileEntry);
     checkNotNull(Strings.nullToEmpty(buildParams.jsFileEntry.getFilepath()));
@@ -96,8 +96,8 @@ public final class ExtJsFileParameter {
   }
 
   @NotNull
-  public Optional<String> getParams() {
-    return Optional.ofNullable(Strings.emptyToNull(params));
+  public Optional<String> getQueryString() {
+    return Optional.ofNullable(Strings.emptyToNull(queryString));
   }
 
   @NotNull

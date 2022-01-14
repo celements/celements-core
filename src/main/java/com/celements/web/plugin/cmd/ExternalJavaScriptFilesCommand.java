@@ -134,7 +134,7 @@ public class ExternalJavaScriptFilesCommand {
     return addLazyExtJSfile(new ExtJsFileParameter.Builder()
         .setJsFile(jsFile)
         .setAction(action)
-        .setParams(params)
+        .setQueryString(params)
         .build());
   }
 
@@ -148,7 +148,7 @@ public class ExternalJavaScriptFilesCommand {
       attUrl = getAttUrlCmd(extJsFileParams.getAttUrlCmd()).getAttachmentURL(
           extJsFileParams.getJsFile(), getModelContext().getXWikiContext());
     }
-    final Optional<String> params = extJsFileParams.getParams();
+    final Optional<String> params = extJsFileParams.getQueryString();
     if (params.isPresent()) {
       if (attUrl.indexOf("?") > -1) {
         attUrl += "&" + params.get();
@@ -197,7 +197,7 @@ public class ExternalJavaScriptFilesCommand {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(jsFile)
         .setAction(action)
-        .setParams(params)
+        .setQueryString(params)
         .build());
   }
 
@@ -219,7 +219,7 @@ public class ExternalJavaScriptFilesCommand {
             extJsFileParams.getJsFile(),
             getModelContext().getXWikiContext());
       }
-      final Optional<String> params = extJsFileParams.getParams();
+      final Optional<String> params = extJsFileParams.getQueryString();
       if (params.isPresent()) {
         if (attUrl.indexOf("?") > -1) {
           attUrl += "&" + params.get();

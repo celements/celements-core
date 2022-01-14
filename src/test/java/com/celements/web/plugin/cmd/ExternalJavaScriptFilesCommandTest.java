@@ -145,13 +145,13 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
             .setJsFile(file)
             .setAction("file")
-            .setParams("me=blu")
+            .setQueryString("me=blu")
             .setAttUrlCmd(attUrlCmd)
             .build()));
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(file)
         .setAction("file")
-        .setParams("me=blu")
+        .setQueryString("me=blu")
         .setAttUrlCmd(attUrlCmd)
         .build()));
     verifyDefault();
@@ -170,7 +170,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     final ExtJsFileParameter extJsFileParam = new ExtJsFileParameter.Builder()
         .setJsFile(file)
         .setAction("file")
-        .setParams("me=blu")
+        .setQueryString("me=blu")
         .setAttUrlCmd(attUrlCmd)
         .build();
     assertEquals("<script type=\"text/javascript\" src=\"" + fileURL + "&amp;me=blu\"></script>",
@@ -547,7 +547,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         command.addLazyExtJSfile(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
-            .setParams("me=blu")
+            .setQueryString("me=blu")
             .setAttUrlCmd(attUrlCmd)
             .build()));
     verifyDefault();
@@ -567,7 +567,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         command.addLazyExtJSfile(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
-            .setParams("me=blu")
+            .setQueryString("me=blu")
             .setAttUrlCmd(attUrlCmd)
             .build()));
     verifyDefault();
