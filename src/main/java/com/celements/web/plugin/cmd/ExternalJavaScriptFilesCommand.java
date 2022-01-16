@@ -61,6 +61,7 @@ import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.JsonBuilder;
 import com.celements.web.classes.CelementsClassDefinition;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -123,7 +124,7 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   public String addLazyExtJSfile(String jsFile) {
     return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFile(Strings.nullToEmpty(jsFile))
         .setLazyLoad(true)
         .build());
   }
@@ -134,7 +135,7 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   public String addLazyExtJSfile(String jsFile, String action) {
     return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFile(Strings.nullToEmpty(jsFile))
         .setAction(action)
         .setLazyLoad(true)
         .build());
@@ -146,7 +147,7 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   public String addLazyExtJSfile(String jsFile, String action, String params) {
     return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFile(Strings.nullToEmpty(jsFile))
         .setAction(action)
         .setQueryString(params)
         .setLazyLoad(true)
@@ -160,7 +161,7 @@ public class ExternalJavaScriptFilesCommand {
   @NotNull
   public String addExtJSfileOnce(String jsFile) {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFile(Strings.nullToEmpty(jsFile))
         .build());
   }
 
@@ -171,7 +172,7 @@ public class ExternalJavaScriptFilesCommand {
   @NotNull
   public String addExtJSfileOnce(String jsFile, String action) {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFile(Strings.nullToEmpty(jsFile))
         .setAction(action)
         .build());
   }
@@ -183,7 +184,7 @@ public class ExternalJavaScriptFilesCommand {
   @NotNull
   public String addExtJSfileOnce(String jsFile, String action, String params) {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFile(Strings.nullToEmpty(jsFile))
         .setAction(action)
         .setQueryString(params)
         .build());
@@ -236,7 +237,7 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   @NotNull
-  public String addExtJSfileOnce(ExtJsFileParameter extJsFileParams) {
+  public String addExtJSfileOnce(@NotNull ExtJsFileParameter extJsFileParams) {
     if (!extJSAttUrlSet.contains(extJsFileParams.getJsFile())) {
       final AttachmentURLCommand attUrlCmd = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock());
       if (attUrlCmd.isAttachmentLink(extJsFileParams.getJsFile())

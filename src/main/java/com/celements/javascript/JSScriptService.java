@@ -1,5 +1,7 @@
 package com.celements.javascript;
 
+import javax.annotation.Nullable;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -28,7 +30,7 @@ public class JSScriptService implements ScriptService {
    * @deprecated since 5.4 instead use {@link includeExtJsFile(ExtJsFileParameter)}
    */
   @Deprecated
-  public String addExtJSfileOnce(String jsFile) {
+  public String addExtJSfileOnce(@Nullable String jsFile) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile);
   }
 
@@ -36,7 +38,7 @@ public class JSScriptService implements ScriptService {
    * @deprecated since 5.4 instead use {@link includeExtJsFile(ExtJsFileParameter)}
    */
   @Deprecated
-  public String addExtJSfileOnce(String jsFile, String action) {
+  public String addExtJSfileOnce(@Nullable String jsFile, @Nullable String action) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
   }
 
@@ -51,7 +53,8 @@ public class JSScriptService implements ScriptService {
    * @deprecated since 5.4 instead use {@link includeExtJsFile(ExtJsFileParameter)}
    */
   @Deprecated
-  public String addExtJSfileOnce(String jsFile, String action, String params) {
+  public String addExtJSfileOnce(@Nullable String jsFile, @Nullable String action,
+      @Nullable String params) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action, params);
   }
 
@@ -59,19 +62,25 @@ public class JSScriptService implements ScriptService {
     return new ExtJsFileParameter.Builder();
   }
 
-  public String includeExtJsFile(ExtJsFileParameter.Builder extJsFileParams) {
-    return getExtJavaScriptFileCmd().includeExtJsFile(extJsFileParams.build());
+  public String includeExtJsFile(@Nullable ExtJsFileParameter.Builder extJsFileParams) {
+    if (extJsFileParams != null) {
+      return getExtJavaScriptFileCmd().includeExtJsFile(extJsFileParams.build());
+    }
+    return "<!-- includeExtJsFile(ExtJsFileParameter.Builder) called with null  -->";
   }
 
-  public String includeExtJsFile(ExtJsFileParameter extJsFileParams) {
-    return getExtJavaScriptFileCmd().includeExtJsFile(extJsFileParams);
+  public String includeExtJsFile(@Nullable ExtJsFileParameter extJsFileParams) {
+    if (extJsFileParams != null) {
+      return getExtJavaScriptFileCmd().includeExtJsFile(extJsFileParams);
+    }
+    return "<!-- includeExtJsFile(ExtJsFileParameter) called with null  -->";
   }
 
   /**
    * @deprecated since 5.4 instead use {@link includeExtJsFile(ExtJsFileParameter)}
    */
   @Deprecated
-  public String addLazyExtJSfile(String jsFile) {
+  public String addLazyExtJSfile(@Nullable String jsFile) {
     return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile);
   }
 
@@ -79,7 +88,7 @@ public class JSScriptService implements ScriptService {
    * @deprecated since 5.4 instead use {@link includeExtJsFile(ExtJsFileParameter)}
    */
   @Deprecated
-  public String addLazyExtJSfile(String jsFile, String action) {
+  public String addLazyExtJSfile(@Nullable String jsFile, @Nullable String action) {
     return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile, action);
   }
 
@@ -94,7 +103,8 @@ public class JSScriptService implements ScriptService {
    * @deprecated since 5.4 instead use {@link includeExtJsFile(ExtJsFileParameter)}
    */
   @Deprecated
-  public String addLazyExtJSfile(String jsFile, String action, String params) {
+  public String addLazyExtJSfile(@Nullable String jsFile, @Nullable String action,
+      @Nullable String params) {
     return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile, action, params);
   }
 
