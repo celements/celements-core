@@ -61,7 +61,6 @@ import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.JsonBuilder;
 import com.celements.web.classes.CelementsClassDefinition;
 import com.celements.web.service.IWebUtilsService;
-import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -122,9 +121,9 @@ public class ExternalJavaScriptFilesCommand {
    * @deprecated since 5.4 instead use {@link getLazySpanTag(ExtJsFileParameter)}
    */
   @Deprecated
-  public String addLazyExtJSfile(String jsFile) {
+  public String addLazyExtJSfile(@NotEmpty String jsFile) {
     return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(Strings.nullToEmpty(jsFile))
+        .setJsFile(jsFile)
         .setLazyLoad(true)
         .build());
   }
@@ -133,9 +132,9 @@ public class ExternalJavaScriptFilesCommand {
    * @deprecated since 5.4 instead use {@link getLazySpanTag(ExtJsFileParameter)}
    */
   @Deprecated
-  public String addLazyExtJSfile(String jsFile, String action) {
+  public String addLazyExtJSfile(@NotEmpty String jsFile, @Nullable String action) {
     return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(Strings.nullToEmpty(jsFile))
+        .setJsFile(jsFile)
         .setAction(action)
         .setLazyLoad(true)
         .build());
@@ -145,9 +144,10 @@ public class ExternalJavaScriptFilesCommand {
    * @deprecated since 5.4 instead use {@link getLazySpanTag(ExtJsFileParameter)}
    */
   @Deprecated
-  public String addLazyExtJSfile(String jsFile, String action, String params) {
+  public String addLazyExtJSfile(@NotEmpty String jsFile, @Nullable String action,
+      @Nullable String params) {
     return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(Strings.nullToEmpty(jsFile))
+        .setJsFile(jsFile)
         .setAction(action)
         .setQueryString(params)
         .setLazyLoad(true)
@@ -159,9 +159,9 @@ public class ExternalJavaScriptFilesCommand {
    */
   @Deprecated
   @NotNull
-  public String addExtJSfileOnce(String jsFile) {
+  public String addExtJSfileOnce(@NotEmpty String jsFile) {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(Strings.nullToEmpty(jsFile))
+        .setJsFile(jsFile)
         .build());
   }
 
@@ -170,9 +170,9 @@ public class ExternalJavaScriptFilesCommand {
    */
   @Deprecated
   @NotNull
-  public String addExtJSfileOnce(String jsFile, String action) {
+  public String addExtJSfileOnce(@NotEmpty String jsFile, @Nullable String action) {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(Strings.nullToEmpty(jsFile))
+        .setJsFile(jsFile)
         .setAction(action)
         .build());
   }
@@ -182,9 +182,10 @@ public class ExternalJavaScriptFilesCommand {
    */
   @Deprecated
   @NotNull
-  public String addExtJSfileOnce(String jsFile, String action, String params) {
+  public String addExtJSfileOnce(@NotEmpty String jsFile, @Nullable String action,
+      @Nullable String params) {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(Strings.nullToEmpty(jsFile))
+        .setJsFile(jsFile)
         .setAction(action)
         .setQueryString(params)
         .build());
@@ -214,7 +215,7 @@ public class ExternalJavaScriptFilesCommand {
         + "</span>";
   }
 
-  private String generateUrl(ExtJsFileParameter extJsFileParams) {
+  private String generateUrl(@NotNull ExtJsFileParameter extJsFileParams) {
     String attUrl;
     final AttachmentURLCommand attUrlCmd = getAttUrlCmd(extJsFileParams.getAttUrlCmdMock());
     final Optional<String> action = extJsFileParams.getAction();

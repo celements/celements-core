@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.*;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
@@ -30,7 +31,7 @@ public final class ExtJsFileParameter {
     }
 
     @NotNull
-    public Builder setJsFile(@NotNull String jsFile) {
+    public Builder setJsFile(@NotEmpty String jsFile) {
       checkNotNull(jsFile);
       this.jsFileEntry.setFilepath(jsFile);
       return this;
@@ -84,7 +85,7 @@ public final class ExtJsFileParameter {
     lazyLoad = buildParams.lazyLoad;
     attUrlCmdMock = buildParams.attUrlCmdMock;
     checkNotNull(buildParams.jsFileEntry);
-    checkNotNull(Strings.nullToEmpty(buildParams.jsFileEntry.getFilepath()));
+    checkNotNull(Strings.emptyToNull(buildParams.jsFileEntry.getFilepath()));
     jsFileEntry = buildParams.jsFileEntry;
   }
 

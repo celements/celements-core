@@ -8,6 +8,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 
 @Component("javascript")
@@ -31,7 +32,10 @@ public class JSScriptService implements ScriptService {
    */
   @Deprecated
   public String addExtJSfileOnce(@Nullable String jsFile) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile);
+    if (!Strings.isNullOrEmpty(jsFile)) {
+      return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile);
+    }
+    return "<!-- addExtJSfileOnce(String) called with null or empty jsFile -->";
   }
 
   /**
@@ -39,7 +43,10 @@ public class JSScriptService implements ScriptService {
    */
   @Deprecated
   public String addExtJSfileOnce(@Nullable String jsFile, @Nullable String action) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
+    if (!Strings.isNullOrEmpty(jsFile)) {
+      return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
+    }
+    return "<!-- addExtJSfileOnce(String, String) called with null or empty jsFile -->";
   }
 
   /**
@@ -55,7 +62,10 @@ public class JSScriptService implements ScriptService {
   @Deprecated
   public String addExtJSfileOnce(@Nullable String jsFile, @Nullable String action,
       @Nullable String params) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action, params);
+    if (!Strings.isNullOrEmpty(jsFile)) {
+      return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action, params);
+    }
+    return "<!-- addExtJSfileOnce(String, String, String) called with null or empty jsFile -->";
   }
 
   public ExtJsFileParameter.Builder createExtJSParam() {
@@ -81,7 +91,10 @@ public class JSScriptService implements ScriptService {
    */
   @Deprecated
   public String addLazyExtJSfile(@Nullable String jsFile) {
-    return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile);
+    if (!Strings.isNullOrEmpty(jsFile)) {
+      return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile);
+    }
+    return "<!-- addLazyExtJSfile(String) called with null or empty jsFile -->";
   }
 
   /**
@@ -89,7 +102,10 @@ public class JSScriptService implements ScriptService {
    */
   @Deprecated
   public String addLazyExtJSfile(@Nullable String jsFile, @Nullable String action) {
-    return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile, action);
+    if (!Strings.isNullOrEmpty(jsFile)) {
+      return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile, action);
+    }
+    return "<!-- addLazyExtJSfile(String, String) called with null or empty jsFile -->";
   }
 
   /**
@@ -105,7 +121,10 @@ public class JSScriptService implements ScriptService {
   @Deprecated
   public String addLazyExtJSfile(@Nullable String jsFile, @Nullable String action,
       @Nullable String params) {
-    return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile, action, params);
+    if (!Strings.isNullOrEmpty(jsFile)) {
+      return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile, action, params);
+    }
+    return "<!-- addLazyExtJSfile(String, String, String) called with null or empty jsFile -->";
   }
 
   private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
