@@ -118,7 +118,10 @@ public final class DefaultLayoutService implements LayoutServiceRole {
             .with(modelContext.getWikiRef())
             .space(resultRow[0].toString())
             .build(SpaceReference.class),
-            Optional.ofNullable(resultRow[1]).map(Object::toString).orElse("untitled Layout"));
+            Optional.ofNullable(resultRow[1])
+                .map(Object::toString)
+                .filter(not(Strings::isNullOrEmpty))
+                .orElse("untitled Layout"));
       }
     } catch (QueryException exp) {
       LOGGER.error("Failed to get all page layouts", exp);

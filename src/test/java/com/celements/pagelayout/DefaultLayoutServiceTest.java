@@ -103,10 +103,11 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getPageLayoutMap_null() throws Exception {
+  public void test_getPageLayoutMap_null_empty() throws Exception {
     List<Object> resultList = new ArrayList<>();
     resultList.add(new Object[] { "layout1Space", "Layout 1 pretty name" });
     resultList.add(new Object[] { "layout2Space", null });
+    resultList.add(new Object[] { "layout3Space", "" });
     Query queryMock = createMockAndAddToDefault(Query.class);
     Capture<String> capturedHQL = newCapture();
     expect(queryManagerMock.createQuery(capture(capturedHQL), eq(Query.HQL))).andReturn(queryMock);
@@ -116,6 +117,8 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     expectedPLmap.put(RefBuilder.create().wiki(context.getDatabase()).space("layout1Space")
         .build(SpaceReference.class), "Layout 1 pretty name");
     expectedPLmap.put(RefBuilder.create().wiki(context.getDatabase()).space("layout2Space")
+        .build(SpaceReference.class), "untitled Layout");
+    expectedPLmap.put(RefBuilder.create().wiki(context.getDatabase()).space("layout3Space")
         .build(SpaceReference.class), "untitled Layout");
     assertEquals(expectedPLmap, layoutService.getPageLayoutMap(true));
     assertTrue("hql must contain isActiv constrains.", capturedHQL.getValue().contains(
