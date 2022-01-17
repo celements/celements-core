@@ -86,6 +86,10 @@ public class JSScriptService implements ScriptService {
     return "<!-- includeExtJsFile(ExtJsFileParameter) called with null  -->";
   }
 
+  public JsLoadMode getJsLoadMode(String loadMode) {
+    return JsLoadMode.valueOf(loadMode);
+  }
+
   /**
    * @deprecated since 5.4 instead use {@link includeExtJsFile(ExtJsFileParameter)}
    */
