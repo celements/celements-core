@@ -197,6 +197,7 @@ public class ExternalJavaScriptFilesCommand {
    */
   @NotNull
   public String includeExtJsFile(@NotNull ExtJsFileParameter extJsFileParams) {
+    LOGGER.info("includeExtJsFile {}", extJsFileParams);
     if (extJsFileParams.isLazyLoad()) {
       return getLazyLoadTag(extJsFileParams);
     } else {
@@ -246,6 +247,8 @@ public class ExternalJavaScriptFilesCommand {
         extJSAttUrlSet.add(extJsFileParams.getJsFile());
       }
       return generateScriptTagOnce(extJsFileParams.getJsFileEntry(), generateUrl(extJsFileParams));
+    } else {
+      LOGGER.debug("addExtJSfileOnce: skip already added {}", extJsFileParams.getJsFile());
     }
     return "";
   }
@@ -258,12 +261,16 @@ public class ExternalJavaScriptFilesCommand {
       if (!jsFileHasBeenSeen(jsFileEntry)) {
         extJSnotFoundSet.add(jsFileEntry.getFilepath());
         jsIncludes2 = buildNotFoundWarning(jsFileEntry.getFilepath());
+      } else {
+        LOGGER.debug("generateScriptTagOnce jsFileUrl == null: skip already seen {}", jsFileEntry);
       }
     } else {
       JsFileEntry jsFileEntry2 = new JsFileEntry(jsFileEntry).addFilepath(jsFileUrl);
       if (!jsFileHasBeenSeen(jsFileEntry2)) {
         jsIncludes2 = getExtStringForJsFile(jsFileEntry2);
         extJSfileSet.add(jsFileEntry2);
+      } else {
+        LOGGER.debug("generateScriptTagOnce jsFileUrl != null: skip already seen {}", jsFileEntry2);
       }
     }
     if (!displayedAll) {

@@ -71,6 +71,13 @@ public final class ExtJsFileParameter {
       return new ExtJsFileParameter(this);
     }
 
+    @Override
+    public String toString() {
+      return "ExtJsFileParameter.Builder [jsFileEntry=" + jsFileEntry + ", action=" + action
+          + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + ", attUrlCmdMock="
+          + attUrlCmdMock + "]";
+    }
+
   }
 
   private final String action;
@@ -121,6 +128,13 @@ public final class ExtJsFileParameter {
   @NotNull
   public JsLoadMode getLoadMode() {
     return jsFileEntry.getLoadMode();
+  }
+
+  @Override
+  public String toString() {
+    return "ExtJsFileParameter [action=" + action + ", jsFileEntry=" + jsFileEntry
+        + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + ", attUrlCmdMock="
+        + attUrlCmdMock + "]";
   }
 
 }
