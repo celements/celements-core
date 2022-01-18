@@ -22,6 +22,8 @@ package com.celements.metatag;
 import static com.google.common.base.Strings.*;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
@@ -40,12 +42,13 @@ import com.celements.metatag.enums.EViewport;
 import com.celements.metatag.enums.opengraph.EOpenGraph;
 import com.celements.metatag.enums.twitter.ETwitter;
 import com.celements.metatag.enums.twitter.ETwitterCardType;
+import com.celements.model.object.ObjectBean;
 import com.google.common.collect.ImmutableMap;
 
 /* ComponentInstanceSupplier in BaseObjectMetaTagProvider needs this to be a component */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class MetaTag implements MetaTagRole {
+public class MetaTag extends ObjectBean implements MetaTagRole {
 
   private Map<String, String> attribs;
   private String content;
@@ -115,7 +118,7 @@ public class MetaTag implements MetaTagRole {
 
   @Override
   public boolean getOverridable() {
-    return (overridable != null) ? overridable : false;
+    return Optional.ofNullable(overridable).orElse(false);
   }
 
   @Override
@@ -173,8 +176,8 @@ public class MetaTag implements MetaTagRole {
     StringBuilder sb = new StringBuilder();
     sb.append("<meta ");
     if (attribs != null) {
-      for (String attrib : attribs.keySet()) {
-        sb.append(attrib).append("=\"").append(attribs.get(attrib)).append("\" ");
+      for (Entry<String, String> attribEntry : attribs.entrySet()) {
+        sb.append(attribEntry.getKey()).append("=\"").append(attribEntry.getValue()).append("\" ");
       }
     }
     if (key != null) {
@@ -189,14 +192,13 @@ public class MetaTag implements MetaTagRole {
 
   @Override
   public boolean equals(Object tag) {
-    return (tag instanceof MetaTag) && equalsLang((MetaTag) tag) && display().equals(((MetaTag) tag)
-        .display());
+    return (tag instanceof MetaTag) && Objects.equals(getLangOpt(), ((MetaTag) tag).getLangOpt())
+        && Objects.equals(display(), ((MetaTag) tag).display());
   }
 
-  private boolean equalsLang(MetaTag tag) {
-    return (getLangOpt().orElse(null) == tag.getLangOpt().orElse(null)) || ((getLangOpt()
-        .isPresent()) && getLangOpt().get().equals(tag
-            .getLangOpt().get()));
+  @Override
+  public int hashCode() {
+    return Objects.hash(getLangOpt(), display());
   }
 
 }
