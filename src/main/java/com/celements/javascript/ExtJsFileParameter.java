@@ -82,8 +82,8 @@ public final class ExtJsFileParameter {
     queryString = Strings.emptyToNull(buildParams.queryString);
     lazyLoad = buildParams.lazyLoad;
     checkNotNull(buildParams.jsFileEntry);
-    checkNotNull(Strings.emptyToNull(buildParams.jsFileEntry.getFilepath()));
     jsFileEntry = new JsFileEntry(buildParams.jsFileEntry);
+    checkNotNull(Strings.emptyToNull(jsFileEntry.getFilepath()));
   }
 
   @NotNull

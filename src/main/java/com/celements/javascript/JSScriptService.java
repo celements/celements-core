@@ -74,7 +74,11 @@ public class JSScriptService implements ScriptService {
 
   public String includeExtJsFile(@Nullable ExtJsFileParameter.Builder extJsFileParams) {
     if (extJsFileParams != null) {
-      return getExtJavaScriptFileCmd().includeExtJsFile(extJsFileParams.build());
+      try {
+        return getExtJavaScriptFileCmd().includeExtJsFile(extJsFileParams.build());
+      } catch (NullPointerException npe) {
+        return "<!-- includeExtJsFile(ExtJsFileParameter.Builder) called with empty filepath  -->";
+      }
     }
     return "<!-- includeExtJsFile(ExtJsFileParameter.Builder) called with null  -->";
   }
