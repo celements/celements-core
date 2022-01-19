@@ -47,6 +47,7 @@ public final class ExtJsFileParameter {
       return this;
     }
 
+    @NotNull
     public Builder setLazyLoad(boolean lazyLoad) {
       this.lazyLoad = lazyLoad;
       return this;
