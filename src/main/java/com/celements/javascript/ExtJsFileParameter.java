@@ -82,17 +82,22 @@ public final class ExtJsFileParameter {
     lazyLoad = buildParams.lazyLoad;
     checkNotNull(buildParams.jsFileEntry);
     checkNotNull(Strings.emptyToNull(buildParams.jsFileEntry.getFilepath()));
-    jsFileEntry = buildParams.jsFileEntry;
+    jsFileEntry = new JsFileEntry(buildParams.jsFileEntry);
   }
 
   @NotNull
   public JsFileEntry getJsFileEntry() {
-    return jsFileEntry;
+    return new JsFileEntry(jsFileEntry);
   }
 
   @NotNull
   public String getJsFile() {
     return jsFileEntry.getFilepath();
+  }
+
+  @NotNull
+  public JsLoadMode getLoadMode() {
+    return jsFileEntry.getLoadMode();
   }
 
   @NotNull
@@ -107,11 +112,6 @@ public final class ExtJsFileParameter {
 
   public boolean isLazyLoad() {
     return lazyLoad;
-  }
-
-  @NotNull
-  public JsLoadMode getLoadMode() {
-    return jsFileEntry.getLoadMode();
   }
 
   @Override

@@ -222,6 +222,7 @@ public class ExternalJavaScriptFilesCommand {
         + "</span>";
   }
 
+  @NotEmpty
   private String generateUrl(@NotNull ExtJsFileParameter extJsFileParams,
       @Nullable AttachmentURLCommand attUrlCmdMock) {
     String attUrl;
@@ -259,8 +260,7 @@ public class ExternalJavaScriptFilesCommand {
           || attUrlCmd.isOnDiskLink(extJsFileParams.getJsFile())) {
         extJSAttUrlSet.add(extJsFileParams.getJsFile());
       }
-      return generateScriptTagOnce(extJsFileParams.getJsFileEntry(),
-          generateUrl(extJsFileParams, attUrlCmd));
+      return generateScriptTagOnce(extJsFileParams, generateUrl(extJsFileParams, attUrlCmd));
     } else {
       LOGGER.debug("addExtJSfileOnce: skip already added {}", extJsFileParams.getJsFile());
     }
@@ -268,9 +268,12 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   @NotNull
-  private String generateScriptTagOnce(JsFileEntry jsFileEntry, String jsFileUrl) {
-    LOGGER.info("generateScriptTagOnce: jsFileEntry [{}] jsFileUrl [{}]", jsFileEntry, jsFileUrl);
+  private String generateScriptTagOnce(@NotNull ExtJsFileParameter extJsFileParams,
+      @NotEmpty String jsFileUrl) {
+    LOGGER.info("generateScriptTagOnce: extJsFileParams [{}] jsFileUrl [{}]", extJsFileParams,
+        jsFileUrl);
     String jsIncludes2 = "";
+    JsFileEntry jsFileEntry = extJsFileParams.getJsFileEntry();
     if (jsFileUrl == null) {
       if (!jsFileHasBeenSeen(jsFileEntry)) {
         extJSnotFoundSet.add(jsFileEntry.getFilepath());
@@ -279,12 +282,12 @@ public class ExternalJavaScriptFilesCommand {
         LOGGER.debug("generateScriptTagOnce jsFileUrl == null: skip already seen {}", jsFileEntry);
       }
     } else {
-      JsFileEntry jsFileEntry2 = new JsFileEntry(jsFileEntry).addFilepath(jsFileUrl);
-      if (!jsFileHasBeenSeen(jsFileEntry2)) {
-        jsIncludes2 = getExtStringForJsFile(jsFileEntry2);
-        extJSfileSet.add(jsFileEntry2);
+      jsFileEntry.setFilepath(jsFileUrl);
+      if (!jsFileHasBeenSeen(jsFileEntry)) {
+        jsIncludes2 = getExtStringForJsFile(jsFileEntry);
+        extJSfileSet.add(jsFileEntry);
       } else {
-        LOGGER.debug("generateScriptTagOnce jsFileUrl != null: skip already seen {}", jsFileEntry2);
+        LOGGER.debug("generateScriptTagOnce jsFileUrl != null: skip already seen {}", jsFileEntry);
       }
     }
     if (!displayedAll) {
