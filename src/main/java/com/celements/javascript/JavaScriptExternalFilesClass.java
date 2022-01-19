@@ -39,7 +39,6 @@ public class JavaScriptExternalFilesClass extends AbstractClassDefinition
 
   public static final ClassField<String> FIELD_FILEPATH = new StringField.Builder(CLASS_REF,
       "filepath").size(30).build();
-
   public static final ClassField<JsLoadMode> FIELD_LOAD_MODE = new EnumSingleListField.Builder<>(
       CLASS_REF, "loadMode", JsLoadMode.class).build();
 
