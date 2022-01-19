@@ -64,7 +64,7 @@ public final class JsFileEntry extends ObjectBean {
   }
 
   public boolean isValid() {
-    return !Strings.isNullOrEmpty(jsFileUrl);
+    return !jsFileUrl.isEmpty();
   }
 
   @Override
