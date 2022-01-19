@@ -1,5 +1,7 @@
 package com.celements.javascript;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,7 +24,8 @@ public final class JsFileEntry extends ObjectBean {
     // Bean needs default constructor
   }
 
-  public JsFileEntry(JsFileEntry jsFileEntry) {
+  public JsFileEntry(@NotNull JsFileEntry jsFileEntry) {
+    checkNotNull(jsFileEntry);
     this.setDocumentReference(jsFileEntry.getDocumentReference());
     this.setNumber(jsFileEntry.getNumber());
     this.setClassReference(jsFileEntry.getClassReference());
@@ -70,7 +73,7 @@ public final class JsFileEntry extends ObjectBean {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(@Nullable Object obj) {
     return (obj instanceof JsFileEntry)
         && Objects.equals(((JsFileEntry) obj).jsFileUrl, this.jsFileUrl);
   }
