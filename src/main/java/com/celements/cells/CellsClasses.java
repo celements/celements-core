@@ -60,7 +60,7 @@ public class CellsClasses extends AbstractClassCollection {
   @Override
   protected void initClasses() throws XWikiException {
     LOGGER.debug("entering initClasses for database: " + getContext().getDatabase());
-    getPageLayoutPropertiesClass();
+    // getPageLayoutPropertiesClass();
     getGroupCellClass();
     getPageDepCellConfigClass();
     getTranslationBoxCellConfigClass();
@@ -109,7 +109,7 @@ public class CellsClasses extends AbstractClassCollection {
     return new DocumentReference(wikiName, "Celements", "PageLayoutPropertiesClass");
   }
 
-  BaseClass getPageLayoutPropertiesClass() throws XWikiException {
+  private BaseClass getPageLayoutPropertiesClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference pageLayoutPropertiesClassRef = cellsClassConfig

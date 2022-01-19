@@ -32,9 +32,25 @@ public interface ICellsClassConfig {
   @Deprecated
   String PAGE_LAYOUT_PROPERTIES_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
       + PAGE_LAYOUT_PROPERTIES_CLASS_DOC;
+  /**
+   * @deprecated since 5.4 instead use {@link PageLayoutPropertiesClass#FIELD_LAYOUT_TYPE}
+   */
+  @Deprecated
   String LAYOUT_TYPE_FIELD = "layout_type";
+  /**
+   * @deprecated since 5.4 instead use {@link PageLayoutPropertiesClass#EDITOR_LAYOUT_VALUE}
+   */
+  @Deprecated
   String EDITOR_LAYOUT_VALUE = "editorLayout";
+  /**
+   * @deprecated since 5.4 instead use {@link PageLayoutPropertiesClass#PAGE_LAYOUT_VALUE}
+   */
+  @Deprecated
   String PAGE_LAYOUT_VALUE = "pageLayout";
+  /**
+   * @deprecated since 5.4 instead use {@link PageLayoutPropertiesClass#FIELD_LAYOUT_DOCTYPE}
+   */
+  @Deprecated
   String LAYOUT_DOCTYPE_FIELD = "doctype";
 
   @Deprecated
