@@ -78,8 +78,8 @@ public final class ExtJsFileParameter {
   private final boolean lazyLoad;
 
   private ExtJsFileParameter(Builder buildParams) {
-    action = buildParams.action;
-    queryString = buildParams.queryString;
+    action = Strings.emptyToNull(buildParams.action);
+    queryString = Strings.emptyToNull(buildParams.queryString);
     lazyLoad = buildParams.lazyLoad;
     checkNotNull(buildParams.jsFileEntry);
     checkNotNull(Strings.emptyToNull(buildParams.jsFileEntry.getFilepath()));
@@ -103,12 +103,12 @@ public final class ExtJsFileParameter {
 
   @NotNull
   public Optional<String> getAction() {
-    return Optional.ofNullable(Strings.emptyToNull(action));
+    return Optional.ofNullable(action);
   }
 
   @NotNull
   public Optional<String> getQueryString() {
-    return Optional.ofNullable(Strings.emptyToNull(queryString));
+    return Optional.ofNullable(queryString);
   }
 
   public boolean isLazyLoad() {
