@@ -60,7 +60,7 @@ public final class JsFileEntry extends ObjectBean {
 
   @NotNull
   public JsLoadMode getLoadMode() {
-    return Optional.ofNullable(loadMode).orElse(LOAD_MODE_DEFAULT);
+    return loadMode;
   }
 
   public boolean isValid() {
