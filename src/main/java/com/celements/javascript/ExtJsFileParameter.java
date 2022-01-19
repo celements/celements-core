@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Immutable;
 
@@ -21,7 +20,6 @@ public final class ExtJsFileParameter {
     private String action;
     private String queryString;
     private boolean lazyLoad = false;
-    private AttachmentURLCommand attUrlCmdMock;
 
     @NotNull
     public Builder setJsFileEntry(@NotNull JsFileEntry jsFileEntry) {
@@ -49,12 +47,6 @@ public final class ExtJsFileParameter {
       return this;
     }
 
-    @NotNull
-    public Builder setAttUrlCmdMock(@Nullable AttachmentURLCommand attUrlCmd) {
-      this.attUrlCmdMock = attUrlCmd;
-      return this;
-    }
-
     public Builder setLazyLoad(boolean lazyLoad) {
       this.lazyLoad = lazyLoad;
       return this;
@@ -74,8 +66,7 @@ public final class ExtJsFileParameter {
     @Override
     public String toString() {
       return "ExtJsFileParameter.Builder [jsFileEntry=" + jsFileEntry + ", action=" + action
-          + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + ", attUrlCmdMock="
-          + attUrlCmdMock + "]";
+          + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + "]";
     }
 
   }
@@ -84,13 +75,11 @@ public final class ExtJsFileParameter {
   private final JsFileEntry jsFileEntry;
   private final String queryString;
   private final boolean lazyLoad;
-  private final AttachmentURLCommand attUrlCmdMock;
 
   private ExtJsFileParameter(Builder buildParams) {
     action = buildParams.action;
     queryString = buildParams.queryString;
     lazyLoad = buildParams.lazyLoad;
-    attUrlCmdMock = buildParams.attUrlCmdMock;
     checkNotNull(buildParams.jsFileEntry);
     checkNotNull(Strings.emptyToNull(buildParams.jsFileEntry.getFilepath()));
     jsFileEntry = buildParams.jsFileEntry;
@@ -121,11 +110,6 @@ public final class ExtJsFileParameter {
   }
 
   @NotNull
-  public Optional<AttachmentURLCommand> getAttUrlCmdMock() {
-    return Optional.ofNullable(attUrlCmdMock);
-  }
-
-  @NotNull
   public JsLoadMode getLoadMode() {
     return jsFileEntry.getLoadMode();
   }
@@ -133,8 +117,7 @@ public final class ExtJsFileParameter {
   @Override
   public String toString() {
     return "ExtJsFileParameter [action=" + action + ", jsFileEntry=" + jsFileEntry
-        + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + ", attUrlCmdMock="
-        + attUrlCmdMock + "]";
+        + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + "]";
   }
 
 }
