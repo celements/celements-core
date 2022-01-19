@@ -4,6 +4,7 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.cells.classes.CellClass;
+import com.celements.cells.classes.PageLayoutPropertiesClass;
 
 @ComponentRole
 public interface ICellsClassConfig {
@@ -20,7 +21,15 @@ public interface ICellsClassConfig {
   String CELLCLASS_IDNAME_FIELD = CellClass.FIELD_ID_NAME.getName();
   String PAGE_DEP_CELL_CONFIG_CLASS_DOC = "PageDepCellConfigClass";
 
+  /**
+   * @deprecated since 5.4 instead use {@link PageLayoutPropertiesClass#DOC_NAME}
+   */
+  @Deprecated
   String PAGE_LAYOUT_PROPERTIES_CLASS_DOC = "PageLayoutPropertiesClass";
+  /**
+   * @deprecated since 5.4 instead use {@link PageLayoutPropertiesClass#CLASS_FN}
+   */
+  @Deprecated
   String PAGE_LAYOUT_PROPERTIES_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
       + PAGE_LAYOUT_PROPERTIES_CLASS_DOC;
   String LAYOUT_TYPE_FIELD = "layout_type";
@@ -31,6 +40,10 @@ public interface ICellsClassConfig {
   @Deprecated
   DocumentReference getCellClassRef(String wikiName);
 
+  /**
+   * @deprecated since 5.4 instead use {@link PageLayoutPropertiesClass#CLASS_REF}
+   */
+  @Deprecated
   DocumentReference getPageLayoutPropertiesClassRef(String wikiName);
 
   DocumentReference getGroupCellClassRef(String wikiName);
