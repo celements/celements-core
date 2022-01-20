@@ -82,7 +82,7 @@ public class RTEConfigClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("templateName", "RichTextEditor Template Name", 30);
     needsUpdate |= bclass.addTextField("templateUrl", "RichTextEditor Template URL", 30);
     needsUpdate |= bclass.addTextField("templateDesc", "RichTextEditor Template" + " Description",
@@ -107,7 +107,7 @@ public class RTEConfigClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextAreaField("styles", "RichTextEditor Styles", 80, 15);
     needsUpdate |= bclass.addTextField("plugins", "RichTextEditor Additional Plugins", 30);
     needsUpdate |= bclass.addTextField("row_1", "RichTextEditor Layout Row 1", 30);

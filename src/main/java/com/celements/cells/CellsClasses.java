@@ -23,6 +23,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.cells.classes.GroupCellClass;
 import com.celements.cells.classes.PageLayoutPropertiesClass;
 import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWikiException;
@@ -86,7 +87,7 @@ public class CellsClasses extends AbstractClassCollection {
     DocumentReference cellClassRef = cellsClassConfig.getCellClassRef(getContext().getDatabase());
     XWikiDocument doc = modelAccess.getOrCreateDocument(cellClassRef);
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(cellClassRef);
+    bclass.setXClassReference(cellClassRef);
     needsUpdate |= bclass.addTextField(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD, "tag name", 30);
     needsUpdate |= bclass.addTextField(ICellsClassConfig.CELLCLASS_IDNAME_FIELD, "id attribute",
         30);
@@ -151,13 +152,17 @@ public class CellsClasses extends AbstractClassCollection {
     return new DocumentReference(wikiName, "Celements", "GroupCellClass");
   }
 
-  private void getGroupCellClass() throws XWikiException {
+  /**
+   * @deprecated since 5.4 instead use {@link GroupCellClass}
+   */
+  @Deprecated
+  public void getGroupCellClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference groupCellClassRef = getGroupCellClassRef(getContext().getDatabase());
     doc = modelAccess.getOrCreateDocument(groupCellClassRef);
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(groupCellClassRef);
+    bclass.setXClassReference(groupCellClassRef);
     needsUpdate |= bclass.addTextField("render_layout", "Render Layout", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
@@ -178,7 +183,7 @@ public class CellsClasses extends AbstractClassCollection {
         getContext().getDatabase());
     doc = modelAccess.getOrCreateDocument(pageDepCellConfigClassRef);
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(pageDepCellConfigClassRef);
+    bclass.setXClassReference(pageDepCellConfigClassRef);
     needsUpdate |= bclass.addTextField("space_name", "Space Name", 30);
     needsUpdate |= bclass.addBooleanField("is_inheritable", "is inheritable", "yesno");
 
@@ -192,7 +197,7 @@ public class CellsClasses extends AbstractClassCollection {
         .getTranslationBoxCellConfigClassRef(getContext().getDatabase());
     doc = modelAccess.getOrCreateDocument(translationBoxCellConfigClassRef);
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(translationBoxCellConfigClassRef);
+    bclass.setXClassReference(translationBoxCellConfigClassRef);
     needsUpdate |= bclass.addTextField("page_exceptions", "Page Exceptions (FullNames"
         + " comma separated)", 30);
     needsUpdate |= bclass.addTextField("pagetype_exceptions", "Page Type Exceptions"
