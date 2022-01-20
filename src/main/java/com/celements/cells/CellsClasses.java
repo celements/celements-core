@@ -63,7 +63,7 @@ public class CellsClasses extends AbstractClassCollection {
   protected void initClasses() throws XWikiException {
     LOGGER.debug("entering initClasses for database: {}", getContext().getDatabase());
     // getPageLayoutPropertiesClass();
-    getGroupCellClass();
+    // getGroupCellClass();
     getPageDepCellConfigClass();
     getTranslationBoxCellConfigClass();
   }
