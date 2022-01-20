@@ -60,7 +60,7 @@ public class CellsClasses extends AbstractClassCollection {
 
   @Override
   protected void initClasses() throws XWikiException {
-    LOGGER.debug("entering initClasses for database: " + getContext().getDatabase());
+    LOGGER.debug("entering initClasses for database: {}", getContext().getDatabase());
     // getPageLayoutPropertiesClass();
     getGroupCellClass();
     getPageDepCellConfigClass();
@@ -138,8 +138,8 @@ public class CellsClasses extends AbstractClassCollection {
       bclass.setCustomMapping("internal");
     }
 
-    LOGGER.debug("getPageLayoutPropertiesClass for db '" + getContext().getDatabase()
-        + "' needs update '" + needsUpdate + "'.");
+    LOGGER.debug("getPageLayoutPropertiesClass for db '{}' needs update '{}'.",
+        getContext().getDatabase(), needsUpdate);
     setContentAndSaveClassDocument(doc, needsUpdate);
   }
 
