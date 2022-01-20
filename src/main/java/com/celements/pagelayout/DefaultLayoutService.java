@@ -348,7 +348,11 @@ public final class DefaultLayoutService implements LayoutServiceRole {
           .filter(getPageLayoutPropertiesClassRef())
           .stream().findFirst();
     } catch (DocumentNotExistsException exp) {
-      LOGGER.info("Layout property doc [{}] does not exist.", layoutPropDocRef, exp);
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("Layout property doc [{}] does not exist.", layoutPropDocRef, exp);
+      } else {
+        LOGGER.debug("Layout property doc [{}] does not exist.", layoutPropDocRef);
+      }
     }
     return Optional.empty();
   }
@@ -430,11 +434,6 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       vcontext.put("doc", oldContextDoc.newDocument(xWikiContext));
     }
     return "";
-  }
-
-  private Optional<HtmlDoctype> getHtmlDoctype(BaseObject layoutPropertyObj, String fieldName) {
-    return HtmlDoctype.getHtmlDoctype(Strings.emptyToNull(layoutPropertyObj.getStringValue(
-        fieldName))).toJavaUtil();
   }
 
   final ClassReference getPageLayoutPropertiesClassRef() {
