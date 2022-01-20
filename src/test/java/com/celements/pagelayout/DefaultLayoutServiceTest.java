@@ -551,6 +551,23 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_getLayoutPropertyObj_withLayout() throws Exception {
+    String layoutSpaceName = "MyTestLayout";
+    SpaceReference layoutSpaceRef = RefBuilder.create().wiki(context.getDatabase())
+        .space(layoutSpaceName).build(SpaceReference.class);
+    XWikiDocument layoutDoc = expectLayoutDoc(layoutSpaceRef, true, true);
+    replayDefault();
+    BaseObject layoutPropObj = layoutDoc
+        .getXObject(layoutService.getPageLayoutPropertiesClassRef().getDocRef(
+            (WikiReference) layoutSpaceRef.getParent()));
+    Optional<BaseObject> layoutPropertyObjOptional = layoutService
+        .getLayoutPropertyObj(layoutSpaceRef);
+    assertTrue(layoutPropertyObjOptional.isPresent());
+    assertEquals(layoutPropObj, layoutPropertyObjOptional.get());
+    verifyDefault();
+  }
+
+  @Test
   public void test_getLayoutPropDocRefForCurrentDoc_noLayout() throws Exception {
     DocumentReference currDocRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyPage");
@@ -924,7 +941,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     layoutDoc.setNew(!exists);
     if (exists) {
       expect(modelAccessMock.getDocument(eq(layoutDocRef))).andReturn(layoutDoc)
-          .once();
+          .atLeastOnce();
       if (withObject) {
         BaseObject layoutPropObj = new BaseObject();
         layoutPropObj.setXClassReference(layoutService.getPageLayoutPropertiesClassRef().getDocRef(

@@ -25,6 +25,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.AbstractClassCollection;
+import com.celements.javascript.JavaScriptExternalFilesClass;
 import com.celements.rteConfig.classes.RTEConfigClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -184,10 +185,19 @@ public class OldCoreClasses extends AbstractClassCollection {
   @Deprecated
   public static final String USER_CSS_CLASS = USER_CSS_CLASS_SPACE + "." + USER_CSS_CLASS_DOC;
 
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC
+   */
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC = "ExternalFiles";
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
+   */
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE = "JavaScript";
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS
+   */
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS = JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
       + "." + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC;
@@ -222,7 +232,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     getActionTypePropertiesClass();
     getFormStorageClass();
     getReceiverEMailClass();
-    getJavaScriptExternalFilesClass();
+    // getJavaScriptExternalFilesClass();
     getContextMenuItemClass();
     getPanelConfigClass();
     getRTEConfigTypeClass();
@@ -531,32 +541,6 @@ public class OldCoreClasses extends AbstractClassCollection {
     return new DocumentReference(wikiName, USER_CSS_CLASS_SPACE, USER_CSS_CLASS_DOC);
   }
 
-  private BaseClass getUserCSSClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = getUserCssClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + USER_CSS_CLASS + " class document. ", exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("cssname", "CSS Filename", 30);
-    needsUpdate |= bclass.addBooleanField("alternate", "alternate", "yesno");
-    needsUpdate |= bclass.addTextField("title", "Title", 30);
-    needsUpdate |= bclass.addBooleanField("is_rte_content", "Is RTE-Content", "yesno");
-    needsUpdate |= bclass.addStaticListField("media", "Media",
-        "all|aural|braille|embossed|handheld|print|projection|screen|tty|tv");
-
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
-  }
-
   public DocumentReference getFormActionClassRef(String wikiName) {
     return new DocumentReference(wikiName, FORM_ACTION_CLASS_SPACE, FORM_ACTION_CLASS_DOC);
   }
@@ -706,27 +690,10 @@ public class OldCoreClasses extends AbstractClassCollection {
         JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC);
   }
 
-  private BaseClass getJavaScriptExternalFilesClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = getJavaScriptExternalFilesClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS + " class document. ", exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("filepath", "filepath", 50);
-
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
-  }
-
+  /**
+   * @deprecated since 5.4, instead use {@link JavaScriptExternalFilesClass#getClassRef()}
+   */
+  @Deprecated
   public DocumentReference getRTEConfigTypeClassRef(String wikiName) {
     return new DocumentReference(wikiName, RTE_CONFIG_TYPE_CLASS_SPACE, RTE_CONFIG_TYPE_CLASS_DOC);
   }
