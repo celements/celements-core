@@ -156,3 +156,4 @@ com.celements.init.TimeZoneInit
 com.celements.pagelayout.DefaultLayoutService
 com.celements.javascript.JavaScriptExternalFilesClass
 com.celements.cells.classes.PageLayoutPropertiesClass
+com.celements.cells.classes.GroupCellClass
