@@ -44,7 +44,7 @@ import com.xpn.xwiki.web.Utils;
 public class PageLayoutPropertiesClassTest extends AbstractComponentTest {
 
   private ClassDefinition pageLayoutPropClass;
-  private CellsClasses pageLayoutPropClassConfig;
+  private CellsClasses cellsClassesColl;
   private XClassCreator xClassCreator;
   private IModelAccessFacade modelAccessMock;
 
@@ -53,7 +53,7 @@ public class PageLayoutPropertiesClassTest extends AbstractComponentTest {
     modelAccessMock = registerComponentMock(IModelAccessFacade.class);
     pageLayoutPropClass = Utils.getComponent(ClassDefinition.class,
         PageLayoutPropertiesClass.CLASS_DEF_HINT);
-    pageLayoutPropClassConfig = (CellsClasses) Utils.getComponent(IClassCollectionRole.class,
+    cellsClassesColl = (CellsClasses) Utils.getComponent(IClassCollectionRole.class,
         "celements.celCellsClasses");
     xClassCreator = Utils.getComponent(XClassCreator.class);
   }
@@ -84,7 +84,7 @@ public class PageLayoutPropertiesClassTest extends AbstractComponentTest {
     modelAccessMock.saveDocument(same(doc), anyObject(String.class));
     expectLastCall().once();
     replayDefault();
-    pageLayoutPropClassConfig.getPageLayoutPropertiesClass();
+    cellsClassesColl.getPageLayoutPropertiesClass();
     verifyDefault();
 
     assertEquals(doc.getXClass(), xClassCreator.generateXClass(pageLayoutPropClass));
