@@ -23,6 +23,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.cells.classes.PageLayoutPropertiesClass;
 import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -35,22 +36,22 @@ public class CellsClasses extends AbstractClassCollection {
   ICellsClassConfig cellsClassConfig;
 
   /**
-   * @deprecated instead use ICellsClassConfig
+   * @deprecated since 24-07-2014 instead use ICellsClassConfig
    */
   @Deprecated
   public static final String CELEMENTS_CELL_CLASS_SPACE = ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE;
   /**
-   * @deprecated instead use ICellsClassConfig
+   * @deprecated since 24-07-2014 instead use ICellsClassConfig
    */
   @Deprecated
   public static final String CELEMENTS_CELL_CLASS_NAME = ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME;
   /**
-   * @deprecated instead use ICellsClassConfig
+   * @deprecated since 24-07-2014 instead use ICellsClassConfig
    */
   @Deprecated
   public static final String CELEMENTS_CELL_CLASS = ICellsClassConfig.CELEMENTS_CELL_CLASS;
   /**
-   * @deprecated instead use ICellsClassConfig
+   * @deprecated since 24-07-2014 instead use ICellsClassConfig
    */
   @Deprecated
   public static final String CELLCLASS_IDNAME_FIELD = ICellsClassConfig.CELLCLASS_IDNAME_FIELD;
@@ -72,7 +73,7 @@ public class CellsClasses extends AbstractClassCollection {
   }
 
   /**
-   * @deprecated instead use ICellsClassConfig.getCellClassRef
+   * @deprecated since 24-07-2014 instead use ICellsClassConfig.getCellClassRef
    */
   @Deprecated
   public DocumentReference getCellClassRef(String wikiName) {
@@ -102,21 +103,25 @@ public class CellsClasses extends AbstractClassCollection {
   }
 
   /**
-   * @deprecated instead use ICellsClassConfig.getPageLayoutPropertiesClassRef
+   * @deprecated since 24-07-2014 instead use ICellsClassConfig.getPageLayoutPropertiesClassRef
    */
   @Deprecated
   public DocumentReference getPageLayoutPropertiesClassRef(String wikiName) {
     return new DocumentReference(wikiName, "Celements", "PageLayoutPropertiesClass");
   }
 
-  private BaseClass getPageLayoutPropertiesClass() throws XWikiException {
+  /**
+   * @deprecated since 5.4 instead use {@link PageLayoutPropertiesClass}
+   */
+  @Deprecated
+  public void getPageLayoutPropertiesClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference pageLayoutPropertiesClassRef = cellsClassConfig
         .getPageLayoutPropertiesClassRef(getContext().getDatabase());
     doc = modelAccess.getOrCreateDocument(pageLayoutPropertiesClassRef);
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(pageLayoutPropertiesClassRef);
+    bclass.setXClassReference(pageLayoutPropertiesClassRef);
     needsUpdate |= bclass.addTextField("prettyname", "Layout Pretty Name", 30);
     needsUpdate |= bclass.addBooleanField("isActive", "is active", "yesno");
     needsUpdate |= bclass.addTextField("authors", "Authors", 30);
@@ -136,18 +141,17 @@ public class CellsClasses extends AbstractClassCollection {
     LOGGER.debug("getPageLayoutPropertiesClass for db '" + getContext().getDatabase()
         + "' needs update '" + needsUpdate + "'.");
     setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
   }
 
   /**
-   * @deprecated instead use ICellsClassConfig.getGroupCellClassRef
+   * @deprecated since 24-07-2014 instead use ICellsClassConfig.getGroupCellClassRef
    */
   @Deprecated
   public DocumentReference getGroupCellClassRef(String wikiName) {
     return new DocumentReference(wikiName, "Celements", "GroupCellClass");
   }
 
-  BaseClass getGroupCellClass() throws XWikiException {
+  private void getGroupCellClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference groupCellClassRef = getGroupCellClassRef(getContext().getDatabase());
@@ -157,18 +161,17 @@ public class CellsClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField("render_layout", "Render Layout", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
   }
 
   /**
-   * @deprecated instead use ICellsClassConfig.getPageDepCellConfigClassRef
+   * @deprecated since 24-07-2014 instead use ICellsClassConfig.getPageDepCellConfigClassRef
    */
   @Deprecated
   public DocumentReference getPageDepCellConfigClassRef(String wikiName) {
     return new DocumentReference(wikiName, "Celements", "PageDepCellConfigClass");
   }
 
-  BaseClass getPageDepCellConfigClass() throws XWikiException {
+  private void getPageDepCellConfigClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference pageDepCellConfigClassRef = getPageDepCellConfigClassRef(
@@ -180,10 +183,9 @@ public class CellsClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addBooleanField("is_inheritable", "is inheritable", "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
   }
 
-  BaseClass getTranslationBoxCellConfigClass() throws XWikiException {
+  private void getTranslationBoxCellConfigClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference translationBoxCellConfigClassRef = cellsClassConfig
@@ -197,7 +199,6 @@ public class CellsClasses extends AbstractClassCollection {
         + " (FullNames comma separated)", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
   }
 
 }
