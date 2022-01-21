@@ -24,6 +24,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.cells.classes.GroupCellClass;
+import com.celements.cells.classes.PageDepCellConfigClass;
 import com.celements.cells.classes.PageLayoutPropertiesClass;
 import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWikiException;
@@ -64,7 +65,7 @@ public class CellsClasses extends AbstractClassCollection {
     LOGGER.debug("entering initClasses for database: {}", getContext().getDatabase());
     // getPageLayoutPropertiesClass();
     // getGroupCellClass();
-    getPageDepCellConfigClass();
+    // getPageDepCellConfigClass();
     getTranslationBoxCellConfigClass();
   }
 
@@ -176,7 +177,11 @@ public class CellsClasses extends AbstractClassCollection {
     return new DocumentReference(wikiName, "Celements", "PageDepCellConfigClass");
   }
 
-  private void getPageDepCellConfigClass() throws XWikiException {
+  /**
+   * @deprecated since 5.4 instead use {@link PageDepCellConfigClass}
+   */
+  @Deprecated
+  public void getPageDepCellConfigClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference pageDepCellConfigClassRef = getPageDepCellConfigClassRef(
