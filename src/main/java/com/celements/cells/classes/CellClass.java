@@ -34,7 +34,7 @@ import com.google.errorprone.annotations.Immutable;
 @Singleton
 @Immutable
 @Component(CellClass.CLASS_DEF_HINT)
-public class CellClass extends AbstractClassDefinition implements CelementsClassDefinition {
+public class CellClass extends AbstractClassDefinition implements CellsClassDefinition, CelementsClassDefinition {
 
   public static final String DOC_NAME = "CellClass";
   public static final String SPACE_NAME = "Celements";
