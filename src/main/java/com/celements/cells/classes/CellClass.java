@@ -33,7 +33,7 @@ import com.google.errorprone.annotations.Immutable;
 
 @Singleton
 @Immutable
-@Component(TranslationBoxCellConfigClass.CLASS_DEF_HINT)
+@Component(CellClass.CLASS_DEF_HINT)
 public class CellClass extends AbstractClassDefinition implements CelementsClassDefinition {
 
   public static final String DOC_NAME = "CellClass";
