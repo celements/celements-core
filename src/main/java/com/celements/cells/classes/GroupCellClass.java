@@ -17,7 +17,7 @@ public class GroupCellClass extends AbstractClassDefinition
     implements CellsClassDefinition {
 
   public static final String DOC_NAME = "GroupCellClass";
-  private static final String SPACE_NAME = "Celements";
+  public static final String SPACE_NAME = "Celements";
   public static final String CLASS_DEF_HINT = SPACE_NAME + "." + DOC_NAME;
   public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 

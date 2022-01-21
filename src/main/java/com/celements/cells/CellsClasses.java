@@ -26,14 +26,20 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.cells.classes.GroupCellClass;
 import com.celements.cells.classes.PageDepCellConfigClass;
 import com.celements.cells.classes.PageLayoutPropertiesClass;
+import com.celements.cells.classes.TranslationBoxCellConfigClass;
 import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+/**
+ * @deprecated since 5.4 instead use the corresponding class definitions
+ */
+@Deprecated
 @Component("celements.celCellsClasses")
 public class CellsClasses extends AbstractClassCollection {
 
+  @Deprecated
   @Requirement
   ICellsClassConfig cellsClassConfig;
 
@@ -60,15 +66,23 @@ public class CellsClasses extends AbstractClassCollection {
 
   public CellsClasses() {}
 
+  /**
+   * @deprecated since 5.4 instead use the corresponding class definitions
+   */
+  @Deprecated
   @Override
   protected void initClasses() throws XWikiException {
     LOGGER.debug("entering initClasses for database: {}", getContext().getDatabase());
     // getPageLayoutPropertiesClass();
     // getGroupCellClass();
     // getPageDepCellConfigClass();
-    getTranslationBoxCellConfigClass();
+    // getTranslationBoxCellConfigClass();
   }
 
+  /**
+   * @deprecated since 5.4 instead use the corresponding class definitions
+   */
+  @Deprecated
   @Override
   public String getConfigName() {
     return "celCellsClasses";
@@ -195,7 +209,11 @@ public class CellsClasses extends AbstractClassCollection {
     setContentAndSaveClassDocument(doc, needsUpdate);
   }
 
-  private void getTranslationBoxCellConfigClass() throws XWikiException {
+  /**
+   * @deprecated since 5.4 instead use {@link TranslationBoxCellConfigClass}
+   */
+  @Deprecated
+  public void getTranslationBoxCellConfigClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference translationBoxCellConfigClassRef = cellsClassConfig
