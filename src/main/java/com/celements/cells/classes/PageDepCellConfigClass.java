@@ -23,9 +23,16 @@ public class PageDepCellConfigClass extends AbstractClassDefinition
   public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 
   public static final ClassField<String> FIELD_SPACE_NAME = new StringField.Builder(CLASS_REF,
-      "space_name").prettyName("Space Name").size(30).build();
+      "space_name")
+          .prettyName("Space Name")
+          .size(30)
+          .build();
+
   public static final ClassField<Boolean> FIELD_IS_ACTIVE = new BooleanField.Builder(CLASS_REF,
-      "is_inheritable").displayType("yesno").prettyName("is inheritable").build();
+      "is_inheritable")
+          .displayType("yesno")
+          .prettyName("is inheritable")
+          .build();
 
   public PageDepCellConfigClass() {
     super(CLASS_REF);
