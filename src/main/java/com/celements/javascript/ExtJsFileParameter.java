@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.*;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -14,6 +15,10 @@ import com.google.errorprone.annotations.Immutable;
 @Immutable
 public final class ExtJsFileParameter {
 
+  /**
+   * ExtJsFileParameter.Builder is reusable.
+   */
+  @NotThreadSafe
   public static final class Builder {
 
     private JsFileEntry jsFileEntry = new JsFileEntry();
@@ -59,6 +64,11 @@ public final class ExtJsFileParameter {
       return this;
     }
 
+    /**
+     * Each call of {@link #build()} creates a new immutable ExtJsFileParameter instance.
+     *
+     * @return a new immutable ExtJsFileParameter
+     */
     @NotNull
     public ExtJsFileParameter build() {
       return new ExtJsFileParameter(this);
