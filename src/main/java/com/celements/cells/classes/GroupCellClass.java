@@ -22,7 +22,10 @@ public class GroupCellClass extends AbstractClassDefinition
   public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 
   public static final ClassField<String> FIELD_RENDER_LAYOUT = new StringField.Builder(CLASS_REF,
-      "render_layout").prettyName("Render Layout").size(30).build();
+      "render_layout")
+          .prettyName("Render Layout")
+          .size(30)
+          .build();
 
   public GroupCellClass() {
     super(CLASS_REF);
