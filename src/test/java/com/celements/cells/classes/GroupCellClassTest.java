@@ -86,6 +86,6 @@ public class GroupCellClassTest extends AbstractComponentTest {
     cellsClassesColl.getGroupCellClass();
     verifyDefault();
 
-    assertEquals(doc.getXClass(), xClassCreator.generateXClass(groupCellClass));
+    assertEquals(doc.getXClass(), xClassCreator.generateXClassForTests(groupCellClass));
   }
 }

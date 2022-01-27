@@ -1,7 +1,5 @@
 package com.celements.cells.classes;
 
-import java.util.List;
-
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -14,7 +12,7 @@ import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.LargeStringField;
 import com.celements.model.classes.fields.StringField;
 import com.celements.model.classes.fields.list.DisplayType;
-import com.celements.model.classes.fields.list.StaticListField;
+import com.celements.model.classes.fields.list.single.StringSingleListField;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
 
@@ -63,23 +61,19 @@ public class PageLayoutPropertiesClass extends AbstractClassDefinition
           .size(30)
           .build();
 
-  public static final ClassField<List<String>> FIELD_LAYOUT_DOCTYPE = new StaticListField.Builder(
+  public static final ClassField<String> FIELD_LAYOUT_DOCTYPE = new StringSingleListField.Builder(
       CLASS_REF, "doctype")
           .size(1)
-          .multiSelect(false)
           .displayType(DisplayType.select)
-          .separator(" ,|")
           .values(ImmutableList.of(HtmlDoctype.XHTML.toString(), HtmlDoctype.HTML5.toString()))
           .prettyName("Doctype")
           /* .relationalStorage(true) */
           .build();
 
-  public static final ClassField<List<String>> FIELD_LAYOUT_TYPE = new StaticListField.Builder(
+  public static final ClassField<String> FIELD_LAYOUT_TYPE = new StringSingleListField.Builder(
       CLASS_REF, "layout_type")
           .size(1)
-          .multiSelect(false)
           .displayType(DisplayType.select)
-          .separator(" ,|")
           .values(ImmutableList.of(PAGE_LAYOUT_VALUE, EDITOR_LAYOUT_VALUE))
           .prettyName("Layout Type")
           /* .relationalStorage(true) */

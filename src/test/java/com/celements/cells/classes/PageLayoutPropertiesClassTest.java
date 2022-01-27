@@ -87,6 +87,6 @@ public class PageLayoutPropertiesClassTest extends AbstractComponentTest {
     cellsClassesColl.getPageLayoutPropertiesClass();
     verifyDefault();
 
-    assertEquals(doc.getXClass(), xClassCreator.generateXClass(pageLayoutPropClass));
+    assertEquals(doc.getXClass(), xClassCreator.generateXClassForTests(pageLayoutPropClass));
   }
 }
