@@ -68,6 +68,11 @@ public class JSScriptService implements ScriptService {
     return "<!-- addExtJSfileOnce(String, String, String) called with null or empty jsFile -->";
   }
 
+  /**
+   * ExtJsFileParameter.Builder is reusable
+   *
+   * @return a new reusable ExtJsFileParameter.Builder
+   */
   public ExtJsFileParameter.Builder createExtJSParam() {
     return new ExtJsFileParameter.Builder();
   }
