@@ -260,7 +260,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("redirect", "Redirect", 30);
     needsUpdate |= bclass.addTextField("querystr", "Query String", 30);
     needsUpdate |= addBooleanField(bclass, "show_included", "Show Included", "yesno", 0);
@@ -291,7 +291,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextAreaField("cmi_link", "CMItem Link (velocity code)", 80, 20);
     needsUpdate |= bclass.addTextField("cmi_text", "CMItem Link Name", 30);
     needsUpdate |= bclass.addTextField("cmi_icon", "optional CMItem icon", 30);
@@ -319,7 +319,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addStaticListField("config_name", "Panel Config Type", 1, false,
         "leftPanels|rightPanels", "select");
     needsUpdate |= bclass.addBooleanField("show_panels", "Display the panel column", "yesno");
@@ -348,7 +348,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("cel_centralfilebase", "Central Filebase", 30);
     needsUpdate |= bclass.addStaticListField("celements_version", "Celements Version Mode", 1,
         false, "---|celements2|celements3", "select");
@@ -401,7 +401,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addBooleanField("force_pwd_change", "force_pwd_change", "yesno");
     needsUpdate |= bclass.addTextField("admin_language", "User Edit-Interface Language", 4);
     needsUpdate |= addBooleanField(bclass, "suspended", "Suspended", "yesno", 0);
@@ -432,7 +432,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("name", "name", 30);
     needsUpdate |= bclass.addTextField("emailFrom", "emailFrom", 30);
     needsUpdate |= bclass.addTextField("emailFields", "emailFields", 30);
@@ -460,7 +460,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("title", "title", 30);
     needsUpdate |= bclass.addTextAreaField("description", "description", 30, 15);
     needsUpdate |= bclass.addNumberField("height", "humbnail Height", 30, "integer");
@@ -500,7 +500,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("attachment", "attachment", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
@@ -525,7 +525,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("filebaseTagDocName", "filebaseTagDocName", 30);
     needsUpdate |= bclass.addTextField("preimport_link", "preimport_link", 30);
     needsUpdate |= bclass.addTextField("allowed_file_extentions", "allowed_file_extentions", 30);
@@ -559,7 +559,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("doc_fullName", "doc_fullName", 30);
     needsUpdate |= bclass.addTextAreaField("completeRuleSnippet", "is Form complete Rule", 80, 15);
 
@@ -593,7 +593,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("action_type", "Action Type", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
@@ -619,7 +619,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("action_exec", "Action Exec Template", 30);
     needsUpdate |= bclass.addTextField("action_name", "Action Pretty Name", 30);
     needsUpdate |= bclass.addTextField("action_edit", "Action Edit Template", 30);
@@ -650,7 +650,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("storageLocation", "Storage Location", 30);
     needsUpdate |= bclass.addTextField("storageClassname", "Storage Classname", 30);
     needsUpdate |= bclass.addTextAreaField("storeMapping", "Store Mapping", 80, 15);
@@ -678,7 +678,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("email", "email", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
@@ -712,7 +712,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("rteconfig", "RichTextEditor Config Document", 30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
@@ -751,7 +751,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("key", "Key", 30);
     needsUpdate |= bclass.addTextAreaField("value", "Value", 80, 15);
 
@@ -782,7 +782,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addPasswordField("tokenvalue", "Token value", 30);
     needsUpdate |= bclass.addDateField("validuntil", "Valid until");
 
@@ -813,7 +813,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addBooleanField("loadAdminMenuBar", "Load admin menu bar", "yesno");
     needsUpdate |= bclass.addBooleanField("showOverlayLanguageBar", "Show overlay language bar",
         "yesno");

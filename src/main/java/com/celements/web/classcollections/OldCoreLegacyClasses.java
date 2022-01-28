@@ -92,7 +92,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("menu_elements", "Available Menu Elements", 30);
     needsUpdate |= bclass.addTextField("skin_config_class_name", "Skin Config Class Name", 30);
 
@@ -118,7 +118,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("fieldname", "fieldname", 30);
     needsUpdate |= addBooleanField(bclass, "isRequired", "is Required", "yesno", 0);
     needsUpdate |= addBooleanField(bclass, "ruleSnippet", "Rule velocity Snippet", "yesno", 0);
@@ -145,7 +145,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("filename", "filename", 30);
     needsUpdate |= bclass.addTextField("id", "id", 30);
 
@@ -172,7 +172,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("filename", "filename", 30);
     needsUpdate |= bclass.addNumberField("height_old", "height_old", 30, "integer");
     needsUpdate |= bclass.addNumberField("width", "width", 30, "integer");
@@ -201,7 +201,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("configname", "Config Name", 30);
     needsUpdate |= bclass.addTextField("columnconfig", "Column Config", 30);
     needsUpdate |= bclass.addStaticListField("accesslvl", "Access Level", 1, false,
@@ -230,7 +230,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("browser_doc", "Browser document full name", 30);
     needsUpdate |= bclass.addTextField("content_doc", "Content default document (optional)", 30);
 

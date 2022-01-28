@@ -19,6 +19,8 @@
  */
 package com.celements.cells.classes;
 
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.ClassReference;
 
@@ -27,11 +29,17 @@ import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.LargeStringField;
 import com.celements.model.classes.fields.StringField;
 import com.celements.web.classes.CelementsClassDefinition;
+import com.google.errorprone.annotations.Immutable;
 
-@Component("Celements.CellClass")
-public class CellClass extends AbstractClassDefinition implements CelementsClassDefinition {
+@Singleton
+@Immutable
+@Component(CellClass.CLASS_DEF_HINT)
+public class CellClass extends AbstractClassDefinition implements CellsClassDefinition, CelementsClassDefinition {
 
-  public static final ClassReference CLASS_REF = new ClassReference("Celements", "CellClass");
+  public static final String DOC_NAME = "CellClass";
+  public static final String SPACE_NAME = "Celements";
+  public static final String CLASS_DEF_HINT = SPACE_NAME + "." + DOC_NAME;
+  public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 
   public static final ClassField<String> FIELD_TAG_NAME = new StringField.Builder(CLASS_REF,
       "tagname").prettyName("tag name").build();

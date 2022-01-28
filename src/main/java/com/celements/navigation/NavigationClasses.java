@@ -134,7 +134,7 @@ public class NavigationClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField(MENU_NAME_FIELD, "Multilingual MenuName", 30);
     needsUpdate |= bclass.addTextField(MENU_NAME_LANG_FIELD, "Language", 5);
     needsUpdate |= bclass.addTextField(MENU_NAME_TOOLTIP_FIELD, "Tool Tip", 30);
@@ -172,7 +172,7 @@ public class NavigationClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField(MENU_ELEMENT_NAME_FIELD, "Menu Element Name", 30);
     needsUpdate |= bclass.addNumberField(FROM_HIERARCHY_LEVEL_FIELD, "From Hierarchy Level", 30,
         "integer");
@@ -221,7 +221,7 @@ public class NavigationClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addNumberField(INavigationClassConfig.MENU_POSITION_FIELD, "Position", 30,
         "integer");
     needsUpdate |= bclass.addTextField(INavigationClassConfig.PART_NAME_FIELD, "Menu Part Name",
@@ -257,7 +257,7 @@ public class NavigationClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addNumberField(INavigationClassConfig.MENU_POSITION_FIELD, "Position", 30,
         "integer");
     needsUpdate |= bclass.addTextField(INavigationClassConfig.PART_NAME_FIELD, "Menu Part Name",

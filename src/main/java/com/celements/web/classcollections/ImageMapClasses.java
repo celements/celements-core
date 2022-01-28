@@ -53,7 +53,7 @@ public class ImageMapClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("map_id", "Map Identifier", 30);
     needsUpdate |= bclass.addTextField("lang", "Language", 30);
     needsUpdate |= bclass.addTextAreaField("map", "Map Code", 80, 15);
@@ -82,7 +82,7 @@ public class ImageMapClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("map_id", "Map Identifier", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);

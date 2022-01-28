@@ -53,7 +53,7 @@ public class RemoteUserValidationClasses extends CelementsClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("host", "Allow from host", 30);
     needsUpdate |= bclass.addTextField("secret", "Secret for host", 30);
 
