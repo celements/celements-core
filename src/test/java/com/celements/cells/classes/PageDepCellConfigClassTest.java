@@ -87,6 +87,6 @@ public class PageDepCellConfigClassTest extends AbstractComponentTest {
     cellsClassesColl.getPageDepCellConfigClass();
     verifyDefault();
 
-    assertEquals(doc.getXClass(), xClassCreator.generateXClassForTests(pageDepCellConfigClass));
+    assertEquals(doc.getXClass(), xClassCreator.generateXClass(pageDepCellConfigClass));
   }
 }

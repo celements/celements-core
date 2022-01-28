@@ -29,6 +29,7 @@ import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.cells.CellsClasses;
+import com.celements.cells.ICellsClassConfig;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.classes.XClassCreator;
 import com.celements.common.test.AbstractComponentTest;
@@ -77,16 +78,17 @@ public class PageLayoutPropertiesClassTest extends AbstractComponentTest {
 
   @Test
   public void test_fields() throws Exception {
-    DocumentReference pageTypeClassRef = pageLayoutPropClass.getClassRef();
-
-    XWikiDocument doc = new XWikiDocument(pageTypeClassRef);
+    final DocumentReference pageTypeClassRef = pageLayoutPropClass.getClassRef();
+    final XWikiDocument doc = new XWikiDocument(pageTypeClassRef);
     expect(modelAccessMock.getOrCreateDocument(eq(pageTypeClassRef))).andReturn(doc).once();
     modelAccessMock.saveDocument(same(doc), anyObject(String.class));
     expectLastCall().once();
     replayDefault();
     cellsClassesColl.getPageLayoutPropertiesClass();
     verifyDefault();
-
-    assertEquals(doc.getXClass(), xClassCreator.generateXClassForTests(pageLayoutPropClass));
+    adjustDefaultListSeparator(doc.getXClass(), ICellsClassConfig.LAYOUT_DOCTYPE_FIELD);
+    adjustDefaultListSeparator(doc.getXClass(), ICellsClassConfig.LAYOUT_TYPE_FIELD);
+    assertEquals(doc.getXClass(), xClassCreator.generateXClass(pageLayoutPropClass));
   }
+
 }
