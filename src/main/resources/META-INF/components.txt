@@ -160,3 +160,4 @@ com.celements.cells.classes.PageLayoutPropertiesClass
 com.celements.cells.classes.GroupCellClass
 com.celements.cells.classes.PageDepCellConfigClass
 com.celements.cells.classes.TranslationBoxCellConfigClass
+com.celements.rendering.head.LegacyLayoutHtmlHeadConfigurator
