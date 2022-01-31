@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import com.celements.model.object.ObjectBean;
 import com.google.common.base.Strings;
 
@@ -82,6 +84,13 @@ public final class JsFileEntry extends ObjectBean {
   public String toString() {
     return "JsFileEntry [jsFileUrl=" + jsFileUrl + ", loadMode=" + loadMode
         + ", " + super.toString() + "]";
+  }
+
+  public String getScriptTagString() {
+    return "<script" + ((getLoadMode() != JsLoadMode.SYNC)
+        ? " " + getLoadMode().toString().toLowerCase()
+        : "") + " type=\"text/javascript\" src=\""
+        + StringEscapeUtils.escapeHtml(getFilepath()) + "\"></script>";
   }
 
 }

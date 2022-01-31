@@ -35,7 +35,6 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.javascript.ExtJsFileParameter;
 import com.celements.javascript.ExtJsFileParameter.Builder;
 import com.celements.javascript.JavaScriptExternalFilesClass;
-import com.celements.javascript.JsFileEntry;
 import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
@@ -189,36 +188,6 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         .setJsFile(file)
         .build(), attUrlCmd));
     verifyDefault();
-  }
-
-  @Test
-  public void testGetExtStringForJsFile() {
-    String url = "http://www.xyz.com?hi=yes&by=no";
-    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
-    String scriptStart = "<script type=\"text/javascript\" src=\"";
-    String scriptEnd = "\"></script>";
-    JsFileEntry jsFile = new JsFileEntry().addFilepath(url);
-    assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
-  }
-
-  @Test
-  public void testGetExtStringForJsFile_defer() {
-    String url = "http://www.xyz.com?hi=yes&by=no";
-    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
-    String scriptStart = "<script defer type=\"text/javascript\" src=\"";
-    String scriptEnd = "\"></script>";
-    JsFileEntry jsFile = new JsFileEntry().addFilepath(url).addLoadMode(JsLoadMode.DEFER);
-    assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
-  }
-
-  @Test
-  public void testGetExtStringForJsFile_async() {
-    String url = "http://www.xyz.com?hi=yes&by=no";
-    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
-    String scriptStart = "<script async type=\"text/javascript\" src=\"";
-    String scriptEnd = "\"></script>";
-    JsFileEntry jsFile = new JsFileEntry().addFilepath(url).addLoadMode(JsLoadMode.ASYNC);
-    assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
   }
 
   @Test

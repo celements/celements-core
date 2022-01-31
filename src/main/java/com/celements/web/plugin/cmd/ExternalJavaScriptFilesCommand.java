@@ -35,7 +35,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,6 @@ import com.celements.convert.bean.XObjectBeanConverter;
 import com.celements.javascript.ExtJsFileParameter;
 import com.celements.javascript.JavaScriptExternalFilesClass;
 import com.celements.javascript.JsFileEntry;
-import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
@@ -284,7 +282,7 @@ public class ExternalJavaScriptFilesCommand {
     } else {
       jsFileEntry.setFilepath(jsFileUrl);
       if (!jsFileHasBeenSeen(jsFileEntry)) {
-        jsIncludes2 = getExtStringForJsFile(jsFileEntry);
+        jsIncludes2 = jsFileEntry.getScriptTagString();
         extJSfileSet.add(jsFileEntry);
       } else {
         LOGGER.debug("generateScriptTagOnce jsFileUrl != null: skip already seen {}", jsFileEntry);
@@ -308,13 +306,6 @@ public class ExternalJavaScriptFilesCommand {
     this.displayedAll = displayedAll;
   }
 
-  String getExtStringForJsFile(JsFileEntry jsFile) {
-    return "<script" + ((jsFile.getLoadMode() != JsLoadMode.SYNC)
-        ? " " + jsFile.getLoadMode().toString().toLowerCase()
-        : "") + " type=\"text/javascript\" src=\""
-        + StringEscapeUtils.escapeHtml(jsFile.getFilepath()) + "\"></script>";
-  }
-
   public String getAllExternalJavaScriptFiles() {
     return getAllExternalJavaScriptFiles(null);
   }
@@ -330,7 +321,7 @@ public class ExternalJavaScriptFilesCommand {
 
   private StringBuilder generateJsImportString() {
     final StringBuilder jsIncludesBuilder = new StringBuilder();
-    StreamEx.of(extJSfileSet.stream().map(this::getExtStringForJsFile))
+    StreamEx.of(extJSfileSet.stream().map(JsFileEntry::getScriptTagString))
         .append(extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
         .forEach(tag -> jsIncludesBuilder.append(tag).append("\n"));
     return jsIncludesBuilder;

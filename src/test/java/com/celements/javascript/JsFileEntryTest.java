@@ -144,6 +144,36 @@ public class JsFileEntryTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_getScriptTagString() {
+    String url = "http://www.xyz.com?hi=yes&by=no";
+    jsFileEntry.addFilepath(url);
+    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
+    String scriptStart = "<script type=\"text/javascript\" src=\"";
+    String scriptEnd = "\"></script>";
+    assertEquals(scriptStart + urlEsc + scriptEnd, jsFileEntry.getScriptTagString());
+  }
+
+  @Test
+  public void test_getScriptTagString_defer() {
+    String url = "http://www.xyz.com?hi=yes&by=no";
+    jsFileEntry.addFilepath(url).addLoadMode(JsLoadMode.DEFER);
+    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
+    String scriptStart = "<script defer type=\"text/javascript\" src=\"";
+    String scriptEnd = "\"></script>";
+    assertEquals(scriptStart + urlEsc + scriptEnd, jsFileEntry.getScriptTagString());
+  }
+
+  @Test
+  public void test_getScriptTagString_async() {
+    String url = "http://www.xyz.com?hi=yes&by=no";
+    jsFileEntry.addFilepath(url).addLoadMode(JsLoadMode.ASYNC);
+    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
+    String scriptStart = "<script async type=\"text/javascript\" src=\"";
+    String scriptEnd = "\"></script>";
+    assertEquals(scriptStart + urlEsc + scriptEnd, jsFileEntry.getScriptTagString());
+  }
+
+  @Test
   public void test_JsExtFileObj_bean() {
     DocumentReference docRef = new DocumentReference("wikiName", "space", "document");
     jsFileEntry.addFilepath(":space.doc:attachment.js")
