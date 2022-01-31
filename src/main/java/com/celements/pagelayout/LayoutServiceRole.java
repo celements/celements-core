@@ -13,6 +13,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.HtmlDoctype;
+import com.celements.model.classes.fields.ClassField;
+import com.celements.rendering.head.HtmlHeadConfiguratorRole;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -97,8 +99,16 @@ public interface LayoutServiceRole {
 
   boolean canRenderLayout(@Nullable SpaceReference layoutSpaceRef);
 
+  /**
+   * @deprecated since 5.4 instead use {@link #getLayoutPropertyField(SpaceReference, ClassField)}
+   */
+  @Deprecated
   @NotNull
   Optional<BaseObject> getLayoutPropertyObj(@Nullable SpaceReference layoutSpaceRef);
+
+  @NotNull
+  <T> Optional<T> getLayoutPropertyField(@NotNull SpaceReference layoutSpaceRef,
+      @NotNull ClassField<T> classField);
 
   @NotNull
   Map<SpaceReference, String> getActivePageLayouts();
@@ -122,6 +132,9 @@ public interface LayoutServiceRole {
 
   @NotNull
   String getVersion(@Nullable SpaceReference layoutSpaceRef);
+
+  @NotNull
+  HtmlHeadConfiguratorRole getHtmlHeadConfigurator(@NotNull SpaceReference layoutSpaceRef);
 
   /**
    * Export an page layout space into XAR using Packaging plugin.

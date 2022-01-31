@@ -37,17 +37,20 @@ import com.celements.cells.HtmlDoctype;
 import com.celements.cells.ICellsClassConfig;
 import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
+import com.celements.cells.classes.PageLayoutPropertiesClass;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
+import com.celements.rendering.head.HtmlHeadConfiguratorRole;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
@@ -59,6 +62,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
+import com.xpn.xwiki.web.Utils;
 
 @Component
 @ThreadSafe
@@ -334,6 +338,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
+  @Deprecated
   public final Optional<BaseObject> getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
     return resolveValidLayoutSpace(layoutSpaceRef)
         .flatMap(this::getLayoutPropDocRef)
@@ -341,12 +346,37 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @NotNull
+  @Deprecated
   private Optional<BaseObject> getLayoutPropertyBaseObject(
       @NotNull DocumentReference layoutPropDocRef) {
     try {
       return XWikiObjectFetcher.on(modelAccess.getDocument(layoutPropDocRef))
           .filter(getPageLayoutPropertiesClassRef())
           .stream().findFirst();
+    } catch (DocumentNotExistsException exp) {
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("Layout property doc [{}] does not exist.", layoutPropDocRef, exp);
+      } else {
+        LOGGER.debug("Layout property doc [{}] does not exist.", layoutPropDocRef);
+      }
+    }
+    return Optional.empty();
+  }
+
+  @Override
+  public final <T> Optional<T> getLayoutPropertyField(SpaceReference layoutSpaceRef,
+      ClassField<T> classField) {
+    return resolveValidLayoutSpace(layoutSpaceRef)
+        .flatMap(this::getLayoutPropDocRef)
+        .flatMap(docRef -> getLayoutPropertyObjectFetcher(docRef, classField));
+  }
+
+  @NotNull
+  private <T> Optional<T> getLayoutPropertyObjectFetcher(
+      @NotNull DocumentReference layoutPropDocRef, ClassField<T> classField) {
+    try {
+      return XWikiObjectFetcher.on(modelAccess.getDocument(layoutPropDocRef))
+          .fetchField(classField).stream().findFirst();
     } catch (DocumentNotExistsException exp) {
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace("Layout property doc [{}] does not exist.", layoutPropDocRef, exp);
@@ -393,6 +423,15 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     return getLayoutPropertyObj(layoutSpaceRef)
         .map(propObj -> propObj.getStringValue("version"))
         .orElse("");
+  }
+
+  @Override
+  public @NotNull HtmlHeadConfiguratorRole getHtmlHeadConfigurator(
+      @NotNull SpaceReference layoutSpaceRef) {
+    @NotNull
+    Optional<HtmlHeadConfiguratorRole> layoutPropertyObjectFetcher = getLayoutPropertyField(
+        layoutSpaceRef, PageLayoutPropertiesClass.FIELD_HTML_HEAD_CONFIGURATOR);
+    return layoutPropertyObjectFetcher.orElse(Utils.getComponent(HtmlHeadConfiguratorRole.class));
   }
 
   @Override

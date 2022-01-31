@@ -12,7 +12,9 @@ import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.LargeStringField;
 import com.celements.model.classes.fields.StringField;
 import com.celements.model.classes.fields.list.DisplayType;
+import com.celements.model.classes.fields.list.single.ComponentSingleListField;
 import com.celements.model.classes.fields.list.single.StringSingleListField;
+import com.celements.rendering.head.HtmlHeadConfiguratorRole;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
 
@@ -77,6 +79,11 @@ public class PageLayoutPropertiesClass extends AbstractClassDefinition
           .values(ImmutableList.of(PAGE_LAYOUT_VALUE, EDITOR_LAYOUT_VALUE))
           .prettyName("Layout Type")
           /* .relationalStorage(true) */
+          .build();
+
+  public static final ClassField<HtmlHeadConfiguratorRole> FIELD_HTML_HEAD_CONFIGURATOR = new ComponentSingleListField.Builder<>(
+      CLASS_REF, "html_head_configurator", HtmlHeadConfiguratorRole.class)
+          .prettyName("HTML head Configurator")
           .build();
 
   public PageLayoutPropertiesClass() {
