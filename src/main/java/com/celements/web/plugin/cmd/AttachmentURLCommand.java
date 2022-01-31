@@ -20,16 +20,23 @@
 package com.celements.web.plugin.cmd;
 
 import java.net.MalformedURLException;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
 import com.celements.web.service.LastStartupTimeStampRole;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
@@ -39,6 +46,14 @@ public class AttachmentURLCommand {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentURLCommand.class);
 
+  public String getAttachmentURL(String link) {
+    return getAttachmentURL(link, getDefaultAction());
+  }
+
+  /**
+   * @deprecated since 5.4 instead use {@link #getAttachmentURL(String)}
+   */
+  @Deprecated
   public String getAttachmentURL(String link, XWikiContext context) {
     return getAttachmentURL(link, getDefaultAction(), context);
   }
@@ -58,16 +73,26 @@ public class AttachmentURLCommand {
         + "/");
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link #getAttachmentURL(String, String)}
+   */
+  @Deprecated
+  @Nullable
   public String getAttachmentURL(String link, String action, XWikiContext context) {
+    return getAttachmentURL(link, action);
+  }
+
+  @Nullable
+  public String getAttachmentURL(String link, String action) {
     String url = link;
     if (isAttachmentLink(link)) {
       String attName = getAttachmentName(link);
       try {
-        XWikiDocument doc = context.getWiki().getDocument(getPageFullName(link), context);
+        XWikiDocument doc = getModelAccess().getDocument(getPageDocRef(link));
         XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(doc, attName);
-        url = doc.getAttachmentURL(attName, action, context);
+        url = doc.getAttachmentURL(attName, action, getContext());
         url += "?version=" + getLastStartupTimeStamp().getLastChangedTimeStamp(att.getDate());
-      } catch (XWikiException exp) {
+      } catch (DocumentNotExistsException exp) {
         LOGGER.error("Error getting attachment URL for doc " + getPageFullName(link) + " and file "
             + attName, exp);
         url = link;
@@ -77,12 +102,13 @@ public class AttachmentURLCommand {
       }
     } else if (isOnDiskLink(link)) {
       String path = link.trim().substring(1);
-      url = context.getWiki().getSkinFile(path, true, context).replace("/skin/", "/" + action
-          + "/");
+      url = getContext().getWiki().getSkinFile(path, true, getContext()).replace("/skin/",
+          "/" + action + "/");
       url += "?version=" + getLastStartupTimeStamp().getFileModificationDate(path);
     }
-    if (url.startsWith("?")) {
-      url = context.getDoc().getURL("view", context) + url;
+    Optional<XWikiDocument> currentDoc = getModelContext().getCurrentDoc().toJavaUtil();
+    if (currentDoc.isPresent() && url.startsWith("?")) {
+      url = currentDoc.get().getURL("view", getContext()) + url;
     }
     return url;
   }
@@ -97,6 +123,10 @@ public class AttachmentURLCommand {
 
   public String getPageFullName(String link) {
     return link.split(";")[0];
+  }
+
+  public DocumentReference getPageDocRef(String link) {
+    return getModelUtils().resolveRef(getPageFullName(link), DocumentReference.class);
   }
 
   public boolean isAttachmentLink(String link) {
@@ -132,11 +162,19 @@ public class AttachmentURLCommand {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
+    return getModelContext().getXWikiContext();
   }
 
-  private Execution getExecution() {
-    return Utils.getComponent(Execution.class);
+  private @NotNull ModelContext getModelContext() {
+    return Utils.getComponent(ModelContext.class);
+  }
+
+  private @NotNull IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private @NotNull ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }
