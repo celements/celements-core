@@ -114,19 +114,19 @@ public class AttachmentURLCommand {
   }
 
   @Nullable
-  public String getAttachmentURL(@NotNull String link, @Nullable String action,
-      @Nullable String queryString) {
+  public String getAttachmentURL(@NotNull String link, @NotNull Optional<String> action,
+      @NotNull Optional<String> queryString) {
     String attUrl;
-    if (action != null) {
-      attUrl = getAttachmentURL(link, action);
+    if (action.isPresent()) {
+      attUrl = getAttachmentURL(link, action.get());
     } else {
       attUrl = getAttachmentURL(link);
     }
-    if (queryString != null) {
+    if (queryString.isPresent()) {
       if (attUrl.indexOf("?") > -1) {
-        attUrl += "&" + queryString;
+        attUrl += "&" + queryString.get();
       } else {
-        attUrl += "?" + queryString;
+        attUrl += "?" + queryString.get();
       }
     }
     return attUrl;

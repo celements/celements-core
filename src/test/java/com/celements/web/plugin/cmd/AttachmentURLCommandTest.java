@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -254,7 +255,8 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
         "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("download");
     String queryString = "asf=oiu";
     replayDefault();
-    String attachmentURL = attUrlCmd.getAttachmentURL(":celJS/bla.js", null, queryString);
+    String attachmentURL = attUrlCmd.getAttachmentURL(":celJS/bla.js", Optional.empty(),
+        Optional.of(queryString));
     String expectedURL = "/appname/download/resources/celJS/bla.js";
     assertTrue(attachmentURL,
         attachmentURL.matches(expectedURL + "\\?version=\\d{14}\\&" + queryString));
@@ -283,7 +285,8 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
         .atLeastOnce();
     String queryString = "asf=oiu";
     replayDefault();
-    String attachmentURL = attUrlCmd.getAttachmentURL("A.B;bla.txt", "testAction", queryString);
+    String attachmentURL = attUrlCmd.getAttachmentURL("A.B;bla.txt", Optional.of("testAction"),
+        Optional.of(queryString));
     assertTrue(attachmentURL,
         attachmentURL.matches(resultURL + "\\?version=\\d{14}\\&" + queryString));
     verifyDefault();
