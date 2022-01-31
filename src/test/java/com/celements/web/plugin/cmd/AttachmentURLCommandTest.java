@@ -88,8 +88,6 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     expect(mockURLFactory.createURL(eq(mySpaceName), eq(myDocName), eq("view"), (String) isNull(),
         (String) isNull(), eq(context.getDatabase()), same(context))).andReturn(viewURL);
     expect(mockURLFactory.getURL(eq(viewURL), same(context))).andReturn(viewURL.getPath());
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
     replayDefault();
     assertEquals("/mySpace/myDoc?xpage=bla&bli=blu", attUrlCmd.getAttachmentURL(
         "?xpage=bla&bli=blu"));
@@ -158,8 +156,6 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
         .doc("B").build(DocumentReference.class);
     XWikiDocument abDoc = new XWikiDocument(abDocRef);
     expect(modelAccessMock.getDocument(eq(abDocRef))).andReturn(abDoc).atLeastOnce();
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
     String attName = "bla.txt";
     AttachmentReference attRef = new RefBuilder().with(abDocRef).att(attName)
         .build(AttachmentReference.class);

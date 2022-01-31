@@ -47,7 +47,7 @@ public class AttachmentURLCommand {
   private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentURLCommand.class);
 
   public String getAttachmentURL(String link) {
-    return getAttachmentURL(link, getDefaultAction());
+    return getAttachmentURL(link, Optional.empty());
   }
 
   /**
@@ -79,18 +79,18 @@ public class AttachmentURLCommand {
   @Deprecated
   @Nullable
   public String getAttachmentURL(String link, String action, XWikiContext context) {
-    return getAttachmentURL(link, action);
+    return getAttachmentURL(link, Optional.ofNullable(action));
   }
 
   @Nullable
-  public String getAttachmentURL(String link, String action) {
+  public String getAttachmentURL(@NotNull String link, @NotNull Optional<String> action) {
     String url = link;
     if (isAttachmentLink(link)) {
       String attName = getAttachmentName(link);
       try {
         XWikiDocument doc = getModelAccess().getDocument(getPageDocRef(link));
         XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(doc, attName);
-        url = doc.getAttachmentURL(attName, action, getContext());
+        url = doc.getAttachmentURL(attName, getAction(action), getContext());
         url += "?version=" + getLastStartupTimeStamp().getLastChangedTimeStamp(att.getDate());
       } catch (DocumentNotExistsException exp) {
         LOGGER.error("Error getting attachment URL for doc " + getPageFullName(link) + " and file "
@@ -103,7 +103,7 @@ public class AttachmentURLCommand {
     } else if (isOnDiskLink(link)) {
       String path = link.trim().substring(1);
       url = getContext().getWiki().getSkinFile(path, true, getContext()).replace("/skin/",
-          "/" + action + "/");
+          "/" + getAction(action) + "/");
       url += "?version=" + getLastStartupTimeStamp().getFileModificationDate(path);
     }
     Optional<XWikiDocument> currentDoc = getModelContext().getCurrentDoc().toJavaUtil();
@@ -113,15 +113,17 @@ public class AttachmentURLCommand {
     return url;
   }
 
+  private String getAction(Optional<String> action) {
+    if (action.isPresent()) {
+      return action.get();
+    }
+    return getDefaultAction();
+  }
+
   @Nullable
   public String getAttachmentURL(@NotNull String link, @NotNull Optional<String> action,
       @NotNull Optional<String> queryString) {
-    String attUrl;
-    if (action.isPresent()) {
-      attUrl = getAttachmentURL(link, action.get());
-    } else {
-      attUrl = getAttachmentURL(link);
-    }
+    String attUrl = getAttachmentURL(link, action);
     if (queryString.isPresent()) {
       if (attUrl.indexOf("?") > -1) {
         attUrl += "&" + queryString.get();
