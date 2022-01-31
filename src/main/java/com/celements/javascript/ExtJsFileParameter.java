@@ -10,6 +10,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.celements.sajson.JsonBuilder;
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Immutable;
 
@@ -143,6 +145,27 @@ public final class ExtJsFileParameter {
   public String toString() {
     return "ExtJsFileParameter [action=" + action + ", jsFileEntry=" + jsFileEntry
         + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + "]";
+  }
+
+  @NotEmpty
+  public String getLazyLoadTag() {
+    return getLazyLoadTag(null);
+  }
+
+  @NotEmpty
+  String getLazyLoadTag(AttachmentURLCommand attUrlCmdMock) {
+    final JsonBuilder jsonBuilder = new JsonBuilder();
+    jsonBuilder.openDictionary();
+    jsonBuilder.addProperty("fullURL",
+        getAttUrlCmd(attUrlCmdMock).getAttachmentURL(getJsFile(), getAction(), getQueryString()));
+    jsonBuilder.addProperty("initLoad", true);
+    jsonBuilder.closeDictionary();
+    return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
+        + "</span>";
+  }
+
+  private @NotNull AttachmentURLCommand getAttUrlCmd(@Nullable AttachmentURLCommand attUrlCmdMock) {
+    return Optional.ofNullable(attUrlCmdMock).orElse(new AttachmentURLCommand());
   }
 
 }

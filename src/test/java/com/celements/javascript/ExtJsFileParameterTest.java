@@ -1,19 +1,31 @@
 package com.celements.javascript;
 
+import static com.celements.common.test.CelementsTestUtils.*;
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExtJsFileParameterTest {
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
+import com.xpn.xwiki.XWikiContext;
+
+public class ExtJsFileParameterTest extends AbstractComponentTest {
 
   private ExtJsFileParameter testExtJsFileParam;
+  private AttachmentURLCommand attUrlCmd = null;
+  private XWikiContext context;
 
   @Before
   public void setUp_ExtJsFileParameterTest() throws Exception {
+    context = getContext();
+    context.put("vcontext", new VelocityContext());
+    attUrlCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
     testExtJsFileParam = new ExtJsFileParameter.Builder()
         .setAction("file")
         .setLazyLoad(true)
@@ -118,4 +130,71 @@ public class ExtJsFileParameterTest {
         + " queryString=asdf=oijasdf, lazyLoad=true]", testExtJsFileParam.toString());
   }
 
+  @Test
+  public void testAddLazyExtJSfile() {
+    String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
+    String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
+    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
+    expect(attUrlCmd.getAttachmentURL(eq(jsFile), same(context))).andReturn(jsFileURL).once();
+    replayDefault();
+    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
+        new ExtJsFileParameter.Builder()
+            .setJsFile(jsFile)
+            .build().getLazyLoadTag(attUrlCmd));
+    verifyDefault();
+  }
+
+  @Test
+  public void testAddLazyExtJSfile_action() {
+    String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
+    String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
+    String action = "file";
+    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
+    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
+        jsFileURL).once();
+    replayDefault();
+    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
+        new ExtJsFileParameter.Builder()
+            .setJsFile(jsFile)
+            .setAction(action)
+            .build().getLazyLoadTag(attUrlCmd));
+    verifyDefault();
+  }
+
+  @Test
+  public void testAddLazyExtJSfile_action_params() {
+    String jsFile = "mySpace.myDoc;loadTinyMCE-async.js";
+    String jsFileURL = "/download/mySpace/myDoc/loadTinyMCE-async.js";
+    String action = "file";
+    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "?me=blu\", \"initLoad\" : true}";
+    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
+        jsFileURL).once();
+    replayDefault();
+    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
+        new ExtJsFileParameter.Builder()
+            .setJsFile(jsFile)
+            .setAction(action)
+            .setQueryString("me=blu")
+            .build().getLazyLoadTag(attUrlCmd));
+    verifyDefault();
+  }
+
+  @Test
+  public void testAddLazyExtJSfile_action_params_onDisk() {
+    String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
+    String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js"
+        + "?version=201507061937";
+    String action = "file";
+    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "&me=blu\", \"initLoad\" : true}";
+    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
+        jsFileURL).once();
+    replayDefault();
+    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
+        new ExtJsFileParameter.Builder()
+            .setJsFile(jsFile)
+            .setAction(action)
+            .setQueryString("me=blu")
+            .build().getLazyLoadTag(attUrlCmd));
+    verifyDefault();
+  }
 }
