@@ -244,4 +244,49 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void test_getAttachmentURL_onDisk_queryString() {
+    String resultURL = "/appname/skin/resources/celJS/bla.js";
+    expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
+    expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
+        new Date());
+    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
+        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("download");
+    String queryString = "asf=oiu";
+    replayDefault();
+    String attachmentURL = attUrlCmd.getAttachmentURL(":celJS/bla.js", null, queryString);
+    String expectedURL = "/appname/download/resources/celJS/bla.js";
+    assertTrue(attachmentURL,
+        attachmentURL.matches(expectedURL + "\\?version=\\d{14}\\&" + queryString));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAttachmentURL_partInternalLink_queryString() throws Exception {
+    String resultURL = "http://mydomain.ch/testAction/A/B/bla.txt";
+    URL tstURL = new URL(resultURL);
+    expect(mockURLFactory.createAttachmentURL(eq("bla.txt"), eq("A"), eq("B"), eq("testAction"),
+        (String) eq(null), eq(context.getDatabase()), same(context))).andReturn(tstURL);
+    expect(mockURLFactory.getURL(eq(tstURL), same(context))).andReturn(resultURL);
+    DocumentReference abDocRef = new RefBuilder().wiki(getContext().getDatabase()).space("A")
+        .doc("B").build(DocumentReference.class);
+    XWikiDocument abDoc = new XWikiDocument(abDocRef);
+    List<XWikiAttachment> attachList = new ArrayList<>();
+    XWikiAttachment blaAtt = new XWikiAttachment();
+    String attName = "bla.txt";
+    blaAtt.setFilename(attName);
+    blaAtt.setDoc(abDoc);
+    attachList.add(blaAtt);
+    abDoc.setAttachmentList(attachList);
+    expect(modelAccessMock.getDocument(eq(abDocRef))).andReturn(abDoc).atLeastOnce();
+    expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName))).andReturn(blaAtt)
+        .atLeastOnce();
+    String queryString = "asf=oiu";
+    replayDefault();
+    String attachmentURL = attUrlCmd.getAttachmentURL("A.B;bla.txt", "testAction", queryString);
+    assertTrue(attachmentURL,
+        attachmentURL.matches(resultURL + "\\?version=\\d{14}\\&" + queryString));
+    verifyDefault();
+  }
+
 }

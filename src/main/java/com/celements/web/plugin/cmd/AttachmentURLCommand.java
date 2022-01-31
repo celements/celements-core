@@ -113,6 +113,25 @@ public class AttachmentURLCommand {
     return url;
   }
 
+  @Nullable
+  public String getAttachmentURL(@NotNull String link, @Nullable String action,
+      @Nullable String queryString) {
+    String attUrl;
+    if (action != null) {
+      attUrl = getAttachmentURL(link, action);
+    } else {
+      attUrl = getAttachmentURL(link);
+    }
+    if (queryString != null) {
+      if (attUrl.indexOf("?") > -1) {
+        attUrl += "&" + queryString;
+      } else {
+        attUrl += "?" + queryString;
+      }
+    }
+    return attUrl;
+  }
+
   private LastStartupTimeStampRole getLastStartupTimeStamp() {
     return Utils.getComponent(LastStartupTimeStampRole.class);
   }
