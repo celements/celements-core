@@ -2,6 +2,7 @@ package com.celements.javascript;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -123,6 +124,19 @@ public final class ExtJsFileParameter {
 
   public boolean isLazyLoad() {
     return lazyLoad;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(jsFileEntry, queryString, lazyLoad);
+  }
+
+  @Override
+  public boolean equals(@Nullable Object obj) {
+    return (obj instanceof ExtJsFileParameter)
+        && Objects.equals(((ExtJsFileParameter) obj).jsFileEntry, this.jsFileEntry)
+        && Objects.equals(((ExtJsFileParameter) obj).queryString, this.queryString)
+        && Objects.equals(((ExtJsFileParameter) obj).lazyLoad, this.lazyLoad);
   }
 
   @Override
