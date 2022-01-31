@@ -69,7 +69,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   @Test
   public void testAddExtJSfileOnce_beforeGetAll() {
     String file = ":celJS/prototype.js";
-    expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).once();
+    expect(attUrlCmd.getAttachmentURL(eq(file), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(file).once();
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(true).atLeastOnce();
     replayDefault();
@@ -82,7 +83,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   @Test
   public void testAddExtJSfileOnce_beforeGetAll_fileNotFound() {
     String fileNotFound = "Content.WebHome;blabla.js";
-    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).once();
+    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(null).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(true).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).anyTimes();
     replayDefault();
@@ -95,7 +97,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   @Test
   public void testAddExtJSfileOnce_afterGetAll() throws XWikiException {
     String file = "/skin/resources/celJS/prototype.js";
-    expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
+    expect(attUrlCmd.getAttachmentURL(eq(file), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(file).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).atLeastOnce();
     replayDefault();
@@ -112,8 +115,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   @Test
   public void testAddExtJSfileOnce_afterGetAll_action() throws XWikiException {
     String file = "/file/resources/celJS/prototype.js";
-    expect(attUrlCmd.getAttachmentURL(eq(file), eq("file"), same(context))).andReturn(
-        file).atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(eq(file), eq(Optional.of("file")), eq(Optional.empty())))
+        .andReturn(file).atLeastOnce();
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).atLeastOnce();
     replayDefault();
@@ -131,17 +134,19 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   @Test
   public void testAddExtJSfileOnce_afterGetAll_action_params() throws XWikiException {
     String file = "/file/resources/celJS/prototype.js";
-    expect(attUrlCmd.getAttachmentURL(eq(file), eq("file"), same(context))).andReturn(
-        file).atLeastOnce();
+    String params = "me=blu";
+    String expectedFilePath = file + "?" + params;
+    expect(attUrlCmd.getAttachmentURL(eq(file), eq(Optional.of("file")), eq(Optional.of(params))))
+        .andReturn(expectedFilePath).atLeastOnce();
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).atLeastOnce();
     replayDefault();
     command.injectDisplayAll(true);
-    assertEquals("<script type=\"text/javascript\" src=\"" + file + "?me=blu\"></script>",
+    assertEquals("<script type=\"text/javascript\" src=\"" + expectedFilePath + "\"></script>",
         command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
             .setJsFile(file)
             .setAction("file")
-            .setQueryString("me=blu")
+            .setQueryString(params)
             .build(), attUrlCmd));
     assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
         .setJsFile(file)
@@ -155,8 +160,10 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   public void testAddExtJSfileOnce_afterGetAll_action_params_onDisk() throws XWikiException {
     String file = ":celJS/prototype.js";
     String fileURL = "/file/resources/celJS/prototype.js?version=201507061937";
-    expect(attUrlCmd.getAttachmentURL(eq(file), eq("file"), same(context))).andReturn(
-        fileURL).atLeastOnce();
+    String params = "me=blu";
+    String expectedFileURL = fileURL + "&" + params;
+    expect(attUrlCmd.getAttachmentURL(eq(file), eq(Optional.of("file")), eq(Optional.of(params))))
+        .andReturn(expectedFileURL).atLeastOnce();
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(true).atLeastOnce();
     replayDefault();
@@ -166,8 +173,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         .setAction("file")
         .setQueryString("me=blu")
         .build();
-    assertEquals("<script type=\"text/javascript\" src=\"" + fileURL + "&amp;me=blu\"></script>",
-        command.addExtJSfileOnce(extJsFileParam, attUrlCmd));
+    assertEquals("<script type=\"text/javascript\" src=\"" + fileURL + "&amp;" + params
+        + "\"></script>", command.addExtJSfileOnce(extJsFileParam, attUrlCmd));
     assertEquals("", command.addExtJSfileOnce(extJsFileParam, attUrlCmd));
     verifyDefault();
   }
@@ -175,7 +182,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   @Test
   public void testAddExtJSfileOnce_afterGetAll_versioning() throws XWikiException {
     String file = "celJS/prototype.js?version=20110401182200";
-    expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
+    expect(attUrlCmd.getAttachmentURL(eq(file), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(file).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).atLeastOnce();
     replayDefault();
@@ -193,7 +201,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   @Test
   public void testAddExtJSfileOnce_afterGetAll_fileNotFound_url() throws XWikiException {
     String fileNotFound = "/download/Content/WebHome/blabla.js";
-    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).times(2);
+    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(null).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).atLeastOnce();
     replayDefault();
@@ -211,7 +220,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   @Test
   public void testAddExtJSfileOnce_afterGetAll_fileNotFound_attUrl() throws XWikiException {
     String fileNotFound = "Content.WebHome;blabla.js";
-    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).once();
+    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(null).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(true).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).anyTimes();
     replayDefault();
@@ -248,8 +258,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     String filePath = "/skin/resources/celJS/prototype.js?version=20220401120000";
     expect(attUrlCmd.isAttachmentLink(eq(filePath))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(filePath))).andReturn(false).atLeastOnce();
-    expect(attUrlCmd.getAttachmentURL(eq(filePath), same(context))).andReturn(filePath)
-        .atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(eq(filePath), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(filePath).atLeastOnce();
     extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(), filePath);
     contextDoc.addXObject(extJsFileObj);
     expect(modelAccessMock.getDocument(eq(contextDocRef))).andReturn(contextDoc).atLeastOnce();
@@ -273,8 +283,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     String filePath = "/skin/resources/celJS/prototype.js?version=20220401120000";
     expect(attUrlCmd.isAttachmentLink(eq(filePath))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(filePath))).andReturn(false).atLeastOnce();
-    expect(attUrlCmd.getAttachmentURL(eq(filePath), same(context))).andReturn(filePath)
-        .atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(eq(filePath), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(filePath).atLeastOnce();
     JsLoadMode loadMode = JsLoadMode.DEFER;
     extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(), filePath);
     extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_LOAD_MODE.getName(),
@@ -302,8 +312,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     String filePath = "/skin/resources/celJS/prototype.js?version=20220401120000";
     expect(attUrlCmd.isAttachmentLink(eq(filePath))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(filePath))).andReturn(false).atLeastOnce();
-    expect(attUrlCmd.getAttachmentURL(eq(filePath), same(context))).andReturn(filePath)
-        .atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(eq(filePath), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(filePath).atLeastOnce();
     JsLoadMode loadMode = JsLoadMode.ASYNC;
     extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(), filePath);
     extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_LOAD_MODE.getName(),
@@ -339,11 +349,13 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     String fileNotFound = "celJS/blabla.js";
-    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).once();
+    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(null).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(true).atLeastOnce();
     String file = "/skin/resources/celJS/prototype.js?version=20110401120000";
-    expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
+    expect(attUrlCmd.getAttachmentURL(eq(file), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(file).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).atLeastOnce();
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
@@ -394,17 +406,20 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     String fileNotFound = ":celJS/blabla.js";
-    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).once();
+    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(null).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(true).atLeastOnce();
     String attFileURL = ":celJS/prototype.js";
     String file = "/skin/celJS/prototype.js?version=20110401120000";
-    expect(attUrlCmd.getAttachmentURL(eq(attFileURL), same(context))).andReturn(file).anyTimes();
+    expect(attUrlCmd.getAttachmentURL(eq(attFileURL), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(file).anyTimes();
     expect(attUrlCmd.isAttachmentLink(eq(attFileURL))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(attFileURL))).andReturn(true).atLeastOnce();
     String file2 = "/file/celJS/prototype.js?version=20110401120000";
-    expect(attUrlCmd.getAttachmentURL(eq(attFileURL), eq("file"), same(context))).andReturn(
-        file2).atLeastOnce();
+    expect(attUrlCmd
+        .getAttachmentURL(eq(attFileURL), eq(Optional.of("file")), eq(Optional.empty())))
+            .andReturn(file2).atLeastOnce();
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
@@ -450,74 +465,6 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     assertEquals("<script type=\"text/javascript\""
         + " src=\"/file/celJS/prototype.js?version=20110401120000\"></script>\n"
         + "<!-- WARNING: js-file not found: " + fileNotFound + "-->\n", allStr);
-    verifyDefault();
-  }
-
-  @Test
-  public void testAddLazyExtJSfile() {
-    String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
-    String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
-    expect(attUrlCmd.getAttachmentURL(eq(jsFile), same(context))).andReturn(jsFileURL).once();
-    replayDefault();
-    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
-        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
-            .setJsFile(jsFile)
-            .build(), attUrlCmd));
-    verifyDefault();
-  }
-
-  @Test
-  public void testAddLazyExtJSfile_action() {
-    String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
-    String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
-    String action = "file";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
-    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
-        jsFileURL).once();
-    replayDefault();
-    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
-        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
-            .setJsFile(jsFile)
-            .setAction(action)
-            .build(), attUrlCmd));
-    verifyDefault();
-  }
-
-  @Test
-  public void testAddLazyExtJSfile_action_params() {
-    String jsFile = "mySpace.myDoc;loadTinyMCE-async.js";
-    String jsFileURL = "/download/mySpace/myDoc/loadTinyMCE-async.js";
-    String action = "file";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "?me=blu\", \"initLoad\" : true}";
-    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
-        jsFileURL).once();
-    replayDefault();
-    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
-        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
-            .setJsFile(jsFile)
-            .setAction(action)
-            .setQueryString("me=blu")
-            .build(), attUrlCmd));
-    verifyDefault();
-  }
-
-  @Test
-  public void testAddLazyExtJSfile_action_params_onDisk() {
-    String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
-    String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js"
-        + "?version=201507061937";
-    String action = "file";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "&me=blu\", \"initLoad\" : true}";
-    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
-        jsFileURL).once();
-    replayDefault();
-    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
-        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
-            .setJsFile(jsFile)
-            .setAction(action)
-            .setQueryString("me=blu")
-            .build(), attUrlCmd));
     verifyDefault();
   }
 

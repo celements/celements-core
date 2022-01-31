@@ -56,7 +56,6 @@ import com.celements.model.reference.RefBuilder;
 import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
-import com.celements.sajson.JsonBuilder;
 import com.celements.web.classes.CelementsClassDefinition;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Suppliers;
@@ -203,45 +202,13 @@ public class ExternalJavaScriptFilesCommand {
     }
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link ExtJsFileParameter#getLazyLoadTag()}
+   */
+  @Deprecated
   @NotEmpty
   public String getLazyLoadTag(@NotNull ExtJsFileParameter extJsFileParams) {
-    return getLazyLoadTag(extJsFileParams, null);
-  }
-
-  @NotEmpty
-  String getLazyLoadTag(@NotNull ExtJsFileParameter extJsFileParams,
-      @Nullable AttachmentURLCommand attUrlCmdMock) {
-    final JsonBuilder jsonBuilder = new JsonBuilder();
-    jsonBuilder.openDictionary();
-    jsonBuilder.addProperty("fullURL", generateUrl(extJsFileParams, attUrlCmdMock));
-    jsonBuilder.addProperty("initLoad", true);
-    jsonBuilder.closeDictionary();
-    return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
-        + "</span>";
-  }
-
-  @NotEmpty
-  private String generateUrl(@NotNull ExtJsFileParameter extJsFileParams,
-      @Nullable AttachmentURLCommand attUrlCmdMock) {
-    String attUrl;
-    final AttachmentURLCommand attUrlCmd = getAttUrlCmd(attUrlCmdMock);
-    final Optional<String> action = extJsFileParams.getAction();
-    if (action.isPresent()) {
-      attUrl = attUrlCmd.getAttachmentURL(extJsFileParams.getJsFile(), action.get(),
-          getModelContext().getXWikiContext());
-    } else {
-      attUrl = attUrlCmd.getAttachmentURL(extJsFileParams.getJsFile(),
-          getModelContext().getXWikiContext());
-    }
-    final Optional<String> params = extJsFileParams.getQueryString();
-    if (params.isPresent()) {
-      if (attUrl.indexOf("?") > -1) {
-        attUrl += "&" + params.get();
-      } else {
-        attUrl += "?" + params.get();
-      }
-    }
-    return attUrl;
+    return extJsFileParams.getLazyLoadTag();
   }
 
   @NotNull
@@ -258,7 +225,7 @@ public class ExternalJavaScriptFilesCommand {
           || attUrlCmd.isOnDiskLink(extJsFileParams.getJsFile())) {
         extJSAttUrlSet.add(extJsFileParams.getJsFile());
       }
-      return generateScriptTagOnce(extJsFileParams, generateUrl(extJsFileParams, attUrlCmd));
+      return generateScriptTagOnce(extJsFileParams, attUrlCmdMock);
     } else {
       LOGGER.debug("addExtJSfileOnce: skip already added {}", extJsFileParams.getJsFile());
     }
@@ -267,7 +234,9 @@ public class ExternalJavaScriptFilesCommand {
 
   @NotNull
   private String generateScriptTagOnce(@NotNull ExtJsFileParameter extJsFileParams,
-      @NotEmpty String jsFileUrl) {
+      @Nullable AttachmentURLCommand attUrlCmdMock) {
+    String jsFileUrl = getAttUrlCmd(attUrlCmdMock).getAttachmentURL(extJsFileParams.getJsFile(),
+        extJsFileParams.getAction(), extJsFileParams.getQueryString());
     LOGGER.info("generateScriptTagOnce: extJsFileParams [{}] jsFileUrl [{}]", extJsFileParams,
         jsFileUrl);
     String jsIncludes2 = "";
@@ -402,8 +371,7 @@ public class ExternalJavaScriptFilesCommand {
     }
   }
 
-  @NotNull
-  AttachmentURLCommand getAttUrlCmd(@Nullable AttachmentURLCommand attUrlCmdMock) {
+  private @NotNull AttachmentURLCommand getAttUrlCmd(@Nullable AttachmentURLCommand attUrlCmdMock) {
     return Optional.ofNullable(attUrlCmdMock).orElse(new AttachmentURLCommand());
   }
 
@@ -419,7 +387,7 @@ public class ExternalJavaScriptFilesCommand {
     return Utils.getComponent(IModelAccessFacade.class);
   }
 
-  private ModelContext getModelContext() {
+  private @NotNull ModelContext getModelContext() {
     return Utils.getComponent(ModelContext.class);
   }
 
