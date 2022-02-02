@@ -23,7 +23,6 @@ import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,13 +38,14 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.reference.RefBuilder;
+import com.celements.ressource_url.UrlRessourceNotExistException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
+@Deprecated
 public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
@@ -65,19 +65,19 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getAttachmentURL_fullURL() {
+  public void test_getAttachmentURL_fullURL() throws Exception {
     assertEquals("http://www.bla.com/bla.txt", attUrlCmd.getAttachmentURL(
-        "http://www.bla.com/bla.txt"));
+        "http://www.bla.com/bla.txt", context));
   }
 
   @Test
-  public void test_getAttachmentURL_partURL() {
+  public void test_getAttachmentURL_partURL() throws Exception {
     assertEquals("/xwiki/bin/download/A/B/bla.txt", attUrlCmd.getAttachmentURL(
-        "/xwiki/bin/download/A/B/bla.txt"));
+        "/xwiki/bin/download/A/B/bla.txt", Optional.empty()));
   }
 
   @Test
-  public void test_getAttachmentURL_dynamicParamURL() throws MalformedURLException {
+  public void test_getAttachmentURL_dynamicParamURL() throws Exception {
     String mySpaceName = "mySpace";
     String myDocName = "myDoc";
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), mySpaceName,
@@ -88,9 +88,11 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     expect(mockURLFactory.createURL(eq(mySpaceName), eq(myDocName), eq("view"), (String) isNull(),
         (String) isNull(), eq(context.getDatabase()), same(context))).andReturn(viewURL);
     expect(mockURLFactory.getURL(eq(viewURL), same(context))).andReturn(viewURL.getPath());
+    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
+        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
     replayDefault();
     assertEquals("/mySpace/myDoc?xpage=bla&bli=blu", attUrlCmd.getAttachmentURL(
-        "?xpage=bla&bli=blu"));
+        "?xpage=bla&bli=blu", context));
     verifyDefault();
   }
 
@@ -117,7 +119,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName))).andReturn(blaAtt)
         .atLeastOnce();
     replayDefault();
-    String attachmentURL = attUrlCmd.getAttachmentURL("celements2web:A.B;bla.txt");
+    String attachmentURL = attUrlCmd.getAttachmentURL("celements2web:A.B;bla.txt", context);
     assertTrue(attachmentURL, attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
     verifyDefault();
   }
@@ -145,7 +147,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName))).andReturn(blaAtt)
         .atLeastOnce();
     replayDefault();
-    String attachmentURL = attUrlCmd.getAttachmentURL("A.B;bla.txt");
+    String attachmentURL = attUrlCmd.getAttachmentURL("A.B;bla.txt", context);
     assertTrue(attachmentURL, attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
     verifyDefault();
   }
@@ -162,12 +164,13 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName)))
         .andThrow(new AttachmentNotExistsException(attRef)).atLeastOnce();
     replayDefault();
-    assertNull(attUrlCmd.getAttachmentURL("A.B;bla.txt"));
+    assertThrows(UrlRessourceNotExistException.class,
+        () -> attUrlCmd.getAttachmentURL("A.B;bla.txt", Optional.empty()));
     verifyDefault();
   }
 
   @Test
-  public void test_getAttachmentURL_onDiskLink() throws XWikiException, MalformedURLException {
+  public void test_getAttachmentURL_onDiskLink() throws Exception {
     String resultURL = "/appname/skin/resources/celJS/bla.js";
     expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
@@ -175,7 +178,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
         "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("download");
     replayDefault();
-    String attachmentURL = attUrlCmd.getAttachmentURL("  :celJS/bla.js");
+    String attachmentURL = attUrlCmd.getAttachmentURL("  :celJS/bla.js", context);
     String expectedURL = "/appname/download/resources/celJS/bla.js";
     assertTrue(attachmentURL, attachmentURL.matches(expectedURL + "\\?version=\\d{14}"));
     verifyDefault();
@@ -212,8 +215,8 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getAttachmentURL_Rubish() {
-    assertEquals("http://A.B;bla.txt", attUrlCmd.getAttachmentURL("http://A.B;bla.txt"));
+  public void test_getAttachmentURL_Rubish() throws Exception {
+    assertEquals("http://A.B;bla.txt", attUrlCmd.getAttachmentURL("http://A.B;bla.txt", context));
   }
 
   @Test
@@ -242,7 +245,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getAttachmentURL_onDisk_queryString() {
+  public void test_getAttachmentURL_onDisk_queryString() throws Exception {
     String resultURL = "/appname/skin/resources/celJS/bla.js";
     expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
