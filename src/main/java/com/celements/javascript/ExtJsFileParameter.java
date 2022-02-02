@@ -10,10 +10,16 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.celements.ressource_url.RessourceUrlServiceRole;
+import com.celements.ressource_url.UrlRessourceNotExistException;
 import com.celements.sajson.JsonBuilder;
-import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Immutable;
+import com.xpn.xwiki.web.Utils;
 
 @Immutable
 public final class ExtJsFileParameter {
@@ -85,8 +91,11 @@ public final class ExtJsFileParameter {
 
   }
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ExtJsFileParameter.class);
+
   private final String action;
-  private final JsFileEntry jsFileEntry;
+  private final String jsFileUrl;
+  private final JsLoadMode loadMode;
   private final String queryString;
   private final boolean lazyLoad;
 
@@ -95,23 +104,19 @@ public final class ExtJsFileParameter {
     queryString = Strings.emptyToNull(buildParams.queryString);
     lazyLoad = buildParams.lazyLoad;
     checkNotNull(buildParams.jsFileEntry);
-    jsFileEntry = new JsFileEntry(buildParams.jsFileEntry);
-    checkNotNull(Strings.emptyToNull(jsFileEntry.getFilepath()));
-  }
-
-  @NotNull
-  public JsFileEntry getJsFileEntry() {
-    return new JsFileEntry(jsFileEntry);
+    jsFileUrl = Strings.emptyToNull(buildParams.jsFileEntry.getFilepath());
+    checkNotNull(jsFileUrl);
+    loadMode = buildParams.jsFileEntry.getLoadMode();
   }
 
   @NotNull
   public String getJsFile() {
-    return jsFileEntry.getFilepath();
+    return jsFileUrl;
   }
 
   @NotNull
   public JsLoadMode getLoadMode() {
-    return jsFileEntry.getLoadMode();
+    return loadMode;
   }
 
   @NotNull
@@ -130,42 +135,71 @@ public final class ExtJsFileParameter {
 
   @Override
   public int hashCode() {
-    return Objects.hash(jsFileEntry, queryString, lazyLoad);
+    return Objects.hash(jsFileUrl, loadMode, queryString, lazyLoad);
   }
 
   @Override
   public boolean equals(@Nullable Object obj) {
     return (obj instanceof ExtJsFileParameter)
-        && Objects.equals(((ExtJsFileParameter) obj).jsFileEntry, this.jsFileEntry)
+        && Objects.equals(((ExtJsFileParameter) obj).jsFileUrl, this.jsFileUrl)
+        && Objects.equals(((ExtJsFileParameter) obj).loadMode, this.loadMode)
         && Objects.equals(((ExtJsFileParameter) obj).queryString, this.queryString)
         && Objects.equals(((ExtJsFileParameter) obj).lazyLoad, this.lazyLoad);
   }
 
   @Override
   public String toString() {
-    return "ExtJsFileParameter [action=" + action + ", jsFileEntry=" + jsFileEntry
-        + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + "]";
+    return "ExtJsFileParameter [action=" + action + ", jsFileUrl=" + jsFileUrl + ", loadMode="
+        + loadMode + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + "]";
   }
 
   @NotEmpty
   public String getLazyLoadTag() {
-    return getLazyLoadTag(null);
-  }
-
-  @NotEmpty
-  String getLazyLoadTag(AttachmentURLCommand attUrlCmdMock) {
     final JsonBuilder jsonBuilder = new JsonBuilder();
     jsonBuilder.openDictionary();
-    jsonBuilder.addProperty("fullURL",
-        getAttUrlCmd(attUrlCmdMock).getAttachmentURL(getJsFile(), getAction(), getQueryString()));
+    try {
+      jsonBuilder.addProperty("fullURL",
+          getAttUrlSrv().createRessourceUrl(getJsFile(), getAction(), getQueryString()));
+    } catch (UrlRessourceNotExistException exp) {
+      LOGGER.info("URL ressource '{}' does not exist.", getJsFile(), exp);
+      jsonBuilder.addProperty("errorMsg", buildNotFoundWarning());
+    }
     jsonBuilder.addProperty("initLoad", true);
     jsonBuilder.closeDictionary();
     return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
         + "</span>";
   }
 
-  private @NotNull AttachmentURLCommand getAttUrlCmd(@Nullable AttachmentURLCommand attUrlCmdMock) {
-    return Optional.ofNullable(attUrlCmdMock).orElse(new AttachmentURLCommand());
+  public String getScriptTag() {
+    try {
+      return getScriptTagString();
+    } catch (UrlRessourceNotExistException exp) {
+      LOGGER.info("URL ressource '{}' does not exist.", getJsFile(), exp);
+      return buildNotFoundWarningComment();
+    }
+  }
+
+  public String getScriptTagString()
+      throws UrlRessourceNotExistException {
+    final String fileUrl = getAttUrlSrv().createRessourceUrl(getJsFile(), getAction(),
+        getQueryString());
+    LOGGER.info("getScriptTagString: extJsFileParams [{}] jsFileUrl [{}]", this, fileUrl);
+    return "<script" + ((getLoadMode() != JsLoadMode.SYNC)
+        ? " " + getLoadMode().toString().toLowerCase()
+        : "") + " type=\"text/javascript\" src=\"" + StringEscapeUtils.escapeHtml(fileUrl)
+        + "\"></script>";
+  }
+
+  public String buildNotFoundWarningComment() {
+    return "<!-- " + buildNotFoundWarning() + " -->";
+  }
+
+  private String buildNotFoundWarning() {
+    return "WARNING: js-file not found: " + getJsFile();
+  }
+
+  private RessourceUrlServiceRole getAttUrlSrv() {
+    return Utils.getComponent(RessourceUrlServiceRole.class);
   }
 
 }

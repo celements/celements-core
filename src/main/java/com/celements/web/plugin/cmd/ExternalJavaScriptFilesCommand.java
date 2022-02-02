@@ -56,6 +56,7 @@ import com.celements.model.reference.RefBuilder;
 import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
+import com.celements.ressource_url.RessourceUrlServiceRole;
 import com.celements.web.classes.CelementsClassDefinition;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Suppliers;
@@ -91,9 +92,8 @@ public class ExternalJavaScriptFilesCommand {
   private static final Supplier<BeanClassDefConverter<BaseObject, JsFileEntry>> JS_FILE_ENTRY_CONVERTER = Suppliers
       .memoize(ExternalJavaScriptFilesCommand::jsFileEntryConverter);
 
-  private final Set<JsFileEntry> extJSfileSet = new LinkedHashSet<>();
+  private final Set<ExtJsFileParameter> extJSfileSet = new LinkedHashSet<>();
   private final Set<String> extJSAttUrlSet = new HashSet<>();
-  private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
 
   /**
@@ -213,19 +213,12 @@ public class ExternalJavaScriptFilesCommand {
 
   @NotNull
   public String addExtJSfileOnce(@NotNull ExtJsFileParameter extJsFileParams) {
-    return addExtJSfileOnce(extJsFileParams, null);
-  }
-
-  @NotNull
-  String addExtJSfileOnce(@NotNull ExtJsFileParameter extJsFileParams,
-      @Nullable AttachmentURLCommand attUrlCmdMock) {
     if (!extJSAttUrlSet.contains(extJsFileParams.getJsFile())) {
-      final AttachmentURLCommand attUrlCmd = getAttUrlCmd(attUrlCmdMock);
-      if (attUrlCmd.isAttachmentLink(extJsFileParams.getJsFile())
-          || attUrlCmd.isOnDiskLink(extJsFileParams.getJsFile())) {
+      if (getRessourceUrlService().isAttachmentLink(extJsFileParams.getJsFile())
+          || getRessourceUrlService().isOnDiskLink(extJsFileParams.getJsFile())) {
         extJSAttUrlSet.add(extJsFileParams.getJsFile());
       }
-      return generateScriptTagOnce(extJsFileParams, attUrlCmdMock);
+      return generateScriptTagOnce(extJsFileParams);
     } else {
       LOGGER.debug("addExtJSfileOnce: skip already added {}", extJsFileParams.getJsFile());
     }
@@ -233,29 +226,14 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   @NotNull
-  private String generateScriptTagOnce(@NotNull ExtJsFileParameter extJsFileParams,
-      @Nullable AttachmentURLCommand attUrlCmdMock) {
-    String jsFileUrl = getAttUrlCmd(attUrlCmdMock).getAttachmentURL(extJsFileParams.getJsFile(),
-        extJsFileParams.getAction(), extJsFileParams.getQueryString());
-    LOGGER.info("generateScriptTagOnce: extJsFileParams [{}] jsFileUrl [{}]", extJsFileParams,
-        jsFileUrl);
+  private String generateScriptTagOnce(@NotNull ExtJsFileParameter extJsFileParams) {
     String jsIncludes2 = "";
-    JsFileEntry jsFileEntry = extJsFileParams.getJsFileEntry();
-    if (jsFileUrl == null) {
-      if (!jsFileHasBeenSeen(jsFileEntry)) {
-        extJSnotFoundSet.add(jsFileEntry.getFilepath());
-        jsIncludes2 = buildNotFoundWarning(jsFileEntry.getFilepath());
-      } else {
-        LOGGER.debug("generateScriptTagOnce jsFileUrl == null: skip already seen {}", jsFileEntry);
-      }
+    if (!jsFileHasBeenSeen(extJsFileParams)) {
+      extJSfileSet.add(extJsFileParams);
+      jsIncludes2 = extJsFileParams.getScriptTag();
     } else {
-      jsFileEntry.setFilepath(jsFileUrl);
-      if (!jsFileHasBeenSeen(jsFileEntry)) {
-        jsIncludes2 = jsFileEntry.getScriptTagString();
-        extJSfileSet.add(jsFileEntry);
-      } else {
-        LOGGER.debug("generateScriptTagOnce jsFileUrl != null: skip already seen {}", jsFileEntry);
-      }
+      LOGGER.debug("generateScriptTagOnce jsFileUrl != null: skip already seen {}",
+          extJsFileParams);
     }
     if (!displayedAll) {
       jsIncludes2 = "";
@@ -263,12 +241,8 @@ public class ExternalJavaScriptFilesCommand {
     return jsIncludes2;
   }
 
-  private String buildNotFoundWarning(String jsFile) {
-    return "<!-- WARNING: js-file not found: " + jsFile + "-->";
-  }
-
-  private boolean jsFileHasBeenSeen(JsFileEntry jsFile) {
-    return extJSfileSet.contains(jsFile) || extJSnotFoundSet.contains(jsFile.getFilepath());
+  private boolean jsFileHasBeenSeen(ExtJsFileParameter extJsFileParams) {
+    return extJSfileSet.contains(extJsFileParams);
   }
 
   void injectDisplayAll(boolean displayedAll) {
@@ -276,12 +250,8 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String getAllExternalJavaScriptFiles() {
-    return getAllExternalJavaScriptFiles(null);
-  }
-
-  String getAllExternalJavaScriptFiles(@Nullable AttachmentURLCommand attUrlCmdMock) {
     streamDocRefs2CollectJsExtFileObj()
-        .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmdMock));
+        .forEachOrdered(this::addAllExtJSfilesFromDocRef);
     notifyExtJavaScriptFileListener();
     final StringBuilder jsIncludesBuilder = generateJsImportString();
     displayedAll = true;
@@ -290,8 +260,7 @@ public class ExternalJavaScriptFilesCommand {
 
   private StringBuilder generateJsImportString() {
     final StringBuilder jsIncludesBuilder = new StringBuilder();
-    StreamEx.of(extJSfileSet.stream().map(JsFileEntry::getScriptTagString))
-        .append(extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
+    StreamEx.of(extJSfileSet.stream().map(ExtJsFileParameter::getScriptTag))
         .forEach(tag -> jsIncludesBuilder.append(tag).append("\n"));
     return jsIncludesBuilder;
   }
@@ -352,8 +321,7 @@ public class ExternalJavaScriptFilesCommand {
     return Collections.emptyMap();
   }
 
-  void addAllExtJSfilesFromDocRef(@NotNull DocumentReference docRef,
-      @Nullable AttachmentURLCommand attUrlCmdMock) {
+  void addAllExtJSfilesFromDocRef(@NotNull DocumentReference docRef) {
     checkNotNull(docRef);
     try {
       XWikiObjectFetcher.on(getModelAccess().getDocument(docRef))
@@ -364,15 +332,14 @@ public class ExternalJavaScriptFilesCommand {
           .forEachOrdered(jsFile -> addExtJSfileOnce(
               new ExtJsFileParameter.Builder()
                   .setJsFileEntry(jsFile)
-                  .build(),
-              attUrlCmdMock));
+                  .build()));
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addAllExtJSfilesFromDocRef skipping [{}] because: not exist.", docRef);
     }
   }
 
-  private @NotNull AttachmentURLCommand getAttUrlCmd(@Nullable AttachmentURLCommand attUrlCmdMock) {
-    return Optional.ofNullable(attUrlCmdMock).orElse(new AttachmentURLCommand());
+  private @NotNull RessourceUrlServiceRole getRessourceUrlService() {
+    return Utils.getComponent(RessourceUrlServiceRole.class);
   }
 
   private @NotNull LayoutServiceRole getLayoutService() {

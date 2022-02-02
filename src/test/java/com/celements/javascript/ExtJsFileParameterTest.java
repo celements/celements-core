@@ -12,20 +12,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.web.plugin.cmd.AttachmentURLCommand;
+import com.celements.ressource_url.RessourceUrlServiceRole;
 import com.xpn.xwiki.XWikiContext;
 
 public class ExtJsFileParameterTest extends AbstractComponentTest {
 
-  private ExtJsFileParameter testExtJsFileParam;
-  private AttachmentURLCommand attUrlCmd = null;
   private XWikiContext context;
+  private RessourceUrlServiceRole resUrlSrv;
+  private ExtJsFileParameter testExtJsFileParam;
 
   @Before
   public void setUp_ExtJsFileParameterTest() throws Exception {
     context = getContext();
     context.put("vcontext", new VelocityContext());
-    attUrlCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    resUrlSrv = registerComponentMock(RessourceUrlServiceRole.class);
     testExtJsFileParam = new ExtJsFileParameter.Builder()
         .setAction("file")
         .setLazyLoad(true)
@@ -37,16 +37,8 @@ public class ExtJsFileParameterTest extends AbstractComponentTest {
 
   @Test
   public void test_hashCode() {
-    assertEquals(Objects.hash(testExtJsFileParam.getJsFileEntry(), "asdf=oijasdf", true),
+    assertEquals(Objects.hash(":safdas/sfasf.js", JsLoadMode.DEFER, "asdf=oijasdf", true),
         testExtJsFileParam.hashCode());
-  }
-
-  @Test
-  public void test_getJsFileEntry() {
-    JsFileEntry testJsFileEntry = new JsFileEntry();
-    testJsFileEntry.setFilepath(":safdas/sfasf.js");
-    assertEquals(testJsFileEntry, testExtJsFileParam.getJsFileEntry());
-    assertNotSame(testExtJsFileParam.getJsFileEntry(), testExtJsFileParam.getJsFileEntry());
   }
 
   @Test
@@ -124,77 +116,78 @@ public class ExtJsFileParameterTest extends AbstractComponentTest {
 
   @Test
   public void test_toString() {
-    assertEquals("ExtJsFileParameter [action=file, jsFileEntry=JsFileEntry"
-        + " [jsFileUrl=:safdas/sfasf.js, loadMode=DEFER,"
-        + " ObjectBean [documentReference=null, classReference=null, number=null]],"
+    assertEquals("ExtJsFileParameter [action=file, jsFileUrl=:safdas/sfasf.js, loadMode=DEFER,"
         + " queryString=asdf=oijasdf, lazyLoad=true]", testExtJsFileParam.toString());
   }
 
   @Test
-  public void testAddLazyExtJSfile() {
+  public void testAddLazyExtJSfile() throws Exception {
     String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
     String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
     String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
-    expect(attUrlCmd.getAttachmentURL(eq(jsFile), same(context))).andReturn(jsFileURL).once();
+    expect(resUrlSrv.createRessourceUrl(eq(jsFile), eq(Optional.empty()), eq(Optional.empty())))
+        .andReturn(jsFileURL).once();
     replayDefault();
     assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
         new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
-            .build().getLazyLoadTag(attUrlCmd));
+            .build().getLazyLoadTag());
     verifyDefault();
   }
 
   @Test
-  public void testAddLazyExtJSfile_action() {
+  public void testAddLazyExtJSfile_action() throws Exception {
     String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
     String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
     String action = "file";
     String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
-    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
-        jsFileURL).once();
+    expect(resUrlSrv.createRessourceUrl(eq(jsFile), eq(Optional.of(action)), eq(Optional.empty())))
+        .andReturn(jsFileURL).once();
     replayDefault();
     assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
         new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
-            .build().getLazyLoadTag(attUrlCmd));
+            .build().getLazyLoadTag());
     verifyDefault();
   }
 
   @Test
-  public void testAddLazyExtJSfile_action_params() {
+  public void testAddLazyExtJSfile_action_params() throws Exception {
     String jsFile = "mySpace.myDoc;loadTinyMCE-async.js";
-    String jsFileURL = "/download/mySpace/myDoc/loadTinyMCE-async.js";
+    String queryString = "me=blu";
+    String jsFileURL = "/download/mySpace/myDoc/loadTinyMCE-async.js?" + queryString;
     String action = "file";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "?me=blu\", \"initLoad\" : true}";
-    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
-        jsFileURL).once();
+    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
+    expect(resUrlSrv.createRessourceUrl(eq(jsFile), eq(Optional.of(action)),
+        eq(Optional.of(queryString)))).andReturn(jsFileURL).once();
     replayDefault();
     assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
         new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
             .setQueryString("me=blu")
-            .build().getLazyLoadTag(attUrlCmd));
+            .build().getLazyLoadTag());
     verifyDefault();
   }
 
   @Test
-  public void testAddLazyExtJSfile_action_params_onDisk() {
+  public void testAddLazyExtJSfile_action_params_onDisk() throws Exception {
     String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
+    String queryString = "me=blu";
     String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js"
-        + "?version=201507061937";
+        + "?version=201507061937&" + queryString;
     String action = "file";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "&me=blu\", \"initLoad\" : true}";
-    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
-        jsFileURL).once();
+    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
+    expect(resUrlSrv.createRessourceUrl(eq(jsFile), eq(Optional.of(action)),
+        eq(Optional.of(queryString)))).andReturn(jsFileURL).once();
     replayDefault();
     assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
         new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
-            .setQueryString("me=blu")
-            .build().getLazyLoadTag(attUrlCmd));
+            .setQueryString(queryString)
+            .build().getLazyLoadTag());
     verifyDefault();
   }
 }
