@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.filebase.IAttachmentServiceRole;
-import com.celements.filebase.uri.FileUriServiceRole;
 import com.celements.filebase.uri.FileNotExistException;
+import com.celements.filebase.uri.FileUriServiceRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentNotExistsException;
@@ -113,7 +113,7 @@ public class AttachmentURLCommand {
       try {
         XWikiDocument doc = getModelAccess().getDocument(getPageDocRef(link));
         XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(doc, attName);
-        url = doc.getAttachmentURL(attName, getAction(action), getContext());
+        url = doc.getAttachmentURL(attName, action.orElse(getDefaultAction()), getContext());
         url += "?version=" + getLastStartupTimeStamp().getLastChangedTimeStamp(att.getDate());
       } catch (DocumentNotExistsException exp) {
         LOGGER.error("Error getting attachment URL for doc '{}' and file {}", getPageFullName(link),
@@ -128,7 +128,7 @@ public class AttachmentURLCommand {
     } else if (isOnDiskLink(link)) {
       String path = link.trim().substring(1);
       url = getContext().getWiki().getSkinFile(path, true, getContext()).replace("/skin/",
-          "/" + getAction(action) + "/");
+          "/" + action.orElse(getDefaultAction()) + "/");
       url += "?version=" + getLastStartupTimeStamp().getFileModificationDate(path);
     }
     Optional<XWikiDocument> currentDoc = getModelContext().getCurrentDoc().toJavaUtil();
@@ -136,13 +136,6 @@ public class AttachmentURLCommand {
       url = currentDoc.get().getURL("view", getContext()) + url;
     }
     return url;
-  }
-
-  private String getAction(Optional<String> action) {
-    if (action.isPresent()) {
-      return action.get();
-    }
-    return getDefaultAction();
   }
 
   /**
