@@ -10,7 +10,7 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
 @ComponentRole
-public interface RessourceUrlServiceRole {
+public interface FileUriServiceRole {
 
   @NotNull
   public String getAttachmentName(@NotNull String link);
@@ -24,11 +24,11 @@ public interface RessourceUrlServiceRole {
 
   @NotNull
   String createRessourceUrl(@NotNull String jsFile, @NotNull Optional<String> action,
-      @NotNull Optional<String> queryString) throws UrlRessourceNotExistException;
+      @NotNull Optional<String> queryString) throws FileNotExistException;
 
   @NotEmpty
   String createRessourceUrl(@NotNull String link, @NotNull Optional<String> action)
-      throws UrlRessourceNotExistException;
+      throws FileNotExistException;
 
   @NotEmpty
   String getRessourceURLPrefix(@NotEmpty String action);

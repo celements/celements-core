@@ -26,7 +26,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class RessourceUrlService implements RessourceUrlServiceRole {
+public class FileUriService implements FileUriServiceRole {
 
   private static final String ATTACHMENT_LINK_REGEX = "([\\w\\-]*:)?([\\w\\-]*\\.[\\w\\-]*){1};.*";
   private static final Supplier<Pattern> ATTACHMENT_LINK_PATTERN = Suppliers
@@ -35,7 +35,7 @@ public class RessourceUrlService implements RessourceUrlServiceRole {
   private static final Supplier<Pattern> ON_DISK_LINK_PATTERN = Suppliers
       .memoize(() -> Pattern.compile(ON_DISK_LINK_REGEX));
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RessourceUrlService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileUriService.class);
 
   @Requirement
   private ModelContext context;
@@ -113,7 +113,7 @@ public class RessourceUrlService implements RessourceUrlServiceRole {
     try {
       return context.getXWikiContext().getURLFactory().getServerURL(context.getXWikiContext())
           .toExternalForm() + createRessourceUrl(fileName, action);
-    } catch (MalformedURLException | UrlRessourceNotExistException exp) {
+    } catch (MalformedURLException | FileNotExistException exp) {
       LOGGER.error("Failed to getServerURL.", exp);
     }
     return "";
@@ -122,7 +122,7 @@ public class RessourceUrlService implements RessourceUrlServiceRole {
   @Override
   @NotNull
   public String createRessourceUrl(@NotNull String link, @NotNull Optional<String> action,
-      @NotNull Optional<String> queryString) throws UrlRessourceNotExistException {
+      @NotNull Optional<String> queryString) throws FileNotExistException {
     final String baseUrl = createRessourceUrl(link, action);
     if (queryString.isPresent()) {
       if (baseUrl.indexOf("?") > -1) {
@@ -136,7 +136,7 @@ public class RessourceUrlService implements RessourceUrlServiceRole {
 
   @Override
   public @NotEmpty String createRessourceUrl(@NotNull String link, @NotNull Optional<String> action)
-      throws UrlRessourceNotExistException {
+      throws FileNotExistException {
     String url = link;
     if (isAttachmentLink(link)) {
       url = createAttachmentUrl(link, action);
@@ -155,7 +155,7 @@ public class RessourceUrlService implements RessourceUrlServiceRole {
   }
 
   private String createAttachmentUrl(String link, Optional<String> action)
-      throws UrlRessourceNotExistException {
+      throws FileNotExistException {
     String attName = getAttachmentName(link);
     try {
       XWikiDocument doc = modelAccess.getDocument(getPageDocRef(link));
@@ -165,10 +165,10 @@ public class RessourceUrlService implements RessourceUrlServiceRole {
     } catch (DocumentNotExistsException exp) {
       LOGGER.error("Error getting attachment URL for doc '{}' and file {}", getPageDocRef(link),
           attName, exp);
-      throw new UrlRessourceNotExistException(link);
+      throw new FileNotExistException(link);
     } catch (AttachmentNotExistsException anee) {
       LOGGER.info("Attachment not found for link [{}] and action [{}]", link, action, anee);
-      throw new UrlRessourceNotExistException(link);
+      throw new FileNotExistException(link);
     }
   }
 

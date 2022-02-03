@@ -35,7 +35,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.filebase.uri.UrlRessourceNotExistException;
+import com.celements.filebase.uri.FileNotExistException;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.reference.RefBuilder;
@@ -164,7 +164,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName)))
         .andThrow(new AttachmentNotExistsException(attRef)).atLeastOnce();
     replayDefault();
-    assertThrows(UrlRessourceNotExistException.class,
+    assertThrows(FileNotExistException.class,
         () -> attUrlCmd.getAttachmentURL("A.B;bla.txt", Optional.empty()));
     verifyDefault();
   }

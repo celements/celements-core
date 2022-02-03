@@ -26,12 +26,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class RessourceUrlServiceTest extends AbstractComponentTest {
+public class FileUriServiceTest extends AbstractComponentTest {
 
   private IModelAccessFacade modelAccessMock;
   private XWikiContext context;
   private XWikiURLFactory mockURLFactory;
-  private RessourceUrlServiceRole resUrlServ;
+  private FileUriServiceRole resUrlServ;
   private XWiki wiki;
 
   @Before
@@ -41,7 +41,7 @@ public class RessourceUrlServiceTest extends AbstractComponentTest {
     wiki = getWikiMock();
     mockURLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
     context.setURLFactory(mockURLFactory);
-    resUrlServ = Utils.getComponent(RessourceUrlServiceRole.class);
+    resUrlServ = Utils.getComponent(FileUriServiceRole.class);
   }
 
   @Test
@@ -147,7 +147,7 @@ public class RessourceUrlServiceTest extends AbstractComponentTest {
     expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName)))
         .andThrow(new AttachmentNotExistsException(attRef)).atLeastOnce();
     replayDefault();
-    assertThrows(UrlRessourceNotExistException.class,
+    assertThrows(FileNotExistException.class,
         () -> resUrlServ.createRessourceUrl("A.B;bla.txt", Optional.empty()));
     verifyDefault();
   }
