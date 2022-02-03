@@ -1,4 +1,4 @@
-package com.celements.ressource_url;
+package com.celements.filebase.uri;
 
 import java.util.Optional;
 

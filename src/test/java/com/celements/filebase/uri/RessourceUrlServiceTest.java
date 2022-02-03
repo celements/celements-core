@@ -1,4 +1,4 @@
-package com.celements.ressource_url;
+package com.celements.filebase.uri;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
@@ -41,7 +41,7 @@ public class RessourceUrlServiceTest extends AbstractComponentTest {
     wiki = getWikiMock();
     mockURLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
     context.setURLFactory(mockURLFactory);
-    resUrlServ = (RessourceUrlServiceRole) Utils.getComponent(RessourceUrlServiceRole.class);
+    resUrlServ = Utils.getComponent(RessourceUrlServiceRole.class);
   }
 
   @Test

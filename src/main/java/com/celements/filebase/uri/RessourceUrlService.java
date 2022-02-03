@@ -1,4 +1,4 @@
-package com.celements.ressource_url;
+package com.celements.filebase.uri;
 
 import java.net.MalformedURLException;
 import java.util.Optional;

@@ -35,10 +35,10 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.filebase.uri.UrlRessourceNotExistException;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.reference.RefBuilder;
-import com.celements.ressource_url.UrlRessourceNotExistException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;

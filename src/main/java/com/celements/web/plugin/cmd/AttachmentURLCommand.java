@@ -31,13 +31,13 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.filebase.uri.RessourceUrlServiceRole;
+import com.celements.filebase.uri.UrlRessourceNotExistException;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
-import com.celements.ressource_url.RessourceUrlServiceRole;
-import com.celements.ressource_url.UrlRessourceNotExistException;
 import com.celements.web.service.LastStartupTimeStampRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
