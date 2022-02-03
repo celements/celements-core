@@ -82,13 +82,6 @@ public class FileUriService implements FileUriServiceRole {
     return false;
   }
 
-  private String getAction(Optional<String> action) {
-    if (action.isPresent()) {
-      return action.get();
-    }
-    return getDefaultAction();
-  }
-
   private String getDefaultAction() {
     return context.getXWikiContext().getWiki().getXWikiPreference("celdefaultAttAction",
         "celements.attachmenturl.defaultaction", "file", context.getXWikiContext());
@@ -162,7 +155,7 @@ public class FileUriService implements FileUriServiceRole {
     try {
       XWikiDocument doc = modelAccess.getDocument(getPageDocRef(link));
       XWikiAttachment att = attachmentSrv.getAttachmentNameEqual(doc, attName);
-      return doc.getAttachmentURL(attName, getAction(action), context.getXWikiContext())
+      return doc.getAttachmentURL(attName, action.orElse(getDefaultAction()), context.getXWikiContext())
           + "?version=" + lastStartupTimeStamp.getLastChangedTimeStamp(att.getDate());
     } catch (DocumentNotExistsException exp) {
       LOGGER.error("Error getting attachment URL for doc '{}' and file {}", getPageDocRef(link),
@@ -179,7 +172,7 @@ public class FileUriService implements FileUriServiceRole {
     String path = link.trim().substring(1);
     url = context.getXWikiContext().getWiki().getSkinFile(path, true, context.getXWikiContext())
         .replace("/skin/",
-            "/" + getAction(action) + "/");
+            "/" + action.orElse(getDefaultAction()) + "/");
     url += "?version=" + lastStartupTimeStamp.getFileModificationDate(path);
     return url;
   }
