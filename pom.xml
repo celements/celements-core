@@ -31,13 +31,6 @@
   <version>5.4-SNAPSHOT</version>
   <description>Celements Core</description>
   <dependencies>
-    <!-- Add here all your dependencies -->
-    <dependency>
-      <groupId>com.celements</groupId>
-      <artifactId>celements-shared-tests-deprecated</artifactId>
-      <version>5.1-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-model</artifactId>
@@ -56,6 +49,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-scheduler</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>
       <scope>provided</scope>
@@ -65,23 +63,26 @@
     <dependency>
       <groupId>com.github.jtidy</groupId>
       <artifactId>jtidy</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>dom3-xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+
+    <!-- testing -->
+    <dependency>
+      <groupId>com.celements</groupId>
+      <artifactId>celements-shared-tests</artifactId>
+      <version>5.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.celements</groupId>
+      <artifactId>celements-shared-tests-deprecated</artifactId>
+      <version>5.1-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockftpserver</groupId>
       <artifactId>MockFtpServer</artifactId>
       <version>2.7.1</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform.plugins</groupId>
-      <artifactId>xwiki-plugin-scheduler</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
   <scm>
