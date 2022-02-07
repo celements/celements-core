@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.filebase.references.FileReference;
 import com.celements.filebase.uri.FileUriServiceRole;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.web.service.LastStartupTimeStampRole;
@@ -120,7 +121,7 @@ public class AttachmentURLCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link FileUriServiceRole#getAttachmentName(String)}
+   *             {@link FileReference#getName()}
    */
   @Deprecated
   public String getAttachmentName(String link) {
@@ -129,7 +130,7 @@ public class AttachmentURLCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link FileUriServiceRole#getPageDocRef(String)}
+   *             {@link FileReference#getDocRef()}
    */
   @Deprecated
   public String getPageFullName(String link) {
@@ -138,7 +139,7 @@ public class AttachmentURLCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link FileUriServiceRole#isAttachmentLink(String)}
+   *             {@link FileReference#isAttachmentReference()}
    */
   @Deprecated
   public boolean isAttachmentLink(String link) {
@@ -152,7 +153,7 @@ public class AttachmentURLCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link FileUriServiceRole#isOnDiskLink(String)}
+   *             {@link FileReference#isOnDiskReference()}
    */
   @Deprecated
   public boolean isOnDiskLink(String link) {
@@ -165,8 +166,8 @@ public class AttachmentURLCommand {
   }
 
   /**
-   * @deprecated since 5.4 instead use {@link RessourceUrlServiceRole#createRessourceUrl(String,
-   *             Optional<String>)}
+   * @deprecated since 5.4 instead use
+   *             {@link FileUriServiceRole#getExternalFileURL(FileReference, Optional<String>)}
    */
   @Deprecated
   public String getExternalAttachmentURL(String fileName, String action, XWikiContext context) {
