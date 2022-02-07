@@ -1,9 +1,10 @@
 package com.celements.filebase.uri;
 
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Optional;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
 
@@ -50,17 +51,17 @@ public class FileUriService implements FileUriServiceRole {
   }
 
   @Override
-  @NotEmpty
-  public String getFileURLPrefix() {
-    return getFileURLPrefix(getDefaultAction());
-  }
-
-  @Override
-  @NotEmpty
-  public String getFileURLPrefix(@NotEmpty String action) {
+  public @NotNull UriBuilder getFileURLPrefix(@NotNull Optional<String> action) {
     XWikiURLFactory urlf = context.getXWikiContext().getURLFactory();
-    return urlf.createResourceURL("", true, context.getXWikiContext()).toString().replace("/skin/",
-        "/" + action + "/");
+    URL baseUrl = urlf.createResourceURL("", false, context.getXWikiContext());
+    try {
+      return UriBuilder.fromUri(baseUrl.toURI())
+          .replacePath("/" + action.orElse(getDefaultAction()) + "/")
+          .path(baseUrl.getPath());
+    } catch (URISyntaxException exp) {
+      LOGGER.error("Failed to get file url prefix.", exp);
+      return UriBuilder.fromPath(baseUrl.toString());
+    }
   }
 
   @Override
@@ -82,18 +83,15 @@ public class FileUriService implements FileUriServiceRole {
       @NotNull Optional<String> queryString) throws FileNotExistException {
     final UriBuilder baseUrl = createFileUrl(fileRef, action);
     if (queryString.isPresent()) {
-      String[] baseQueryParts = baseUrl.toString().split("\\?", 2);
-      if (baseQueryParts.length > 1) {
-        return baseUrl.replaceQuery(baseQueryParts[1] + "&" + queryString.get());
-      } else {
-        return baseUrl.replaceQuery(queryString.get());
-      }
+      return baseUrl.replaceQuery(Optional.ofNullable(baseUrl.build().getQuery())
+          .map(qS -> qS + "&" + queryString.get())
+          .orElse(queryString.get()));
     }
     return baseUrl;
   }
 
-  @Override
-  public @NotNull UriBuilder createFileUrl(@NotNull FileReference fileRef,
+  @NotNull
+  UriBuilder createFileUrl(@NotNull FileReference fileRef,
       @NotNull Optional<String> action)
       throws FileNotExistException {
     UriBuilder uriBuilder;

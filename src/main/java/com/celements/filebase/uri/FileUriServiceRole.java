@@ -2,7 +2,6 @@ package com.celements.filebase.uri;
 
 import java.util.Optional;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
 
@@ -18,14 +17,7 @@ public interface FileUriServiceRole {
       @NotNull Optional<String> queryString) throws FileNotExistException;
 
   @NotNull
-  UriBuilder createFileUrl(@NotNull FileReference fileRef, @NotNull Optional<String> action)
-      throws FileNotExistException;
-
-  @NotEmpty
-  String getFileURLPrefix(@NotEmpty String action);
-
-  @NotEmpty
-  String getFileURLPrefix();
+  UriBuilder getFileURLPrefix(@NotNull Optional<String> action);
 
   @NotNull
   String getExternalFileURL(@NotNull FileReference fileRef, @NotNull Optional<String> action);

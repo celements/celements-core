@@ -191,10 +191,11 @@ public class FileUriServiceTest extends AbstractComponentTest {
   public void test_getFileURLPrefix() throws Exception {
     expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
         "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
-    expect(mockURLFactory.createResourceURL(eq(""), eq(true), same(context))).andReturn(new URL(
-        "http://test.fabian.dev:10080/skin/resources/"));
+    expect(mockURLFactory.createResourceURL(eq(""), eq(false), same(context))).andReturn(new URL(
+        "http://test.fabian.dev:10080/resources/"));
     replayDefault();
-    assertEquals("http://test.fabian.dev:10080/file/resources/", fileUriServ.getFileURLPrefix());
+    assertEquals("http://test.fabian.dev:10080/file/resources/",
+        fileUriServ.getFileURLPrefix(Optional.empty()).toString());
     verifyDefault();
   }
 
