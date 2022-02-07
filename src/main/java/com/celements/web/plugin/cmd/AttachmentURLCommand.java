@@ -23,23 +23,17 @@ import java.net.MalformedURLException;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.context.Execution;
 
 import com.celements.filebase.IAttachmentServiceRole;
-import com.celements.filebase.uri.FileNotExistException;
 import com.celements.filebase.uri.FileUriServiceRole;
-import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;
-import com.celements.model.access.exception.DocumentNotExistsException;
-import com.celements.model.context.ModelContext;
-import com.celements.model.util.ModelUtils;
 import com.celements.web.service.LastStartupTimeStampRole;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
@@ -55,7 +49,7 @@ public class AttachmentURLCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link FileUriServiceRole#createRessourceUrl(String, Optional)}
+   *             {@link FileUriServiceRole#createFileUrl(String, Optional)}
    */
   @Deprecated
   public String getAttachmentURL(String link, XWikiContext context) {
@@ -68,7 +62,7 @@ public class AttachmentURLCommand {
   }
 
   /**
-   * @deprecated since 5.4 instead use {@link FileUriServiceRole#getRessourceURLPrefix()}
+   * @deprecated since 5.4 instead use {@link FileUriServiceRole#getFileURLPrefix()}
    */
   @Deprecated
   public String getAttachmentURLPrefix() {
@@ -76,7 +70,7 @@ public class AttachmentURLCommand {
   }
 
   /**
-   * @deprecated since 5.4 instead use {@link FileUriServiceRole#getRessourceURLPrefix(String)}
+   * @deprecated since 5.4 instead use {@link FileUriServiceRole#getFileURLPrefix(String)}
    */
   @Deprecated
   public String getAttachmentURLPrefix(String action) {
@@ -92,70 +86,32 @@ public class AttachmentURLCommand {
   @Deprecated
   @Nullable
   public String getAttachmentURL(String link, String action, XWikiContext context) {
-    try {
-      return getAttachmentURL(link, Optional.ofNullable(action));
-    } catch (FileNotExistException exp) {
-      return null;
-    }
-  }
-
-  /**
-   * @deprecated since 5.4 instead use
-   *             {@link RessourceUrlServiceRole#createRessourceUrl(String, Optional<String>)}
-   */
-  @Deprecated
-  @NotEmpty
-  public String getAttachmentURL(@NotNull String link, @NotNull Optional<String> action)
-      throws FileNotExistException {
     String url = link;
     if (isAttachmentLink(link)) {
       String attName = getAttachmentName(link);
       try {
-        XWikiDocument doc = getModelAccess().getDocument(getPageDocRef(link));
+        XWikiDocument doc = context.getWiki().getDocument(getPageFullName(link), context);
         XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(doc, attName);
-        url = doc.getAttachmentURL(attName, action.orElse(getDefaultAction()), getContext());
+        url = doc.getAttachmentURL(attName, action, context);
         url += "?version=" + getLastStartupTimeStamp().getLastChangedTimeStamp(att.getDate());
-      } catch (DocumentNotExistsException exp) {
-        LOGGER.error("Error getting attachment URL for doc '{}' and file {}", getPageFullName(link),
-            attName, exp);
-        // 01.02.2022;F.Pichler; is this functionality used? No test available. Adding exception.
-        // url = link;
-        throw new FileNotExistException(link);
+      } catch (XWikiException exp) {
+        LOGGER.error("Error getting attachment URL for doc " + getPageFullName(link) + " and file "
+            + attName, exp);
+        url = link;
       } catch (AttachmentNotExistsException anee) {
         LOGGER.info("Attachment not found for link [{}] and action [{}]", link, action, anee);
-        throw new FileNotExistException(link);
+        return null;
       }
     } else if (isOnDiskLink(link)) {
       String path = link.trim().substring(1);
-      url = getContext().getWiki().getSkinFile(path, true, getContext()).replace("/skin/",
-          "/" + action.orElse(getDefaultAction()) + "/");
+      url = context.getWiki().getSkinFile(path, true, context).replace("/skin/", "/" + action
+          + "/");
       url += "?version=" + getLastStartupTimeStamp().getFileModificationDate(path);
     }
-    Optional<XWikiDocument> currentDoc = getModelContext().getCurrentDoc().toJavaUtil();
-    if (currentDoc.isPresent() && url.startsWith("?")) {
-      url = currentDoc.get().getURL("view", getContext()) + url;
+    if (url.startsWith("?")) {
+      url = context.getDoc().getURL("view", context) + url;
     }
     return url;
-  }
-
-  /**
-   * @deprecated since 5.4 instead use
-   *             {@link RessourceUrlServiceRole#createRessourceUrl(String, Optional<String>,
-   *             Optional<String>)}
-   */
-  @Deprecated
-  @Nullable
-  public String getAttachmentURL(@NotNull String link, @NotNull Optional<String> action,
-      @NotNull Optional<String> queryString) throws FileNotExistException {
-    String attUrl = getAttachmentURL(link, action);
-    if (queryString.isPresent()) {
-      if (attUrl.indexOf("?") > -1) {
-        attUrl += "&" + queryString.get();
-      } else {
-        attUrl += "?" + queryString.get();
-      }
-    }
-    return attUrl;
   }
 
   private LastStartupTimeStampRole getLastStartupTimeStamp() {
@@ -178,15 +134,6 @@ public class AttachmentURLCommand {
   @Deprecated
   public String getPageFullName(String link) {
     return link.split(";")[0];
-  }
-
-  /**
-   * @deprecated since 5.4 instead use
-   *             {@link FileUriServiceRole#getPageDocRef(String)}
-   */
-  @Deprecated
-  public DocumentReference getPageDocRef(String link) {
-    return getModelUtils().resolveRef(getPageFullName(link), DocumentReference.class);
   }
 
   /**
@@ -223,19 +170,10 @@ public class AttachmentURLCommand {
    */
   @Deprecated
   public String getExternalAttachmentURL(String fileName, String action, XWikiContext context) {
-    return getExternalAttachmentURL(fileName, Optional.ofNullable(action));
-  }
-
-  /**
-   * @deprecated since 5.4 instead use
-   *             {@link RessourceUrlServiceRole#getExternalRessourceURL(String, Optional<String>)}
-   */
-  @Deprecated
-  public String getExternalAttachmentURL(String fileName, Optional<String> action) {
     try {
-      return getContext().getURLFactory().getServerURL(getContext()).toExternalForm()
-          + getAttachmentURL(fileName, action);
-    } catch (MalformedURLException | FileNotExistException exp) {
+      return context.getURLFactory().getServerURL(context).toExternalForm() + getAttachmentURL(
+          fileName, action, context);
+    } catch (MalformedURLException exp) {
       LOGGER.error("Failed to getServerURL.", exp);
     }
     return "";
@@ -246,19 +184,11 @@ public class AttachmentURLCommand {
   }
 
   private XWikiContext getContext() {
-    return getModelContext().getXWikiContext();
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
-  private @NotNull ModelContext getModelContext() {
-    return Utils.getComponent(ModelContext.class);
-  }
-
-  private @NotNull IModelAccessFacade getModelAccess() {
-    return Utils.getComponent(IModelAccessFacade.class);
-  }
-
-  private @NotNull ModelUtils getModelUtils() {
-    return Utils.getComponent(ModelUtils.class);
+  private Execution getExecution() {
+    return Utils.getComponent(Execution.class);
   }
 
 }
