@@ -2,41 +2,31 @@ package com.celements.filebase.uri;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.reference.DocumentReference;
+
+import com.celements.filebase.references.FileReference;
 
 @ComponentRole
 public interface FileUriServiceRole {
 
   @NotNull
-  public String getAttachmentName(@NotNull String link);
-
-  @NotNull
-  DocumentReference getPageDocRef(@NotNull String link);
-
-  boolean isAttachmentLink(String link);
-
-  boolean isOnDiskLink(@Nullable String link);
-
-  @NotNull
-  String createRessourceUrl(@NotNull String jsFile, @NotNull Optional<String> action,
+  String createFileUrl(@NotNull FileReference fileRef, @NotNull Optional<String> action,
       @NotNull Optional<String> queryString) throws FileNotExistException;
 
   @NotEmpty
-  String createRessourceUrl(@NotNull String link, @NotNull Optional<String> action)
+  String createFileUrl(@NotNull FileReference fileRef, @NotNull Optional<String> action)
       throws FileNotExistException;
 
   @NotEmpty
-  String getRessourceURLPrefix(@NotEmpty String action);
+  String getFileURLPrefix(@NotEmpty String action);
 
   @NotEmpty
-  String getRessourceURLPrefix();
+  String getFileURLPrefix();
 
   @NotNull
-  String getExternalRessourceURL(@NotNull String fileName, @NotNull Optional<String> action);
+  String getExternalFileURL(@NotNull FileReference fileRef, @NotNull Optional<String> action);
 
 }

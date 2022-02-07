@@ -16,6 +16,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.filebase.references.FileReference;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.reference.RefBuilder;
@@ -45,19 +46,20 @@ public class FileUriServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_createRessourceUrl_fullURL() throws Exception {
-    assertEquals("http://www.bla.com/bla.txt", resUrlServ.createRessourceUrl(
-        "http://www.bla.com/bla.txt", Optional.empty()));
+  public void test_createFileUrl_fullURL() throws Exception {
+    FileReference fileRef = FileReference.of("http://www.bla.com/bla.txt").build();
+    assertEquals("http://www.bla.com/bla.txt", resUrlServ.createFileUrl(fileRef, Optional.empty()));
   }
 
   @Test
-  public void test_createRessourceUrl_partURL() throws Exception {
-    assertEquals("/xwiki/bin/download/A/B/bla.txt", resUrlServ.createRessourceUrl(
-        "/xwiki/bin/download/A/B/bla.txt", Optional.empty()));
+  public void test_createFileUrl_partURL() throws Exception {
+    FileReference fileRef = FileReference.of("/xwiki/bin/download/A/B/bla.txt").build();
+    assertEquals("/xwiki/bin/download/A/B/bla.txt", resUrlServ.createFileUrl(fileRef,
+        Optional.empty()));
   }
 
   @Test
-  public void test_createRessourceUrl_dynamicParamURL() throws Exception {
+  public void test_createFileUrl_dynamicParamURL() throws Exception {
     String mySpaceName = "mySpace";
     String myDocName = "myDoc";
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), mySpaceName,
@@ -69,13 +71,14 @@ public class FileUriServiceTest extends AbstractComponentTest {
         (String) isNull(), eq(context.getDatabase()), same(context))).andReturn(viewURL);
     expect(mockURLFactory.getURL(eq(viewURL), same(context))).andReturn(viewURL.getPath());
     replayDefault();
-    assertEquals("/mySpace/myDoc?xpage=bla&bli=blu", resUrlServ.createRessourceUrl(
-        "?xpage=bla&bli=blu", Optional.empty()));
+    FileReference fileRef = FileReference.of("?xpage=bla&bli=blu").build();
+    assertEquals("/mySpace/myDoc?xpage=bla&bli=blu", resUrlServ.createFileUrl(fileRef,
+        Optional.empty()));
     verifyDefault();
   }
 
   @Test
-  public void test_createRessourceUrl_fullInternalLink() throws Exception {
+  public void test_createFileUrl_fullInternalLink() throws Exception {
     String resultURL = "http://celements2web.localhost/file/A/B/bla.txt";
     DocumentReference abDocRef = new RefBuilder().wiki("celements2web").space("A").doc("B")
         .build(DocumentReference.class);
@@ -97,8 +100,8 @@ public class FileUriServiceTest extends AbstractComponentTest {
     expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName))).andReturn(blaAtt)
         .atLeastOnce();
     replayDefault();
-    String attachmentURL = resUrlServ.createRessourceUrl("celements2web:A.B;bla.txt",
-        Optional.empty());
+    FileReference fileRef = FileReference.of("celements2web:A.B;bla.txt").build();
+    String attachmentURL = resUrlServ.createFileUrl(fileRef, Optional.empty());
     assertNotNull(attachmentURL);
     assertTrue("expecting " + resultURL + " but got " + attachmentURL,
         attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
@@ -106,7 +109,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_createRessourceUrl_partInternalLink() throws Exception {
+  public void test_createFileUrl_partInternalLink() throws Exception {
     String resultURL = "http://mydomain.ch/file/A/B/bla.txt";
     URL tstURL = new URL(resultURL);
     expect(mockURLFactory.createAttachmentURL(eq("bla.txt"), eq("A"), eq("B"), eq("file"),
@@ -128,7 +131,8 @@ public class FileUriServiceTest extends AbstractComponentTest {
     expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName))).andReturn(blaAtt)
         .atLeastOnce();
     replayDefault();
-    String attachmentURL = resUrlServ.createRessourceUrl("A.B;bla.txt", Optional.empty());
+    FileReference fileRef = FileReference.of("A.B;bla.txt").build();
+    String attachmentURL = resUrlServ.createFileUrl(fileRef, Optional.empty());
     assertNotNull(attachmentURL);
     assertTrue("expecting " + resultURL + " but got " + attachmentURL,
         attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
@@ -136,7 +140,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_createRessourceUrl_partInternalLink_notExists() throws Exception {
+  public void test_createFileUrl_partInternalLink_notExists() throws Exception {
     DocumentReference abDocRef = new RefBuilder().wiki(getContext().getDatabase()).space("A")
         .doc("B").build(DocumentReference.class);
     XWikiDocument abDoc = new XWikiDocument(abDocRef);
@@ -147,13 +151,14 @@ public class FileUriServiceTest extends AbstractComponentTest {
     expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName)))
         .andThrow(new AttachmentNotExistsException(attRef)).atLeastOnce();
     replayDefault();
+    FileReference fileRef = FileReference.of("A.B;bla.txt").build();
     assertThrows(FileNotExistException.class,
-        () -> resUrlServ.createRessourceUrl("A.B;bla.txt", Optional.empty()));
+        () -> resUrlServ.createFileUrl(fileRef, Optional.empty()));
     verifyDefault();
   }
 
   @Test
-  public void test_createRessourceUrl_onDiskLink() throws Exception {
+  public void test_createFileUrl_onDiskLink() throws Exception {
     String resultURL = "/appname/skin/resources/celJS/bla.js";
     expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
@@ -161,8 +166,8 @@ public class FileUriServiceTest extends AbstractComponentTest {
     expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
         "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("download");
     replayDefault();
-    String attachmentURL = resUrlServ.createRessourceUrl(" :celJS/bla.js", Optional.empty(),
-        Optional.empty());
+    FileReference fileRef = FileReference.of(" :celJS/bla.js").build();
+    String attachmentURL = resUrlServ.createFileUrl(fileRef, Optional.empty(), Optional.empty());
     String expectedURL = "/appname/download/resources/celJS/bla.js";
     assertNotNull(attachmentURL);
     assertTrue("expecting " + expectedURL + " but got " + attachmentURL,
@@ -171,69 +176,25 @@ public class FileUriServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_createRessourceUrl_Rubish() throws Exception {
+  public void test_createFileUrl_Rubish() throws Exception {
+    FileReference fileRef = FileReference.of("http://A.B;bla.txt").build();
     assertEquals("http://A.B;bla.txt",
-        resUrlServ.createRessourceUrl("http://A.B;bla.txt", Optional.empty(),
-            Optional.empty()).toString());
+        resUrlServ.createFileUrl(fileRef, Optional.empty(), Optional.empty()).toString());
   }
 
   @Test
-  public void test_isAttachmentLink_null() {
-    assertFalse(resUrlServ.isAttachmentLink(null));
-  }
-
-  @Test
-  public void test_isAttachmentLink_empty() {
-    assertFalse(resUrlServ.isAttachmentLink(""));
-  }
-
-  @Test
-  public void test_isAttachmentLink_url() {
-    assertFalse(resUrlServ.isAttachmentLink("/download/Space/Page/attachment.jpg"));
-  }
-
-  @Test
-  public void test_isAttachmentLink_is() {
-    assertTrue(resUrlServ.isAttachmentLink("Space.Page;attachment.jpg"));
-  }
-
-  @Test
-  public void test_isAttachmentLink_isSpecialChars() {
-    assertTrue(resUrlServ.isAttachmentLink("Teilnehmer.f8Nx9vyPOX8O2;Hans-002-Bearbeitet-2.jpg"));
-  }
-
-  @Test
-  public void test_isAttachmentLink_isWithDb() {
-    assertTrue(resUrlServ.isAttachmentLink("db:Space.Page;attachment.jpg"));
-  }
-
-  @Test
-  public void test_isOnDiskLink_true() {
-    assertTrue(resUrlServ.isOnDiskLink(":bla.js"));
-    assertTrue(resUrlServ.isOnDiskLink(" :celJS/bla.js"));
-  }
-
-  @Test
-  public void test_isOnDiskLink_false() {
-    assertFalse(resUrlServ.isOnDiskLink("bla.js"));
-    assertFalse(resUrlServ.isOnDiskLink("x:celJS/bla.js"));
-    assertFalse(resUrlServ.isOnDiskLink("x:A.B;bla.js"));
-  }
-
-  @Test
-  public void test_getRessourceURLPrefix() throws Exception {
+  public void test_getFileURLPrefix() throws Exception {
     expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
         "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
     expect(mockURLFactory.createResourceURL(eq(""), eq(true), same(context))).andReturn(new URL(
         "http://test.fabian.dev:10080/skin/resources/"));
     replayDefault();
-    assertEquals("http://test.fabian.dev:10080/file/resources/",
-        resUrlServ.getRessourceURLPrefix());
+    assertEquals("http://test.fabian.dev:10080/file/resources/", resUrlServ.getFileURLPrefix());
     verifyDefault();
   }
 
   @Test
-  public void test_getAttachmentURL_onDisk_queryString() throws Exception {
+  public void test_createFileUrl_onDisk_queryString() throws Exception {
     String resultURL = "/appname/skin/resources/celJS/bla.js";
     expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
@@ -242,7 +203,8 @@ public class FileUriServiceTest extends AbstractComponentTest {
         "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("download");
     String queryString = "asf=oiu";
     replayDefault();
-    String attachmentURL = resUrlServ.createRessourceUrl(":celJS/bla.js", Optional.empty(),
+    FileReference fileRef = FileReference.of(":celJS/bla.js").build();
+    String attachmentURL = resUrlServ.createFileUrl(fileRef, Optional.empty(),
         Optional.of(queryString));
     String expectedURL = "/appname/download/resources/celJS/bla.js";
     assertTrue(attachmentURL,
@@ -251,7 +213,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getAttachmentURL_partInternalLink_queryString() throws Exception {
+  public void test_createFileUrl_partInternalLink_queryString() throws Exception {
     String resultURL = "http://mydomain.ch/testAction/A/B/bla.txt";
     URL tstURL = new URL(resultURL);
     expect(mockURLFactory.createAttachmentURL(eq("bla.txt"), eq("A"), eq("B"), eq("testAction"),
@@ -270,9 +232,12 @@ public class FileUriServiceTest extends AbstractComponentTest {
     expect(modelAccessMock.getDocument(eq(abDocRef))).andReturn(abDoc).atLeastOnce();
     expect(modelAccessMock.getAttachmentNameEqual(same(abDoc), eq(attName))).andReturn(blaAtt)
         .atLeastOnce();
+    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
+        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
     String queryString = "asf=oiu";
     replayDefault();
-    String attachmentURL = resUrlServ.createRessourceUrl("A.B;bla.txt", Optional.of("testAction"),
+    FileReference fileRef = FileReference.of("A.B;bla.txt").build();
+    String attachmentURL = resUrlServ.createFileUrl(fileRef, Optional.of("testAction"),
         Optional.of(queryString));
     assertTrue(attachmentURL,
         attachmentURL.matches(resultURL + "\\?version=\\d{14}\\&" + queryString));
