@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.model.reference.DocumentReference;
 
@@ -38,8 +39,8 @@ public class FileReference implements Serializable {
     private String name;
     private FileReferenceType type;
     private DocumentReference docRef;
-
     private String fullPath;
+    private String queryString;
 
     @NotNull
     private static String getAttachmentName(@NotEmpty String link) {
@@ -81,8 +82,8 @@ public class FileReference implements Serializable {
       return FileReferenceType.EXTERNAL;
     }
 
-    public Builder setFileName(@NotEmpty String fileName) {
-      checkArgument(!Strings.isNullOrEmpty(fileName), "fileName may not be empty");
+    public Builder setFileName(@NotNull String fileName) {
+      checkNotNull(fileName);
       this.name = fileName;
       return this;
     }
@@ -98,26 +99,34 @@ public class FileReference implements Serializable {
       this.docRef = docRef;
     }
 
-    public void setFullPath(@NotEmpty String fullPath) {
-      checkArgument(!Strings.isNullOrEmpty(fullPath), "fileName may not be empty");
+    public void setFullPath(@NotNull String fullPath) {
+      checkNotNull(fullPath);
       this.fullPath = fullPath;
+    }
+
+    public void setQueryString(@NotNull String queryString) {
+      checkNotNull(queryString);
+      this.queryString = queryString;
     }
 
     public FileReference build() {
       return new FileReference(this);
     }
+
   }
 
   private final String name;
   private final FileReferenceType type;
   private final DocumentReference docRef;
   private final String fullPath;
+  private final String queryString;
 
   public FileReference(Builder builder) {
     this.name = builder.name;
     this.type = builder.type;
     this.fullPath = builder.fullPath;
     this.docRef = builder.docRef;
+    this.queryString = builder.queryString;
   }
 
   public String getName() {
@@ -134,6 +143,14 @@ public class FileReference implements Serializable {
 
   public String getFullPath() {
     return fullPath;
+  }
+
+  public String getQueryString() {
+    return queryString;
+  }
+
+  public UriBuilder getUri() {
+    return UriBuilder.fromPath(fullPath).replaceQuery(queryString);
   }
 
   public boolean isAttachmentReference() {
@@ -165,15 +182,19 @@ public class FileReference implements Serializable {
   }
 
   public static Builder of(@NotEmpty String link) {
-    checkArgument(!Strings.isNullOrEmpty(link), "fileName may not be empty");
+    checkArgument(!Strings.isNullOrEmpty(link), "link may not be empty");
+    final String[] linkParts = link.split("\\?");
     Builder builder = new Builder();
-    builder.setType(Builder.getTypeOfLink(link));
+    builder.setType(Builder.getTypeOfLink(linkParts[0]));
     if (builder.type == FileReferenceType.ATTACHMENT) {
-      builder.setFileName(Builder.getAttachmentName(link));
-      builder.setDocRef(Builder.getPageDocRef(link));
+      builder.setFileName(Builder.getAttachmentName(linkParts[0]));
+      builder.setDocRef(Builder.getPageDocRef(linkParts[0]));
     } else {
-      builder.setFileName(Builder.getPathFileName(link));
-      builder.setFullPath(link);
+      builder.setFileName(Builder.getPathFileName(linkParts[0]));
+      builder.setFullPath(linkParts[0]);
+    }
+    if (linkParts.length > 1) {
+      builder.setQueryString(linkParts[1]);
     }
     return builder;
   }

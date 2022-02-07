@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,51 +78,53 @@ public class FileUriService implements FileUriServiceRole {
 
   @Override
   @NotNull
-  public String createFileUrl(@NotNull FileReference fileRef, @NotNull Optional<String> action,
+  public UriBuilder createFileUrl(@NotNull FileReference fileRef, @NotNull Optional<String> action,
       @NotNull Optional<String> queryString) throws FileNotExistException {
-    final String baseUrl = createFileUrl(fileRef, action);
+    final UriBuilder baseUrl = createFileUrl(fileRef, action);
     if (queryString.isPresent()) {
-      if (baseUrl.indexOf("?") > -1) {
-        return baseUrl + "&" + queryString.get();
+      String[] baseQueryParts = baseUrl.toString().split("\\?", 2);
+      if (baseQueryParts.length > 1) {
+        return baseUrl.replaceQuery(baseQueryParts[1] + "&" + queryString.get());
       } else {
-        return baseUrl + "?" + queryString.get();
+        return baseUrl.replaceQuery(queryString.get());
       }
     }
     return baseUrl;
   }
 
   @Override
-  public @NotEmpty String createFileUrl(@NotNull FileReference fileRef,
+  public @NotNull UriBuilder createFileUrl(@NotNull FileReference fileRef,
       @NotNull Optional<String> action)
       throws FileNotExistException {
-    String url;
+    UriBuilder uriBuilder;
     if (fileRef.isAttachmentReference()) {
-      url = createAttachmentUrl(fileRef, action);
+      uriBuilder = createAttachmentUrl(fileRef, action);
     } else if (fileRef.isOnDiskReference()) {
-      url = createOnDiskUrl(fileRef, action);
+      uriBuilder = createOnDiskUrl(fileRef, action);
     } else {
-      url = fileRef.getFullPath();
+      uriBuilder = fileRef.getUri();
     }
-    return addContextUrl(url);
+    return addContextUrl(uriBuilder);
   }
 
-  private String addContextUrl(String url) {
+  UriBuilder addContextUrl(UriBuilder uriBuilder) {
     Optional<XWikiDocument> currentDoc = context.getCurrentDoc().toJavaUtil();
-    if (currentDoc.isPresent() && url.startsWith("?")) {
-      url = currentDoc.get().getURL("view", context.getXWikiContext()) + url;
+    if (currentDoc.isPresent() && uriBuilder.toString().startsWith("?")) {
+      uriBuilder.replacePath(currentDoc.get().getURL("view", context.getXWikiContext()));
     }
-    return url;
+    return uriBuilder;
   }
 
-  private String createAttachmentUrl(@NotNull FileReference fileRef, Optional<String> action)
+  private UriBuilder createAttachmentUrl(@NotNull FileReference fileRef, Optional<String> action)
       throws FileNotExistException {
     String attName = fileRef.getName();
     try {
       XWikiDocument doc = modelAccess.getDocument(fileRef.getDocRef());
       XWikiAttachment att = attachmentSrv.getAttachmentNameEqual(doc, attName);
-      return doc.getAttachmentURL(attName, action.orElse(getDefaultAction()),
-          context.getXWikiContext())
-          + "?version=" + lastStartupTimeStamp.getLastChangedTimeStamp(att.getDate());
+
+      return UriBuilder.fromPath(doc.getAttachmentURL(attName, action.orElse(getDefaultAction()),
+          context.getXWikiContext()))
+          .replaceQuery("version=" + lastStartupTimeStamp.getLastChangedTimeStamp(att.getDate()));
     } catch (DocumentNotExistsException exp) {
       LOGGER.error("Error getting attachment URL for doc '{}' and file {}", fileRef.getDocRef(),
           attName, exp);
@@ -132,14 +135,14 @@ public class FileUriService implements FileUriServiceRole {
     }
   }
 
-  private String createOnDiskUrl(@NotNull FileReference fileRef, Optional<String> action) {
-    String url;
+  UriBuilder createOnDiskUrl(@NotNull FileReference fileRef, Optional<String> action) {
     String path = fileRef.getFullPath().trim().substring(1);
-    url = context.getXWikiContext().getWiki().getSkinFile(path, true, context.getXWikiContext())
-        .replace("/skin/",
-            "/" + action.orElse(getDefaultAction()) + "/");
-    url += "?version=" + lastStartupTimeStamp.getFileModificationDate(path);
-    return url;
+    UriBuilder uri = UriBuilder.fromPath(
+        context.getXWikiContext().getWiki().getSkinFile(path, true, context.getXWikiContext())
+            .replace("/skin/",
+                "/" + action.orElse(getDefaultAction()) + "/"));
+    uri.queryParam("version", lastStartupTimeStamp.getFileModificationDate(path));
+    return uri;
   }
 
 }
