@@ -80,11 +80,16 @@ public class FileUriScriptServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_createAbsoluteFileUri_null() {
-    assertNotNull(fileUriSrv.createAbsoluteFileUri(null, null, null));
+    assertNotNull(fileUriSrv.createAbsoluteFileUri((FileReference) null, null, null));
+    assertEquals("", fileUriSrv.createAbsoluteFileUri((FileReference) null, null, null).toString());
+    assertNotNull(fileUriSrv.createAbsoluteFileUri((String) null, null, null));
+    assertEquals("", fileUriSrv.createAbsoluteFileUri((String) null, null, null).toString());
+    assertNotNull(fileUriSrv.createAbsoluteFileUri((String) null, null));
+    assertEquals("", fileUriSrv.createAbsoluteFileUri((String) null, null).toString());
   }
 
   @Test
-  public void test_createAbsoluteFileUri() throws Exception {
+  public void test_createAbsoluteFileUri_fileRef() throws Exception {
     String serverUrl = "http://localhost";
     URL viewURL = new URL(serverUrl);
     expect(mockURLFactory.getServerURL(same(context))).andReturn(viewURL);
@@ -98,19 +103,16 @@ public class FileUriScriptServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getExternalFileURL_null() {
-    assertNotNull(fileUriSrv.getExternalFileURL(null, null, null));
-    assertEquals("", fileUriSrv.getExternalFileURL(null, null, null));
-    assertNotNull(fileUriSrv.getExternalFileURL(null, null));
-    assertEquals("", fileUriSrv.getExternalFileURL(null, null));
-  }
-
-  @Test
-  public void test_getExternalFileURL() throws Exception {
-    URL viewURL = new URL("http://localhost");
+  public void test_getExternalFileURL_string() throws Exception {
+    String filePath = "/a/b/c.txt";
+    String serverUrl = "http://localhost";
+    URL viewURL = new URL(serverUrl);
     expect(mockURLFactory.getServerURL(same(context))).andReturn(viewURL);
     replayDefault();
-    assertNotNull(fileUriSrv.getExternalFileURL("/a/b/c.txt", null, null));
+    UriBuilder fileUri = fileUriSrv.createAbsoluteFileUri(filePath, null, null);
+    assertNotNull(fileUri);
+    assertEquals("Absolute file uri must enclose all information for externalForm.",
+        serverUrl + filePath, fileUri.build().toURL().toExternalForm());
     verifyDefault();
   }
 
