@@ -52,14 +52,39 @@ public class FileUriServiceTest extends AbstractComponentTest {
   public void test_createFileUrl_fullURL() throws Exception {
     FileReference fileRef = FileReference.of("http://www.bla.com/bla.txt").build();
     assertEquals("http://www.bla.com/bla.txt",
-        fileUriServ.createFileUrl(fileRef, Optional.empty()).build().toString());
+        fileUriServ.createFileUri(fileRef, Optional.empty()).build().toString());
   }
 
   @Test
   public void test_createFileUrl_partURL() throws Exception {
     FileReference fileRef = FileReference.of("/xwiki/bin/download/A/B/bla.txt").build();
-    assertEquals("/xwiki/bin/download/A/B/bla.txt", fileUriServ.createFileUrl(fileRef,
+    assertEquals("/xwiki/bin/download/A/B/bla.txt", fileUriServ.createFileUri(fileRef,
         Optional.empty()).build().toString());
+  }
+
+  @Test
+  public void test_getExternalFileURL_partURL() throws Exception {
+    FileReference fileRef = FileReference.of("/xwiki/bin/download/A/B/bla.txt").build();
+    URL viewURL = new URL("http://localhost");
+    expect(mockURLFactory.getServerURL(same(context))).andReturn(viewURL);
+    replayDefault();
+    assertEquals("http://localhost/xwiki/bin/download/A/B/bla.txt",
+        fileUriServ.createAbsoluteFileUri(fileRef, Optional.empty(), Optional.empty()).build()
+            .toURL().toExternalForm().toString());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getExternalFileURL_partURL_external() throws Exception {
+    FileReference fileRef = FileReference.of("http://myTesthost.ch/xwiki/bin/download/A/B/bla.txt")
+        .build();
+    URL viewURL = new URL("http://localhost");
+    expect(mockURLFactory.getServerURL(same(context))).andReturn(viewURL);
+    replayDefault();
+    assertEquals("http://myTesthost.ch/xwiki/bin/download/A/B/bla.txt",
+        fileUriServ.createAbsoluteFileUri(fileRef, Optional.empty(), Optional.empty()).build()
+            .toURL().toExternalForm().toString());
+    verifyDefault();
   }
 
   @Test
@@ -76,7 +101,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
     expect(mockURLFactory.getURL(eq(viewURL), same(context))).andReturn(viewURL.getPath());
     replayDefault();
     FileReference fileRef = FileReference.of("?xpage=bla&bli=blu").build();
-    assertEquals("/mySpace/myDoc?xpage=bla&bli=blu", fileUriServ.createFileUrl(fileRef,
+    assertEquals("/mySpace/myDoc?xpage=bla&bli=blu", fileUriServ.createFileUri(fileRef,
         Optional.empty()).build().toString());
     verifyDefault();
   }
@@ -105,7 +130,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
         .atLeastOnce();
     replayDefault();
     FileReference fileRef = FileReference.of("celements2web:A.B;bla.txt").build();
-    String attachmentURL = fileUriServ.createFileUrl(fileRef, Optional.empty()).build().toString();
+    String attachmentURL = fileUriServ.createFileUri(fileRef, Optional.empty()).build().toString();
     assertNotNull(attachmentURL);
     assertTrue("expecting " + resultURL + " but got " + attachmentURL,
         attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
@@ -136,7 +161,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
         .atLeastOnce();
     replayDefault();
     FileReference fileRef = FileReference.of("A.B;bla.txt").build();
-    String attachmentURL = fileUriServ.createFileUrl(fileRef, Optional.empty()).build().toString();
+    String attachmentURL = fileUriServ.createFileUri(fileRef, Optional.empty()).build().toString();
     assertNotNull(attachmentURL);
     assertTrue("expecting " + resultURL + " but got " + attachmentURL,
         attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
@@ -157,7 +182,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
     replayDefault();
     FileReference fileRef = FileReference.of("A.B;bla.txt").build();
     assertThrows(FileNotExistException.class,
-        () -> fileUriServ.createFileUrl(fileRef, Optional.empty()));
+        () -> fileUriServ.createFileUri(fileRef, Optional.empty()));
     verifyDefault();
   }
 
@@ -171,7 +196,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
         "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("download");
     replayDefault();
     FileReference fileRef = FileReference.of(" :celJS/bla.js").build();
-    String attachmentURL = fileUriServ.createFileUrl(fileRef, Optional.empty(), Optional.empty())
+    String attachmentURL = fileUriServ.createFileUri(fileRef, Optional.empty(), Optional.empty())
         .toString();
     String expectedURL = "/appname/download/resources/celJS/bla.js";
     assertNotNull(attachmentURL);
@@ -184,7 +209,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
   public void test_createFileUrl_Rubish() throws Exception {
     FileReference fileRef = FileReference.of("http://A.B;bla.txt").build();
     assertEquals("http://A.B;bla.txt",
-        fileUriServ.createFileUrl(fileRef, Optional.empty(), Optional.empty()).toString());
+        fileUriServ.createFileUri(fileRef, Optional.empty(), Optional.empty()).toString());
   }
 
   @Test
@@ -195,7 +220,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
         "http://test.fabian.dev:10080/resources/"));
     replayDefault();
     assertEquals("http://test.fabian.dev:10080/file/resources/",
-        fileUriServ.getFileURLPrefix(Optional.empty()).toString());
+        fileUriServ.getFileUriPrefix(Optional.empty()).toString());
     verifyDefault();
   }
 
@@ -210,7 +235,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
     String queryString = "asf=oiu";
     replayDefault();
     FileReference fileRef = FileReference.of(":celJS/bla.js").build();
-    String attachmentURL = fileUriServ.createFileUrl(fileRef, Optional.empty(),
+    String attachmentURL = fileUriServ.createFileUri(fileRef, Optional.empty(),
         Optional.of(queryString)).toString();
     String expectedURL = "/appname/download/resources/celJS/bla.js";
     assertTrue(attachmentURL,
@@ -243,7 +268,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
     String queryString = "asf=oiu";
     replayDefault();
     FileReference fileRef = FileReference.of("A.B;bla.txt").build();
-    String attachmentURL = fileUriServ.createFileUrl(fileRef, Optional.of("testAction"),
+    String attachmentURL = fileUriServ.createFileUri(fileRef, Optional.of("testAction"),
         Optional.of(queryString)).toString();
     assertTrue(attachmentURL,
         attachmentURL.matches(resultURL + "\\?version=\\d{14}\\&" + queryString));
@@ -264,7 +289,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
     expect(mockURLFactory.getURL(eq(viewURL), same(context))).andReturn(viewURL.getPath());
     UriBuilder uri = UriBuilder.fromPath("").replaceQuery("sdf=asdf");
     replayDefault();
-    assertEquals("/mySpace/myDoc?sdf=asdf", fileUriServ.addContextUrl(uri).toString());
+    assertEquals("/mySpace/myDoc?sdf=asdf", fileUriServ.addContextUri(uri).toString());
     verifyDefault();
   }
 
@@ -288,7 +313,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
     FileReference fileRef = FileReference.of(":celRes/test/bla.css").build();
     assertEquals(
         "http://celements2web.localhost/createOnDiskUrl/celRes/test/bla.css?version=20191230101135",
-        fileUriServ.createOnDiskUrl(fileRef, Optional.of("createOnDiskUrl")).toString());
+        fileUriServ.createOnDiskUri(fileRef, Optional.of("createOnDiskUrl")).toString());
     verifyDefault();
   }
 
