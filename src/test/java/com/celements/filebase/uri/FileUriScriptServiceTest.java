@@ -7,14 +7,17 @@ import static org.junit.Assert.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.ws.rs.core.UriBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.filebase.references.FileReference;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -27,9 +30,12 @@ public class FileUriScriptServiceTest extends AbstractComponentTest {
   private XWikiContext context;
   private XWikiURLFactory mockURLFactory;
   private XWiki wiki;
+  private ConfigurationSource configSrcMock;
 
   @Before
   public void setUp_FileUriScriptServiceTest() throws Exception {
+    configSrcMock = registerComponentMock(ConfigurationSource.class,
+        CelementsFromWikiConfigurationSource.NAME);
     context = getContext();
     wiki = getWikiMock();
     mockURLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
@@ -54,8 +60,7 @@ public class FileUriScriptServiceTest extends AbstractComponentTest {
     Date lastModificationDate = new SimpleDateFormat("YYYYmmddHHMMss").parse("20201123101535");
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/prototype.js"))).andReturn(
         lastModificationDate);
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("download");
+    expectDefaultAction(Optional.of("download"));
     replayDefault();
     assertEquals("/file/resources/celJS/prototype.js?version=20191230101135",
         fileUriSrv.createFileUrl(":celJS/prototype.js", "file").toString());
@@ -70,8 +75,7 @@ public class FileUriScriptServiceTest extends AbstractComponentTest {
     Date lastModificationDate = new SimpleDateFormat("YYYYmmddHHMMss").parse("20201123101535");
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/prototype.js"))).andReturn(
         lastModificationDate);
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("download");
+    expectDefaultAction(Optional.of("download"));
     replayDefault();
     assertEquals("/file/resources/celJS/prototype.js?version=20191230101135&bla=asfd",
         fileUriSrv.createFileUrl(":celJS/prototype.js", "file", "bla=asfd").toString());
@@ -116,4 +120,11 @@ public class FileUriScriptServiceTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  private void expectDefaultAction(Optional<String> action) {
+    expect(configSrcMock.getProperty(eq("celements.fileuri.defaultaction")))
+        .andReturn(action.orElse("file"));
+    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
+        "celements.attachmenturl.defaultaction"), eq("file"), same(context)))
+            .andReturn(action.orElse("file")).atLeastOnce();
+  }
 }
