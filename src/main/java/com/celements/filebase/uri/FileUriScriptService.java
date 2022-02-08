@@ -16,7 +16,10 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.filebase.references.FileReference;
 import com.google.common.base.Strings;
 
+import groovy.lang.Singleton;
+
 @Component(FileUriScriptService.NAME)
+@Singleton
 public class FileUriScriptService implements ScriptService {
 
   public static final String NAME = "fileUri";

@@ -28,7 +28,10 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
+import groovy.lang.Singleton;
+
 @Component
+@Singleton
 public class FileUriService implements FileUriServiceRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileUriService.class);
