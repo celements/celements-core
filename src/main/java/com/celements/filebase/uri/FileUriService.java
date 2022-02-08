@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.filebase.references.FileReference;
 import com.celements.model.access.IModelAccessFacade;
@@ -21,6 +23,7 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.celements.web.service.LastStartupTimeStampRole;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -45,9 +48,14 @@ public class FileUriService implements FileUriServiceRole {
   @Requirement
   private LastStartupTimeStampRole lastStartupTimeStamp;
 
+  @Requirement(CelementsFromWikiConfigurationSource.NAME)
+  private ConfigurationSource configSrc;
+
   private String getDefaultAction() {
-    return context.getXWikiContext().getWiki().getXWikiPreference("celdefaultAttAction",
-        "celements.attachmenturl.defaultaction", "file", context.getXWikiContext());
+    return Optional.ofNullable(
+        Strings.emptyToNull(configSrc.getProperty("celements.fileuri.defaultaction")))
+        .orElse(context.getXWikiContext().getWiki().getXWikiPreference("celdefaultAttAction",
+            "celements.attachmenturl.defaultaction", "file", context.getXWikiContext()));
   }
 
   @Override
