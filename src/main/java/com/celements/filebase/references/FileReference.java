@@ -22,7 +22,7 @@ import com.google.errorprone.annotations.Immutable;
 import com.xpn.xwiki.web.Utils;
 
 @Immutable
-public class FileReference implements Serializable {
+public final class FileReference implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
