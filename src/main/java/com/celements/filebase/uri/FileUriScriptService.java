@@ -1,7 +1,6 @@
 package com.celements.filebase.uri;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -29,43 +28,43 @@ public class FileUriScriptService implements ScriptService {
   @Requirement
   private FileUriServiceRole fileUriService;
 
+  @NotNull
   public FileReference createFileReference(@NotEmpty String link) {
     return FileReference.of(link).build();
   }
 
-  @Nullable
-  public URL createFileUrl(@Nullable String fileRef) {
+  @NotNull
+  public UriBuilder createFileUrl(@Nullable String fileRef) {
     return createFileUrl(fileRef, null);
   }
 
-  @Nullable
-  public URL createFileUrl(@Nullable String fileRef, @Nullable String action) {
+  @NotNull
+  public UriBuilder createFileUrl(@Nullable String fileRef, @Nullable String action) {
     return createFileUrl(fileRef, action, null);
   }
 
-  @Nullable
-  public URL createFileUrl(@Nullable String fileRef, @Nullable String action,
+  @NotNull
+  public UriBuilder createFileUrl(@Nullable String fileRef, @Nullable String action,
       @Nullable String queryString) {
     if (!Strings.isNullOrEmpty(fileRef)) {
       return createFileUrl(createFileReference(fileRef), action, queryString);
     }
-    return null;
+    return UriBuilder.fromPath("");
   }
 
-  @Nullable
-  public URL createFileUrl(@Nullable FileReference fileRef, @Nullable String action,
+  @NotNull
+  public UriBuilder createFileUrl(@Nullable FileReference fileRef, @Nullable String action,
       @Nullable String queryString) {
     if (fileRef != null) {
       try {
         return fileUriService.createFileUri(fileRef, Optional.ofNullable(action),
-            Optional.ofNullable(queryString)).build().toURL();
-      } catch (FileNotExistException | MalformedURLException | IllegalArgumentException
-          | UriBuilderException exp) {
+            Optional.ofNullable(queryString));
+      } catch (FileNotExistException exp) {
         LOGGER.info("createFileUrl for [{}] with action [{}] an queryString [{}] failed.", fileRef,
             action, queryString, exp);
       }
     }
-    return null;
+    return UriBuilder.fromPath("");
   }
 
   @NotNull
@@ -74,17 +73,18 @@ public class FileUriScriptService implements ScriptService {
   }
 
   @NotNull
-  public String getExternalFileURL(@Nullable FileReference fileRef, @Nullable String action) {
+  public String getExternalFileURL(@Nullable String fileRef, @Nullable String action) {
     return getExternalFileURL(fileRef, action, null);
   }
 
   @NotNull
-  public String getExternalFileURL(@Nullable FileReference fileRef, @Nullable String action,
+  public String getExternalFileURL(@Nullable String fileRef, @Nullable String action,
       @Nullable String queryString) {
-    if (fileRef != null) {
+    if (!Strings.isNullOrEmpty(fileRef)) {
       try {
-        return fileUriService.createAbsoluteFileUri(fileRef, Optional.ofNullable(action),
-            Optional.ofNullable(queryString)).build().toURL().toExternalForm();
+        return fileUriService.createAbsoluteFileUri(FileReference.of(fileRef).build(),
+            Optional.ofNullable(action), Optional.ofNullable(queryString))
+            .build().toURL().toExternalForm();
       } catch (MalformedURLException | IllegalArgumentException | UriBuilderException exp) {
         LOGGER.info("getExternalFileURL for [{}] with action [{}] failed.", fileRef, action, exp);
       }
