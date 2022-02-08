@@ -66,6 +66,11 @@ public class FileUriScriptService implements ScriptService {
   }
 
   @NotNull
+  public UriBuilder getFileURLPrefix() {
+    return fileUriService.getFileUriPrefix(Optional.empty());
+  }
+
+  @NotNull
   public UriBuilder getFileURLPrefix(@Nullable String action) {
     return fileUriService.getFileUriPrefix(Optional.ofNullable(action));
   }

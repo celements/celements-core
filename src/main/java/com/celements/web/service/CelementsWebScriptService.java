@@ -54,6 +54,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.appScript.IAppScriptService;
 import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.filebase.FileBaseScriptService;
+import com.celements.filebase.uri.FileUriScriptService;
 import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.celements.metatag.BaseObjectMetaTagProvider;
@@ -98,6 +99,8 @@ import com.xpn.xwiki.web.Utils;
 
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
+
+  private static final String DELETED_ATTACHMENTS_HQL = "select datt.id from DeletedAttachment as datt order by datt.filename asc";
 
   private static final String CEL_GLOBALVAL_PREFIX = "celements.globalvalues.";
 
@@ -373,22 +376,43 @@ public class CelementsWebScriptService implements ScriptService {
     return getImageMapCommand().displayAllImageMapConfigs();
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link FileUriScriptService#createFileUrl(String)}
+   */
+  @Deprecated
   public String getSkinFile(String fileName) {
     return new AttachmentURLCommand().getAttachmentURL(fileName, getContext());
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link FileUriScriptService#createFileUrl(String, String)}
+   */
+  @Deprecated
   public String getSkinFile(String fileName, String action) {
     return new AttachmentURLCommand().getAttachmentURL(fileName, action, getContext());
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link FileUriScriptService#getFileURLPrefix()}
+   */
+  @Deprecated
   public String getAttachmentURLPrefix() {
     return new AttachmentURLCommand().getAttachmentURLPrefix();
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link FileUriScriptService#getFileURLPrefix(String)}
+   */
+  @Deprecated
   public String getAttachmentURLPrefix(String action) {
     return new AttachmentURLCommand().getAttachmentURLPrefix(action);
   }
 
+  /**
+   * @deprecated since 5.4 instead use
+   *             {@link FileUriScriptService#createAbsoluteFileUri(String, String)}
+   */
+  @Deprecated
   public String getSkinFileExternal(String fileName, String action) {
     return new AttachmentURLCommand().getExternalAttachmentURL(fileName, action, getContext());
   }
@@ -485,8 +509,8 @@ public class CelementsWebScriptService implements ScriptService {
       renderCommand.initRenderingEngine(rendererNameList);
       return renderCommand.renderDocument(docRef, lang);
     } catch (XWikiException exp) {
-      LOGGER.error("renderCelementsDocument: Failed to render [" + docRef + "] lang [" + lang
-          + "].", exp);
+      LOGGER.error("renderCelementsDocument: Failed to render [{}] in lang [{}].", docRef, lang,
+          exp);
     }
     return "";
   }
@@ -513,8 +537,9 @@ public class CelementsWebScriptService implements ScriptService {
     try {
       return webUtilsService.renderInheritableDocument(docRef, lang);
     } catch (XWikiException exp) {
-      LOGGER.error("renderInheritableDocument: Failed to render inheritable [" + docRef
-          + "] in lang [" + lang + "].");
+      LOGGER.error(
+          "renderInheritableDocument: Failed to render inheritable [{}] in lang [{}].", docRef,
+          lang, exp);
     }
     return "";
   }
@@ -563,7 +588,8 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   private String getDeletedDocsHql(String orderby, boolean hideOverwritten) {
-    String deletedDocsHql = "select distinct ddoc.fullName" + " from XWikiDeletedDocument as ddoc";
+    String deletedDocsHql = "select distinct ddoc.fullName"
+        + " from XWikiDeletedDocument as ddoc";
     if (hideOverwritten) {
       deletedDocsHql += " where ddoc.fullName not in (select doc.fullName from"
           + " XWikiDocument as doc)";
@@ -628,16 +654,12 @@ public class CelementsWebScriptService implements ScriptService {
   public List<Object> getDeletedAttachments() {
     List<Object> resultList = Collections.emptyList();
     try {
-      Query query = queryManager.createQuery(getDeletedAttachmentsHql(), Query.HQL);
+      Query query = queryManager.createQuery(DELETED_ATTACHMENTS_HQL, Query.HQL);
       resultList = query.execute();
     } catch (QueryException queryExp) {
       LOGGER.error("Failed to parse or execute deletedAttachments hql query.", queryExp);
     }
     return resultList;
-  }
-
-  private String getDeletedAttachmentsHql() {
-    return "select datt.id from DeletedAttachment as datt order by datt.filename asc";
   }
 
   /**
@@ -724,7 +746,7 @@ public class CelementsWebScriptService implements ScriptService {
       String key) {
     BaseCollection skinConfigBaseColl = new SkinConfigObjCommand().getSkinConfigFieldInheritor(
         fallbackClassName).getObject(key);
-    if ((skinConfigBaseColl != null) && (skinConfigBaseColl instanceof BaseObject)) {
+    if (skinConfigBaseColl instanceof BaseObject) {
       BaseObject skinConfigObj = (BaseObject) skinConfigBaseColl;
       return skinConfigObj.newObjectApi(skinConfigObj, getContext());
     } else {
