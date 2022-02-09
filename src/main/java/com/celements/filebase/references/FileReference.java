@@ -29,12 +29,9 @@ public final class FileReference implements Serializable {
   @NotThreadSafe
   public static final class Builder {
 
-    private static final String ATTACHMENT_LINK_REGEX = "([\\w\\-]*:)?([\\w\\-]*\\.[\\w\\-]*){1};.*";
-    private static final Supplier<Pattern> ATTACHMENT_LINK_PATTERN = Suppliers
-        .memoize(() -> Pattern.compile(ATTACHMENT_LINK_REGEX));
-    private static final String ON_DISK_LINK_REGEX = "^:[/\\w\\-\\.]*";
-    private static final Supplier<Pattern> ON_DISK_LINK_PATTERN = Suppliers
-        .memoize(() -> Pattern.compile(ON_DISK_LINK_REGEX));
+  private static final Pattern ATTACHMENT_LINK_PATTERN = Pattern.compile(
+      "([\\w\\-]*:)?([\\w\\-]*\\.[\\w\\-]*){1};.*");
+  private static final Pattern ON_DISK_LINK_PATTERN = Pattern.compile("^:[/\\w\\-\\.]*");
 
     private String name;
     private FileReferenceType type;
