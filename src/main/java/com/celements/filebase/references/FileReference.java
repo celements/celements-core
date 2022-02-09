@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.*;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -18,7 +17,6 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.util.ModelUtils;
 import com.google.common.base.Strings;
-import com.google.common.base.Suppliers;
 import com.google.errorprone.annotations.Immutable;
 import com.xpn.xwiki.web.Utils;
 
@@ -34,9 +32,9 @@ public final class FileReference implements Serializable {
   @NotThreadSafe
   public static final class Builder {
 
-  private static final Pattern ATTACHMENT_LINK_PATTERN = Pattern.compile(
-      "([\\w\\-]*:)?([\\w\\-]*\\.[\\w\\-]*){1};.*");
-  private static final Pattern ON_DISK_LINK_PATTERN = Pattern.compile("^:[/\\w\\-\\.]*");
+    private static final Pattern ATTACHMENT_LINK_PATTERN = Pattern.compile(
+        "([\\w\\-]*:)?([\\w\\-]*\\.[\\w\\-]*){1};.*");
+    private static final Pattern ON_DISK_LINK_PATTERN = Pattern.compile("^:[/\\w\\-\\.]*");
 
     private String name;
     private FileReferenceType type;
@@ -57,14 +55,14 @@ public final class FileReference implements Serializable {
 
     private static boolean isAttachmentLink(@Nullable String link) {
       if (link != null) {
-        return ATTACHMENT_LINK_PATTERN.get().matcher(link.trim()).matches();
+        return ATTACHMENT_LINK_PATTERN.matcher(link.trim()).matches();
       }
       return false;
     }
 
     private static boolean isOnDiskLink(@Nullable String link) {
       if (link != null) {
-        return ON_DISK_LINK_PATTERN.get().matcher(link.trim()).matches();
+        return ON_DISK_LINK_PATTERN.matcher(link.trim()).matches();
       }
       return false;
     }
