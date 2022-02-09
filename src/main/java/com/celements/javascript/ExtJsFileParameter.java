@@ -142,9 +142,7 @@ public final class ExtJsFileParameter {
   public boolean equals(@Nullable Object obj) {
     return (obj instanceof ExtJsFileParameter)
         && Objects.equals(((ExtJsFileParameter) obj).jsFileUrl, this.jsFileUrl)
-        && Objects.equals(((ExtJsFileParameter) obj).loadMode, this.loadMode)
-        && Objects.equals(((ExtJsFileParameter) obj).queryString, this.queryString)
-        && Objects.equals(((ExtJsFileParameter) obj).lazyLoad, this.lazyLoad);
+        && Objects.equals(((ExtJsFileParameter) obj).queryString, this.queryString));
   }
 
   @Override
