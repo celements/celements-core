@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.*;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -25,6 +26,10 @@ import com.xpn.xwiki.web.Utils;
 public final class FileReference implements Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  public enum FileReferenceType {
+    ON_DISK, ATTACHMENT, EXTERNAL;
+  }
 
   @NotThreadSafe
   public static final class Builder {
@@ -104,9 +109,8 @@ public final class FileReference implements Serializable {
       this.fullPath = fullPath;
     }
 
-    public void setQueryString(@NotNull String queryString) {
-      checkNotNull(queryString);
-      this.queryString = queryString;
+    public void setQueryString(@Nullable String queryString) {
+      this.queryString = Strings.emptyToNull(queryString);
     }
 
     public FileReference build() {
@@ -121,7 +125,7 @@ public final class FileReference implements Serializable {
   private final String fullPath;
   private final String queryString;
 
-  public FileReference(Builder builder) {
+  private FileReference(Builder builder) {
     this.name = builder.name;
     this.type = builder.type;
     this.fullPath = builder.fullPath;
@@ -145,8 +149,8 @@ public final class FileReference implements Serializable {
     return fullPath;
   }
 
-  public String getQueryString() {
-    return queryString;
+  public Optional<String> getQueryString() {
+    return Optional.ofNullable(queryString);
   }
 
   public UriBuilder getUri() {
@@ -181,7 +185,7 @@ public final class FileReference implements Serializable {
         + fullPath + "]";
   }
 
-  public static Builder of(@NotEmpty String link) {
+  public static FileReference of(@NotEmpty String link) {
     checkArgument(!Strings.isNullOrEmpty(link), "link may not be empty");
     final String[] linkParts = link.split("\\?");
     Builder builder = new Builder();
@@ -196,7 +200,7 @@ public final class FileReference implements Serializable {
     if (linkParts.length > 1) {
       builder.setQueryString(linkParts[1]);
     }
-    return builder;
+    return builder.build();
   }
 
 }

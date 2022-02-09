@@ -3,6 +3,7 @@ package com.celements.filebase.uri;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
+import javax.inject.Singleton;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
@@ -15,8 +16,6 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.filebase.references.FileReference;
 import com.google.common.base.Strings;
-
-import groovy.lang.Singleton;
 
 @Component(FileUriScriptService.NAME)
 @Singleton
@@ -31,7 +30,7 @@ public class FileUriScriptService implements ScriptService {
 
   @NotNull
   public FileReference createFileReference(@NotEmpty String link) {
-    return FileReference.of(link).build();
+    return FileReference.of(link);
   }
 
   @NotNull
