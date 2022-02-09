@@ -73,6 +73,7 @@ public final class FileReference implements Serializable {
           DocumentReference.class);
     }
 
+    @NotNull
     private static FileReferenceType getTypeOfLink(@NotEmpty String link) {
       if (isOnDiskLink(link)) {
         return FileReferenceType.ON_DISK;
@@ -82,12 +83,14 @@ public final class FileReference implements Serializable {
       return FileReferenceType.EXTERNAL;
     }
 
+    @NotNull
     public Builder setFileName(@NotNull String fileName) {
       checkNotNull(fileName);
       this.name = fileName;
       return this;
     }
 
+    @NotNull
     public Builder setType(@NotNull FileReferenceType type) {
       checkNotNull(type);
       this.type = type;
@@ -99,8 +102,8 @@ public final class FileReference implements Serializable {
       this.docRef = docRef;
     }
 
-    public void setFullPath(@NotNull String fullPath) {
-      checkNotNull(fullPath);
+    public void setFullPath(@NotEmpty String fullPath) {
+      checkArgument(!Strings.isNullOrEmpty(fullPath), "path may not be null or empty");
       this.fullPath = fullPath;
     }
 
@@ -108,6 +111,7 @@ public final class FileReference implements Serializable {
       this.queryString = Strings.emptyToNull(queryString);
     }
 
+    @NotNull
     public FileReference build() {
       return new FileReference(this);
     }
@@ -128,26 +132,32 @@ public final class FileReference implements Serializable {
     this.queryString = builder.queryString;
   }
 
+  @NotNull
   public String getName() {
     return name;
   }
 
+  @NotNull
   public FileReferenceType getType() {
     return type;
   }
 
+  @Nullable
   public DocumentReference getDocRef() {
     return docRef;
   }
 
+  @NotEmpty
   public String getFullPath() {
     return fullPath;
   }
 
+  @NotNull
   public Optional<String> getQueryString() {
     return Optional.ofNullable(queryString);
   }
 
+  @NotNull
   public UriBuilder getUri() {
     return UriBuilder.fromPath(fullPath).replaceQuery(queryString);
   }
@@ -180,6 +190,7 @@ public final class FileReference implements Serializable {
         + fullPath + "]";
   }
 
+  @NotNull
   public static FileReference of(@NotEmpty String link) {
     checkArgument(!Strings.isNullOrEmpty(link), "link may not be empty");
     final String[] linkParts = link.split("\\?");
