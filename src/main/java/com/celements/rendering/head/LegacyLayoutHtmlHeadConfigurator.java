@@ -33,22 +33,22 @@ public class LegacyLayoutHtmlHeadConfigurator implements HtmlHeadConfiguratorRol
       .setAction("file").setLoadMode(JsLoadMode.DEFER);
 
   private static final Set<ExtJsFileParameter> DEFAULT_JS_FILES = ImmutableSet.of(
-      extJSParam.setJsFile(":celJS/prototype.js").build(),
-      extJSParam.setJsFile(":celJS/jquery.min.js").build(),
-      extJSParam.setJsFile(":celJS/jquery-noconflict.js").build(),
-      extJSParam.setJsFile(":celJS/initCelements.min.js").build(),
-      extDeferJSParam.setJsFile(":celJS/mobile/MobileSupport.js").build(),
-      extDeferJSParam.setJsFile(":celJS/scriptaculous/effects.js").build(),
-      extDeferJSParam.setJsFile(":celJS/validation.js").build(),
-      extDeferJSParam.setJsFile(":celJS/bootstrap/bootstrap.min.js").build(),
-      extDeferJSParam.setJsFile(":celJS/bootstrap/bootstrap-multiselect.js").build(),
+      extJSParam.setJsFileRef(":celJS/prototype.js").build(),
+      extJSParam.setJsFileRef(":celJS/jquery.min.js").build(),
+      extJSParam.setJsFileRef(":celJS/jquery-noconflict.js").build(),
+      extJSParam.setJsFileRef(":celJS/initCelements.min.js").build(),
+      extDeferJSParam.setJsFileRef(":celJS/mobile/MobileSupport.js").build(),
+      extDeferJSParam.setJsFileRef(":celJS/scriptaculous/effects.js").build(),
+      extDeferJSParam.setJsFileRef(":celJS/validation.js").build(),
+      extDeferJSParam.setJsFileRef(":celJS/bootstrap/bootstrap.min.js").build(),
+      extDeferJSParam.setJsFileRef(":celJS/bootstrap/bootstrap-multiselect.js").build(),
       extDeferJSParam
-          .setJsFile(":celJS/jquery-datetimepicker/2.5/jquery.datetimepicker.full.min.js").build(),
-      extDeferJSParam.setJsFile(":celJS/dateTimePicker/generateDateTimePicker.js").build(),
-      extDeferJSParam.setJsFile(":celJS/bootstrap/bootstrap-multiselect.js").build());
+          .setJsFileRef(":celJS/jquery-datetimepicker/2.5/jquery.datetimepicker.full.min.js").build(),
+      extDeferJSParam.setJsFileRef(":celJS/dateTimePicker/generateDateTimePicker.js").build(),
+      extDeferJSParam.setJsFileRef(":celJS/bootstrap/bootstrap-multiselect.js").build());
 
   private static final ExtJsFileParameter SWF_OBJECT_JS = extDeferJSParam
-      .setJsFile(":celJS/SWFObject-2.2/swfobject.js").build();
+      .setJsFileRef(":celJS/SWFObject-2.2/swfobject.js").build();
 
   @Override
   public List<ExtJsFileParameter> getAllInitialJavaScriptFiles() {

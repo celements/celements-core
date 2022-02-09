@@ -29,7 +29,7 @@ public class LegacyLayoutHtmlHeadConfiguratorTest extends AbstractComponentTest 
     expect(getWikiMock().getXWikiPreferenceAsInt(eq("cel_disable_swfobject"), eq(0),
         same(getContext()))).andReturn(0);
     ExtJsFileParameter initCelements = new ExtJsFileParameter.Builder()
-        .setJsFile(":celJS/initCelements.min.js").setAction("file").build();
+        .setJsFileRef(":celJS/initCelements.min.js").setAction("file").build();
     replayDefault();
     List<ExtJsFileParameter> resultList = configurator.getAllInitialJavaScriptFiles();
     assertNotNull(resultList);

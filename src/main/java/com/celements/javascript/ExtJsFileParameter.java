@@ -4,18 +4,22 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.celements.ressource_url.RessourceUrlServiceRole;
-import com.celements.ressource_url.UrlRessourceNotExistException;
+import com.celements.filebase.references.FileReference;
+import com.celements.filebase.uri.FileNotExistException;
+import com.celements.filebase.uri.FileUriServiceRole;
 import com.celements.sajson.JsonBuilder;
 import com.google.common.base.Strings;
 import com.google.errorprone.annotations.Immutable;
@@ -30,7 +34,8 @@ public final class ExtJsFileParameter {
   @NotThreadSafe
   public static final class Builder {
 
-    private JsFileEntry jsFileEntry = new JsFileEntry();
+    private FileReference jsFileRef;
+    private JsLoadMode loadMode = JsLoadMode.SYNC;
     private String action;
     private String queryString;
     private boolean lazyLoad = false;
@@ -38,14 +43,21 @@ public final class ExtJsFileParameter {
     @NotNull
     public Builder setJsFileEntry(@NotNull JsFileEntry jsFileEntry) {
       checkNotNull(jsFileEntry);
-      this.jsFileEntry = jsFileEntry;
+      this.jsFileRef = FileReference.of(jsFileEntry.getFilepath()).build();
       return this;
     }
 
     @NotNull
-    public Builder setJsFile(@NotEmpty String jsFile) {
-      checkNotNull(jsFile);
-      this.jsFileEntry.setFilepath(jsFile);
+    public Builder setJsFileRef(@NotNull FileReference jsFileRef) {
+      checkNotNull(jsFileRef);
+      this.jsFileRef = jsFileRef;
+      return this;
+    }
+
+    @NotNull
+    public Builder setJsFileRef(@NotEmpty String link) {
+      checkNotNull(link);
+      this.jsFileRef = FileReference.of(link).build();
       return this;
     }
 
@@ -57,7 +69,7 @@ public final class ExtJsFileParameter {
 
     @NotNull
     public Builder setQueryString(@Nullable String params) {
-      this.queryString = params;
+      this.queryString = Strings.emptyToNull(params);
       return this;
     }
 
@@ -69,7 +81,7 @@ public final class ExtJsFileParameter {
 
     @NotNull
     public Builder setLoadMode(@Nullable JsLoadMode loadMode) {
-      this.jsFileEntry.setLoadMode(loadMode);
+      this.loadMode = loadMode;
       return this;
     }
 
@@ -85,7 +97,7 @@ public final class ExtJsFileParameter {
 
     @Override
     public String toString() {
-      return "ExtJsFileParameter.Builder [jsFileEntry=" + jsFileEntry + ", action=" + action
+      return "ExtJsFileParameter.Builder [jsFileEntry=" + jsFileRef + ", action=" + action
           + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + "]";
     }
 
@@ -94,24 +106,27 @@ public final class ExtJsFileParameter {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExtJsFileParameter.class);
 
   private final String action;
-  private final String jsFileUrl;
+  private final FileReference jsFileRef;
   private final JsLoadMode loadMode;
   private final String queryString;
   private final boolean lazyLoad;
 
   private ExtJsFileParameter(Builder buildParams) {
     action = Strings.emptyToNull(buildParams.action);
-    queryString = Strings.emptyToNull(buildParams.queryString);
     lazyLoad = buildParams.lazyLoad;
-    checkNotNull(buildParams.jsFileEntry);
-    jsFileUrl = Strings.emptyToNull(buildParams.jsFileEntry.getFilepath());
-    checkNotNull(jsFileUrl);
-    loadMode = buildParams.jsFileEntry.getLoadMode();
+    checkNotNull(buildParams.jsFileRef);
+    jsFileRef = buildParams.jsFileRef;
+    queryString = Strings.emptyToNull(
+        Stream.of(jsFileRef.getQueryString(), buildParams.queryString)
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining("&")));
+    checkNotNull(jsFileRef);
+    loadMode = buildParams.loadMode;
   }
 
   @NotNull
-  public String getJsFile() {
-    return jsFileUrl;
+  public FileReference getJsFileRef() {
+    return jsFileRef;
   }
 
   @NotNull
@@ -135,19 +150,19 @@ public final class ExtJsFileParameter {
 
   @Override
   public int hashCode() {
-    return Objects.hash(jsFileUrl, loadMode, queryString, lazyLoad);
+    return Objects.hash(jsFileRef, queryString);
   }
 
   @Override
   public boolean equals(@Nullable Object obj) {
     return (obj instanceof ExtJsFileParameter)
-        && Objects.equals(((ExtJsFileParameter) obj).jsFileUrl, this.jsFileUrl)
-        && Objects.equals(((ExtJsFileParameter) obj).queryString, this.queryString));
+        && Objects.equals(((ExtJsFileParameter) obj).jsFileRef, this.jsFileRef)
+        && Objects.equals(((ExtJsFileParameter) obj).queryString, this.queryString);
   }
 
   @Override
   public String toString() {
-    return "ExtJsFileParameter [action=" + action + ", jsFileUrl=" + jsFileUrl + ", loadMode="
+    return "ExtJsFileParameter [action=" + action + ", jsFileUrl=" + jsFileRef + ", loadMode="
         + loadMode + ", queryString=" + queryString + ", lazyLoad=" + lazyLoad + "]";
   }
 
@@ -157,9 +172,9 @@ public final class ExtJsFileParameter {
     jsonBuilder.openDictionary();
     try {
       jsonBuilder.addProperty("fullURL",
-          getAttUrlSrv().createRessourceUrl(getJsFile(), getAction(), getQueryString()));
-    } catch (UrlRessourceNotExistException exp) {
-      LOGGER.info("URL ressource '{}' does not exist.", getJsFile(), exp);
+          getAttUrlSrv().createFileUri(getJsFileRef(), getAction(), getQueryString()).toString());
+    } catch (FileNotExistException exp) {
+      LOGGER.info("URL ressource '{}' does not exist.", getJsFileRef(), exp);
       jsonBuilder.addProperty("errorMsg", buildNotFoundWarning());
     }
     jsonBuilder.addProperty("initLoad", true);
@@ -171,20 +186,20 @@ public final class ExtJsFileParameter {
   public String getScriptTag() {
     try {
       return getScriptTagString();
-    } catch (UrlRessourceNotExistException exp) {
-      LOGGER.info("URL ressource '{}' does not exist.", getJsFile(), exp);
+    } catch (FileNotExistException exp) {
+      LOGGER.info("URL ressource '{}' does not exist.", getJsFileRef(), exp);
       return buildNotFoundWarningComment();
     }
   }
 
-  public String getScriptTagString()
-      throws UrlRessourceNotExistException {
-    final String fileUrl = getAttUrlSrv().createRessourceUrl(getJsFile(), getAction(),
+  public String getScriptTagString() throws FileNotExistException {
+    final UriBuilder fileUri = getAttUrlSrv().createFileUri(getJsFileRef(), getAction(),
         getQueryString());
-    LOGGER.info("getScriptTagString: extJsFileParams [{}] jsFileUrl [{}]", this, fileUrl);
+    LOGGER.info("getScriptTagString: extJsFileParams [{}] jsFileUrl [{}]", this, fileUri);
     return "<script" + ((getLoadMode() != JsLoadMode.SYNC)
         ? " " + getLoadMode().toString().toLowerCase()
-        : "") + " type=\"text/javascript\" src=\"" + StringEscapeUtils.escapeHtml(fileUrl)
+        : "") + " type=\"text/javascript\" src=\""
+        + StringEscapeUtils.escapeHtml(fileUri.toString())
         + "\"></script>";
   }
 
@@ -193,11 +208,11 @@ public final class ExtJsFileParameter {
   }
 
   private String buildNotFoundWarning() {
-    return "WARNING: js-file not found: " + getJsFile();
+    return "WARNING: js-file not found: " + getJsFileRef().getFullPath();
   }
 
-  private RessourceUrlServiceRole getAttUrlSrv() {
-    return Utils.getComponent(RessourceUrlServiceRole.class);
+  private FileUriServiceRole getAttUrlSrv() {
+    return Utils.getComponent(FileUriServiceRole.class);
   }
 
 }

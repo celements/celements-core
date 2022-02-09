@@ -22,7 +22,6 @@ package com.celements.web.plugin.cmd;
 import static com.google.common.base.Preconditions.*;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +44,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.reflect.ReflectiveInstanceSupplier;
 import com.celements.convert.bean.BeanClassDefConverter;
 import com.celements.convert.bean.XObjectBeanConverter;
+import com.celements.filebase.uri.FileUriServiceRole;
 import com.celements.javascript.ExtJsFileParameter;
 import com.celements.javascript.JavaScriptExternalFilesClass;
 import com.celements.javascript.JsFileEntry;
@@ -56,7 +56,6 @@ import com.celements.model.reference.RefBuilder;
 import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
-import com.celements.ressource_url.RessourceUrlServiceRole;
 import com.celements.web.classes.CelementsClassDefinition;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Suppliers;
@@ -93,7 +92,6 @@ public class ExternalJavaScriptFilesCommand {
       .memoize(ExternalJavaScriptFilesCommand::jsFileEntryConverter);
 
   private final Set<ExtJsFileParameter> extJSfileSet = new LinkedHashSet<>();
-  private final Set<String> extJSAttUrlSet = new HashSet<>();
   private boolean displayedAll = false;
 
   /**
@@ -120,7 +118,7 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   public String addLazyExtJSfile(@NotEmpty String jsFile) {
     return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFileRef(jsFile)
         .setLazyLoad(true)
         .build());
   }
@@ -131,7 +129,7 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   public String addLazyExtJSfile(@NotEmpty String jsFile, @Nullable String action) {
     return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFileRef(jsFile)
         .setAction(action)
         .setLazyLoad(true)
         .build());
@@ -144,7 +142,7 @@ public class ExternalJavaScriptFilesCommand {
   public String addLazyExtJSfile(@NotEmpty String jsFile, @Nullable String action,
       @Nullable String params) {
     return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFileRef(jsFile)
         .setAction(action)
         .setQueryString(params)
         .setLazyLoad(true)
@@ -158,7 +156,7 @@ public class ExternalJavaScriptFilesCommand {
   @NotNull
   public String addExtJSfileOnce(@NotEmpty String jsFile) {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFileRef(jsFile)
         .build());
   }
 
@@ -169,7 +167,7 @@ public class ExternalJavaScriptFilesCommand {
   @NotNull
   public String addExtJSfileOnce(@NotEmpty String jsFile, @Nullable String action) {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFileRef(jsFile)
         .setAction(action)
         .build());
   }
@@ -182,7 +180,7 @@ public class ExternalJavaScriptFilesCommand {
   public String addExtJSfileOnce(@NotEmpty String jsFile, @Nullable String action,
       @Nullable String params) {
     return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
+        .setJsFileRef(jsFile)
         .setAction(action)
         .setQueryString(params)
         .build());
@@ -213,14 +211,15 @@ public class ExternalJavaScriptFilesCommand {
 
   @NotNull
   public String addExtJSfileOnce(@NotNull ExtJsFileParameter extJsFileParams) {
-    if (!extJSAttUrlSet.contains(extJsFileParams.getJsFile())) {
-      if (getRessourceUrlService().isAttachmentLink(extJsFileParams.getJsFile())
-          || getRessourceUrlService().isOnDiskLink(extJsFileParams.getJsFile())) {
-        extJSAttUrlSet.add(extJsFileParams.getJsFile());
+    if (!extJSfileSet.contains(extJsFileParams)) {
+      if (extJsFileParams.getJsFileRef().isAttachmentReference()
+          || extJsFileParams.getJsFileRef().isOnDiskReference()) {
+        extJSfileSet.add(extJsFileParams);
       }
       return generateScriptTagOnce(extJsFileParams);
     } else {
-      LOGGER.debug("addExtJSfileOnce: skip already added {}", extJsFileParams.getJsFile());
+      LOGGER.debug("addExtJSfileOnce: skip already added {}",
+          extJsFileParams.getJsFileRef().getFullPath());
     }
     return "";
   }
@@ -338,8 +337,8 @@ public class ExternalJavaScriptFilesCommand {
     }
   }
 
-  private @NotNull RessourceUrlServiceRole getRessourceUrlService() {
-    return Utils.getComponent(RessourceUrlServiceRole.class);
+  private @NotNull FileUriServiceRole getRessourceUrlService() {
+    return Utils.getComponent(FileUriServiceRole.class);
   }
 
   private @NotNull LayoutServiceRole getLayoutService() {

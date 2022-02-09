@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Requirement;
 
+import com.celements.filebase.uri.FileUriServiceRole;
 import com.celements.pagelayout.LayoutServiceRole;
-import com.celements.ressource_url.RessourceUrlServiceRole;
 
 public class JavaScriptService implements JavaScriptServiceRole {
 
@@ -15,7 +15,7 @@ public class JavaScriptService implements JavaScriptServiceRole {
   private LayoutServiceRole layoutService;
 
   @Requirement
-  private RessourceUrlServiceRole attUrlService;
+  private FileUriServiceRole attUrlService;
 
   public String getAllExternalJavaScriptFiles() {
     // return layoutService.getHtmlHeadConfigurator(layoutService.getCurrentRenderingLayout())
