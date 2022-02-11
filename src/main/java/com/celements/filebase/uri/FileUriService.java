@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.filebase.references.FileReference;
 import com.celements.model.access.IModelAccessFacade;
@@ -21,11 +23,15 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.celements.web.service.LastStartupTimeStampRole;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
+import groovy.lang.Singleton;
+
 @Component
+@Singleton
 public class FileUriService implements FileUriServiceRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileUriService.class);
@@ -45,15 +51,19 @@ public class FileUriService implements FileUriServiceRole {
   @Requirement
   private LastStartupTimeStampRole lastStartupTimeStamp;
 
+  @Requirement(CelementsFromWikiConfigurationSource.NAME)
+  private ConfigurationSource configSrc;
+
   private String getDefaultAction() {
-    return context.getXWikiContext().getWiki().getXWikiPreference("celdefaultAttAction",
-        "celements.attachmenturl.defaultaction", "file", context.getXWikiContext());
+    return Optional.ofNullable(
+        Strings.emptyToNull(configSrc.getProperty("celements.fileuri.defaultaction")))
+        .orElse(context.getXWikiContext().getWiki().getXWikiPreference("celdefaultAttAction",
+            "celements.attachmenturl.defaultaction", "file", context.getXWikiContext()));
   }
 
   @Override
-  public @NotNull UriBuilder getFileURLPrefix(@NotNull Optional<String> action) {
-    XWikiURLFactory urlf = context.getXWikiContext().getURLFactory();
-    URL baseUrl = urlf.createResourceURL("", false, context.getXWikiContext());
+  public @NotNull UriBuilder getFileUriPrefix(@NotNull Optional<String> action) {
+    URL baseUrl = getUrlFactory().createResourceURL("", false, context.getXWikiContext());
     try {
       return UriBuilder.fromUri(baseUrl.toURI())
           .replacePath("/" + action.orElse(getDefaultAction()) + "/")
@@ -66,22 +76,26 @@ public class FileUriService implements FileUriServiceRole {
 
   @Override
   @NotNull
-  public String getExternalFileURL(@NotNull FileReference fileRef,
-      @NotNull Optional<String> action) {
+  public UriBuilder createAbsoluteFileUri(@NotNull FileReference fileRef,
+      @NotNull Optional<String> action, Optional<String> queryString) {
     try {
-      return context.getXWikiContext().getURLFactory().getServerURL(context.getXWikiContext())
-          .toExternalForm() + createFileUrl(fileRef, action);
-    } catch (MalformedURLException | FileNotExistException exp) {
-      LOGGER.error("Failed to getServerURL.", exp);
+      return UriBuilder.fromUri(getUrlFactory().getServerURL(context.getXWikiContext()).toURI())
+          .uri(createFileUri(fileRef, action, queryString).build());
+    } catch (MalformedURLException | FileNotExistException | URISyntaxException exp) {
+      LOGGER.error("Failed to getServerURL for [{}].", fileRef, exp);
+      return UriBuilder.fromPath("");
     }
-    return "";
+  }
+
+  private XWikiURLFactory getUrlFactory() {
+    return context.getXWikiContext().getURLFactory();
   }
 
   @Override
   @NotNull
-  public UriBuilder createFileUrl(@NotNull FileReference fileRef, @NotNull Optional<String> action,
+  public UriBuilder createFileUri(@NotNull FileReference fileRef, @NotNull Optional<String> action,
       @NotNull Optional<String> queryString) throws FileNotExistException {
-    final UriBuilder baseUrl = createFileUrl(fileRef, action);
+    final UriBuilder baseUrl = createFileUri(fileRef, action);
     if (queryString.isPresent()) {
       return baseUrl.replaceQuery(Optional.ofNullable(baseUrl.build().getQuery())
           .map(qS -> qS + "&" + queryString.get())
@@ -91,21 +105,21 @@ public class FileUriService implements FileUriServiceRole {
   }
 
   @NotNull
-  UriBuilder createFileUrl(@NotNull FileReference fileRef,
+  UriBuilder createFileUri(@NotNull FileReference fileRef,
       @NotNull Optional<String> action)
       throws FileNotExistException {
     UriBuilder uriBuilder;
     if (fileRef.isAttachmentReference()) {
-      uriBuilder = createAttachmentUrl(fileRef, action);
+      uriBuilder = createAttachmentUri(fileRef, action);
     } else if (fileRef.isOnDiskReference()) {
-      uriBuilder = createOnDiskUrl(fileRef, action);
+      uriBuilder = createOnDiskUri(fileRef, action);
     } else {
       uriBuilder = fileRef.getUri();
     }
-    return addContextUrl(uriBuilder);
+    return addContextUri(uriBuilder);
   }
 
-  UriBuilder addContextUrl(UriBuilder uriBuilder) {
+  UriBuilder addContextUri(UriBuilder uriBuilder) {
     Optional<XWikiDocument> currentDoc = context.getCurrentDoc().toJavaUtil();
     if (currentDoc.isPresent() && uriBuilder.toString().startsWith("?")) {
       uriBuilder.replacePath(currentDoc.get().getURL("view", context.getXWikiContext()));
@@ -113,7 +127,7 @@ public class FileUriService implements FileUriServiceRole {
     return uriBuilder;
   }
 
-  private UriBuilder createAttachmentUrl(@NotNull FileReference fileRef, Optional<String> action)
+  private UriBuilder createAttachmentUri(@NotNull FileReference fileRef, Optional<String> action)
       throws FileNotExistException {
     String attName = fileRef.getName();
     try {
@@ -133,7 +147,7 @@ public class FileUriService implements FileUriServiceRole {
     }
   }
 
-  UriBuilder createOnDiskUrl(@NotNull FileReference fileRef, Optional<String> action) {
+  UriBuilder createOnDiskUri(@NotNull FileReference fileRef, Optional<String> action) {
     String path = fileRef.getFullPath().trim().substring(1);
     UriBuilder uri = UriBuilder.fromPath(
         context.getXWikiContext().getWiki().getSkinFile(path, true, context.getXWikiContext())

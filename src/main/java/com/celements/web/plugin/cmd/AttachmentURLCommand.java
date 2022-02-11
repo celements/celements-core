@@ -50,7 +50,7 @@ public class AttachmentURLCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link FileUriServiceRole#createFileUrl(String, Optional)}
+   *             {@link FileUriServiceRole#createFileUri(String, Optional)}
    */
   @Deprecated
   public String getAttachmentURL(String link, XWikiContext context) {
@@ -71,7 +71,7 @@ public class AttachmentURLCommand {
   }
 
   /**
-   * @deprecated since 5.4 instead use {@link FileUriServiceRole#getFileURLPrefix(String)}
+   * @deprecated since 5.4 instead use {@link FileUriServiceRole#getFileUriPrefix(String)}
    */
   @Deprecated
   public String getAttachmentURLPrefix(String action) {

@@ -13,13 +13,14 @@ import com.celements.filebase.references.FileReference;
 public interface FileUriServiceRole {
 
   @NotNull
-  UriBuilder createFileUrl(@NotNull FileReference fileRef, @NotNull Optional<String> action,
+  UriBuilder createFileUri(@NotNull FileReference fileRef, @NotNull Optional<String> action,
       @NotNull Optional<String> queryString) throws FileNotExistException;
 
   @NotNull
-  UriBuilder getFileURLPrefix(@NotNull Optional<String> action);
+  UriBuilder getFileUriPrefix(@NotNull Optional<String> action);
 
   @NotNull
-  String getExternalFileURL(@NotNull FileReference fileRef, @NotNull Optional<String> action);
+  UriBuilder createAbsoluteFileUri(@NotNull FileReference fileRef, @NotNull Optional<String> action,
+      Optional<String> queryString);
 
 }

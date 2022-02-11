@@ -4,7 +4,7 @@ import static com.google.common.base.Preconditions.*;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -17,24 +17,24 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.util.ModelUtils;
 import com.google.common.base.Strings;
-import com.google.common.base.Suppliers;
 import com.google.errorprone.annotations.Immutable;
 import com.xpn.xwiki.web.Utils;
 
 @Immutable
-public class FileReference implements Serializable {
+public final class FileReference implements Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  public enum FileReferenceType {
+    ON_DISK, ATTACHMENT, EXTERNAL;
+  }
 
   @NotThreadSafe
   public static final class Builder {
 
-    private static final String ATTACHMENT_LINK_REGEX = "([\\w\\-]*:)?([\\w\\-]*\\.[\\w\\-]*){1};.*";
-    private static final Supplier<Pattern> ATTACHMENT_LINK_PATTERN = Suppliers
-        .memoize(() -> Pattern.compile(ATTACHMENT_LINK_REGEX));
-    private static final String ON_DISK_LINK_REGEX = "^:[/\\w\\-\\.]*";
-    private static final Supplier<Pattern> ON_DISK_LINK_PATTERN = Suppliers
-        .memoize(() -> Pattern.compile(ON_DISK_LINK_REGEX));
+    private static final Pattern ATTACHMENT_LINK_PATTERN = Pattern.compile(
+        "([\\w\\-]*:)?([\\w\\-]*\\.[\\w\\-]*){1};.*");
+    private static final Pattern ON_DISK_LINK_PATTERN = Pattern.compile("^:[/\\w\\-\\.]*");
 
     private String name;
     private FileReferenceType type;
@@ -55,14 +55,14 @@ public class FileReference implements Serializable {
 
     private static boolean isAttachmentLink(@Nullable String link) {
       if (link != null) {
-        return ATTACHMENT_LINK_PATTERN.get().matcher(link.trim()).matches();
+        return ATTACHMENT_LINK_PATTERN.matcher(link.trim()).matches();
       }
       return false;
     }
 
     private static boolean isOnDiskLink(@Nullable String link) {
       if (link != null) {
-        return ON_DISK_LINK_PATTERN.get().matcher(link.trim()).matches();
+        return ON_DISK_LINK_PATTERN.matcher(link.trim()).matches();
       }
       return false;
     }
@@ -73,6 +73,7 @@ public class FileReference implements Serializable {
           DocumentReference.class);
     }
 
+    @NotNull
     private static FileReferenceType getTypeOfLink(@NotEmpty String link) {
       if (isOnDiskLink(link)) {
         return FileReferenceType.ON_DISK;
@@ -82,12 +83,14 @@ public class FileReference implements Serializable {
       return FileReferenceType.EXTERNAL;
     }
 
+    @NotNull
     public Builder setFileName(@NotNull String fileName) {
       checkNotNull(fileName);
       this.name = fileName;
       return this;
     }
 
+    @NotNull
     public Builder setType(@NotNull FileReferenceType type) {
       checkNotNull(type);
       this.type = type;
@@ -99,16 +102,16 @@ public class FileReference implements Serializable {
       this.docRef = docRef;
     }
 
-    public void setFullPath(@NotNull String fullPath) {
-      checkNotNull(fullPath);
+    public void setFullPath(@NotEmpty String fullPath) {
+      checkArgument(!Strings.isNullOrEmpty(fullPath), "path may not be null or empty");
       this.fullPath = fullPath;
     }
 
-    public void setQueryString(@NotNull String queryString) {
-      checkNotNull(queryString);
-      this.queryString = queryString;
+    public void setQueryString(@Nullable String queryString) {
+      this.queryString = Strings.emptyToNull(queryString);
     }
 
+    @NotNull
     public FileReference build() {
       return new FileReference(this);
     }
@@ -121,7 +124,7 @@ public class FileReference implements Serializable {
   private final String fullPath;
   private final String queryString;
 
-  public FileReference(Builder builder) {
+  private FileReference(Builder builder) {
     this.name = builder.name;
     this.type = builder.type;
     this.fullPath = builder.fullPath;
@@ -129,26 +132,32 @@ public class FileReference implements Serializable {
     this.queryString = builder.queryString;
   }
 
+  @NotNull
   public String getName() {
     return name;
   }
 
+  @NotNull
   public FileReferenceType getType() {
     return type;
   }
 
+  @Nullable
   public DocumentReference getDocRef() {
     return docRef;
   }
 
+  @NotEmpty
   public String getFullPath() {
     return fullPath;
   }
 
-  public String getQueryString() {
-    return queryString;
+  @NotNull
+  public Optional<String> getQueryString() {
+    return Optional.ofNullable(queryString);
   }
 
+  @NotNull
   public UriBuilder getUri() {
     return UriBuilder.fromPath(fullPath).replaceQuery(queryString);
   }
@@ -181,7 +190,8 @@ public class FileReference implements Serializable {
         + fullPath + "]";
   }
 
-  public static Builder of(@NotEmpty String link) {
+  @NotNull
+  public static FileReference of(@NotEmpty String link) {
     checkArgument(!Strings.isNullOrEmpty(link), "link may not be empty");
     final String[] linkParts = link.split("\\?");
     Builder builder = new Builder();
@@ -196,7 +206,7 @@ public class FileReference implements Serializable {
     if (linkParts.length > 1) {
       builder.setQueryString(linkParts[1]);
     }
-    return builder;
+    return builder.build();
   }
 
 }
