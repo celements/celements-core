@@ -30,7 +30,6 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.query.QueryException;
 
 import com.celements.auth.IAuthenticationServiceRole;
@@ -42,6 +41,7 @@ import com.celements.common.test.ExceptionAsserter;
 import com.celements.common.test.TestMessageTool;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.reference.RefBuilder;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.api.Attachment;
@@ -54,8 +54,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractComponentTest {
 
-  private final DocumentReference userDocRef = new ImmutableDocumentReference("db", "XWiki",
-      "msladek");
+  private final DocumentReference userDocRef = RefBuilder.create()
+      .wiki("db").space("XWiki").doc("msladek").build(DocumentReference.class);
 
   private PasswordRecoveryAndEmailValidationCommand cmd;
 

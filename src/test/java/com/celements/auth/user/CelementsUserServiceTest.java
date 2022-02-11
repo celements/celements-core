@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -31,6 +30,7 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.model.reference.RefBuilder;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiGroupsClass;
@@ -51,8 +51,8 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
   private CelementsUserService service;
 
-  private final DocumentReference userDocRef = new ImmutableDocumentReference("xwikidb", "XWiki",
-      "msladek");
+  private final DocumentReference userDocRef = RefBuilder.create()
+      .wiki("XWiki").space("XWiki").doc("msladek").build(DocumentReference.class);
 
   @Before
   public void prepareTest() throws Exception {

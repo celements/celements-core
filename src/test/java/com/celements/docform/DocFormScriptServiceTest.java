@@ -13,13 +13,13 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.docform.IDocForm.ResponseState;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.reference.RefBuilder;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -38,7 +38,8 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     registerComponentMocks(IModelAccessFacade.class, IRightsAccessFacadeRole.class);
     docFormService = (DocFormScriptService) Utils.getComponent(ScriptService.class, "docform");
-    docRef = new ImmutableDocumentReference("db", "space", "doc");
+    docRef = RefBuilder.create().wiki("db").space("space").doc("doc")
+        .build(DocumentReference.class);
     getContext().setRequest(new XWikiServletRequestStub());
   }
 
