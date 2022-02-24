@@ -1,8 +1,8 @@
 package com.celements.docform;
 
 import static com.celements.docform.DocFormRequestKey.*;
-import static com.celements.model.util.References.*;
 import static com.celements.web.classes.oldcore.XWikiDocumentClass.*;
+import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Strings.*;
 import static com.google.common.collect.ImmutableList.*;
 import static com.google.common.collect.ImmutableSet.*;
@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
@@ -46,10 +45,10 @@ public class DocFormRequestKeyParser {
   /**
    * used if no fullName is provided in the parsed string keys
    */
-  private final ImmutableDocumentReference defaultDocRef;
+  private final DocumentReference defaultDocRef;
 
   public DocFormRequestKeyParser(DocumentReference defaultDocRef) {
-    this.defaultDocRef = cloneRef(defaultDocRef, ImmutableDocumentReference.class);
+    this.defaultDocRef = checkNotNull(defaultDocRef);
   }
 
   /**

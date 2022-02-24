@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -51,8 +50,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
   private CelementsUserService service;
 
-  private final DocumentReference userDocRef = new ImmutableDocumentReference("xwikidb", "XWiki",
-      "msladek");
+  private final DocumentReference userDocRef = new DocumentReference("xwikidb", "XWiki", "msladek");
 
   @Before
   public void prepareTest() throws Exception {
