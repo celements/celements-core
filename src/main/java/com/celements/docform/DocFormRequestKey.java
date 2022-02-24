@@ -1,6 +1,5 @@
 package com.celements.docform;
 
-import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Strings.*;
 
@@ -11,7 +10,6 @@ import javax.annotation.concurrent.Immutable;
 
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
@@ -25,7 +23,7 @@ public class DocFormRequestKey implements Comparable<DocFormRequestKey> {
 
   private final String keyString;
   private final Type type;
-  private final ImmutableDocumentReference docRef;
+  private final DocumentReference docRef;
   private final ClassReference classRef;
   private final int objNb;
   private final boolean remove;
@@ -59,7 +57,7 @@ public class DocFormRequestKey implements Comparable<DocFormRequestKey> {
       ClassReference classRef, int objNb, boolean remove, String fieldName) {
     this.keyString = checkNotNull(emptyToNull(key));
     this.type = checkNotNull(type);
-    this.docRef = cloneRef(docRef, ImmutableDocumentReference.class);
+    this.docRef = checkNotNull(docRef);
     this.classRef = classRef;
     this.objNb = objNb;
     this.remove = remove;

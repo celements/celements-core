@@ -30,7 +30,6 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.query.QueryException;
 
 import com.celements.auth.IAuthenticationServiceRole;
@@ -54,8 +53,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractComponentTest {
 
-  private final DocumentReference userDocRef = new ImmutableDocumentReference("db", "XWiki",
-      "msladek");
+  private final DocumentReference userDocRef = new DocumentReference("db", "XWiki", "msladek");
 
   private PasswordRecoveryAndEmailValidationCommand cmd;
 

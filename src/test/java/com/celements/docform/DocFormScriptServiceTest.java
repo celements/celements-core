@@ -13,7 +13,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.common.test.AbstractComponentTest;
@@ -38,7 +37,7 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     registerComponentMocks(IModelAccessFacade.class, IRightsAccessFacadeRole.class);
     docFormService = (DocFormScriptService) Utils.getComponent(ScriptService.class, "docform");
-    docRef = new ImmutableDocumentReference("db", "space", "doc");
+    docRef = new DocumentReference("db", "space", "doc");
     getContext().setRequest(new XWikiServletRequestStub());
   }
 

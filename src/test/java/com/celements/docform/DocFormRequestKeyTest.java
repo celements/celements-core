@@ -13,7 +13,6 @@ import java.util.Set;
 import org.junit.Test;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 
 import com.google.common.collect.ImmutableList;
 
@@ -104,7 +103,7 @@ public class DocFormRequestKeyTest {
   }
 
   private DocumentReference getDocRef(String name) {
-    return new ImmutableDocumentReference("db", "space", name);
+    return new DocumentReference("db", "space", name);
   }
 
   private ClassReference getClassRef(String name) {
