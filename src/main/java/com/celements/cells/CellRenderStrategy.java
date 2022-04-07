@@ -34,7 +34,9 @@ import org.xwiki.velocity.XWikiVelocityException;
 
 import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.cells.attribute.DefaultAttributeBuilder;
+import com.celements.cells.classes.CellAttributeClass;
 import com.celements.cells.classes.CellClass;
+import com.celements.common.MoreOptional;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
@@ -51,6 +53,7 @@ import com.google.common.primitives.Ints;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class CellRenderStrategy implements IRenderStrategy {
@@ -132,6 +135,8 @@ public class CellRenderStrategy implements IRenderStrategy {
           .ifPresent(attrBuilder::addStyles);
       fetcher.fetchField(CellClass.FIELD_EVENT_DATA_ATTR).stream().findFirst()
           .ifPresent(value -> collectEventDataAttr(cellDocRef, attrBuilder, value));
+      XWikiObjectFetcher.on(cellDoc).filter(CellAttributeClass.CLASS_REF).stream()
+          .forEach(attrObj -> collectCustomAttributes(attrObj, attrBuilder));
     } catch (DocumentNotExistsException exc) {
       LOGGER.warn("failed to get cell doc [{}]", cellDocRef, exc);
     }
@@ -160,14 +165,35 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   private void collectEventDataAttr(DocumentReference cellDocRef, AttributeBuilder attributes,
       String value) {
+    evaluateVelocity(value, cellDocRef).ifPresent(text -> {
+      attributes.addCssClasses("celOnEvent");
+      attributes.addAttribute("data-cel-event", value);
+    });
+  }
+
+  private void collectCustomAttributes(BaseObject attrObj, AttributeBuilder attrBuilder) {
+    DocumentReference cellDocRef = attrObj.getDocumentReference();
     try {
+      String name = attrObj.getStringValue(CellAttributeClass.FIELD_NAME.getName());
+      String value = attrObj.getStringValue(CellAttributeClass.FIELD_VALUE.getName());
       value = velocityService.evaluateVelocityText(value).trim();
-      if (!value.isEmpty()) {
-        attributes.addCssClasses("celOnEvent");
-        attributes.addAttribute("data-cel-event", value);
+      Optional<String> text = evaluateVelocity(value, cellDocRef);
+      if (text.isPresent()) {
+        attrBuilder.addAttribute(name, value);
+      } else {
+        attrBuilder.addEmptyAttribute(name);
       }
     } catch (XWikiVelocityException exc) {
       LOGGER.warn("unable to velo-evaluate data-cel-event text on [{}]", cellDocRef, exc);
+    }
+  }
+
+  private Optional<String> evaluateVelocity(String text, DocumentReference cellDocRef) {
+    try {
+      return MoreOptional.asNonBlank(velocityService.evaluateVelocityText(text));
+    } catch (XWikiVelocityException exc) {
+      LOGGER.warn("unable to velo-evaluate text on [{}]", cellDocRef, exc);
+      return Optional.empty();
     }
   }
 
