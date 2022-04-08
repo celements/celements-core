@@ -42,13 +42,13 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.TreeNode;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.velocity.VelocityService;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.google.common.primitives.Ints;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -66,7 +66,6 @@ public class CellRenderStrategy implements IRenderStrategy {
   private SpaceReference spaceReference;
 
   RenderCommand rendererCmd;
-  PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
   private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
   private final ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
   private final Execution execution = Utils.getComponent(Execution.class);
@@ -95,7 +94,7 @@ public class CellRenderStrategy implements IRenderStrategy {
   @Override
   public SpaceReference getSpaceReference() {
     if (spaceReference == null) {
-      return pageLayoutCmd.getDefaultLayoutSpaceReference();
+      return getLayoutService().getDefaultLayoutSpaceReference();
     } else {
       return spaceReference;
     }
@@ -173,18 +172,13 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   private void collectCustomAttributes(BaseObject attrObj, AttributeBuilder attrBuilder) {
     DocumentReference cellDocRef = attrObj.getDocumentReference();
-    try {
-      String name = attrObj.getStringValue(CellAttributeClass.FIELD_NAME.getName());
-      String value = attrObj.getStringValue(CellAttributeClass.FIELD_VALUE.getName());
-      value = velocityService.evaluateVelocityText(value).trim();
-      Optional<String> text = evaluateVelocity(value, cellDocRef);
-      if (text.isPresent()) {
-        attrBuilder.addAttribute(name, value);
-      } else {
-        attrBuilder.addEmptyAttribute(name);
-      }
-    } catch (XWikiVelocityException exc) {
-      LOGGER.warn("unable to velo-evaluate data-cel-event text on [{}]", cellDocRef, exc);
+    String name = attrObj.getStringValue(CellAttributeClass.FIELD_NAME.getName());
+    String value = attrObj.getStringValue(CellAttributeClass.FIELD_VALUE.getName());
+    Optional<String> text = evaluateVelocity(value, cellDocRef);
+    if (text.isPresent()) {
+      attrBuilder.addAttribute(name, text.get());
+    } else {
+      attrBuilder.addEmptyAttribute(name);
     }
   }
 
@@ -256,6 +250,10 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   IPageTypeRole getPageTypeService() {
     return Utils.getComponent(IPageTypeRole.class);
+  }
+
+  LayoutServiceRole getLayoutService() {
+    return Utils.getComponent(LayoutServiceRole.class);
   }
 
 }
