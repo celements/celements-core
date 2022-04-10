@@ -34,23 +34,26 @@ import org.xwiki.velocity.XWikiVelocityException;
 
 import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.cells.attribute.DefaultAttributeBuilder;
+import com.celements.cells.classes.CellAttributeClass;
 import com.celements.cells.classes.CellClass;
+import com.celements.common.MoreOptional;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.TreeNode;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.velocity.VelocityService;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.google.common.primitives.Ints;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class CellRenderStrategy implements IRenderStrategy {
@@ -63,7 +66,6 @@ public class CellRenderStrategy implements IRenderStrategy {
   private SpaceReference spaceReference;
 
   RenderCommand rendererCmd;
-  PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
   private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
   private final ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
   private final Execution execution = Utils.getComponent(Execution.class);
@@ -92,7 +94,7 @@ public class CellRenderStrategy implements IRenderStrategy {
   @Override
   public SpaceReference getSpaceReference() {
     if (spaceReference == null) {
-      return pageLayoutCmd.getDefaultLayoutSpaceReference();
+      return getLayoutService().getDefaultLayoutSpaceReference();
     } else {
       return spaceReference;
     }
@@ -132,6 +134,8 @@ public class CellRenderStrategy implements IRenderStrategy {
           .ifPresent(attrBuilder::addStyles);
       fetcher.fetchField(CellClass.FIELD_EVENT_DATA_ATTR).stream().findFirst()
           .ifPresent(value -> collectEventDataAttr(cellDocRef, attrBuilder, value));
+      XWikiObjectFetcher.on(cellDoc).filter(CellAttributeClass.CLASS_REF).stream()
+          .forEach(attrObj -> collectCustomAttributes(attrObj, attrBuilder));
     } catch (DocumentNotExistsException exc) {
       LOGGER.warn("failed to get cell doc [{}]", cellDocRef, exc);
     }
@@ -160,14 +164,30 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   private void collectEventDataAttr(DocumentReference cellDocRef, AttributeBuilder attributes,
       String value) {
+    evaluateVelocity(value, cellDocRef).ifPresent(text -> {
+      attributes.addCssClasses("celOnEvent");
+      attributes.addAttribute("data-cel-event", value);
+    });
+  }
+
+  private void collectCustomAttributes(BaseObject attrObj, AttributeBuilder attrBuilder) {
+    DocumentReference cellDocRef = attrObj.getDocumentReference();
+    String name = attrObj.getStringValue(CellAttributeClass.FIELD_NAME.getName());
+    String value = attrObj.getStringValue(CellAttributeClass.FIELD_VALUE.getName());
+    Optional<String> text = evaluateVelocity(value, cellDocRef);
+    if (text.isPresent()) {
+      attrBuilder.addAttribute(name, text.get());
+    } else {
+      attrBuilder.addEmptyAttribute(name);
+    }
+  }
+
+  private Optional<String> evaluateVelocity(String text, DocumentReference cellDocRef) {
     try {
-      value = velocityService.evaluateVelocityText(value).trim();
-      if (!value.isEmpty()) {
-        attributes.addCssClasses("celOnEvent");
-        attributes.addAttribute("data-cel-event", value);
-      }
+      return MoreOptional.asNonBlank(velocityService.evaluateVelocityText(text));
     } catch (XWikiVelocityException exc) {
-      LOGGER.warn("unable to velo-evaluate data-cel-event text on [{}]", cellDocRef, exc);
+      LOGGER.warn("unable to velo-evaluate text on [{}]", cellDocRef, exc);
+      return Optional.empty();
     }
   }
 
@@ -230,6 +250,10 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   IPageTypeRole getPageTypeService() {
     return Utils.getComponent(IPageTypeRole.class);
+  }
+
+  LayoutServiceRole getLayoutService() {
+    return Utils.getComponent(LayoutServiceRole.class);
   }
 
 }
