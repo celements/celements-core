@@ -30,7 +30,7 @@ import org.xwiki.context.Execution;
 
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.filebase.references.FileReference;
-import com.celements.filebase.uri.FileUriServiceRole;
+import com.celements.filebase.uri.FileUrlServiceRole;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.web.service.LastStartupTimeStampRole;
 import com.xpn.xwiki.XWikiContext;
@@ -41,7 +41,7 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
- * @deprecated since 5.4 instead use {@link FileUriServiceRole}
+ * @deprecated since 5.4 instead use {@link FileUrlServiceRole}
  */
 @Deprecated
 public class AttachmentURLCommand {
@@ -50,7 +50,7 @@ public class AttachmentURLCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link FileUriServiceRole#createFileUri(String, Optional)}
+   *             {@link FileUrlServiceRole#createFileUri(String, Optional)}
    */
   @Deprecated
   public String getAttachmentURL(String link, XWikiContext context) {
@@ -63,7 +63,7 @@ public class AttachmentURLCommand {
   }
 
   /**
-   * @deprecated since 5.4 instead use {@link FileUriServiceRole#getFileURLPrefix()}
+   * @deprecated since 5.4 instead use {@link FileUrlServiceRole#getFileURLPrefix()}
    */
   @Deprecated
   public String getAttachmentURLPrefix() {
@@ -71,7 +71,7 @@ public class AttachmentURLCommand {
   }
 
   /**
-   * @deprecated since 5.4 instead use {@link FileUriServiceRole#getFileUriPrefix(String)}
+   * @deprecated since 5.4 instead use {@link FileUrlServiceRole#getFileUrlPrefix(String)}
    */
   @Deprecated
   public String getAttachmentURLPrefix(String action) {

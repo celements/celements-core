@@ -26,7 +26,7 @@ public class FileUriScriptService implements ScriptService {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileUriScriptService.class);
 
   @Requirement
-  private FileUriServiceRole fileUriService;
+  private FileUrlServiceRole fileUriService;
 
   @NotNull
   public FileReference createFileReference(@NotEmpty String link) {
@@ -69,12 +69,12 @@ public class FileUriScriptService implements ScriptService {
 
   @NotNull
   public UriBuilder getFileURLPrefix() {
-    return fileUriService.getFileUriPrefix(Optional.empty());
+    return fileUriService.getFileUrlPrefix(Optional.empty());
   }
 
   @NotNull
   public UriBuilder getFileURLPrefix(@Nullable String action) {
-    return fileUriService.getFileUriPrefix(Optional.ofNullable(action));
+    return fileUriService.getFileUrlPrefix(Optional.ofNullable(action));
   }
 
   @NotNull

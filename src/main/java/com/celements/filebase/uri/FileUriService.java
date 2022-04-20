@@ -32,7 +32,7 @@ import groovy.lang.Singleton;
 
 @Component
 @Singleton
-public class FileUriService implements FileUriServiceRole {
+public class FileUriService implements FileUrlServiceRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileUriService.class);
 
@@ -62,7 +62,7 @@ public class FileUriService implements FileUriServiceRole {
   }
 
   @Override
-  public @NotNull UriBuilder getFileUriPrefix(@NotNull Optional<String> action) {
+  public @NotNull UriBuilder getFileUrlPrefix(@NotNull Optional<String> action) {
     URL baseUrl = getUrlFactory().createResourceURL("", false, context.getXWikiContext());
     try {
       return UriBuilder.fromUri(baseUrl.toURI())

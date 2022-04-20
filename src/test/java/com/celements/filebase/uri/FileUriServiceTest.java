@@ -50,7 +50,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
     wiki = getWikiMock();
     mockURLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
     context.setURLFactory(mockURLFactory);
-    fileUriServ = (FileUriService) Utils.getComponent(FileUriServiceRole.class);
+    fileUriServ = (FileUriService) Utils.getComponent(FileUrlServiceRole.class);
   }
 
   @Test
@@ -220,7 +220,7 @@ public class FileUriServiceTest extends AbstractComponentTest {
         "http://test.fabian.dev:10080/resources/"));
     replayDefault();
     assertEquals("http://test.fabian.dev:10080/file/resources/",
-        fileUriServ.getFileUriPrefix(Optional.empty()).toString());
+        fileUriServ.getFileUrlPrefix(Optional.empty()).toString());
     verifyDefault();
   }
 
