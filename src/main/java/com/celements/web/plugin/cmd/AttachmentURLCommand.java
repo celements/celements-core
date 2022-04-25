@@ -20,12 +20,17 @@
 package com.celements.web.plugin.cmd;
 
 import java.net.MalformedURLException;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.filebase.references.FileReference;
+import com.celements.filebase.uri.FileUrlServiceRole;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.web.service.LastStartupTimeStampRole;
 import com.xpn.xwiki.XWikiContext;
@@ -35,29 +40,52 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
+/**
+ * @deprecated since 5.4 instead use {@link FileUrlServiceRole}
+ */
+@Deprecated
 public class AttachmentURLCommand {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentURLCommand.class);
 
+  /**
+   * @deprecated since 5.4 instead use
+   *             {@link FileUrlServiceRole#createFileUri(String, Optional)}
+   */
+  @Deprecated
   public String getAttachmentURL(String link, XWikiContext context) {
     return getAttachmentURL(link, getDefaultAction(), context);
   }
 
-  protected String getDefaultAction() {
+  private String getDefaultAction() {
     return getContext().getWiki().getXWikiPreference("celdefaultAttAction",
         "celements.attachmenturl.defaultaction", "file", getContext());
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link FileUrlServiceRole#getFileURLPrefix()}
+   */
+  @Deprecated
   public String getAttachmentURLPrefix() {
     return getAttachmentURLPrefix(getDefaultAction());
   }
 
+  /**
+   * @deprecated since 5.4 instead use {@link FileUrlServiceRole#getFileUrlPrefix(String)}
+   */
+  @Deprecated
   public String getAttachmentURLPrefix(String action) {
     XWikiURLFactory urlf = getContext().getURLFactory();
     return urlf.createResourceURL("", true, getContext()).toString().replace("/skin/", "/" + action
         + "/");
   }
 
+  /**
+   * @deprecated since 5.4 instead use
+   *             {@link RessourceUrlServiceRole#createRessourceUrl(String, Optional<String>)}
+   */
+  @Deprecated
+  @Nullable
   public String getAttachmentURL(String link, String action, XWikiContext context) {
     String url = link;
     if (isAttachmentLink(link)) {
@@ -91,14 +119,29 @@ public class AttachmentURLCommand {
     return Utils.getComponent(LastStartupTimeStampRole.class);
   }
 
+  /**
+   * @deprecated since 5.4 instead use
+   *             {@link FileReference#getName()}
+   */
+  @Deprecated
   public String getAttachmentName(String link) {
     return link.split(";")[1];
   }
 
+  /**
+   * @deprecated since 5.4 instead use
+   *             {@link FileReference#getDocRef()}
+   */
+  @Deprecated
   public String getPageFullName(String link) {
     return link.split(";")[0];
   }
 
+  /**
+   * @deprecated since 5.4 instead use
+   *             {@link FileReference#isAttachmentReference()}
+   */
+  @Deprecated
   public boolean isAttachmentLink(String link) {
     boolean isAttachmentLink = false;
     if (link != null) {
@@ -108,6 +151,11 @@ public class AttachmentURLCommand {
     return isAttachmentLink;
   }
 
+  /**
+   * @deprecated since 5.4 instead use
+   *             {@link FileReference#isOnDiskReference()}
+   */
+  @Deprecated
   public boolean isOnDiskLink(String link) {
     boolean isAttachmentLink = false;
     if (link != null) {
@@ -117,6 +165,11 @@ public class AttachmentURLCommand {
     return isAttachmentLink;
   }
 
+  /**
+   * @deprecated since 5.4 instead use
+   *             {@link FileUriServiceRole#getExternalFileURL(FileReference, Optional<String>)}
+   */
+  @Deprecated
   public String getExternalAttachmentURL(String fileName, String action, XWikiContext context) {
     try {
       return context.getURLFactory().getServerURL(context).toExternalForm() + getAttachmentURL(

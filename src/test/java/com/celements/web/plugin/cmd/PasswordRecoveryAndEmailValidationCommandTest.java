@@ -41,6 +41,7 @@ import com.celements.common.test.ExceptionAsserter;
 import com.celements.common.test.TestMessageTool;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.reference.RefBuilder;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.api.Attachment;
@@ -53,7 +54,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractComponentTest {
 
-  private final DocumentReference userDocRef = new DocumentReference("db", "XWiki", "msladek");
+  private final DocumentReference userDocRef = RefBuilder.create()
+      .wiki("db").space("XWiki").doc("msladek").build(DocumentReference.class);
 
   private PasswordRecoveryAndEmailValidationCommand cmd;
 

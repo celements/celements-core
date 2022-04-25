@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +49,7 @@ public class DocFormRequestKeyParser {
    */
   private final DocumentReference defaultDocRef;
 
-  public DocFormRequestKeyParser(DocumentReference defaultDocRef) {
+  public DocFormRequestKeyParser(@NotNull DocumentReference defaultDocRef) {
     this.defaultDocRef = checkNotNull(defaultDocRef);
   }
 

@@ -19,6 +19,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.docform.IDocForm.ResponseState;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.reference.RefBuilder;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -37,7 +38,8 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     registerComponentMocks(IModelAccessFacade.class, IRightsAccessFacadeRole.class);
     docFormService = (DocFormScriptService) Utils.getComponent(ScriptService.class, "docform");
-    docRef = new DocumentReference("db", "space", "doc");
+    docRef = RefBuilder.create().wiki("db").space("space").doc("doc")
+        .build(DocumentReference.class);
     getContext().setRequest(new XWikiServletRequestStub());
   }
 

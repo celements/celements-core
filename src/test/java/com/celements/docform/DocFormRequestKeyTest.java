@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.reference.RefBuilder;
 import com.google.common.collect.ImmutableList;
 
 public class DocFormRequestKeyTest {
@@ -103,7 +104,7 @@ public class DocFormRequestKeyTest {
   }
 
   private DocumentReference getDocRef(String name) {
-    return new DocumentReference("db", "space", name);
+    return RefBuilder.create().wiki("db").space("space").doc(name).build(DocumentReference.class);
   }
 
   private ClassReference getClassRef(String name) {

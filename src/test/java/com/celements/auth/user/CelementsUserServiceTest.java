@@ -30,6 +30,7 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.model.reference.RefBuilder;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiGroupsClass;
@@ -50,7 +51,8 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
   private CelementsUserService service;
 
-  private final DocumentReference userDocRef = new DocumentReference("xwikidb", "XWiki", "msladek");
+  private final DocumentReference userDocRef = RefBuilder.create()
+      .wiki("XWiki").space("XWiki").doc("msladek").build(DocumentReference.class);
 
   @Before
   public void prepareTest() throws Exception {

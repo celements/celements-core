@@ -30,7 +30,8 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
   @Before
   public void prepare() throws Exception {
     db = getContext().getDatabase();
-    defaultDocRef = new DocumentReference(db, "Space", "DefaultDoc");
+    defaultDocRef = RefBuilder.create().wiki(db).space("space").doc("DefaultDoc")
+        .build(DocumentReference.class);
     parser = new DocFormRequestKeyParser(defaultDocRef);
   }
 
