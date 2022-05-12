@@ -26,6 +26,8 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.sajson.JsonBuilder;
+
 @ComponentRole
 public interface RteConfigRole {
 
@@ -36,6 +38,6 @@ public interface RteConfigRole {
   String getRTEConfigField(@NotNull String name);
 
   @NotNull
-  String getRteJsonConfigField(@NotNull String name);
+  JsonBuilder getRteJsonConfigField(@NotNull String name);
 
 }
