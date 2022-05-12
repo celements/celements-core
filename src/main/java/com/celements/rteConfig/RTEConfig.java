@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -229,7 +231,13 @@ public class RTEConfig implements RteConfigRole {
   private DocumentReference getXWikiPreferencesClassRef() {
     return new RefBuilder().with(context.getWikiRef()).space(
         IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_SPACE).doc(
-            IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_DOC).build(DocumentReference.class);
+            IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_DOC)
+        .build(DocumentReference.class);
+  }
+
+  @Override
+  public @NotNull String getRteJsonConfigField(@NotNull String name) {
+    throw new UnsupportedOperationException();
   }
 
 }

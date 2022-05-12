@@ -35,4 +35,7 @@ public interface RteConfigRole {
   @NotNull
   String getRTEConfigField(@NotNull String name);
 
+  @NotNull
+  String getRteJsonConfigField(@NotNull String name);
+
 }
