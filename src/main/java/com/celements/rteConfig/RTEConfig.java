@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -45,6 +47,7 @@ import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.rteConfig.classes.IRTEConfigClassConfig;
+import com.celements.sajson.JsonBuilder;
 import com.celements.web.classcollections.IOldCoreClassConfig;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
@@ -229,7 +232,13 @@ public class RTEConfig implements RteConfigRole {
   private DocumentReference getXWikiPreferencesClassRef() {
     return new RefBuilder().with(context.getWikiRef()).space(
         IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_SPACE).doc(
-            IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_DOC).build(DocumentReference.class);
+            IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_DOC)
+        .build(DocumentReference.class);
+  }
+
+  @Override
+  public @NotNull JsonBuilder getRteJsonConfigField(@NotNull String name) {
+    throw new UnsupportedOperationException();
   }
 
 }
