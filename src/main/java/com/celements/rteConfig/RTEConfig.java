@@ -47,6 +47,7 @@ import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.rteConfig.classes.IRTEConfigClassConfig;
+import com.celements.sajson.JsonBuilder;
 import com.celements.web.classcollections.IOldCoreClassConfig;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
@@ -236,7 +237,7 @@ public class RTEConfig implements RteConfigRole {
   }
 
   @Override
-  public @NotNull String getRteJsonConfigField(@NotNull String name) {
+  public @NotNull JsonBuilder getRteJsonConfigField(@NotNull String name) {
     throw new UnsupportedOperationException();
   }
 
