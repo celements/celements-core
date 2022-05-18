@@ -130,7 +130,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   String getPageLayoutHQL(boolean onlyActive) {
-    String hql = "select doc.space, pl.prettyname"
+    String hql = "select distinct doc.space, pl.prettyname"
         + " from XWikiDocument as doc, BaseObject obj, Celements.PageLayoutPropertiesClass as pl"
         + " where doc.fullName = obj.name"
         + " and obj.className='Celements.PageLayoutPropertiesClass'"

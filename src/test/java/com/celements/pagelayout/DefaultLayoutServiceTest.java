@@ -80,19 +80,20 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_getPageLayoutHQL() {
-    assertEquals("select doc.space, pl.prettyname" + " from XWikiDocument as doc, BaseObject obj,"
-        + " Celements.PageLayoutPropertiesClass as pl" + " where doc.fullName = obj.name"
-        + " and obj.className='Celements.PageLayoutPropertiesClass'" + " and pl.id.id=obj.id"
+    assertEquals("select distinct doc.space, pl.prettyname"
+        + " from XWikiDocument as doc, BaseObject obj, Celements.PageLayoutPropertiesClass as pl"
+        + " where doc.fullName = obj.name and obj.className='Celements.PageLayoutPropertiesClass'"
+        + " and pl.id.id=obj.id"
         + " order by pl.prettyname asc", layoutService.getPageLayoutHQL(false));
   }
 
   @Test
   public void test_getPageLayoutHQL_onlyActive() {
-    assertEquals("select doc.space, pl.prettyname" + " from XWikiDocument as doc, BaseObject obj,"
-        + " Celements.PageLayoutPropertiesClass as pl" + " where doc.fullName = obj.name"
-        + " and obj.className='Celements.PageLayoutPropertiesClass'" + " and pl.id.id=obj.id"
-        + " and pl.isActive = 1" + " order by pl.prettyname asc",
-        layoutService.getPageLayoutHQL(true));
+    assertEquals("select distinct doc.space, pl.prettyname"
+        + " from XWikiDocument as doc, BaseObject obj, Celements.PageLayoutPropertiesClass as pl"
+        + " where doc.fullName = obj.name and obj.className='Celements.PageLayoutPropertiesClass'"
+        + " and pl.id.id=obj.id and pl.isActive = 1"
+        + " order by pl.prettyname asc", layoutService.getPageLayoutHQL(true));
   }
 
   @Test
