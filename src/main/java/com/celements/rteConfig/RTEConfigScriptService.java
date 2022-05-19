@@ -41,6 +41,7 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.marshalling.ComponentMarshaller;
 import com.celements.marshalling.Marshaller;
 import com.celements.rte.RteImplementation;
+import com.celements.sajson.JsonBuilder;
 
 @Component("rteconfig")
 public class RTEConfigScriptService implements ScriptService {
@@ -75,6 +76,16 @@ public class RTEConfigScriptService implements ScriptService {
       LOGGER.error("getRTEConfigField for name [" + name + "] failed.", exp);
     }
     return "";
+  }
+
+  @NotNull
+  public JsonBuilder getRteJsonConfigField(@NotNull String name) {
+    try {
+      return getActiveRteConfig().getRteJsonConfigField(name);
+    } catch (Exception exp) {
+      LOGGER.error("getRteJsonConfigField for name [" + name + "] failed.", exp);
+    }
+    return new JsonBuilder();
   }
 
   public boolean isEmptyRTEString(@NotNull String rteContent) {
