@@ -21,6 +21,7 @@ package com.celements.rteConfig;
 
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -35,9 +36,9 @@ public interface RteConfigRole {
   List<DocumentReference> getRTEConfigsList();
 
   @NotNull
-  String getRTEConfigField(@NotNull String name);
+  String getRTEConfigField(@NotEmpty String name);
 
   @NotNull
-  JsonBuilder getRteJsonConfigField(@NotNull String name);
+  JsonBuilder getRteJsonConfigField(@NotEmpty String name);
 
 }

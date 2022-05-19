@@ -42,6 +42,7 @@ import com.celements.marshalling.ComponentMarshaller;
 import com.celements.marshalling.Marshaller;
 import com.celements.rte.RteImplementation;
 import com.celements.sajson.JsonBuilder;
+import com.google.common.base.Strings;
 
 @Component("rteconfig")
 public class RTEConfigScriptService implements ScriptService {
@@ -69,27 +70,34 @@ public class RTEConfigScriptService implements ScriptService {
   private Execution execution;
 
   @NotNull
-  public String getRTEConfigField(@NotNull String name) {
-    try {
-      return getActiveRteConfig().getRTEConfigField(name);
-    } catch (Exception exp) {
-      LOGGER.error("getRTEConfigField for name [" + name + "] failed.", exp);
+  public String getRTEConfigField(@Nullable String name) {
+    if (!Strings.isNullOrEmpty(name)) {
+      try {
+        return getActiveRteConfig().getRTEConfigField(name);
+      } catch (Exception exp) {
+        LOGGER.error("getRTEConfigField for name [" + name + "] failed.", exp);
+      }
     }
     return "";
   }
 
   @NotNull
-  public JsonBuilder getRteJsonConfigField(@NotNull String name) {
-    try {
-      return getActiveRteConfig().getRteJsonConfigField(name);
-    } catch (Exception exp) {
-      LOGGER.error("getRteJsonConfigField for name [" + name + "] failed.", exp);
+  public JsonBuilder getRteJsonConfigField(@Nullable String name) {
+    if (!Strings.isNullOrEmpty(name)) {
+      try {
+        return getActiveRteConfig().getRteJsonConfigField(name);
+      } catch (Exception exp) {
+        LOGGER.error("getRteJsonConfigField for name [" + name + "] failed.", exp);
+      }
     }
     return new JsonBuilder();
   }
 
-  public boolean isEmptyRTEString(@NotNull String rteContent) {
-    return defaultEmptyDocStrategyRole.isEmptyRTEString(rteContent);
+  public boolean isEmptyRTEString(@Nullable String rteContent) {
+    if (!Strings.isNullOrEmpty(name)) {
+      return defaultEmptyDocStrategyRole.isEmptyRTEString(rteContent);
+    }
+    return true;
   }
 
   @NotNull
