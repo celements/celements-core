@@ -81,6 +81,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-scheduler</artifactId>
+      <version>5.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
