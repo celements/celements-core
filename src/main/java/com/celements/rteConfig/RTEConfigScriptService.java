@@ -94,7 +94,7 @@ public class RTEConfigScriptService implements ScriptService {
   }
 
   public boolean isEmptyRTEString(@Nullable String rteContent) {
-    if (!Strings.isNullOrEmpty(name)) {
+    if (!Strings.isNullOrEmpty(rteContent)) {
       return defaultEmptyDocStrategyRole.isEmptyRTEString(rteContent);
     }
     return true;
