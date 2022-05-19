@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
@@ -102,8 +103,8 @@ public class RTEConfig implements RteConfigRole {
   }
 
   @Override
-  public String getRTEConfigField(String name) {
-    checkNotNull(name);
+  public String getRTEConfigField(@NotEmpty String name) {
+    checkNotNull(Strings.emptyToNull(name));
     Optional<XWikiDocument> doc = context.getCurrentDoc();
     Optional<SpaceReference> currentSpaceRef = context.getCurrentSpaceRef();
     String resultConfig = "";
@@ -237,7 +238,7 @@ public class RTEConfig implements RteConfigRole {
   }
 
   @Override
-  public @NotNull JsonBuilder getRteJsonConfigField(@NotNull String name) {
+  public @NotNull JsonBuilder getRteJsonConfigField(@NotEmpty String name) {
     throw new UnsupportedOperationException();
   }
 
