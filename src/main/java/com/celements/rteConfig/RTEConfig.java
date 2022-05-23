@@ -22,9 +22,9 @@ package com.celements.rteConfig;
 import static com.google.common.base.Preconditions.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -51,8 +51,8 @@ import com.celements.rteConfig.classes.IRTEConfigClassConfig;
 import com.celements.sajson.JsonBuilder;
 import com.celements.web.classcollections.IOldCoreClassConfig;
 import com.celements.web.service.IWebUtilsService;
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -68,11 +68,10 @@ public class RTEConfig implements RteConfigRole {
       + RTE_CONFIG_TYPE_CLASS_NAME;
   public static final String CONFIG_PROP_NAME = "rteconfig";
 
-  private final static Map<String, String> rteConfigFieldDefaults = new HashMap<>();
-
-  static {
-    rteConfigFieldDefaults.put("blockformats", "rte_heading1=h1,rte_text=p");
-  };
+  private static final Map<String, String> RTE_CONFIG_FIELD_DEFAULTS = ImmutableMap
+      .<String, String>builder()
+      .put("blockformats", "rte_heading1=h1,rte_text=p")
+      .build();
 
   @Requirement
   IRTEConfigClassConfig rteConfigClassConfig;
@@ -105,8 +104,8 @@ public class RTEConfig implements RteConfigRole {
   @Override
   public String getRTEConfigField(@NotEmpty String name) {
     checkNotNull(Strings.emptyToNull(name));
-    Optional<XWikiDocument> doc = context.getCurrentDoc();
-    Optional<SpaceReference> currentSpaceRef = context.getCurrentSpaceRef();
+    Optional<XWikiDocument> doc = context.getCurrentDoc().toJavaUtil();
+    Optional<SpaceReference> currentSpaceRef = context.getCurrentSpaceRef().toJavaUtil();
     String resultConfig = "";
 
     // Doc
@@ -138,9 +137,9 @@ public class RTEConfig implements RteConfigRole {
     // xwiki.cfg
     if (Strings.isNullOrEmpty(resultConfig.trim())) {
       resultConfig = getContext().getWiki().Param("celements.rteconfig." + name,
-          rteConfigFieldDefaults.get(name));
+          RTE_CONFIG_FIELD_DEFAULTS.get(name));
     }
-    return resultConfig;
+    return Strings.nullToEmpty(resultConfig);
   }
 
   private String getRTEConfigFieldFromPageType(String name) {
