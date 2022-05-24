@@ -218,6 +218,27 @@ public class RTEConfigTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testGetRTEConfigField_null() throws Exception {
+    DocumentReference testPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "TestSpace").doc("WebPreferences").build(DocumentReference.class);
+    DocumentReference xwikiPrefDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
+        "XWiki").doc("XWikiPreferences").build(DocumentReference.class);
+    // Doc
+    context.setDoc(curDoc);
+    // WebPreferences
+    XWikiDocument webPrefDoc = new XWikiDocument(testPrefDocRef);
+    expect(modelAccessMock.getDocument(eq(testPrefDocRef))).andReturn(webPrefDoc).once();
+    // XWikiPreferences
+    XWikiDocument prefDoc = new XWikiDocument(xwikiPrefDocRef);
+    expect(modelAccessMock.getDocument(eq(xwikiPrefDocRef))).andReturn(prefDoc).once();
+    // xwiki.cfg
+    expect(getWikiMock().Param("celements.rteconfig.styles", null)).andReturn(null);
+    replayDefault();
+    assertEquals("", config.getRTEConfigField("styles"));
+    verifyDefault();
+  }
+
+  @Test
   public void testGetPreferenceFromConfigObject() throws Exception {
     String confDocName = "confdocname";
     DocumentReference confDocRef = new RefBuilder().wiki(getContext().getDatabase()).space(
