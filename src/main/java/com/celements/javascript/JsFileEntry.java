@@ -67,6 +67,11 @@ public final class JsFileEntry extends ObjectBean {
     return !jsFileUrl.isEmpty();
   }
 
+  public boolean isModule() {
+    String fileName = getFilepath().split("[?$]")[0];
+    return fileName.endsWith(".mjs");
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(jsFileUrl);
