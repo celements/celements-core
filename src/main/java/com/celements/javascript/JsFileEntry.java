@@ -68,7 +68,7 @@ public final class JsFileEntry extends ObjectBean {
   }
 
   public boolean isModule() {
-    String fileName = getFilepath().split("[?$]")[0];
+    String fileName = UriBuilder.fromUri(getFilepath()).build().getPath();
     return fileName.endsWith(".mjs");
   }
 
