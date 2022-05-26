@@ -311,7 +311,11 @@ public class ExternalJavaScriptFilesCommand {
   String getExtStringForJsFile(JsFileEntry jsFile) {
     return "<script" + ((jsFile.getLoadMode() != JsLoadMode.SYNC)
         ? " " + jsFile.getLoadMode().toString().toLowerCase()
-        : "") + " type=\"text/javascript\" src=\""
+        : "") + " type=\""
+        + (jsFile.isModule()
+            ? "module"
+            : "text/javascript")
+        + "\" src=\""
         + StringEscapeUtils.escapeHtml(jsFile.getFilepath()) + "\"></script>";
   }
 

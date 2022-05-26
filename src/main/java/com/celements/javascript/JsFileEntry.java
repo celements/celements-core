@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
 
 import com.celements.model.object.ObjectBean;
 import com.google.common.base.Strings;
@@ -65,6 +66,11 @@ public final class JsFileEntry extends ObjectBean {
 
   public boolean isValid() {
     return !jsFileUrl.isEmpty();
+  }
+
+  public boolean isModule() {
+    String fileName = UriBuilder.fromUri(getFilepath()).build().getPath();
+    return fileName.endsWith(".mjs");
   }
 
   @Override
