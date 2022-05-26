@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
 
 import com.celements.model.object.ObjectBean;
 import com.google.common.base.Strings;
