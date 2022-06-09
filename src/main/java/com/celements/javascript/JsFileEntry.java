@@ -54,6 +54,9 @@ public final class JsFileEntry extends ObjectBean {
     this.loadMode = Optional.ofNullable(loadMode).orElse(LOAD_MODE_DEFAULT);
   }
 
+  /**
+   * may contain a query part '/path?x=a&y=b'
+   */
   @NotNull
   public String getFilepath() {
     return jsFileUrl;

@@ -70,7 +70,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   @Test
   public void testAddExtJSfileOnce_beforeGetAll() {
     String file = ":celJS/prototype.js";
-    expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).once();
+    String filePath = "/file/celJS/prototype.js?version=12344";
+    expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(filePath).once();
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(true).atLeastOnce();
     replayDefault();
