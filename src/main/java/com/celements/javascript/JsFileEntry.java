@@ -56,7 +56,6 @@ public final class JsFileEntry extends ObjectBean {
 
   /**
    * may contain a query part '/path?x=a&y=b'
-   * may represent an on disk path by starting with ':celJS/path'
    */
   @NotNull
   public String getFilepath() {
@@ -73,8 +72,7 @@ public final class JsFileEntry extends ObjectBean {
   }
 
   public boolean isModule() {
-    String pathAndQuery = getFilepath().replace(":", "");
-    String fileName = UriBuilder.fromUri(pathAndQuery).build().getPath();
+    String fileName = UriBuilder.fromUri(getFilepath()).build().getPath();
     return fileName.endsWith(".mjs");
   }
 
