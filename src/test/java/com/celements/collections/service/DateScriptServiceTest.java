@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 
@@ -46,6 +47,12 @@ public class DateScriptServiceTest extends AbstractComponentTest {
     assertNull(ss.format(" ", dt));
     assertNull(ss.format("asdf", dt));
     assertNull(ss.format(pattern, null));
+  }
+
+  @Test
+  public void test_format_ISO() {
+    LocalDateTime dt = LocalDate.of(2022, 8, 14).atTime(20, 54, 04, 123000000);
+    assertEquals("2022-08-14T20:54:04.123Z", ss.formatISO(dt));
   }
 
   @Test
