@@ -129,8 +129,16 @@ public class DateScriptService implements ScriptService {
     }
   }
 
+  public String format(String pattern, Date date) {
+    return this.format(pattern, toInstant(date));
+  }
+
   public String formatISO(Temporal temporal) {
     return format(PATTERN_ISO, DateUtil.atZone(temporal, ZoneId.of("UTC")));
+  }
+
+  public String formatISO(Date date) {
+    return this.formatISO(toInstant(date));
   }
 
   public ZonedDateTime parse(String pattern, String text) {
