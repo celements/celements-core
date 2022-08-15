@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
+import java.time.temporal.Temporal;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class DateScriptServiceTest extends AbstractComponentTest {
     assertNull(ss.format(null, dt));
     assertNull(ss.format(" ", dt));
     assertNull(ss.format("asdf", dt));
-    assertNull(ss.format(pattern, null));
+    assertNull(ss.format(pattern, (Temporal) null));
   }
 
   @Test
