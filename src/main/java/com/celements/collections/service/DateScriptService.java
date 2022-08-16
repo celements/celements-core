@@ -29,6 +29,8 @@ public class DateScriptService implements ScriptService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DateScriptService.class);
 
+  public static final String PATTERN_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
   public ZoneId getZone() {
     return DateUtil.getDefaultZone();
   }
@@ -127,15 +129,36 @@ public class DateScriptService implements ScriptService {
     }
   }
 
+  public String format(String pattern, Date date) {
+    return this.format(pattern, toInstant(date));
+  }
+
+  public String formatISO(Temporal temporal) {
+    return format(PATTERN_ISO, DateUtil.atZone(temporal, ZoneId.of("UTC")));
+  }
+
+  public String formatISO(Date date) {
+    return this.formatISO(toInstant(date));
+  }
+
   public ZonedDateTime parse(String pattern, String text) {
+    return parse(pattern, DateUtil.getDefaultZone(), text);
+  }
+
+  public ZonedDateTime parse(String pattern, ZoneId zone, String text) {
     try {
+      ZoneId zoneId = guard(zone).orElseGet(DateUtil::getDefaultZone);
       return guard(text)
-          .map(guard(pattern).map(DateFormat::parser).orElseGet(() -> (t -> null)))
+          .map(guard(pattern).map(p -> DateFormat.parser(p, zoneId)).orElseGet(() -> (t -> null)))
           .orElse(null);
     } catch (DateTimeException exc) {
       LOGGER.info("parse - failed for [{}] with pattern [{}]", text, pattern, exc);
       return null;
     }
+  }
+
+  public ZonedDateTime parseISO(String text) {
+    return parse(PATTERN_ISO, ZoneId.of("UTC"), text);
   }
 
   private <T> Optional<T> guard(T obj) {
