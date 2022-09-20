@@ -19,6 +19,8 @@
  */
 package com.celements.web.css;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,7 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+@NotThreadSafe
 public class CSSString extends CSS {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CSSString.class);

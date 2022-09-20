@@ -19,6 +19,8 @@
  */
 package com.celements.web.css;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,6 +35,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+@NotThreadSafe
 public class CSSBaseObject extends CSS {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CSSBaseObject.class);
