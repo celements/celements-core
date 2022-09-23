@@ -27,7 +27,7 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
     outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
         + " ");
     String loadSrc = urlSrv.getExternalURL(docRef, "view",
-        "xpage=ajax&ajax_mode=pageTypeWithLayout");
+        "xpage=ajax&ajax_mode=pageTypeWithLayout&ajax=1&overwriteLayout=SimpleLayout");
     outStream.append("src=\"" + loadSrc + "\" size=32 ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
     outStream.append("</cel-lazy-load>\n");
