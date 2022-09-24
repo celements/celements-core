@@ -38,7 +38,7 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
 
   private @NotNull String getLoadSrcUrl(DocumentReference docRef) {
     return urlSrv.getURL(docRef, "view",
-        "xpage=ajax&ajax_mode=pageTypeWithLayout&ajax=1&overwriteLayout=SimpleLayout");
+        "xpage=ajax&ajax_mode=pageTypeWithLayout&ajax=1&overwriteLayout=SimpleLayout&skipWrapper=1");
   }
 
 }
