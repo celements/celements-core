@@ -439,8 +439,8 @@ public class CelementsWebScriptService implements ScriptService {
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
     // we must not get here for !getService().isAppScriptRequest()
     if ("view".equals(getContext().getAction()) && renderDoc.isNew()) {
-      LOGGER.info("renderCelementsDocument: Failed to get xwiki document for"
-          + renderDoc.getFullName() + " no rendering applied.");
+      LOGGER.info("renderCelementsDocument: Failed to get xwiki document for [{}] no rendering"
+          + " applied.", renderDoc.getFullName());
       return "";
     } else {
       return renderCelementsDocument(renderDoc.getDocumentReference(), renderDoc.getLanguage(),
@@ -449,31 +449,30 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String renderDocument(DocumentReference docRef) {
-    LOGGER.trace("renderDocument: docRef [" + docRef + "].");
+    LOGGER.trace("renderDocument: docRef [{}].", docRef);
     return new RenderCommand().renderDocument(docRef);
   }
 
   public String renderDocument(DocumentReference docRef, DocumentReference includeDocRef) {
-    LOGGER.trace("renderDocument: docRef [" + docRef + "] and includeDocRef [" + includeDocRef
-        + "].");
+    LOGGER.trace("renderDocument: docRef [{}] and includeDocRef [{}].", docRef, includeDocRef);
     return new RenderCommand().renderDocument(docRef, includeDocRef);
   }
 
   public String renderDocument(DocumentReference docRef, String lang) {
-    LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "].");
+    LOGGER.trace("renderDocument: lang [{}] docRef [{}].", lang, docRef);
     return new RenderCommand().renderDocument(docRef, lang);
   }
 
   public String renderDocument(DocumentReference docRef, DocumentReference includeDocRef,
       String lang) {
-    LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "] and includeDocRef ["
-        + includeDocRef + "].");
+    LOGGER.trace("renderDocument: lang [{}] docRef [{}] and includeDocRef [{}].", lang, docRef,
+        includeDocRef);
     return new RenderCommand().renderDocument(docRef, includeDocRef, lang);
   }
 
   public String renderDocument(Document renderDoc) {
-    LOGGER.trace("renderDocument: renderDocLang [" + renderDoc.getLanguage() + "] renderDoc ["
-        + renderDoc.getDocumentReference() + "].");
+    LOGGER.trace("renderDocument: renderDocLang [{}] renderDoc [{}].", renderDoc.getLanguage(),
+        renderDoc.getDocumentReference());
     return new RenderCommand().renderDocument(renderDoc.getDocumentReference(),
         renderDoc.getLanguage());
   }
@@ -485,8 +484,7 @@ public class CelementsWebScriptService implements ScriptService {
       renderCommand.initRenderingEngine(rendererNameList);
       return renderCommand.renderDocument(docRef, lang);
     } catch (XWikiException exp) {
-      LOGGER.error("renderCelementsDocument: Failed to render [" + docRef + "] lang [" + lang
-          + "].", exp);
+      LOGGER.error("renderCelementsDocument: Failed to render [{}] lang [{}].", docRef, lang, exp);
     }
     return "";
   }
