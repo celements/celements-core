@@ -30,8 +30,7 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
         + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
     outStream.append("<cel-lazy-load ");
-    String loadSrc = getLoadSrcUrl(docRef);
-    outStream.append("src=\"" + loadSrc + "\" size=32 ");
+    outStream.append("src=\"" + getLoadSrcUrl(docRef) + "\" size=32 ");
     outStream.append("</cel-lazy-load>\n");
     outStream.append("</div>\n");
   }
