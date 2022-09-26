@@ -19,6 +19,7 @@
  */
 package com.celements.rendering;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -35,11 +36,12 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -50,7 +52,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
-public class RenderCommandTest extends AbstractBridgedComponentTestCase {
+public class RenderCommandTest extends AbstractComponentTest {
 
   private RenderCommand renderCmd;
   private XWikiContext context;
@@ -234,8 +236,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content", "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(myDoc),
-        (PageTypeReference) isNull())).andReturn(null);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc)))
+        .andReturn(Optional.absent());
     expect(xwiki.getDocument(eq(myDocRef), same(context))).andReturn(myDoc).atLeastOnce();
     String expectedContent = "expected Content $doc.fullName";
     expect(myDoc.getTranslatedContent(eq("de"), same(context))).andReturn(expectedContent);
@@ -260,8 +262,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content", "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(myDoc),
-        (PageTypeReference) isNull())).andReturn(null);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc))).andReturn(Optional.absent());
     expect(xwiki.getDocument(eq(myDocRef), same(context))).andReturn(myDoc).once();
     String expectedContent = "expected Content $doc.fullName";
     expect(myDoc.getTranslatedContent(eq("de"), same(context))).andReturn(expectedContent);
@@ -287,8 +288,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content", "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(myDoc),
-        (PageTypeReference) isNull())).andReturn(null);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc))).andReturn(Optional.absent());
     expect(xwiki.getDocument(eq(myDocRef), same(context))).andReturn(myDoc).once();
     String expectedContent = "expected Content $doc.fullName";
     expect(myDoc.getTranslatedContent(eq("de"), same(context))).andReturn(expectedContent);
@@ -313,8 +313,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content", "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).anyTimes();
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(myDoc),
-        (PageTypeReference) isNull())).andReturn(null).anyTimes();
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc))).andReturn(Optional.absent())
+        .anyTimes();
     expect(xwiki.getDocument(eq(myDocRef), same(context))).andReturn(myDoc).anyTimes();
     String expectedContent = "expected Content $doc.fullName";
     expect(myDoc.getTranslatedContent(eq("de"), same(context))).andReturn(
@@ -338,8 +338,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content", "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).anyTimes();
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(myDoc),
-        (PageTypeReference) isNull())).andReturn(null).anyTimes();
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc))).andReturn(Optional.absent())
+        .anyTimes();
     expect(xwiki.getDocument(eq(myDocRef), same(context))).andReturn(myDoc).anyTimes();
     String expectedContent = "expected Content $doc.fullName";
     expect(myDoc.getTranslatedContent(eq("de"), same(context))).andReturn(
@@ -376,8 +376,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
     IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc), eq(
-        defaultPTRef))).andReturn(ptRefMock);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
+        .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
     String renderTemplateFN = "celements2web:Templates.CellTypeView";
@@ -417,8 +417,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
     IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc), eq(
-        defaultPTRef))).andReturn(ptRefMock);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
+        .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
     String renderTemplateFN = "celements2web:Templates.CellTypeView";
@@ -457,8 +457,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
     IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
-        (PageTypeReference) isNull())).andReturn(ptRefMock);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
+        .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
     String renderTemplateFN = "celements2web:Templates.CellTypeView";
@@ -495,8 +495,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
     IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
-        (PageTypeReference) isNull())).andReturn(ptRefMock);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
+        .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
     String renderTemplateFN = "celements2web:Templates.CellTypeView";
@@ -540,8 +540,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
     IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
-        (PageTypeReference) isNull())).andReturn(ptRefMock);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
+        .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
@@ -580,8 +580,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
     IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
-        (PageTypeReference) isNull())).andReturn(ptRefMock);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
+        .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
@@ -620,8 +620,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
     IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
-        (PageTypeReference) isNull())).andReturn(ptRefMock);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
+        .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
@@ -655,8 +655,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
     IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
-        (PageTypeReference) isNull())).andReturn(ptRefMock);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
+        .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
@@ -687,8 +687,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
     IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
-        (PageTypeReference) isNull())).andReturn(ptRefMock);
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
+        .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
@@ -946,8 +946,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content", "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).anyTimes();
-    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(myDoc),
-        (PageTypeReference) isNull())).andReturn(null).anyTimes();
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc)))
+        .andReturn(Optional.absent()).anyTimes();
     expect(xwiki.getDocument(eq(myDocRef), same(context))).andReturn(myDoc).anyTimes();
     String expectedContent = "expected Content $doc.fullName";
     expect(myDoc.getTranslatedContent(eq("de"), same(context))).andReturn(
