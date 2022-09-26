@@ -214,7 +214,7 @@ public class RenderCommand {
   }
 
   public String renderDocument(DocumentReference docRef, String lang) {
-    LOGGER.debug("renderDocument for lang  [" + lang + "] and docref [" + docRef + "].");
+    LOGGER.debug("renderDocument for lang  [{}] and docref [{}].", lang, docRef);
     try {
       XWikiDocument xwikidoc = getContext().getWiki().getDocument(docRef, getContext());
       return renderDocument(xwikidoc, null, lang);
@@ -227,15 +227,15 @@ public class RenderCommand {
 
   public String renderDocument(DocumentReference docRef, DocumentReference includeDocRef,
       String lang) {
-    LOGGER.debug("renderDocument for lang  [" + lang + "] and docref [" + docRef
-        + "] and includeDocRef [" + includeDocRef + "].");
+    LOGGER.debug("renderDocument for lang  [{}] and docref [{}] and includeDocRef [{}].", lang,
+        docRef, includeDocRef);
     try {
       XWikiDocument contentdoc = getContext().getWiki().getDocument(docRef, getContext());
       XWikiDocument includeDoc = getContext().getWiki().getDocument(includeDocRef, getContext());
       return renderDocument(contentdoc, includeDoc, lang);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get translated document for [" + docRef + "] or includeDoc ["
-          + includeDocRef + "].", exp);
+      LOGGER.error("Failed to get translated document for [{}] or includeDoc [{}].", docRef,
+          includeDocRef, exp);
     }
     return "";
   }
