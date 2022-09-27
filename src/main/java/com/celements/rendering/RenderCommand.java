@@ -22,8 +22,6 @@ package com.celements.rendering;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -150,7 +148,6 @@ public class RenderCommand {
             getContext().getUser(), cellDocFN, getContext())) {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       vcontext.put("celldoc", cellDoc.newDocument(getContext()));
-      @NotNull
       Optional<PageTypeReference> optCellTypeRef = getPageTypeResolver()
           .resolvePageTypeReference(cellDoc);
       PageTypeReference cellTypeRef;
@@ -164,9 +161,7 @@ public class RenderCommand {
         cellType = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
       }
       return renderTemplatePath(getRenderTemplatePath(cellType, cellDocFN, renderMode), lang);
-    } else
-
-    {
+    } else {
       if ((getContext() == null) || (getContext().get("vcontext") == null)) {
         LOGGER.error("Failed to renderCelementsDocument '{}', because velocity context "
             + " or context is null.", cellDoc.getDocumentReference());
