@@ -35,12 +35,16 @@ public class RenderedContentPresentationType implements IPresentationTypeRole<IN
     outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
         + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
+    addRenderedContent(outStream, docRef);
+    outStream.append("</div>\n");
+  }
+
+  protected void addRenderedContent(StringBuilder outStream, DocumentReference docRef) {
     try {
       outStream.append(getRenderCommand().renderCelementsDocument(docRef, "view"));
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get document for [" + docRef + "].", exp);
     }
-    outStream.append("</div>\n");
   }
 
   RenderCommand getRenderCommand() {

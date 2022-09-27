@@ -22,17 +22,11 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
   private UrlService urlSrv;
 
   @Override
-  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
-      DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
-    LOGGER.debug("writeNodeContent for [{}].", docRef);
-    outStream.append("<div ");
-    outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
-        + " ");
-    outStream.append(nav.addUniqueElementId(docRef) + ">\n");
-    outStream.append("<cel-lazy-load ");
-    outStream.append("src=\"" + getLoadSrcUrl(docRef) + "\" size=32 ");
+  protected void addRenderedContent(StringBuilder outStream, DocumentReference docRef) {
+    outStream.append("<cel-lazy-load src=\"");
+    outStream.append(getLoadSrcUrl(docRef));
+    outStream.append("\" size=32 >");
     outStream.append("</cel-lazy-load>\n");
-    outStream.append("</div>\n");
   }
 
   private @NotNull String getLoadSrcUrl(DocumentReference docRef) {

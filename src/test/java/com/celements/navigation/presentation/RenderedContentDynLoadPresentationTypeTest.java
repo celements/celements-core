@@ -103,7 +103,7 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
     String queryString = "xpage=ajax&ajax_mode=rendering/renderDocumentWithPageType&ajax=1";
     String expectedUrl = "/MySpace/MyCurrentDoc?" + queryString;
     String expectedNodeContent = "<cel-lazy-load src=\"" + expectedUrl
-        + "\" size=32 </cel-lazy-load>\n";
+        + "\" size=32 ></cel-lazy-load>\n";
     expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
         "id=\"N3:Content:Content.MyPage\"").once();
     expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
