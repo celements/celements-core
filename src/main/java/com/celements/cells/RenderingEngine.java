@@ -77,7 +77,7 @@ public class RenderingEngine implements IRenderingEngine {
    */
   @Override
   public void renderPageLayout(SpaceReference spaceRef) {
-    LOGGER.debug("renderPageLayout: start rendering [" + spaceRef + "].");
+    LOGGER.debug("renderPageLayout: start rendering [{}].", spaceRef);
     renderStrategy.startRendering();
     renderStrategy.setSpaceReference(spaceRef);
     internal_renderSubCells(null);
@@ -97,9 +97,9 @@ public class RenderingEngine implements IRenderingEngine {
     if (renderStrategy.isRenderSubCells(parentRef)) {
       List<TreeNode> children = getTreeNodeService().getSubNodesForParent(parentRef,
           renderStrategy.getMenuPart(parentNode));
-      LOGGER.debug("internal_renderSubCells: for parent [" + parentRef + "] render ["
-          + children.size() + "] children [" + children + "].");
-      if (children.size() > 0) {
+      LOGGER.debug("internal_renderSubCells: for parent [{}] render [{}] children [{}].",
+          parentRef, children.size(), children);
+      if (!children.isEmpty()) {
         renderStrategy.startRenderChildren(parentRef);
         boolean isFirstItem = true;
         for (TreeNode node : children) {

@@ -33,6 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
+import com.celements.web.service.UrlService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,36 +43,38 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
 
-public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
+public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private INavigation nav;
   private XWiki xwiki;
   private DocumentReference currentDocRef;
   private XWikiDocument currentDoc;
-  private RenderedContentPresentationType vtPresType;
+  private RenderedContentDynLoadPresentationType vtPresType;
   private TestRenderEngine testRenderEngine;
   private RenderCommand renderCmdMock;
+  private UrlService urlServiceMock;
 
   @Before
-  public void setUp_RenderedContentPresentationTypeTest() throws Exception {
+  public void setUp_RenderedContentDynLoadPresentationTypeTest() throws Exception {
+    xwiki = getWikiMock();
     context = getContext();
+    urlServiceMock = registerComponentMock(UrlService.class);
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
     nav = createMockAndAddToDefault(INavigation.class);
-    xwiki = createMockAndAddToDefault(XWiki.class);
-    context.setWiki(xwiki);
     testRenderEngine = new TestRenderEngine();
     expect(xwiki.getRenderingEngine()).andReturn(testRenderEngine).anyTimes();
-    vtPresType = new RenderedContentPresentationType();
+    vtPresType = (RenderedContentDynLoadPresentationType) Utils
+        .getComponent(IPresentationTypeRole.class, "renderedContentDynLoad");
     renderCmdMock = createMockAndAddToDefault(RenderCommand.class);
     vtPresType.renderCmd = renderCmdMock;
   }
 
   @Test
   public void testComponentLoaded() {
-    assertNotNull(Utils.getComponent(IPresentationTypeRole.class, "renderedContent"));
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class, "renderedContentDynLoad"));
   }
 
   @Test
@@ -97,14 +100,17 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
     boolean isFirstItem = true;
     boolean isLastItem = false;
     boolean isLeaf = true;
-    String expectedNodeContent = "expected rendered content for node";
-    expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view"))).andReturn(
-        expectedNodeContent);
+    String queryString = "xpage=ajax&ajax_mode=rendering/renderDocumentWithPageType&ajax=1";
+    String expectedUrl = "/MySpace/MyCurrentDoc?" + queryString;
+    String expectedNodeContent = "<cel-lazy-load src=\"" + expectedUrl
+        + "\" size=32 ></cel-lazy-load>\n";
     expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
         "id=\"N3:Content:Content.MyPage\"").once();
     expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
         isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
             + " first cel_nav_isLeaf RichText\"").once();
+    expect(urlServiceMock.getURL(eq(currentDocRef), eq("view"), eq(queryString)))
+        .andReturn(expectedUrl);
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
