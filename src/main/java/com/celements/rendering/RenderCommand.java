@@ -36,7 +36,6 @@ import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.web.service.IWebUtilsService;
-import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -148,14 +147,9 @@ public class RenderCommand {
             getContext().getUser(), cellDocFN, getContext())) {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       vcontext.put("celldoc", cellDoc.newDocument(getContext()));
-      Optional<PageTypeReference> optCellTypeRef = getPageTypeResolver()
-          .resolvePageTypeReference(cellDoc);
-      PageTypeReference cellTypeRef;
-      if (defaultPageTypeRef != null) {
-        cellTypeRef = optCellTypeRef.or(defaultPageTypeRef);
-      } else {
-        cellTypeRef = optCellTypeRef.orNull();
-      }
+      PageTypeReference cellTypeRef = getPageTypeResolver()
+          .resolvePageTypeReference(cellDoc).toJavaUtil()
+          .orElse(defaultPageTypeRef);
       IPageTypeConfig cellType = null;
       if (cellTypeRef != null) {
         cellType = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
