@@ -162,3 +162,4 @@ com.celements.cells.classes.GroupCellClass
 com.celements.cells.classes.PageDepCellConfigClass
 com.celements.cells.classes.TranslationBoxCellConfigClass
 com.celements.cells.classes.CellAttributeClass
+com.celements.web.classes.KeyValueClass

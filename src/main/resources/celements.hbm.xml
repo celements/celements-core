@@ -100,6 +100,9 @@
       <column name="CKV_ID" not-null="true" />
       <generator class="assigned" />
     </id>
+    <property name="label" type="string">
+      <column name="CKV_LABEL" />
+    </property>
     <property name="key" type="string">
       <column name="CKV_KEY" />
     </property>
