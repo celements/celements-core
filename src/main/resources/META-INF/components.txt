@@ -32,6 +32,7 @@ com.celements.navigation.presentation.DefaultPresentationType
 com.celements.navigation.presentation.RenderedContentPresentationType
 com.celements.navigation.presentation.RenderedContentDynLoadPresentationType
 com.celements.navigation.presentation.SitemapPresentationType
+com.celements.navigation.presentation.PresentationPageType
 com.celements.validation.FormValidationService
 com.celements.validation.XClassRegexRule
 com.celements.emptycheck.service.EmptyCheckService
