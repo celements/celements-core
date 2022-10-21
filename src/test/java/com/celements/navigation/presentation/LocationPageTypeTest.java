@@ -18,7 +18,8 @@ public class LocationPageTypeTest extends AbstractComponentTest {
   private PresentationPageType locPageType;
 
   @Before
-  public void setUp_LocationPageTypeTest() throws Exception {
+  public void setUp_PresentationPageTypeTest() throws Exception {
+
     locPageType = (PresentationPageType) Utils.getComponent(IJavaPageTypeRole.class,
         PresentationPageType.PAGETYPE_NAME);
   }
