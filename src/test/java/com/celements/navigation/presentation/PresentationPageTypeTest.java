@@ -13,34 +13,34 @@ import com.celements.pagetype.category.IPageTypeCategoryRole;
 import com.celements.pagetype.java.IJavaPageTypeRole;
 import com.xpn.xwiki.web.Utils;
 
-public class LocationPageTypeTest extends AbstractComponentTest {
+public class PresentationPageTypeTest extends AbstractComponentTest {
 
-  private PresentationPageType locPageType;
+  private PresentationPageType presentationPageType;
 
   @Before
-  public void setUp_LocationPageTypeTest() throws Exception {
-    locPageType = (PresentationPageType) Utils.getComponent(IJavaPageTypeRole.class,
+  public void setUp_PresentationPageTypeTest() throws Exception {
+    presentationPageType = (PresentationPageType) Utils.getComponent(IJavaPageTypeRole.class,
         PresentationPageType.PAGETYPE_NAME);
   }
 
   @Test
   public void test_getName() {
     replayDefault();
-    assertEquals(PresentationPageType.PAGETYPE_NAME, locPageType.getName());
+    assertEquals(PresentationPageType.PAGETYPE_NAME, presentationPageType.getName());
     verifyDefault();
   }
 
   @Test
   public void test_displayInFrameLayout() {
     replayDefault();
-    assertTrue(locPageType.displayInFrameLayout());
+    assertTrue(presentationPageType.displayInFrameLayout());
     verifyDefault();
   }
 
   @Test
   public void test_getCategories() {
     replayDefault();
-    Set<IPageTypeCategoryRole> categories = locPageType.getCategories();
+    Set<IPageTypeCategoryRole> categories = presentationPageType.getCategories();
     assertNotNull(categories);
     assertEquals(1, categories.size());
     assertEquals(Utils.getComponent(IPageTypeCategoryRole.class), categories.toArray()[0]);
@@ -50,35 +50,37 @@ public class LocationPageTypeTest extends AbstractComponentTest {
   @Test
   public void test_hasPageTitle() {
     replayDefault();
-    assertFalse(locPageType.hasPageTitle());
+    assertFalse(presentationPageType.hasPageTitle());
     verifyDefault();
   }
 
   @Test
   public void test_isUnconnectedParent() {
     replayDefault();
-    assertFalse(locPageType.isUnconnectedParent());
+    assertFalse(presentationPageType.isUnconnectedParent());
     verifyDefault();
   }
 
   @Test
   public void test_isVisible() {
     replayDefault();
-    assertTrue(locPageType.isVisible());
+    assertTrue(presentationPageType.isVisible());
     verifyDefault();
   }
 
   @Test
   public void test_getViewTemplateName() {
     replayDefault();
-    assertEquals(PresentationPageType.VIEW_TEMPLATE_NAME, locPageType.getViewTemplateName());
+    assertEquals(PresentationPageType.VIEW_TEMPLATE_NAME, presentationPageType
+        .getViewTemplateName());
     verifyDefault();
   }
 
   @Test
   public void test_getEditTemplateName() {
     replayDefault();
-    assertEquals(PresentationPageType.EDIT_TEMPLATE_NAME, locPageType.getEditTemplateName());
+    assertEquals(PresentationPageType.EDIT_TEMPLATE_NAME, presentationPageType
+        .getEditTemplateName());
     verifyDefault();
   }
 
@@ -86,7 +88,7 @@ public class LocationPageTypeTest extends AbstractComponentTest {
   public void test_getRenderTemplateForRenderMode_view() {
     replayDefault();
     assertEquals(PresentationPageType.VIEW_TEMPLATE_NAME,
-        locPageType.getRenderTemplateForRenderMode("view"));
+        presentationPageType.getRenderTemplateForRenderMode("view"));
     verifyDefault();
   }
 
@@ -94,7 +96,7 @@ public class LocationPageTypeTest extends AbstractComponentTest {
   public void test_getRenderTemplateForRenderMode_edit() {
     replayDefault();
     assertEquals(PresentationPageType.EDIT_TEMPLATE_NAME,
-        locPageType.getRenderTemplateForRenderMode("edit"));
+        presentationPageType.getRenderTemplateForRenderMode("edit"));
     verifyDefault();
   }
 
