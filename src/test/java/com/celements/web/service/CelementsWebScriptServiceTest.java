@@ -1,9 +1,8 @@
 package com.celements.web.service;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
-
-import java.text.NumberFormat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +11,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.appScript.AppScriptService;
 import com.celements.appScript.IAppScriptService;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -20,7 +19,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestCase {
+public class CelementsWebScriptServiceTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
@@ -73,27 +72,26 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetHumanReadableSize_PartSize_de_country_CH() {
     context.setLanguage("de");
-    assertEquals("de-ch", "1'006.7 MiB", celWebService.getHumanReadableSize(1055563210, false,
-        celWebService.getLocal("de", "ch")));
+    String formatted = celWebService.getHumanReadableSize(1055563210, false,
+        celWebService.getLocal("de", "ch"))
+        .replace('\'', '’'); // older java versions used different apostrophe
+    assertEquals("de-ch", "1’006.7 MiB", formatted);
     assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210, true, "fr"));
   }
 
   @Test
-  public void testGetLocal() {
-    java.text.NumberFormat formater = NumberFormat.getInstance(celWebService.getLocal("de"));
-    assertEquals("12.312.312", formater.format(12312312L));
+  public void test_getLocal() {
+    assertEquals("de", celWebService.getLocal("de").toString());
   }
 
   @Test
-  public void testGetLocal_country() {
-    java.text.NumberFormat formater = NumberFormat.getInstance(celWebService.getLocal("de", "ch"));
-    assertEquals("12'312'312", formater.format(12312312L));
+  public void test_getLocal_country() {
+    assertEquals("de_CH", celWebService.getLocal("de", "ch").toString());
   }
 
   @Test
-  public void testGetLocal_country_illegal_combination() {
-    java.text.NumberFormat formater = NumberFormat.getInstance(celWebService.getLocal("en", "ch"));
-    assertEquals("12,312,312", formater.format(12312312L));
+  public void test_getLocal_country_illegal_combination() {
+    assertEquals("en_CH", celWebService.getLocal("en", "ch").toString());
   }
 
   @Test

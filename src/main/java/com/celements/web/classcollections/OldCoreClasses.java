@@ -27,6 +27,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.classes.AbstractClassCollection;
 import com.celements.javascript.JavaScriptExternalFilesClass;
 import com.celements.rteConfig.classes.RTEConfigClasses;
+import com.celements.web.classes.KeyValueClass;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -94,11 +95,11 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String RTE_CONFIG_TYPE_PRPOP_CLASS = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS;
 
   @Deprecated
-  public static final String KEY_VALUE_CLASS_DOC = "KeyValueClass";
+  public static final String KEY_VALUE_CLASS_DOC = KeyValueClass.DOC_NAME;
   @Deprecated
-  public static final String KEY_VALUE_CLASS_SPACE = "Classes";
+  public static final String KEY_VALUE_CLASS_SPACE = KeyValueClass.SPACE_NAME;
   @Deprecated
-  public static final String KEY_VALUE_CLASS = KEY_VALUE_CLASS_SPACE + "." + KEY_VALUE_CLASS_DOC;
+  public static final String KEY_VALUE_CLASS = KeyValueClass.CLASS_DEF_HINT;
 
   @Deprecated
   public static final String TOKEN_CLASS_DOC = "TokenClass";
@@ -236,7 +237,6 @@ public class OldCoreClasses extends AbstractClassCollection {
     getContextMenuItemClass();
     getPanelConfigClass();
     getRTEConfigTypeClass();
-    getTagValueClass();
     getTokenClass();
     getOverlayConfigClass();
     getRedirectClass();
@@ -733,35 +733,9 @@ public class OldCoreClasses extends AbstractClassCollection {
         RTE_CONFIG_TYPE_PRPOP_CLASS_DOC);
   }
 
+  @Deprecated
   public DocumentReference getTagValueClassRef(String wikiName) {
     return new DocumentReference(wikiName, KEY_VALUE_CLASS_SPACE, KEY_VALUE_CLASS_DOC);
-  }
-
-  private BaseClass getTagValueClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = getTagValueClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + KEY_VALUE_CLASS_DOC + " class document. ", exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setXClassReference(classRef);
-    needsUpdate |= bclass.addTextField("key", "Key", 30);
-    needsUpdate |= bclass.addTextAreaField("value", "Value", 80, 15);
-
-    if (!"internal".equals(bclass.getCustomMapping())) {
-      needsUpdate = true;
-      bclass.setCustomMapping("internal");
-    }
-
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
   }
 
   public DocumentReference getTokenClassRef(String wikiName) {
