@@ -5,12 +5,12 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.cells.attribute.DefaultCellAttribute.Builder;
-import com.google.common.base.Optional;
 
 public class DefaultAttributeBuilderTest {
 

@@ -75,7 +75,7 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
 
   @Override
   public Optional<String> getAttribute(String attrName) {
-    return getCellAttributeBuilder(attrName).build().getValue().toJavaUtil();
+    return getCellAttributeBuilder(attrName).build().getValue();
   }
 
   DefaultCellAttribute.Builder getCellAttributeBuilder(String attrName) {

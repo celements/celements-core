@@ -3,6 +3,7 @@ package com.celements.cells.attribute;
 import static com.google.common.base.Preconditions.*;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -10,7 +11,6 @@ import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 @Immutable
@@ -59,7 +59,7 @@ public class DefaultCellAttribute implements CellAttribute {
 
   @Override
   public Optional<String> getValue() {
-    return Optional.fromNullable(value);
+    return Optional.ofNullable(value);
   }
 
 }

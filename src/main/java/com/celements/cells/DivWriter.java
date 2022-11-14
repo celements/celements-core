@@ -93,12 +93,11 @@ public class DivWriter implements ICellWriter {
       String attrName = cellAttr.getName();
       getOut().append(" ");
       getOut().append(attrName);
-      getOut().append("=\"");
-      String attrValue = cellAttr.getValue().toJavaUtil()
-          .orElse(attrName);
-      // TODO CELDEV-343: check for HTML5 type. Only add default Value for XHMTL
-      getOut().append(StringEscapeUtils.escapeHtml(attrValue));
-      getOut().append("\"");
+      cellAttr.getValue().ifPresent(attrValue -> {
+        getOut().append("=\"");
+        getOut().append(StringEscapeUtils.escapeHtml(attrValue));
+        getOut().append("\"");
+      });
     }
     getOut().append(">");
     hasLevelContent = false;
