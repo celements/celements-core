@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -49,8 +49,8 @@ public class DivWriter implements ICellWriter {
   }
 
   @Override
-  public Optional<String> getCurrentLevel() {
-    return Optional.ofNullable(openLevels.peek());
+  public Stream<String> getOpenLevels() {
+    return openLevels.stream();
   }
 
   @Override
