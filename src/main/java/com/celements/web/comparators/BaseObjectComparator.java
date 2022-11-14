@@ -46,12 +46,11 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
     return asc ? create(orderField) : reversed(orderField);
   }
 
-  public static Comparator<BaseObject> create(Collection<String> orderFields) {
+  public static Optional<Comparator<BaseObject>> create(Collection<String> orderFields) {
     return orderFields.stream()
         .map(String::trim).filter(not(String::isEmpty))
         .map(sort -> create(sort.replaceFirst("-", ""), !sort.startsWith("-")))
-        .reduce((c1, c2) -> c1.thenComparing(c2))
-        .orElse(null);
+        .reduce((c1, c2) -> c1.thenComparing(c2));
   }
 
   private String orderField = "";
