@@ -20,8 +20,10 @@
 package com.celements.web.comparators;
 
 import static com.celements.common.MoreObjectsCel.*;
+import static com.google.common.base.Predicates.*;
 import static com.google.common.base.Strings.*;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
@@ -42,6 +44,14 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
 
   public static Comparator<BaseObject> create(String orderField, boolean asc) {
     return asc ? create(orderField) : reversed(orderField);
+  }
+
+  public static Comparator<BaseObject> create(Collection<String> orderFields) {
+    return orderFields.stream()
+        .map(String::trim).filter(not(String::isEmpty))
+        .map(sort -> create(sort.replaceFirst("-", ""), !sort.startsWith("-")))
+        .reduce((c1, c2) -> c1.thenComparing(c2))
+        .orElse(null);
   }
 
   private String orderField = "";
