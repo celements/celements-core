@@ -383,7 +383,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     expect(mockctRendererCmd.renderCelementsCell(eq(cellRef))).andReturn(
         cellContentExpected).once();
     // ASSERT
-    outWriterMock.appendContent(eq(cellContentExpected));
+    expect(outWriterMock.appendContent(eq(cellContentExpected))).andReturn(outWriterMock);
     replayDefault();
     renderer.renderEmptyChildren(cellNode);
     verifyDefault();

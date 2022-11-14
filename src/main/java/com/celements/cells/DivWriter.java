@@ -19,18 +19,20 @@
  */
 package com.celements.cells;
 
+import static com.google.common.base.MoreObjects.*;
+import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Strings.*;
+
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
 import com.celements.cells.attribute.CellAttribute;
 import com.celements.cells.attribute.DefaultAttributeBuilder;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 
 public class DivWriter implements ICellWriter {
 
@@ -38,12 +40,17 @@ public class DivWriter implements ICellWriter {
 
   private StringBuilder out;
   private Deque<String> openLevels = new LinkedList<>();
+  private boolean hasLevelContent = false;
 
-  public DivWriter() {
-  }
+  public DivWriter() {}
 
   public DivWriter(StringBuilder out) {
-    this.out = out;
+    this.out = checkNotNull(out);
+  }
+
+  @Override
+  public Optional<String> getCurrentLevel() {
+    return Optional.ofNullable(openLevels.peek());
   }
 
   @Override
@@ -78,7 +85,7 @@ public class DivWriter implements ICellWriter {
 
   @Override
   public void openLevel(String tagName, List<CellAttribute> attributes) {
-    tagName = MoreObjects.firstNonNull(Strings.emptyToNull(tagName), TAGNAME_DIV);
+    tagName = firstNonNull(emptyToNull(tagName), TAGNAME_DIV);
     openLevels.push(tagName);
     getOut().append("<");
     getOut().append(tagName);
@@ -87,12 +94,14 @@ public class DivWriter implements ICellWriter {
       getOut().append(" ");
       getOut().append(attrName);
       getOut().append("=\"");
-      Optional<String> attrValue = cellAttr.getValue();
+      String attrValue = cellAttr.getValue().toJavaUtil()
+          .orElse(attrName);
       // TODO CELDEV-343: check for HTML5 type. Only add default Value for XHMTL
-      getOut().append(StringEscapeUtils.escapeHtml(attrValue.or(attrName)));
+      getOut().append(StringEscapeUtils.escapeHtml(attrValue));
       getOut().append("\"");
     }
     getOut().append(">");
+    hasLevelContent = false;
   }
 
   @Override
@@ -105,6 +114,7 @@ public class DivWriter implements ICellWriter {
   public void clear() {
     out = null;
     openLevels.clear();
+    hasLevelContent = false;
   }
 
   StringBuilder getOut() {
@@ -115,8 +125,18 @@ public class DivWriter implements ICellWriter {
   }
 
   @Override
-  public void appendContent(String content) {
-    getOut().append(content);
+  public boolean hasLevelContent() {
+    return hasLevelContent;
+  }
+
+  @Override
+  public DivWriter appendContent(String content) {
+    content = nullToEmpty(content).trim();
+    if (!content.isEmpty()) {
+      getOut().append(content);
+      hasLevelContent = true;
+    }
+    return this;
   }
 
   @Override

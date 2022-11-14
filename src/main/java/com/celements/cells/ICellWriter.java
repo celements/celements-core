@@ -20,6 +20,7 @@
 package com.celements.cells;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -45,7 +46,8 @@ public interface ICellWriter {
 
   void clear();
 
-  void appendContent(String content);
+  @NotNull
+  ICellWriter appendContent(@Nullable String content);
 
   void openLevel();
 
@@ -54,6 +56,11 @@ public interface ICellWriter {
   void openLevel(@NotNull String tagName);
 
   void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes);
+
+  @NotNull
+  Optional<String> getCurrentLevel();
+
+  boolean hasLevelContent();
 
   @NotNull
   String getAsString();

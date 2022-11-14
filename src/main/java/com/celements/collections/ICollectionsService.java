@@ -24,15 +24,25 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+@Deprecated
 @ComponentRole
 public interface ICollectionsService {
 
-  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+  /**
+   * @since 5.8 instead use {@link XWikiObjectFetcher}
+   */
+  @Deprecated
+  List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField, boolean asc);
 
-  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+  /**
+   * @since 5.8 instead use {@link XWikiObjectFetcher}
+   */
+  @Deprecated
+  List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2);
 }
