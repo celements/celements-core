@@ -58,6 +58,8 @@ import com.xpn.xwiki.web.Utils;
 
 public class CellRenderStrategy implements IRenderStrategy {
 
+  public static final String EXEC_CTX_KEY_OBJ_NB = "celements.globalvalues.cell.number";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(CellRenderStrategy.class);
 
   private ICellWriter cellWriter;
@@ -154,8 +156,8 @@ public class CellRenderStrategy implements IRenderStrategy {
   private String collectId(DocumentReference cellDocRef, XWikiObjectFetcher fetcher) {
     String id = fetcher.fetchField(CellClass.FIELD_ID_NAME).stream().findFirst()
         .orElseGet(() -> "cell:" + modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", ".."));
-    Integer idNb = Ints.tryParse(Objects.toString(execution.getContext().getProperty(
-        "celements.globalvalues.cell.number")));
+    Integer idNb = Ints.tryParse(Objects.toString(
+        execution.getContext().getProperty(EXEC_CTX_KEY_OBJ_NB)));
     if (idNb != null) {
       id += "_" + idNb;
     }
