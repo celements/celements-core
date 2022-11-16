@@ -2,28 +2,35 @@ package com.celements.web.comparators;
 
 import static org.junit.Assert.*;
 
+import java.util.Comparator;
 import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LongProperty;
 import com.xpn.xwiki.objects.StringProperty;
 
-public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
+public class BaseObjectComparatorTest extends AbstractComponentTest {
+
+  Comparator<BaseObject> compAsc;
+  Comparator<BaseObject> compDesc;
 
   @Before
   public void setUp_BaseObjectComparatorTest() throws Exception {
-
+    compAsc = BaseObjectComparator.create("x")
+        .thenComparing(BaseObjectComparator.create("y"));
+    compDesc = BaseObjectComparator.reversed("x")
+        .thenComparing(BaseObjectComparator.reversed("y"));
   }
 
   @Test
   public void testCompare_onlyOneSort() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
+    Comparator<BaseObject> comp = compAsc;
     BaseObject obj1 = new BaseObject();
     obj1.setStringValue("x", "f");
     BaseObject obj2 = new BaseObject();
@@ -33,7 +40,8 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCompare_onlyOneSort_inverted() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", false, "y", false);
+    Comparator<BaseObject> comp = BaseObjectComparator.reversed("x")
+        .thenComparing(BaseObjectComparator.reversed("y"));
     BaseObject obj1 = new BaseObject();
     obj1.setStringValue("x", "f");
     BaseObject obj2 = new BaseObject();
@@ -43,7 +51,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCompare_firstSortBigger() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
+    Comparator<BaseObject> comp = compAsc;
     BaseObject obj1 = new BaseObject();
     obj1.setIntValue("x", 3);
     obj1.setLongValue("y", 1);
@@ -55,7 +63,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCompare_firstSortBigger_inverted() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", false, "y", false);
+    Comparator<BaseObject> comp = compDesc;
     BaseObject obj1 = new BaseObject();
     obj1.setIntValue("x", 3);
     obj1.setLongValue("y", 1);
@@ -67,7 +75,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCompare_firstSortSmaller() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
+    Comparator<BaseObject> comp = compAsc;
     BaseObject obj1 = new BaseObject();
     obj1.setIntValue("x", 1);
     obj1.setLongValue("y", 3);
@@ -79,7 +87,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCompare_firstSortSmaller_inverted() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", false, "y", false);
+    Comparator<BaseObject> comp = compDesc;
     BaseObject obj1 = new BaseObject();
     obj1.setIntValue("x", 1);
     obj1.setLongValue("y", 3);
@@ -91,7 +99,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCompare_secondSort() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
+    Comparator<BaseObject> comp = compAsc;
     BaseObject obj1 = new BaseObject();
     obj1.setIntValue("x", 1);
     obj1.setLongValue("y", 1);
@@ -103,7 +111,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCompare_secondSort_inverted() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", false, "y", false);
+    Comparator<BaseObject> comp = compDesc;
     BaseObject obj1 = new BaseObject();
     obj1.setIntValue("x", 1);
     obj1.setLongValue("y", 1);
@@ -115,94 +123,30 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCompare_null() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
+    Comparator<BaseObject> comp = compAsc;
     BaseObject obj1 = new BaseObject();
     BaseObject obj2 = new BaseObject();
     obj1.setDateValue("x", new Date(1000000));
     obj2.setDateValue("x", null);
-    assertEquals(1, comp.compare(obj1, obj2));
+    assertTrue(0 < comp.compare(obj1, obj2));
     obj1.setDateValue("x", null);
     assertEquals(0, comp.compare(obj1, obj2));
     obj2.setDateValue("x", new Date(541342131));
-    assertEquals(-1, comp.compare(obj1, obj2));
-  }
-
-  @Test
-  public void testCompareFieldStringPropertyStringProperty() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
-    StringProperty prop1 = new StringProperty();
-    StringProperty prop2 = new StringProperty();
-    prop1.setValue("b");
-    prop2.setValue("a");
-    assertTrue(comp.compareField(prop1, prop2) > 0);
-    prop1.setValue("a b,c");
-    prop2.setValue("a b,c");
-    assertEquals(0, comp.compareField(prop1, prop2));
-    prop1.setValue("max");
-    prop2.setValue("x");
-    assertTrue(comp.compareField(prop1, prop2) < 0);
-  }
-
-  @Test
-  public void testCompareFieldIntegerPropertyIntegerProperty() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
-    IntegerProperty prop1 = new IntegerProperty();
-    IntegerProperty prop2 = new IntegerProperty();
-    prop1.setValue(2);
-    prop2.setValue(1);
-    assertEquals(1, comp.compareField(prop1, prop2));
-    prop1.setValue(4);
-    prop2.setValue(4);
-    assertEquals(0, comp.compareField(prop1, prop2));
-    prop1.setValue(12);
-    prop2.setValue(1512);
-    assertEquals(-1, comp.compareField(prop1, prop2));
-  }
-
-  @Test
-  public void testCompareFieldLongPropertyLongProperty() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
-    LongProperty prop1 = new LongProperty();
-    LongProperty prop2 = new LongProperty();
-    prop1.setValue(231l);
-    prop2.setValue(52l);
-    assertEquals(1, comp.compareField(prop1, prop2));
-    prop1.setValue(1234567890l);
-    prop2.setValue(1234567890l);
-    assertEquals(0, comp.compareField(prop1, prop2));
-    prop1.setValue(41331l);
-    prop2.setValue(1243123l);
-    assertEquals(-1, comp.compareField(prop1, prop2));
-  }
-
-  @Test
-  public void testCompareFieldDatePropertyDateProperty() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
-    DateProperty prop1 = new DateProperty();
-    DateProperty prop2 = new DateProperty();
-    prop1.setValue(new Date(1000000));
-    prop2.setValue(new Date(1));
-    assertEquals(1, comp.compareField(prop1, prop2));
-    prop1.setValue(new Date(123456789));
-    prop2.setValue(new Date(123456789));
-    assertEquals(0, comp.compareField(prop1, prop2));
-    prop1.setValue(new Date(1345132));
-    prop2.setValue(new Date(541342131));
-    assertEquals(-1, comp.compareField(prop1, prop2));
+    assertTrue(0 > comp.compare(obj1, obj2));
   }
 
   @Test
   public void testGetValue() {
-    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
+    BaseObjectComparator comp = new BaseObjectComparator(null);
     BaseObject obj = new BaseObject();
     obj.setStringValue("str", "s");
     obj.setIntValue("int", 12);
     obj.setLongValue("long", 123l);
     obj.setDateValue("date", new Date(1234));
-    assertTrue(comp.getValue(obj, "str") instanceof StringProperty);
-    assertTrue(comp.getValue(obj, "int") instanceof IntegerProperty);
-    assertTrue(comp.getValue(obj, "long") instanceof LongProperty);
-    assertTrue(comp.getValue(obj, "date") instanceof DateProperty);
+    assertTrue(comp.getProperty(obj, "str") instanceof StringProperty);
+    assertTrue(comp.getProperty(obj, "int") instanceof IntegerProperty);
+    assertTrue(comp.getProperty(obj, "long") instanceof LongProperty);
+    assertTrue(comp.getProperty(obj, "date") instanceof DateProperty);
   }
 
 }

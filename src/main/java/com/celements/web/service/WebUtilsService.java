@@ -61,6 +61,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.auth.user.User;
 import com.celements.auth.user.UserInstantiationException;
 import com.celements.auth.user.UserService;
+import com.celements.collections.ICollectionsService;
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
@@ -81,7 +82,6 @@ import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.sajson.Builder;
 import com.celements.web.CelConstant;
-import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
@@ -151,6 +151,9 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Requirement
   private IDefaultEmptyDocStrategyRole emptyChecker;
+
+  @Requirement
+  private ICollectionsService collectionService;
 
   @Requirement
   private ConfigurationSource defaultConfigSrc;
@@ -911,7 +914,8 @@ public class WebUtilsService implements IWebUtilsService {
       try {
         docData.put("celrenderedcontent", replaceInternalWithExternalLinks(
             getCelementsRenderCmd().renderCelementsDocument(xwikiDoc.getDocumentReference(),
-                getContext().getLanguage(), "view"), host));
+                getContext().getLanguage(), "view"),
+            host));
       } catch (XWikiException exp) {
         LOGGER.error("Exception with rendering content: ", exp);
       }
@@ -1000,45 +1004,18 @@ public class WebUtilsService implements IWebUtilsService {
     return revision;
   }
 
+  @Deprecated
   @Override
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField, boolean asc) {
-    return getObjectsOrdered(doc, classRef, orderField, asc, null, false);
+    return collectionService.getObjectsOrdered(doc, classRef, orderField, asc);
   }
 
-  /**
-   * Get a list of Objects for a Document sorted by one or two fields.
-   *
-   * @param doc
-   *          The Document where the Objects are attached.
-   * @param classRef
-   *          The reference to the class of the Objects to return
-   * @param orderField1
-   *          Field to order the objects by. First priority.
-   * @param asc1
-   *          Order first priority ascending or descending.
-   * @param orderField2
-   *          Field to order the objects by. Second priority.
-   * @param asc2
-   *          Order second priority ascending or descending.
-   * @return List of objects ordered as specified
-   */
+  @Deprecated
   @Override
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2) {
-    List<BaseObject> resultList = new ArrayList<>();
-    if (doc != null) {
-      List<BaseObject> allObjects = doc.getXObjects(classRef);
-      if (allObjects != null) {
-        for (BaseObject obj : allObjects) {
-          if (obj != null) {
-            resultList.add(obj);
-          }
-        }
-      }
-      Collections.sort(resultList, new BaseObjectComparator(orderField1, asc1, orderField2, asc2));
-    }
-    return resultList;
+    return collectionService.getObjectsOrdered(doc, classRef, orderField1, asc1, orderField2, asc2);
   }
 
   @Override

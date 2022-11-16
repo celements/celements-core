@@ -1,15 +1,15 @@
 package com.celements.cells.attribute;
 
-import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
+import javax.validation.constraints.NotNull;
 
 public interface CellAttribute {
 
   @NotNull
-  public String getName();
+  String getName();
 
   @NotNull
-  public Optional<String> getValue();
+  Optional<String> getValue();
 
 }

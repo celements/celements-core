@@ -19,8 +19,11 @@
  */
 package com.celements.rendering;
 
+import static com.google.common.base.Predicates.*;
+
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -31,7 +34,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.util.ModelUtils;
-import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
@@ -146,15 +148,13 @@ public class RenderCommand {
         && getContext().getWiki().getRightService().hasAccessLevel(renderMode,
             getContext().getUser(), cellDocFN, getContext())) {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-      vcontext.put("celldoc", cellDoc.newDocument(getContext()));
-      PageTypeReference cellTypeRef = getPageTypeResolver()
-          .resolvePageTypeReference(cellDoc).toJavaUtil()
-          .orElse(defaultPageTypeRef);
-      IPageTypeConfig cellType = null;
-      if (cellTypeRef != null) {
-        cellType = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
+      Object currVCellDoc = vcontext.get("celldoc");
+      try {
+        vcontext.put("celldoc", cellDoc.newDocument(getContext()));
+        return renderTemplatePath(getRenderTemplatePath(cellDoc, renderMode), lang);
+      } finally {
+        vcontext.put("celldoc", currVCellDoc);
       }
-      return renderTemplatePath(getRenderTemplatePath(cellType, cellDocFN, renderMode), lang);
     } else {
       if ((getContext() == null) || (getContext().get("vcontext") == null)) {
         LOGGER.error("Failed to renderCelementsDocument '{}', because velocity context "
@@ -323,22 +323,15 @@ public class RenderCommand {
     return templateOnDiskPath;
   }
 
-  String getRenderTemplatePath(IPageTypeConfig cellType, String cellDocFN, String renderMode)
-      throws XWikiException {
-    LOGGER.trace("getRenderTemplatePath: for cellDoc [" + cellDocFN + "] with cellType ["
-        + (cellType != null ? cellType.getName() : "null") + "] and renderMode [" + renderMode
-        + "].");
-    if (cellType != null) {
-      String renderTemplateFullName = cellType.getRenderTemplateForRenderMode(renderMode);
-      if ((renderTemplateFullName != null) && !"".equals(renderTemplateFullName)) {
-        LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
-            + cellType.getName() + "] and renderTemplate [" + renderTemplateFullName + "].");
-        return renderTemplateFullName;
-      }
-      LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
-          + cellType.getName() + "] using content of cellDoc [" + cellDocFN + "].");
-    }
-    return cellDocFN;
+  String getRenderTemplatePath(XWikiDocument cellDoc, String renderMode) {
+    String cellDocFN = getModelUtils().serializeRef(cellDoc.getDocumentReference());
+    return Optional.ofNullable(getPageTypeResolver()
+        .resolvePageTypeReference(cellDoc).toJavaUtil()
+        .orElse(defaultPageTypeRef))
+        .map(getPageTypeService()::getPageTypeConfigForPageTypeRef)
+        .map(cellType -> cellType.getRenderTemplateForRenderMode(renderMode))
+        .filter(not(String::isEmpty))
+        .orElse(cellDocFN);
   }
 
   private IWebUtilsService getWebUtilsService() {

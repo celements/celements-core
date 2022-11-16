@@ -19,135 +19,72 @@
  */
 package com.celements.web.comparators;
 
+import static com.celements.common.MoreObjectsCel.*;
+import static com.google.common.base.Predicates.*;
+import static com.google.common.base.Strings.*;
+
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.DateProperty;
-import com.xpn.xwiki.objects.IntegerProperty;
-import com.xpn.xwiki.objects.LongProperty;
-import com.xpn.xwiki.objects.StringProperty;
 
 public class BaseObjectComparator implements Comparator<BaseObject> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(BaseObjectComparator.class);
+  public static Comparator<BaseObject> create(String orderField) {
+    return new BaseObjectComparator(orderField);
+  }
 
-  private String orderField1 = null;
-  private boolean asc1 = true;
-  private String orderField2 = null;
-  private boolean asc2 = true;
+  public static Comparator<BaseObject> reversed(String orderField) {
+    return new BaseObjectComparator(orderField).reversed();
+  }
 
-  public BaseObjectComparator(String orderField1, boolean asc1, String orderField2, boolean asc2) {
-    this.orderField1 = orderField1;
-    this.asc1 = asc1;
-    this.orderField2 = orderField2;
-    this.asc2 = asc2;
+  public static Comparator<BaseObject> create(String orderField, boolean asc) {
+    return asc ? create(orderField) : reversed(orderField);
+  }
+
+  public static Optional<Comparator<BaseObject>> create(Collection<String> orderFields) {
+    return orderFields.stream()
+        .map(String::trim).filter(not(String::isEmpty))
+        .map(sort -> create(sort.replaceFirst("-", ""), !sort.startsWith("-")))
+        .reduce((c1, c2) -> c1.thenComparing(c2));
+  }
+
+  private String orderField = "";
+
+  public BaseObjectComparator(String orderField) {
+    this.orderField = nullToEmpty(orderField);
+  }
+
+  public String getOrderField() {
+    return orderField;
   }
 
   @Override
   public int compare(BaseObject obj1, BaseObject obj2) {
-    Object val1 = getValue(obj1, orderField1);
-    Object val2 = getValue(obj2, orderField1);
-
-    int firstLarger = 0;
-
-    short resultWithNull = compareWithNullValue(val1, val2);
-    if (resultWithNull != Short.MIN_VALUE) {
-      firstLarger = resultWithNull;
+    Object val1 = getProperty(obj1, orderField).getValue();
+    Object val2 = getProperty(obj2, orderField).getValue();
+    if ((val1 instanceof Integer) && (val2 instanceof Integer)) {
+      return ((Integer) val1).compareTo((Integer) val2);
+    } else if ((val1 instanceof Long) && (val2 instanceof Long)) {
+      return ((Long) val1).compareTo((Long) val2);
+    } else if ((val1 instanceof Float) && (val2 instanceof Float)) {
+      return ((Float) val1).compareTo((Float) val2);
+    } else if ((val1 instanceof Double) && (val2 instanceof Double)) {
+      return ((Double) val1).compareTo((Double) val2);
+    } else if ((val1 instanceof Date) && (val2 instanceof Date)) {
+      return ((Date) val1).compareTo((Date) val2);
     } else {
-      if (val1 instanceof StringProperty) {
-        firstLarger = compareField((StringProperty) val1, (StringProperty) val2);
-      } else if (val1 instanceof IntegerProperty) {
-        firstLarger = compareField((IntegerProperty) val1, (IntegerProperty) val2);
-      } else if (val1 instanceof LongProperty) {
-        firstLarger = compareField((LongProperty) val1, (LongProperty) val2);
-      } else if (val1 instanceof DateProperty) {
-        firstLarger = compareField((DateProperty) val1, (DateProperty) val2);
-      }
+      return Objects.toString(val1, "").compareTo(Objects.toString(val2, ""));
     }
-    if ((firstLarger == 0) && (orderField2 != null) && (orderField2.trim().length() > 0)) {
-      val1 = getValue(obj1, orderField2);
-      val2 = getValue(obj2, orderField2);
-
-      resultWithNull = compareWithNullValue(val1, val2);
-      if (resultWithNull != Short.MIN_VALUE) {
-        firstLarger = resultWithNull;
-      } else {
-        if (val1 instanceof StringProperty) {
-          firstLarger = compareField((StringProperty) val1, (StringProperty) val2);
-        } else if (val1 instanceof IntegerProperty) {
-          firstLarger = compareField((IntegerProperty) val1, (IntegerProperty) val2);
-        } else if (val1 instanceof LongProperty) {
-          firstLarger = compareField((LongProperty) val1, (LongProperty) val2);
-        } else if (val1 instanceof DateProperty) {
-          firstLarger = compareField((DateProperty) val1, (DateProperty) val2);
-        }
-      }
-      firstLarger *= asc2 ? 1 : -1;
-    } else {
-      firstLarger *= asc1 ? 1 : -1;
-    }
-    return firstLarger;
   }
 
-  int compareField(StringProperty value, StringProperty value2) {
-    return value.getValue().compareTo(value2.getValue());
-  }
-
-  short compareField(IntegerProperty value, IntegerProperty value2) {
-    if ((Integer) value.getValue() > (Integer) value2.getValue()) {
-      return 1;
-    } else if ((Integer) value.getValue() < (Integer) value2.getValue()) {
-      return -1;
-    }
-    return 0;
-  }
-
-  short compareField(LongProperty value, LongProperty value2) {
-    if ((Long) value.getValue() > (Long) value2.getValue()) {
-      return 1;
-    } else if ((Long) value.getValue() < (Long) value2.getValue()) {
-      return -1;
-    }
-    return 0;
-  }
-
-  short compareField(DateProperty value, DateProperty value2) {
-    if (((Date) value.getValue()).getTime() > ((Date) value2.getValue()).getTime()) {
-      return 1;
-    } else if (((Date) value.getValue()).getTime() < ((Date) value2.getValue()).getTime()) {
-      return -1;
-    }
-    return 0;
-  }
-
-  short compareWithNullValue(Object val1, Object val2) {
-    if ((val1 == null) || ((val1 instanceof BaseProperty)
-        && (((BaseProperty) val1).getValue() == null))) {
-      if ((val2 == null) || ((val2 instanceof BaseProperty)
-          && (((BaseProperty) val2).getValue() == null))) {
-        return 0;
-      } else {
-        return -1;
-      }
-    } else if ((val2 == null) || ((val2 instanceof BaseProperty)
-        && (((BaseProperty) val2).getValue() == null))) {
-      return 1;
-    }
-    return Short.MIN_VALUE;
-  }
-
-  Object getValue(BaseObject obj, String field) {
-    try {
-      return obj.get(field);
-    } catch (XWikiException e) {
-      LOGGER.error("Could not get field '" + field + "' from object '" + obj + "'", e);
-    }
-    return null;
+  BaseProperty getProperty(BaseObject obj, String field) {
+    return Optional.ofNullable(obj.getField(field))
+        .flatMap(prop -> tryCast(prop, BaseProperty.class))
+        .orElseGet(BaseProperty::new);
   }
 }
