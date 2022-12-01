@@ -32,19 +32,6 @@ public interface ICellWriter {
   @NotNull
   Stream<String> getOpenLevels();
 
-  /**
-   * @deprecated since 2.82 instead use openLevel(String, List<CellAttribute>)
-   */
-  @Deprecated
-  void openLevel(@Nullable String tagName, @Nullable String idname, @Nullable String cssClasses,
-      @Nullable String cssStyles);
-
-  /**
-   * @deprecated since 2.82 instead use openLevel(List<CellAttribute>)
-   */
-  @Deprecated
-  void openLevel(String idname, String cssClasses, String cssStyles);
-
   void closeLevel();
 
   void clear();
@@ -56,7 +43,7 @@ public interface ICellWriter {
 
   void openLevel(@NotNull List<CellAttribute> attributes);
 
-  void openLevel(@NotNull String tagName);
+  void openLevel(@Nullable String tagName);
 
   void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes);
 
