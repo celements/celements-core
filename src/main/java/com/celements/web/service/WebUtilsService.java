@@ -1308,21 +1308,25 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
-      String defLang) {
-    return StreamEx.of(lang, defLang)
+  public String getTranslatedDiscTemplateContent(String renderTemplatePath,
+      String language, String defaultLanguage) {
+    return StreamEx.of(language, defaultLanguage)
         .mapPartial(MoreOptional::asNonBlank)
         .append("")
         .distinct()
-        .mapPartial(theLang -> {
-          String templatePath = getTemplatePathOnDisk(renderTemplatePath, theLang);
-          try {
-            return asNonBlank(getContext().getWiki().getResourceContent(templatePath));
-          } catch (IOException exp) {
-            LOGGER.debug("Exception while parsing template [{}]", templatePath, exp);
-            return Optional.empty();
-          }
-        }).findFirst().orElse("");
+        .map(lang -> getTemplatePathOnDisk(renderTemplatePath, lang))
+        .mapPartial(this::loadResourceContent)
+        .findFirst()
+        .orElse("");
+  }
+
+  private Optional<String> loadResourceContent(String templatePath) {
+    try {
+      return asNonBlank(getContext().getWiki().getResourceContent(templatePath));
+    } catch (IOException exp) {
+      LOGGER.debug("Exception while parsing template [{}]", templatePath, exp);
+      return Optional.empty();
+    }
   }
 
   private IPageTypeResolverRole getPageTypeResolver() {
