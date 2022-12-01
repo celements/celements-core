@@ -45,6 +45,7 @@ import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
+import com.celements.web.CelConstant;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
@@ -475,6 +476,10 @@ public interface IWebUtilsService {
   void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
       List<String> params);
 
+  /**
+   * @deprecated instead use {@link CelConstant#CENTRAL_WIKI}
+   */
+  @Deprecated
   WikiReference getCentralWikiRef();
 
   /**

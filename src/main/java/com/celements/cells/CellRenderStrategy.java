@@ -58,7 +58,11 @@ import com.xpn.xwiki.web.Utils;
 
 public class CellRenderStrategy implements IRenderStrategy {
 
-  public static final String EXEC_CTX_KEY_OBJ_NB = "celements.globalvalues.cell.number";
+  public static final String EXEC_CTX_KEY = "celements.globalvalues.cell";
+  public static final String EXEC_CTX_KEY_DOC_SUFFIX = ".document";
+  public static final String EXEC_CTX_KEY_DOC = EXEC_CTX_KEY + EXEC_CTX_KEY_DOC_SUFFIX;
+  public static final String EXEC_CTX_KEY_OBJ_NB_SUFFIX = ".number";
+  public static final String EXEC_CTX_KEY_OBJ_NB = EXEC_CTX_KEY + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CellRenderStrategy.class);
 

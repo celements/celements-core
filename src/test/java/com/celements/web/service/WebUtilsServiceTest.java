@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +34,6 @@ import com.celements.web.comparators.XWikiAttachmentAscendingChangeDateComparato
 import com.celements.web.comparators.XWikiAttachmentAscendingNameComparator;
 import com.celements.web.comparators.XWikiAttachmentDescendingChangeDateComparator;
 import com.celements.web.comparators.XWikiAttachmentDescendingNameComparator;
-import com.google.common.base.Optional;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -350,9 +350,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void test_getAdminLanguage_fromUser() throws Exception {
     context.setLanguage("de");
     User user = createMockAndAddToDefault(User.class);
-    expect(user.getAdminLanguage()).andReturn(Optional.of("fr"));
-    expect(xwiki.getSpacePreference("admin_language", "de", context)).andReturn("");
-    expect(xwiki.Param("celements.admin_language")).andReturn("");
+    expect(user.getAdminLanguage()).andReturn(com.google.common.base.Optional.of("fr"));
 
     replayDefault();
     assertEquals("fr", webUtilsService.getAdminLanguage(user));
@@ -363,7 +361,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void test_getAdminLanguage_defaultPreferences() throws Exception {
     context.setLanguage("de");
     User user = createMockAndAddToDefault(User.class);
-    expect(user.getAdminLanguage()).andReturn(Optional.<String>absent());
+    expect(user.getAdminLanguage()).andReturn(com.google.common.base.Optional.<String>absent());
     expect(xwiki.getSpacePreference("admin_language", "de", context)).andReturn("es");
 
     replayDefault();
@@ -376,7 +374,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     String systemDefaultAdminLang = "en";
     context.setLanguage("de");
     User user = createMockAndAddToDefault(User.class);
-    expect(user.getAdminLanguage()).andReturn(Optional.<String>absent());
+    expect(user.getAdminLanguage()).andReturn(com.google.common.base.Optional.<String>absent());
     expect(xwiki.getSpacePreference("admin_language", "de", context)).andReturn("");
     expect(xwiki.Param("celements.admin_language")).andReturn("");
 
@@ -1043,19 +1041,18 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
     expect(modelAccessMock.exists(localTemplateRef)).andReturn(true);
-    XWikiDocument localTemplateDocDef = createMockAndAddToDefault(XWikiDocument.class);
-    expect(localTemplateDocDef.getDocumentReference()).andReturn(localTemplateRef).anyTimes();
-    expect(xwiki.getDocument(eq(localTemplateRef), same(context))).andReturn(
-        localTemplateDocDef).once();
+    XWikiDocument localTemplateDoc = new XWikiDocument(localTemplateRef);
+    localTemplateDoc.setDefaultLanguage("de");
+    expect(modelAccessMock.getDocumentOpt(eq(localTemplateRef)))
+        .andReturn(Optional.of(localTemplateDoc));
     String localScriptText = "my expected local script";
-    expect(localTemplateDocDef.getTranslatedContent(eq("de"), same(context))).andReturn(
-        localScriptText);
+    localTemplateDoc.setContent(localScriptText);
     XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
         XWikiRenderingEngine.class);
     expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
         "groovy")).anyTimes();
     String expectedRenderedText = "my expected rendered local script";
-    expect(mockRenderingEngine.renderText(eq(localScriptText), same(localTemplateDocDef),
+    expect(mockRenderingEngine.renderText(eq(localScriptText), same(localTemplateDoc),
         (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
     replayDefault();
     webUtilsService.injectedRenderingEngine = mockRenderingEngine;
@@ -1072,19 +1069,18 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
     expect(modelAccessMock.exists(centralTemplateRef)).andReturn(true);
-    XWikiDocument centralTemplateDocDef = createMockAndAddToDefault(XWikiDocument.class);
-    expect(centralTemplateDocDef.getDocumentReference()).andReturn(centralTemplateRef).anyTimes();
-    expect(xwiki.getDocument(eq(centralTemplateRef), same(context))).andReturn(
-        centralTemplateDocDef).once();
+    XWikiDocument centralTemplateDoc = new XWikiDocument(centralTemplateRef);
+    centralTemplateDoc.setDefaultLanguage("en");
+    expect(modelAccessMock.getDocumentOpt(eq(centralTemplateRef)))
+        .andReturn(Optional.of(centralTemplateDoc));
     String centralScriptText = "my expected central script";
-    expect(centralTemplateDocDef.getTranslatedContent(eq("en"), same(context))).andReturn(
-        centralScriptText);
+    centralTemplateDoc.setContent(centralScriptText);
     XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
         XWikiRenderingEngine.class);
     expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
         "groovy")).anyTimes();
     String expectedRenderedText = "my expected rendered central script";
-    expect(mockRenderingEngine.renderText(eq(centralScriptText), same(centralTemplateDocDef),
+    expect(mockRenderingEngine.renderText(eq(centralScriptText), same(centralTemplateDoc),
         (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
     replayDefault();
     webUtilsService.injectedRenderingEngine = mockRenderingEngine;

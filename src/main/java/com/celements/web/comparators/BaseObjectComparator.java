@@ -83,7 +83,8 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
   }
 
   BaseProperty getProperty(BaseObject obj, String field) {
-    return Optional.ofNullable(obj.getField(field))
+    return Optional.ofNullable(obj)
+        .map(o -> o.getField(field))
         .flatMap(prop -> tryCast(prop, BaseProperty.class))
         .orElseGet(BaseProperty::new);
   }

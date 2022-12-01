@@ -19,9 +19,9 @@
  */
 package com.celements.web.service;
 
+import static com.celements.common.MoreOptional.*;
 import static com.google.common.base.Strings.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -37,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -62,13 +63,13 @@ import com.celements.auth.user.User;
 import com.celements.auth.user.UserInstantiationException;
 import com.celements.auth.user.UserService;
 import com.celements.collections.ICollectionsService;
+import com.celements.common.MoreOptional;
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
-import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.EntityTypeUtil;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -86,7 +87,6 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -99,6 +99,8 @@ import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
+
+import one.util.streamex.StreamEx;
 
 @Component
 public class WebUtilsService implements IWebUtilsService {
@@ -399,11 +401,11 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public String getAdminLanguage(User user) {
-    Optional<String> adminLanguage = Optional.absent();
+    Optional<String> adminLanguage = Optional.empty();
     if (user != null) {
-      adminLanguage = user.getAdminLanguage();
+      adminLanguage = user.getAdminLanguage().toJavaUtil();
     }
-    return adminLanguage.or(getDefaultAdminLanguage());
+    return adminLanguage.orElseGet(this::getDefaultAdminLanguage);
   }
 
   @Override
@@ -984,12 +986,12 @@ public class WebUtilsService implements IWebUtilsService {
   public String getUserNameForDocRef(DocumentReference userDocRef) throws XWikiException {
     Optional<String> prettyName;
     try {
-      prettyName = getUserService().getUser(userDocRef).getPrettyName();
+      prettyName = getUserService().getUser(userDocRef).getPrettyName().toJavaUtil();
     } catch (UserInstantiationException exc) {
       LOGGER.warn("failed loading user '{}'", userDocRef, exc);
-      prettyName = Optional.absent();
+      prettyName = Optional.empty();
     }
-    return prettyName.or(getAdminMessageTool().get("cel_ml_unknown_author"));
+    return prettyName.orElseGet(() -> getAdminMessageTool().get("cel_ml_unknown_author"));
   }
 
   @Override
@@ -1208,10 +1210,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   private String getTemplatePathLangSuffix(String lang) {
-    if (lang != null) {
-      return "_" + lang;
-    }
-    return "";
+    return asNonBlank(lang).map(l -> "_" + l).orElse("");
   }
 
   @Override
@@ -1311,40 +1310,19 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
       String defLang) {
-    String templateContent;
-    List<String> langList = new ArrayList<>();
-    if (lang != null) {
-      langList.add(lang);
-    }
-    if ((defLang != null) && !defLang.equals(lang)) {
-      langList.add(defLang);
-    }
-    templateContent = "";
-    for (String theLang : langList) {
-      String templatePath = getTemplatePathOnDisk(renderTemplatePath, theLang);
-      try {
-        templateContent = getContext().getWiki().getResourceContent(templatePath);
-      } catch (FileNotFoundException fnfExp) {
-        LOGGER.trace("FileNotFound [" + templatePath + "].");
-        templateContent = "";
-      } catch (IOException exp) {
-        LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
-        templateContent = "";
-      }
-    }
-    if ("".equals(templateContent)) {
-      String templatePathDef = getTemplatePathOnDisk(renderTemplatePath);
-      try {
-        templateContent = getContext().getWiki().getResourceContent(templatePathDef);
-      } catch (FileNotFoundException fnfExp) {
-        LOGGER.trace("FileNotFound [" + templatePathDef + "].");
-        return "";
-      } catch (IOException exp) {
-        LOGGER.debug("Exception while parsing template [" + templatePathDef + "].", exp);
-        return "";
-      }
-    }
-    return templateContent;
+    return StreamEx.of(lang, defLang)
+        .mapPartial(MoreOptional::asNonBlank)
+        .append("")
+        .distinct()
+        .mapPartial(theLang -> {
+          String templatePath = getTemplatePathOnDisk(renderTemplatePath, theLang);
+          try {
+            return asNonBlank(getContext().getWiki().getResourceContent(templatePath));
+          } catch (IOException exp) {
+            LOGGER.debug("Exception while parsing template [{}]", templatePath, exp);
+            return Optional.empty();
+          }
+        }).findFirst().orElse("");
   }
 
   private IPageTypeResolverRole getPageTypeResolver() {
@@ -1382,9 +1360,10 @@ public class WebUtilsService implements IWebUtilsService {
     }
   }
 
+  @Deprecated
   @Override
   public WikiReference getCentralWikiRef() {
-    return RefBuilder.create().wiki(CelConstant.CENTRAL_WIKI_NAME).build(WikiReference.class);
+    return CelConstant.CENTRAL_WIKI;
   }
 
   @Deprecated
