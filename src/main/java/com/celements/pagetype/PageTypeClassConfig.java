@@ -25,8 +25,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.pagetype.classes.PageTypeClass;
+import com.celements.pagetype.classes.PageTypePropertiesClass;
 import com.celements.web.service.IWebUtilsService;
 
+/**
+ * @deprecated use {@link PageTypeClass} and {@link PageTypePropertiesClass}
+ */
+@Deprecated
 @Component
 public class PageTypeClassConfig implements IPageTypeClassConfig {
 

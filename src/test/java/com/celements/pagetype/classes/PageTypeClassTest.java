@@ -60,18 +60,6 @@ public class PageTypeClassTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetClassSpaceName() {
-    String expectedStr = "Celements2";
-    assertEquals(expectedStr, pageTypeClass.getClassSpaceName());
-  }
-
-  @Test
-  public void testGetClassDocName() {
-    String expectedStr = "PageType";
-    assertEquals(expectedStr, pageTypeClass.getClassDocName());
-  }
-
-  @Test
   public void test_isInternalMapping() {
     assertFalse(pageTypeClass.isInternalMapping());
   }
