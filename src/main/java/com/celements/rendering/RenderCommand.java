@@ -192,20 +192,24 @@ public class RenderCommand {
 
   private Contextualiser getCellContextualiser(XWikiDocument cellDoc) {
     Contextualiser contextualiser = new Contextualiser();
-    Optional<String> key = Optional.ofNullable(cellDoc)
+    Optional<String> scopeKey = getRenderScopeKey(cellDoc);
+    scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
+        .map(getExecutionContext()::getProperty)
+        .flatMap(doc -> tryCast(doc, XWikiDocument.class))
+        .ifPresent(contextualiser::withDoc);
+    scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
+        .map(getExecutionContext()::getProperty)
+        .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
+    return contextualiser;
+  }
+
+  private Optional<String> getRenderScopeKey(XWikiDocument cellDoc) {
+    return Optional.ofNullable(cellDoc)
         .flatMap(doc -> XWikiObjectFetcher.on(doc)
             .filter(KeyValueClass.FIELD_KEY, "cell-render-scope")
             .fetchField(KeyValueClass.FIELD_VALUE)
             .stream().findFirst())
         .map(scope -> EXEC_CTX_KEY + "." + scope);
-    key.map(k -> k + EXEC_CTX_KEY_DOC_SUFFIX)
-        .map(getExecutionContext()::getProperty)
-        .flatMap(o -> tryCast(o, XWikiDocument.class))
-        .ifPresent(contextualiser::withDoc);
-    key.map(k -> k + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
-        .map(getExecutionContext()::getProperty)
-        .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
-    return contextualiser;
   }
 
   public String renderDocument(DocumentReference docRef) {
