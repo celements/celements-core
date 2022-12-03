@@ -23,59 +23,67 @@ import static com.google.common.base.MoreObjects.*;
 import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Strings.*;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Stream;
+
+import javax.annotation.concurrent.NotThreadSafe;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
 import com.celements.cells.attribute.CellAttribute;
-import com.celements.cells.attribute.DefaultAttributeBuilder;
 
+@NotThreadSafe
 public class DivWriter implements ICellWriter {
 
   private static final String TAGNAME_DIV = "div";
 
-  private StringBuilder out;
-  private Deque<String> openLevels = new LinkedList<>();
-  private boolean hasLevelContent = false;
+  private final StringBuilder out;
 
-  public DivWriter() {}
+  /**
+   * Entry: tagName (String), hasContent (Boolean)
+   */
+  private final Deque<Entry<String, Boolean>> openLevels = new LinkedList<>();
+
+  public DivWriter() {
+    this(new StringBuilder());
+  }
 
   public DivWriter(StringBuilder out) {
     this.out = checkNotNull(out);
   }
 
+  private Optional<Entry<String, Boolean>> getCurrentLevel() {
+    return Optional.ofNullable(openLevels.peek());
+  }
+
   @Override
   public Stream<String> getOpenLevels() {
-    return openLevels.stream();
+    return openLevels.stream().map(Entry::getKey);
   }
 
   @Override
   public void closeLevel() {
-    String tagName = openLevels.pop();
-    getOut().append("</");
-    getOut().append(tagName);
-    getOut().append(">");
-  }
-
-  @Override
-  @Deprecated
-  public void openLevel(String tagName, String idname, String cssClasses, String cssStyles) {
-    openLevel(tagName, new DefaultAttributeBuilder().addId(idname).addCssClasses(
-        cssClasses).addStyles(cssStyles).build());
+    if (!openLevels.isEmpty()) {
+      out.append("</");
+      out.append(openLevels.pop().getKey());
+      out.append(">");
+    }
   }
 
   @Override
   public void openLevel() {
-    openLevel("");
+    openLevel(TAGNAME_DIV);
   }
 
   @Override
   public void openLevel(List<CellAttribute> attributes) {
-    openLevel(null, attributes);
+    openLevel(TAGNAME_DIV, attributes);
   }
 
   @Override
@@ -86,66 +94,54 @@ public class DivWriter implements ICellWriter {
   @Override
   public void openLevel(String tagName, List<CellAttribute> attributes) {
     tagName = firstNonNull(emptyToNull(tagName), TAGNAME_DIV);
-    openLevels.push(tagName);
-    getOut().append("<");
-    getOut().append(tagName);
+    getCurrentLevel().ifPresent(e -> e.setValue(true));
+    openLevels.push(new SimpleEntry<>(tagName, false));
+    out.append("<");
+    out.append(tagName);
     for (CellAttribute cellAttr : attributes) {
       String attrName = cellAttr.getName();
-      getOut().append(" ");
-      getOut().append(attrName);
+      out.append(" ");
+      out.append(attrName);
       cellAttr.getValue().ifPresent(attrValue -> {
-        getOut().append("=\"");
-        getOut().append(StringEscapeUtils.escapeHtml(attrValue));
-        getOut().append("\"");
+        out.append("=\"");
+        out.append(StringEscapeUtils.escapeHtml(attrValue));
+        out.append("\"");
       });
     }
-    getOut().append(">");
-    hasLevelContent = false;
-  }
-
-  @Override
-  @Deprecated
-  public void openLevel(String idname, String cssClasses, String cssStyles) {
-    openLevel("", idname, cssClasses, cssStyles);
+    out.append(">");
   }
 
   @Override
   public void clear() {
-    out = null;
+    out.setLength(0);
     openLevels.clear();
-    hasLevelContent = false;
-  }
-
-  StringBuilder getOut() {
-    if (out == null) {
-      out = new StringBuilder();
-    }
-    return out;
   }
 
   @Override
   public boolean hasLevelContent() {
-    return hasLevelContent;
+    return getCurrentLevel()
+        .map(Entry::getValue)
+        .orElse(out.length() > 0);
   }
 
   @Override
   public DivWriter appendContent(String content) {
     content = nullToEmpty(content).trim();
     if (!content.isEmpty()) {
-      getOut().append(content);
-      hasLevelContent = true;
+      getCurrentLevel().ifPresent(e -> e.setValue(true));
+      out.append(content);
     }
     return this;
   }
 
   @Override
   public String getAsString() {
-    return getOut().toString();
+    return out.toString();
   }
 
   @Override
   public StringBuilder getAsStringBuilder() {
-    return getOut();
+    return out;
   }
 
   @Override

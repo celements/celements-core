@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.cells.attribute.CellAttribute;
+import com.celements.cells.attribute.DefaultAttributeBuilder;
 import com.celements.cells.attribute.DefaultCellAttribute;
 
 public class DivWriterTest {
@@ -40,29 +41,34 @@ public class DivWriterTest {
   }
 
   @Test
-  public void testCloseLevel() {
-    String tagName = "";
-    String idname = "theId";
-    divWriter.openLevel(tagName, idname, "", "");
+  public void test_closeLevel_noArg() {
+    divWriter.openLevel();
     divWriter.closeLevel();
-    assertEquals("<div id=\"theId\"></div>", divWriter.getAsString());
+    assertEquals("<div></div>", divWriter.getAsString());
   }
 
   @Test
-  public void testCloseLevel_tagName() {
+  public void test_closeLevel_empty() {
+    divWriter.openLevel("");
+    divWriter.closeLevel();
+    assertEquals("<div></div>", divWriter.getAsString());
+  }
+
+  @Test
+  public void test_closeLevel_tagName() {
     String tagName = "form";
-    String idname = "theId2";
-    divWriter.openLevel(tagName, idname, "", "");
+    divWriter.openLevel(tagName);
     divWriter.closeLevel();
-    assertEquals("<form id=\"theId2\"></form>", divWriter.getAsString());
+    assertEquals("<form></form>", divWriter.getAsString());
   }
 
   @Test
-  public void testOpenLevel() {
+  public void test_openLevel() {
     String idname = "newId";
     String cssClasses = "classes";
     String cssStyles = "width:100px;\nheight:10px;\n";
-    divWriter.openLevel(idname, cssClasses, cssStyles);
+    divWriter.openLevel(new DefaultAttributeBuilder().addId(idname).addCssClasses(
+        cssClasses).addStyles(cssStyles).build());
     String returnedString = divWriter.getAsString();
     assertTrue("Must start with '<div ' but got '" + returnedString + "'",
         returnedString.startsWith("<div "));
@@ -79,38 +85,25 @@ public class DivWriterTest {
   }
 
   @Test
-  public void testOpenLevel_id_null() {
+  public void test_openLevel_cssClasses() {
     String cssClasses = "classes";
-    divWriter.openLevel(null, cssClasses, "");
+    divWriter.openLevel(new DefaultAttributeBuilder().addCssClasses(cssClasses).build());
     assertEquals("<div class=\"" + cssClasses + "\">", divWriter.getAsString());
   }
 
   @Test
-  public void testOpenLevel_id_empty() {
-    String cssClasses = "classes";
-    divWriter.openLevel("", cssClasses, "");
-    assertEquals("<div class=\"" + cssClasses + "\">", divWriter.getAsString());
-  }
-
-  @Test
-  public void testOpenLevel_cssClasses_null() {
+  public void test_openLevel_id() {
     String idname = "newId";
-    divWriter.openLevel(idname, null, "");
+    divWriter.openLevel(new DefaultAttributeBuilder().addId(idname).build());
     assertEquals("<div id=\"" + idname + "\">", divWriter.getAsString());
   }
 
   @Test
-  public void testOpenLevel_cssClasses_empty() {
-    String idname = "newId";
-    divWriter.openLevel(idname, "", "");
-    assertEquals("<div id=\"" + idname + "\">", divWriter.getAsString());
-  }
-
-  @Test
-  public void testOpenLevel_cssStyles_empty() {
+  public void test_openLevel_cssStyles_empty() {
     String idname = "newId";
     String cssClasses = "classes";
-    divWriter.openLevel(idname, cssClasses, "");
+    divWriter.openLevel(new DefaultAttributeBuilder().addId(idname).addCssClasses(cssClasses)
+        .build());
     assertTrue("Must start with '<div '", divWriter.getAsString().startsWith("<div "));
     assertTrue("Must end with '>'", divWriter.getAsString().endsWith(">"));
     String cssClassExpected = " class=\"" + cssClasses + "\"";
@@ -121,44 +114,30 @@ public class DivWriterTest {
   }
 
   @Test
-  public void testOpenLevel_cssStyles_null() {
-    String idname = "newId";
-    String cssClasses = "classes";
-    divWriter.openLevel(idname, cssClasses, null);
-    assertTrue("Must start with '<div '", divWriter.getAsString().startsWith("<div "));
-    assertTrue("Must end with '>'", divWriter.getAsString().endsWith(">"));
-    String cssClassExpected = " class=\"" + cssClasses + "\"";
-    assertTrue("Must contain '" + cssClassExpected + "'", divWriter.getAsString().contains(
-        cssClassExpected));
-    assertFalse("Must not contain any style values.", divWriter.getAsString().contains(
-        " style=\""));
-  }
-
-  @Test
-  public void testGetOut() {
-    StringBuilder out = divWriter.getOut();
+  public void test_getAsStringBuilder() {
+    StringBuilder out = divWriter.getAsStringBuilder();
     assertNotNull("lacy initalization expected", out);
     assertSame("out buffer may not be reset without calling startRendering in between", out,
-        divWriter.getOut());
+        divWriter.getAsStringBuilder());
   }
 
   @Test
-  public void testGetAsString() {
+  public void test_getAsString() {
     String expectedOutput = "blabla output";
-    divWriter.getOut().append(expectedOutput);
+    divWriter.getAsStringBuilder().append(expectedOutput);
     assertEquals("asString must return the current state of the StringBuilder (out).",
         expectedOutput, divWriter.getAsString());
   }
 
   @Test
-  public void testClear() {
-    divWriter.getOut().append("blabla");
+  public void test_clear() {
+    divWriter.getAsStringBuilder().append("blabla");
     divWriter.clear();
     assertEquals("clear must reset the output stream", "", divWriter.getAsString());
   }
 
   @Test
-  public void testAppendContent() {
+  public void test_appendContent() {
     String content = "blablabla";
     divWriter.appendContent(content);
     assertEquals("appendContent must add the given content to the output stream", content,
@@ -166,7 +145,7 @@ public class DivWriterTest {
   }
 
   @Test
-  public void testOpenLevel_Attributes() {
+  public void test_openLevel_Attributes() {
     DefaultCellAttribute.Builder attrBuilder = new DefaultCellAttribute.Builder().attrName(
         "testName").addValue("testValue");
     DefaultCellAttribute.Builder attrBuilder2 = new DefaultCellAttribute.Builder().attrName(
@@ -185,7 +164,7 @@ public class DivWriterTest {
   }
 
   @Test
-  public void testOpenLevel_quotes() {
+  public void test_openLevel_quotes() {
     DefaultCellAttribute.Builder attrBuilder = new DefaultCellAttribute.Builder().attrName(
         "testName").addValue("test. : -äöü\"Value");
     List<CellAttribute> attributes = Arrays.asList((CellAttribute) attrBuilder.build());
@@ -197,5 +176,21 @@ public class DivWriterTest {
     String attrExpected = "testName=\"test. : -&auml;&ouml;&uuml;&quot;Value\"";
     assertTrue("Must contain '" + attrExpected + "' but got '" + returnedString + "'",
         returnedString.contains(attrExpected));
+  }
+
+  @Test
+  public void test_hasLevelContent() {
+    assertFalse(divWriter.hasLevelContent());
+    divWriter.appendContent("lol");
+    assertTrue(divWriter.hasLevelContent());
+    divWriter.openLevel();
+    assertFalse(divWriter.hasLevelContent());
+    divWriter.openLevel();
+    divWriter.closeLevel();
+    assertTrue(divWriter.hasLevelContent());
+    divWriter.closeLevel();
+    assertTrue(divWriter.hasLevelContent());
+    divWriter.clear();
+    assertFalse(divWriter.hasLevelContent());
   }
 }
