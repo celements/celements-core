@@ -75,6 +75,7 @@ public class PageLayoutCommand {
 
   private Map<String, String> convertMap(Map<SpaceReference, String> pageLayoutMap) {
     return EntryStream.of(pageLayoutMap)
+        .filterKeys(spaceRef -> getModelContext().getWikiRef().equals(spaceRef.getParent()))
         .mapKeys(SpaceReference::getName)
         .toImmutableMap();
   }
@@ -91,7 +92,7 @@ public class PageLayoutCommand {
 
   /**
    * @deprecated since 5.4 instead use
-   *             {@link LayoutServiceRole#getActivePageLyouts()}
+   *             {@link LayoutServiceRole#getActivePageLayouts()}
    */
   @Deprecated
   public Map<String, String> getActivePageLyouts() {

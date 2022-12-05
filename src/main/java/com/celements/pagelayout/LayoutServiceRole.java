@@ -3,6 +3,7 @@ package com.celements.pagelayout;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.cells.HtmlDoctype;
 import com.xpn.xwiki.XWikiException;
@@ -19,12 +21,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @ComponentRole
 public interface LayoutServiceRole {
 
-  public static final String PAGE_LAYOUT_PROPERTIES_CLASS_SPACE = "Celements";
-  public static final String PAGE_LAYOUT_PROPERTIES_CLASS_DOC = "PageLayoutPropertiesClass";
-  public static final String PAGE_LAYOUT_PROPERTIES_CLASS = PAGE_LAYOUT_PROPERTIES_CLASS_SPACE + "."
-      + PAGE_LAYOUT_PROPERTIES_CLASS_DOC;
-
-  public static final String CEL_LAYOUT_EDITOR_PL_NAME = "CelLayoutEditor";
+  String CEL_LAYOUT_EDITOR_PL_NAME = "CelLayoutEditor";
 
   boolean createLayout(@NotNull SpaceReference layoutSpaceRef);
 
@@ -105,6 +102,12 @@ public interface LayoutServiceRole {
 
   @NotNull
   Map<SpaceReference, String> getAllPageLayouts();
+
+  @NotNull
+  Stream<SpaceReference> streamAllLayoutsSpaces();
+
+  @NotNull
+  Stream<SpaceReference> streamLayoutsSpaces(WikiReference... wikis);
 
   @NotNull
   Optional<SpaceReference> resolveValidLayoutSpace(@Nullable SpaceReference layoutSpaceRef);

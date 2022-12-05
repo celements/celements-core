@@ -23,37 +23,44 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.pagetype.classes.PageTypeClass;
+import com.celements.pagetype.classes.PageTypePropertiesClass;
+
+/**
+ * @deprecated use {@link PageTypeClass} and {@link PageTypePropertiesClass}
+ */
+@Deprecated
 @ComponentRole
 public interface IPageTypeClassConfig {
 
-  public static final String PAGE_TYPE_PROPERTIES_CLASS_SPACE = "Celements2";
-  public static final String PAGE_TYPE_PROPERTIES_CLASS_DOC = "PageTypeProperties";
-  public static final String PAGE_TYPE_PROPERTIES_CLASS = PAGE_TYPE_PROPERTIES_CLASS_SPACE + "."
+  String PAGE_TYPE_PROPERTIES_CLASS_SPACE = "Celements2";
+  String PAGE_TYPE_PROPERTIES_CLASS_DOC = "PageTypeProperties";
+  String PAGE_TYPE_PROPERTIES_CLASS = PAGE_TYPE_PROPERTIES_CLASS_SPACE + "."
       + PAGE_TYPE_PROPERTIES_CLASS_DOC;
 
-  public static final String PAGE_TYPE_CLASS_SPACE = "Celements2";
-  public static final String PAGE_TYPE_CLASS_DOC = "PageType";
-  public static final String PAGE_TYPE_CLASS = PAGE_TYPE_CLASS_SPACE + "." + PAGE_TYPE_CLASS_DOC;
-  public static final String PAGE_TYPE_FIELD = "page_type";
-  public static final String PAGE_TYPE_LAYOUT_FIELD = "page_layout";
-  public static final String PAGETYPE_PROP_HASPAGETITLE = "haspagetitle";
-  public static final String PAGETYPE_PROP_RTE_HEIGHT = "rte_height";
-  public static final String PAGETYPE_PROP_RTE_WIDTH = "rte_width";
-  public static final String PAGETYPE_PROP_LOAD_RICHTEXT = "load_richtext";
-  public static final String PAGETYPE_PROP_SHOW_FRAME = "show_frame";
-  public static final String PAGETYPE_PROP_VISIBLE = "visible";
-  public static final String PAGETYPE_PROP_PAGE_VIEW = "page_view";
-  public static final String PAGETYPE_PROP_PAGE_EDIT = "page_edit";
-  public static final String PAGETYPE_PROP_CATEGORY = "category";
-  public static final String PAGETYPE_PROP_TYPE_NAME = "type_name";
-  public static final String PAGETYPE_PROP_IS_UNCONNECTED_PARENT = "unconnected_parent";
-  public static final String PAGETYPE_PROP_TAG_NAME = "tag_name";
-  public static final String PAGETYPE_PROP_INLINE_EDITOR_MODE = "inline_editor";
+  String PAGE_TYPE_CLASS_SPACE = "Celements2";
+  String PAGE_TYPE_CLASS_DOC = "PageType";
+  String PAGE_TYPE_CLASS = PAGE_TYPE_CLASS_SPACE + "." + PAGE_TYPE_CLASS_DOC;
+  String PAGE_TYPE_FIELD = "page_type";
+  String PAGE_TYPE_LAYOUT_FIELD = "page_layout";
+  String PAGETYPE_PROP_HASPAGETITLE = "haspagetitle";
+  String PAGETYPE_PROP_RTE_HEIGHT = "rte_height";
+  String PAGETYPE_PROP_RTE_WIDTH = "rte_width";
+  String PAGETYPE_PROP_LOAD_RICHTEXT = "load_richtext";
+  String PAGETYPE_PROP_SHOW_FRAME = "show_frame";
+  String PAGETYPE_PROP_VISIBLE = "visible";
+  String PAGETYPE_PROP_PAGE_VIEW = "page_view";
+  String PAGETYPE_PROP_PAGE_EDIT = "page_edit";
+  String PAGETYPE_PROP_CATEGORY = "category";
+  String PAGETYPE_PROP_TYPE_NAME = "type_name";
+  String PAGETYPE_PROP_IS_UNCONNECTED_PARENT = "unconnected_parent";
+  String PAGETYPE_PROP_TAG_NAME = "tag_name";
+  String PAGETYPE_PROP_INLINE_EDITOR_MODE = "inline_editor";
 
-  public DocumentReference getPageTypePropertiesClassRef(WikiReference wikiRef);
+  DocumentReference getPageTypePropertiesClassRef(WikiReference wikiRef);
 
-  public DocumentReference getPageTypeClassRef();
+  DocumentReference getPageTypeClassRef();
 
-  public DocumentReference getPageTypeClassRef(WikiReference wikiRef);
+  DocumentReference getPageTypeClassRef(WikiReference wikiRef);
 
 }

@@ -19,6 +19,9 @@
  */
 package com.celements.pagelayout;
 
+import static com.google.common.collect.ImmutableList.*;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,9 +42,7 @@ import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.web.plugin.api.PageLayoutApi;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
 
 @Component("layout")
 public class LayoutScriptService implements ScriptService {
@@ -84,7 +85,7 @@ public class LayoutScriptService implements ScriptService {
   }
 
   /**
-   * @deprecated since 5.4 instead use {@link #getAllPageLayouts()}
+   * @deprecated since 5.4 instead use {@link #getAllPageLayoutSpaceRefs()}
    */
   @Deprecated
   public Map<String, String> getAllPageLayouts() {
@@ -99,6 +100,28 @@ public class LayoutScriptService implements ScriptService {
   @NotNull
   public Map<SpaceReference, String> getAllPageLayoutSpaceRefs() {
     return layoutService.getAllPageLayouts();
+  }
+
+  @NotNull
+  public List<PageLayoutApi> getActiveLayouts() {
+    return layoutService.streamAllLayoutsSpaces()
+        .filter(layoutService::isActive)
+        .map(PageLayoutApi::new)
+        .collect(toImmutableList());
+  }
+
+  @NotNull
+  public List<PageLayoutApi> getAllLayouts() {
+    return layoutService.streamAllLayoutsSpaces()
+        .map(PageLayoutApi::new)
+        .collect(toImmutableList());
+  }
+
+  @NotNull
+  public List<PageLayoutApi> getLocalLayouts() {
+    return layoutService.streamLayoutsSpaces(modelContext.getWikiRef())
+        .map(PageLayoutApi::new)
+        .collect(toImmutableList());
   }
 
   /**
@@ -162,7 +185,7 @@ public class LayoutScriptService implements ScriptService {
   public PageLayoutApi getPageLayoutApiForDocRef(@Nullable DocumentReference docRef) {
     SpaceReference pageLayoutForDoc = layoutService.getPageLayoutForDoc(docRef);
     if (pageLayoutForDoc != null) {
-      return new PageLayoutApi(pageLayoutForDoc, getContext());
+      return new PageLayoutApi(pageLayoutForDoc);
     }
     return null;
   }
@@ -173,8 +196,10 @@ public class LayoutScriptService implements ScriptService {
    */
   @Deprecated
   public PageLayoutApi getPageLayoutApiForName(@Nullable String layoutSpaceName) {
-    return new PageLayoutApi(getWebUtilsService().resolveSpaceReference(layoutSpaceName),
-        getContext());
+    if (layoutSpaceName != null) {
+      return new PageLayoutApi(modelUtils.resolveRef(layoutSpaceName, SpaceReference.class));
+    }
+    return null;
   }
 
   public String getPageLayoutForDoc(@Nullable DocumentReference docRef) {
@@ -220,10 +245,5 @@ public class LayoutScriptService implements ScriptService {
       getContext().put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
     }
     return (PageLayoutCommand) getContext().get(CELEMENTS_PAGE_LAYOUT_COMMAND);
-  }
-
-  @Deprecated
-  private IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
   }
 }
