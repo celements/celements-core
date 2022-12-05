@@ -34,6 +34,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -187,7 +188,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     expect(queryManagerMock.createQuery(eq(HQL_PAGE_LAYOUT), eq(Query.HQL))).andReturn(queryMock);
     expect(queryMock.setWiki(wiki.getName())).andReturn(queryMock);
     expect(queryMock.execute()).andReturn(layouts.stream()
-        .map(s -> new Object[] { s.getName() })
+        .map(EntityReference::getName)
         .collect(toList()));
   }
 
