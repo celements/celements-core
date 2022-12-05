@@ -129,8 +129,8 @@ public class RenderedExtractPresentationTypeTest extends AbstractBridgedComponen
     String templateDiskPath = ":celTemplates/RenderedExtract.vm";
     expect(webUtilsServiceMock.getInheritedTemplatedPath(eq(templateDocRef))).andReturn(
         templateDiskPath);
-    expect(renderCmdMock.renderTemplatePath(eq(templateDiskPath), eq("de"))).andReturn(
-        expectedNodeExtract);
+    expect(renderCmdMock.renderTemplatePath(eq(templateDiskPath), eq("de"), eq("")))
+        .andReturn(expectedNodeExtract);
     replayDefault();
     String expectedRenderedExtract = "<div class=\"cel_cm_navigation_menuitem first"
         + " cel_nav_isLeaf RichText\" id=\"N3:Content:Content.MyPage\">\n" + expectedNodeExtract
