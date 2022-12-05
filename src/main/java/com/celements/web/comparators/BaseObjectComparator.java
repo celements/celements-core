@@ -25,8 +25,6 @@ import static com.google.common.base.Strings.*;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.xpn.xwiki.objects.BaseObject;
@@ -53,10 +51,13 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
         .reduce((c1, c2) -> c1.thenComparing(c2));
   }
 
+  private final Comparator<Object> valueComparator;
+
   private String orderField = "";
 
   public BaseObjectComparator(String orderField) {
     this.orderField = nullToEmpty(orderField);
+    valueComparator = new ObjectComparator();
   }
 
   public String getOrderField() {
@@ -65,21 +66,9 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
 
   @Override
   public int compare(BaseObject obj1, BaseObject obj2) {
-    Object val1 = getProperty(obj1, orderField).getValue();
-    Object val2 = getProperty(obj2, orderField).getValue();
-    if ((val1 instanceof Integer) && (val2 instanceof Integer)) {
-      return ((Integer) val1).compareTo((Integer) val2);
-    } else if ((val1 instanceof Long) && (val2 instanceof Long)) {
-      return ((Long) val1).compareTo((Long) val2);
-    } else if ((val1 instanceof Float) && (val2 instanceof Float)) {
-      return ((Float) val1).compareTo((Float) val2);
-    } else if ((val1 instanceof Double) && (val2 instanceof Double)) {
-      return ((Double) val1).compareTo((Double) val2);
-    } else if ((val1 instanceof Date) && (val2 instanceof Date)) {
-      return ((Date) val1).compareTo((Date) val2);
-    } else {
-      return Objects.toString(val1, "").compareTo(Objects.toString(val2, ""));
-    }
+    return valueComparator.compare(
+        getProperty(obj1, orderField).getValue(),
+        getProperty(obj2, orderField).getValue());
   }
 
   BaseProperty getProperty(BaseObject obj, String field) {
