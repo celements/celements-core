@@ -126,7 +126,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   @Override
   public Stream<SpaceReference> streamAllLayoutsSpaces() {
     return streamLayoutsSpaces(modelContext.getWikiRef(), CelConstant.CENTRAL_WIKI)
-        .collapse((layout1, layout2) -> layout1.getName().equals(layout2.getName()));
+        .distinct(SpaceReference::getName);
   }
 
   @Override
