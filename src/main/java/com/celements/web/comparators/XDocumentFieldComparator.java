@@ -1,7 +1,6 @@
 package com.celements.web.comparators;
 
 import static com.google.common.base.Preconditions.*;
-import static com.google.common.collect.ImmutableList.*;
 import static java.util.stream.Collectors.*;
 
 import java.util.Collection;
@@ -27,35 +26,27 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Immutable
 public class XDocumentFieldComparator implements Comparator<XWikiDocument> {
 
-  private final List<SortField> sorts;
-  private final Comparator<Collection<Object>> valueComparator;
+  private final Comparator<XWikiDocument> comparator;
 
   public XDocumentFieldComparator(@NotNull Stream<SortField> sorts) {
-    this.sorts = sorts.collect(toImmutableList());
-    this.valueComparator = new CollectionComparator<>(new ObjectComparator());
+    this.comparator = sorts
+        .map(SortField::asDocComparator)
+        .reduce((c1, c2) -> c1.thenComparing(c2))
+        .orElseGet(() -> Comparator.comparing(doc -> 0));
   }
 
   @Override
   public int compare(XWikiDocument doc1, XWikiDocument doc2) {
-    return sorts.stream()
-        .map(this::asComparator)
-        .reduce((c1, c2) -> c1.thenComparing(c2))
-        .map(cmp -> cmp.compare(doc1, doc2))
-        .orElse(0);
-  }
-
-  private Comparator<XWikiDocument> asComparator(SortField sort) {
-    Comparator<XWikiDocument> cmp = Comparator.comparing(
-        doc -> sort.fetcher(doc).streamNullable().collect(toList()),
-        valueComparator);
-    return sort.asc ? cmp : cmp.reversed();
+    return comparator.compare(doc1, doc2);
   }
 
   @Immutable
   public static class SortField {
 
-    static final String DELIM = ".";
-    static final Splitter SPLITTER = Splitter.on(DELIM).omitEmptyStrings().trimResults();
+    private static final String DELIM = ".";
+    private static final Splitter SPLITTER = Splitter.on(DELIM).omitEmptyStrings().trimResults();
+    private static final Comparator<Collection<Object>> COMPARATOR = new CollectionComparator<>(
+        new ObjectComparator());
 
     public final ClassField<?> field;
     public final Optional<Integer> number;
@@ -71,7 +62,13 @@ public class XDocumentFieldComparator implements Comparator<XWikiDocument> {
       this.asc = asc;
     }
 
-    FieldFetcher<?> fetcher(XWikiDocument doc) {
+    public Comparator<XWikiDocument> asDocComparator() {
+      Comparator<XWikiDocument> cmp = Comparator.comparing(doc -> fetcher(doc)
+          .streamNullable().collect(toList()), COMPARATOR);
+      return asc ? cmp : cmp.reversed();
+    }
+
+    public FieldFetcher<?> fetcher(XWikiDocument doc) {
       XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(doc);
       number.ifPresent(fetcher::filter);
       return fetcher.fetchField(field);
