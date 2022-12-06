@@ -194,18 +194,15 @@ public class RenderCommand {
   private Contextualiser getCellContextualiser(XWikiDocument cellDoc) {
     Contextualiser contextualiser = new Contextualiser();
     Optional<String> scopeKey = getRenderScopeKey(cellDoc);
-    LOGGER.debug("getCellContextualiser: cell [{}], scope [{}]", cellDoc, scopeKey);
     scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
         .map(logF(getExecutionContext()::getProperty)
-            .debug(LOGGER).msg("getCellContextualiser"))
+            .debug(LOGGER).msg("getCellContextualiser - cell [{}]", cellDoc))
         .flatMap(doc -> tryCast(doc, XWikiDocument.class))
-        .ifPresent(logC(contextualiser::withDoc)
-            .debug(LOGGER).msg("getCellContextualiser"));
+        .ifPresent(contextualiser::withDoc);
     scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
         .map(logF(getExecutionContext()::getProperty)
-            .debug(LOGGER).msg("getCellContextualiser"))
-        .ifPresent(logC(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb))
-            .debug(LOGGER).msg("getCellContextualiser"));
+            .debug(LOGGER).msg("getCellContextualiser - cell [{}]", cellDoc))
+        .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
     return contextualiser;
   }
 
