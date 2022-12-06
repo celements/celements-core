@@ -23,6 +23,7 @@ import static com.celements.model.util.ReferenceSerializationMode.*;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.velocity.VelocityService;
+import com.celements.web.service.CelementsWebScriptService;
 import com.google.common.primitives.Ints;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -63,6 +65,10 @@ public class CellRenderStrategy implements IRenderStrategy {
   public static final String EXEC_CTX_KEY_DOC = EXEC_CTX_KEY + EXEC_CTX_KEY_DOC_SUFFIX;
   public static final String EXEC_CTX_KEY_OBJ_NB_SUFFIX = ".number";
   public static final String EXEC_CTX_KEY_OBJ_NB = EXEC_CTX_KEY + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
+  public static final String EXEC_CTX_KEY_GLOBAL = CelementsWebScriptService.CEL_GLOBALVAL_PREFIX
+      + "cell";
+  public static final String EXEC_CTX_KEY_GLOBAL_OBJ_NB = EXEC_CTX_KEY_GLOBAL
+      + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CellRenderStrategy.class);
 
@@ -160,12 +166,12 @@ public class CellRenderStrategy implements IRenderStrategy {
   private String collectId(DocumentReference cellDocRef, XWikiObjectFetcher fetcher) {
     String id = fetcher.fetchField(CellClass.FIELD_ID_NAME).stream().findFirst()
         .orElseGet(() -> "cell:" + modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", ".."));
-    Integer idNb = Ints.tryParse(Objects.toString(
-        execution.getContext().getProperty(EXEC_CTX_KEY_OBJ_NB)));
-    if (idNb != null) {
-      id += "_" + idNb;
-    }
-    return id;
+    return id + Stream.of(EXEC_CTX_KEY_OBJ_NB, EXEC_CTX_KEY_GLOBAL_OBJ_NB)
+        .map(execution.getContext()::getProperty)
+        .map(val -> Ints.tryParse(Objects.toString(val)))
+        .filter(Objects::nonNull)
+        .map(nb -> "_" + nb)
+        .findFirst().orElse("");
   }
 
   private void collectEventDataAttr(DocumentReference cellDocRef, AttributeBuilder attributes,
