@@ -193,6 +193,7 @@ public class RenderCommand {
   private Contextualiser getCellContextualiser(XWikiDocument cellDoc) {
     Contextualiser contextualiser = new Contextualiser();
     Optional<String> scopeKey = getRenderScopeKey(cellDoc);
+    LOGGER.debug("getCellContextualiser: cell [{}], scope [{}]", cellDoc, scopeKey);
     scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
         .map(getExecutionContext()::getProperty)
         .flatMap(doc -> tryCast(doc, XWikiDocument.class))
