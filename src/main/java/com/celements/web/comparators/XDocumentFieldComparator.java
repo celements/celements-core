@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.classes.fields.ClassField;
-import com.celements.model.classes.fields.DefaultClassField;
+import com.celements.model.classes.fields.PlainClassField;
 import com.celements.model.object.ObjectFetcher.FieldFetcher;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.web.classes.oldcore.XWikiDocumentClass;
@@ -89,7 +89,7 @@ public class XDocumentFieldComparator implements Comparator<XWikiDocument> {
       skip += (number != null) ? 1 : 0;
       String name = parts.stream().skip(skip).collect(joining(DELIM));
       if (!name.isEmpty()) {
-        ClassField<?> field = new DefaultClassField<>(classRef, name, Object.class);
+        ClassField<?> field = new PlainClassField<>(classRef, name, Object.class);
         return Optional.of(new SortField(field, number, asc));
       }
       return Optional.empty();
