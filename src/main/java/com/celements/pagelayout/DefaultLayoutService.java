@@ -38,6 +38,7 @@ import com.celements.cells.HtmlDoctype;
 import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
 import com.celements.cells.classes.PageLayoutPropertiesClass;
+import com.celements.common.MoreOptional;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
@@ -125,7 +126,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   @Override
   public Stream<SpaceReference> streamAllLayoutsSpaces() {
     return streamLayoutsSpaces(modelContext.getWikiRef(), CelConstant.CENTRAL_WIKI)
-        .collapse((layout1, layout2) -> layout1.getName().equals(layout2.getName()));
+        .distinct(SpaceReference::getName);
   }
 
   @Override
@@ -139,9 +140,10 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     try {
       Query query = queryManager.createQuery(HQL_PAGE_LAYOUT, Query.HQL)
           .setWiki(wiki.getName());
-      return StreamEx.of(query.<Object[]>execute())
-          .map(row -> RefBuilder.from(wiki)
-              .space(row[0].toString())
+      return StreamEx.of(query.<String>execute())
+          .mapPartial(MoreOptional::asNonBlank)
+          .map(space -> RefBuilder.from(wiki)
+              .space(space)
               .build(SpaceReference.class));
     } catch (QueryException exp) {
       LOGGER.error("Failed to get all page layouts", exp);
