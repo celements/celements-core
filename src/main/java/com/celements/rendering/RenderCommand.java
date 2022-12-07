@@ -22,6 +22,7 @@ package com.celements.rendering;
 import static com.celements.cells.CellRenderStrategy.*;
 import static com.celements.common.MoreObjectsCel.*;
 import static com.celements.common.lambda.LambdaExceptionUtil.*;
+import static com.celements.logging.LogUtils.*;
 import static com.google.common.base.Predicates.*;
 
 import java.util.Arrays;
@@ -194,11 +195,13 @@ public class RenderCommand {
     Contextualiser contextualiser = new Contextualiser();
     Optional<String> scopeKey = getRenderScopeKey(cellDoc);
     scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
-        .map(getExecutionContext()::getProperty)
+        .map(logF(getExecutionContext()::getProperty)
+            .debug(LOGGER).msg("getCellContextualiser - cell [{}]", cellDoc))
         .flatMap(doc -> tryCast(doc, XWikiDocument.class))
         .ifPresent(contextualiser::withDoc);
     scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
-        .map(getExecutionContext()::getProperty)
+        .map(logF(getExecutionContext()::getProperty)
+            .debug(LOGGER).msg("getCellContextualiser - cell [{}]", cellDoc))
         .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
     return contextualiser;
   }

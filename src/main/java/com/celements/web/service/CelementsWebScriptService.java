@@ -97,7 +97,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
 
-  private static final String CEL_GLOBALVAL_PREFIX = "celements.globalvalues.";
+  public static final String CEL_GLOBALVAL_PREFIX = "celements.globalvalues.";
 
   private static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 

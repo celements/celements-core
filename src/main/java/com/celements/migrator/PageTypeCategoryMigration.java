@@ -78,7 +78,7 @@ public class PageTypeCategoryMigration extends AbstractCelementsHibernateMigrato
   }
 
   String getXwql() {
-    return "from doc.object(" + FIELD.getClassDef().getName() + ") prop";
+    return "from doc.object(" + FIELD.getClassReference().serialize() + ") prop";
   }
 
   private void setCategoryIfAbsent(DocumentReference docRef) throws DocumentAccessException {

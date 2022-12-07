@@ -34,6 +34,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -113,26 +114,32 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     List<SpaceReference> allLayouts = new ArrayList<>();
     for (WikiReference wiki : wikis) {
       List<SpaceReference> layouts = ImmutableList.of(
-          new SpaceReference("layout1Space", wiki),
-          new SpaceReference("layout2Space", wiki));
+          new SpaceReference("layout1Space-" + wiki.getName(), wiki),
+          new SpaceReference("layout2Space-" + wiki.getName(), wiki));
       expectLayoutQuery(wiki, layouts);
       allLayouts.addAll(layouts);
     }
     replayDefault();
-    assertEquals(allLayouts, layoutService.streamAllLayoutsSpaces().collect(toList()));
+    List<SpaceReference> result = layoutService.streamAllLayoutsSpaces().collect(toList());
+    assertEquals(allLayouts, result);
     verifyDefault();
   }
 
   @Test
   public void test_streamAllLayoutsSpaces_override() throws Exception {
-    SpaceReference localLayout = new SpaceReference("layoutSpace", getWikiRef());
-    expectLayoutQuery(getWikiRef(), ImmutableList.of(localLayout));
-    SpaceReference centralLayout = new SpaceReference("layoutSpace", CelConstant.CENTRAL_WIKI);
-    expectLayoutQuery(CelConstant.CENTRAL_WIKI, ImmutableList.of(centralLayout));
+    List<SpaceReference> localLayouts = ImmutableList.of(
+        new SpaceReference("layout1Space", getWikiRef()),
+        new SpaceReference("layout2Space", getWikiRef()),
+        new SpaceReference("layout3Space", getWikiRef()));
+    expectLayoutQuery(getWikiRef(), localLayouts);
+    expectLayoutQuery(CelConstant.CENTRAL_WIKI, ImmutableList.of(
+        new SpaceReference("layout1Space", CelConstant.CENTRAL_WIKI),
+        new SpaceReference("layout2Space", CelConstant.CENTRAL_WIKI),
+        new SpaceReference("layout3Space", CelConstant.CENTRAL_WIKI)));
 
     replayDefault();
     assertEquals("only the local should be returned since it overrides the central",
-        ImmutableList.of(localLayout),
+        localLayouts,
         layoutService.streamAllLayoutsSpaces().collect(toList()));
     verifyDefault();
   }
@@ -187,7 +194,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     expect(queryManagerMock.createQuery(eq(HQL_PAGE_LAYOUT), eq(Query.HQL))).andReturn(queryMock);
     expect(queryMock.setWiki(wiki.getName())).andReturn(queryMock);
     expect(queryMock.execute()).andReturn(layouts.stream()
-        .map(s -> new Object[] { s.getName() })
+        .map(EntityReference::getName)
         .collect(toList()));
   }
 

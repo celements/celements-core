@@ -105,6 +105,11 @@ public class PageLayoutApi extends Api {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return getSpaceRef().toString();
+  }
+
   private static final ModelContext getContext() {
     return Utils.getComponent(ModelContext.class);
   }
