@@ -51,7 +51,6 @@ import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
-import com.celements.rteConfig.RTEConfigScriptService;
 import com.celements.sajson.Builder;
 import com.celements.validation.ValidationType;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
@@ -988,41 +987,6 @@ public class CelementsWebPluginApi extends Api {
     LOGGER.warn("deprecated usage of sendCallbackNotificationMail on ["
         + getWebUtilsService().serializeRef(docRef) + "].");
     getSynCustom().sendCallbackNotificationMail(data, recipients);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link RTEConfigScriptService #isEmptyRTEString(String)}
-   */
-  @Deprecated
-  public boolean isEmptyRTEString(String rteContent) {
-    return getRTEConfigScriptService().isEmptyRTEString(rteContent);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link WebUtilsScriptService #getParentSpace()}
-   */
-  @Deprecated
-  public String getParentSpace() {
-    return getWebUtilsScriptService().getParentSpace();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link RTEConfigScriptService #getRTEConfigsList()}
-   */
-  @Deprecated
-  public List<DocumentReference> getRTEConfigsList() {
-    return getRTEConfigScriptService().getRTEConfigsList();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link RTEConfigScriptService #getRTEConfigField(String)}
-   */
-  @Deprecated
-  public String getRTEConfigField(String name) {
-    return getRTEConfigScriptService().getRTEConfigField(name);
   }
 
   /**
@@ -2056,10 +2020,6 @@ public class CelementsWebPluginApi extends Api {
 
   private FileBaseScriptService getFileBaseScriptService() {
     return (FileBaseScriptService) Utils.getComponent(ScriptService.class, "filebase");
-  }
-
-  private RTEConfigScriptService getRTEConfigScriptService() {
-    return (RTEConfigScriptService) Utils.getComponent(ScriptService.class, "rteconfig");
   }
 
   private NextFreeDocScriptService getNextFreeDocScriptService() {

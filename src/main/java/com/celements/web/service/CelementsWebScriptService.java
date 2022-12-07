@@ -22,7 +22,6 @@ package com.celements.web.service;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -64,7 +63,6 @@ import com.celements.navigation.service.ITreeNodeService;
 import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.pagetype.service.PageTypeScriptService;
 import com.celements.rendering.RenderCommand;
-import com.celements.rteConfig.IRTEConfigTemplateRole;
 import com.celements.sajson.Builder;
 import com.celements.sajson.JsonScriptService;
 import com.celements.validation.ValidationType;
@@ -130,9 +128,6 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement("treeNode")
   ScriptService treeNodeScriptService;
-
-  @Requirement
-  IRTEConfigTemplateRole rteConfigTemplateService;
 
   @Requirement
   IClassesCompositorComponent classesComp;
@@ -1018,20 +1013,6 @@ public class CelementsWebScriptService implements ScriptService {
       return true;
     }
     return false;
-  }
-
-  public List<com.xpn.xwiki.api.Object> getRTETemplateList() {
-    try {
-      List<BaseObject> rteTemplateList = rteConfigTemplateService.getRTETemplateList();
-      List<com.xpn.xwiki.api.Object> rteTemplateListExternal = new ArrayList<>();
-      for (BaseObject rteTmpl : rteTemplateList) {
-        rteTemplateListExternal.add(rteTmpl.newObjectApi(rteTmpl, getContext()));
-      }
-      return rteTemplateListExternal;
-    } catch (XWikiException exp) {
-      LOGGER.error("getRTETemplateList failed.", exp);
-    }
-    return Collections.emptyList();
   }
 
   public EntityReference getParentReference(DocumentReference docRef) {

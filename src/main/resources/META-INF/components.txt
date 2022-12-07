@@ -58,9 +58,6 @@ com.celements.mandatory.Robots_TXT
 com.celements.web.service.MobileLoggingScriptService
 com.celements.rendering.XHTMLtoHTML5cleanup
 com.celements.navigation.presentation.LayoutEditorPresentationType
-com.celements.rteConfig.classes.RTEConfigClasses
-com.celements.rteConfig.classes.RTEConfigClassConfig
-com.celements.rteConfig.RTEConfigTemplateService
 com.celements.navigation.NavigationClassConfig
 com.celements.webform.ActionScriptService
 com.celements.webform.ActionService
@@ -76,7 +73,6 @@ com.celements.javascript.JSScriptService
 com.celements.pagelayout.LayoutScriptService
 com.celements.web.service.LegacySkinScriptService
 com.celements.nextfreedoc.NextFreeDocScriptService
-com.celements.rteConfig.RTEConfigScriptService
 com.celements.navigation.service.TreeNodeScriptService
 com.celements.web.service.CelementsWebService
 com.celements.nextfreedoc.NextFreeDocService
@@ -146,9 +142,6 @@ com.celements.velocity.DefaultVelocityService
 com.celements.web.classes.DocumentExtractClass
 com.celements.migrator.PageTypeCategoryMigration
 com.celements.sajson.JsonScriptService
-com.celements.rteConfig.RTEConfig
-com.celements.rte.RteDefaultImplementation
-com.celements.rte.RteTinyMce3
 com.celements.observation.save.object.XObjectEventConverter
 com.celements.cells.classes.CellClass
 com.celements.collections.service.StreamScriptService
