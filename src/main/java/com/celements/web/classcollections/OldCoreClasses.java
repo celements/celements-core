@@ -26,7 +26,6 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.AbstractClassCollection;
 import com.celements.javascript.JavaScriptExternalFilesClass;
-import com.celements.rteConfig.classes.RTEConfigClasses;
 import com.celements.web.classes.KeyValueClass;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -86,13 +85,6 @@ public class OldCoreClasses extends AbstractClassCollection {
   @Deprecated
   public static final String RTE_CONFIG_TYPE_CLASS = RTE_CONFIG_TYPE_CLASS_SPACE + "."
       + RTE_CONFIG_TYPE_CLASS_DOC;
-
-  @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
-  @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE;
-  @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS;
 
   @Deprecated
   public static final String KEY_VALUE_CLASS_DOC = KeyValueClass.DOC_NAME;
@@ -722,15 +714,6 @@ public class OldCoreClasses extends AbstractClassCollection {
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
-  }
-
-  /**
-   * @deprecated instead use IRTEConfigClassConfig.getRTEConfigTypePropertiesClassRef
-   */
-  @Deprecated
-  public DocumentReference getRTEConfigTypePropertiesClassRef(String wikiName) {
-    return new DocumentReference(wikiName, RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE,
-        RTE_CONFIG_TYPE_PRPOP_CLASS_DOC);
   }
 
   @Deprecated
