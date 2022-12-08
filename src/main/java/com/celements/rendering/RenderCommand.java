@@ -19,10 +19,7 @@
  */
 package com.celements.rendering;
 
-import static com.celements.cells.CellRenderStrategy.*;
-import static com.celements.common.MoreObjectsCel.*;
 import static com.celements.common.lambda.LambdaExceptionUtil.*;
-import static com.celements.logging.LogUtils.*;
 import static com.google.common.base.Predicates.*;
 
 import java.util.Arrays;
@@ -39,12 +36,10 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.Contextualiser;
-import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
-import com.celements.web.classes.KeyValueClass;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -145,7 +140,9 @@ public class RenderCommand {
         && getContext().getWiki().getRightService().hasAccessLevel(renderMode,
             getContext().getUser(), cellDocFN, getContext())) {
       String template = getRenderTemplatePath(cellDoc, renderMode);
-      return renderTemplatePath(cellDoc, template, lang, "");
+      return new Contextualiser()
+          .withVeloContext("celldoc", cellDoc.newDocument(getContext()))
+          .execute(rethrow(() -> renderTemplatePath(cellDoc, template, lang, "")));
     } else {
       if ((getContext() == null) || (getContext().get("vcontext") == null)) {
         LOGGER.error("Failed to renderCelementsDocument '{}', because velocity context "
@@ -174,13 +171,10 @@ public class RenderCommand {
       templateContent = getTranslatedContent(templateDoc.get(), lang);
     }
     if (!StringUtils.isEmpty(templateContent)) {
-      renderedContent = getCellContextualiser(cellDoc).execute(rethrow(() -> {
-        LOGGER.trace("renderTemplatePath: templateDoc [{}], ctxDoc [{}], content: {}",
-            templateDoc, getContext().getDoc(), templateContent);
-        return getRenderingEngine().renderText(templateContent,
-            templateDoc.orElse(getContext().getDoc()),
-            getContext().getDoc(), getContext());
-      }));
+      XWikiDocument contentDoc = templateDoc.orElse(getContext().getDoc());
+      LOGGER.trace("renderTemplatePath: contentDoc [{}], content: {}", contentDoc, templateContent);
+      renderedContent = getRenderingEngine().renderText(templateContent, contentDoc,
+          getContext().getDoc(), getContext());
     } else {
       LOGGER.info("renderTemplatePath: skip rendering, empty template [{}]", renderTemplatePath);
     }
@@ -193,33 +187,6 @@ public class RenderCommand {
           renderTemplatePath, DocumentReference.class));
     }
     return Optional.empty();
-  }
-
-  private Contextualiser getCellContextualiser(XWikiDocument cellDoc) {
-    Contextualiser contextualiser = new Contextualiser();
-    if (cellDoc != null) {
-      LOGGER.trace("getCellContextualiser: cellDoc [{}]", cellDoc);
-      contextualiser.withVeloContext("celldoc", cellDoc.newDocument(getContext()));
-      Optional<String> scopeKey = getRenderScopeKey(cellDoc);
-      scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
-          .map(logF(getExecutionContext()::getProperty)
-              .debug(LOGGER).msg("getCellContextualiser"))
-          .flatMap(doc -> tryCast(doc, XWikiDocument.class))
-          .ifPresent(contextualiser::withDoc);
-      scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
-          .map(logF(getExecutionContext()::getProperty)
-              .debug(LOGGER).msg("getCellContextualiser"))
-          .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
-    }
-    return contextualiser;
-  }
-
-  private Optional<String> getRenderScopeKey(XWikiDocument cellDoc) {
-    return XWikiObjectFetcher.on(cellDoc)
-        .filter(KeyValueClass.FIELD_KEY, "cell-render-scope")
-        .fetchField(KeyValueClass.FIELD_VALUE)
-        .stream().findFirst()
-        .map(scope -> EXEC_CTX_KEY + "." + scope);
   }
 
   public String renderDocument(DocumentReference docRef) {
