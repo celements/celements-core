@@ -145,9 +145,7 @@ public class RenderCommand {
         && getContext().getWiki().getRightService().hasAccessLevel(renderMode,
             getContext().getUser(), cellDocFN, getContext())) {
       String template = getRenderTemplatePath(cellDoc, renderMode);
-      return new Contextualiser()
-          .withVeloContext("celldoc", cellDoc.newDocument(getContext()))
-          .execute(rethrow(() -> renderTemplatePath(cellDoc, template, lang, "")));
+      return renderTemplatePath(cellDoc, template, lang, "");
     } else {
       if ((getContext() == null) || (getContext().get("vcontext") == null)) {
         LOGGER.error("Failed to renderCelementsDocument '{}', because velocity context "
@@ -168,15 +166,21 @@ public class RenderCommand {
     String templateContent;
     Optional<XWikiDocument> templateDoc = getTemplateDoc(renderTemplatePath);
     if (!templateDoc.isPresent()) {
+      LOGGER.debug("renderTemplatePath: from disk [{}]", renderTemplatePath);
       templateContent = getWebUtilsService().getTranslatedDiscTemplateContent(renderTemplatePath,
           lang, defLang);
     } else {
+      LOGGER.debug("renderTemplatePath: from doc [{}]", templateDoc.get());
       templateContent = getTranslatedContent(templateDoc.get(), lang);
     }
     if (!StringUtils.isEmpty(templateContent)) {
-      renderedContent = getCellContextualiser(cellDoc).execute(rethrow(() -> getRenderingEngine()
-          .renderText(templateContent, templateDoc.orElse(getContext().getDoc()),
-              getContext().getDoc(), getContext())));
+      renderedContent = getCellContextualiser(cellDoc).execute(rethrow(() -> {
+        LOGGER.trace("renderTemplatePath: templateDoc [{}], ctxDoc [{}], content: {}",
+            templateDoc, getContext().getDoc(), templateContent);
+        return getRenderingEngine().renderText(templateContent,
+            templateDoc.orElse(getContext().getDoc()),
+            getContext().getDoc(), getContext());
+      }));
     } else {
       LOGGER.info("renderTemplatePath: skip rendering, empty template [{}]", renderTemplatePath);
     }
@@ -193,25 +197,28 @@ public class RenderCommand {
 
   private Contextualiser getCellContextualiser(XWikiDocument cellDoc) {
     Contextualiser contextualiser = new Contextualiser();
-    Optional<String> scopeKey = getRenderScopeKey(cellDoc);
-    scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
-        .map(logF(getExecutionContext()::getProperty)
-            .debug(LOGGER).msg("getCellContextualiser - cell [{}]", cellDoc))
-        .flatMap(doc -> tryCast(doc, XWikiDocument.class))
-        .ifPresent(contextualiser::withDoc);
-    scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
-        .map(logF(getExecutionContext()::getProperty)
-            .debug(LOGGER).msg("getCellContextualiser - cell [{}]", cellDoc))
-        .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
+    if (cellDoc != null) {
+      LOGGER.trace("getCellContextualiser: cellDoc [{}]", cellDoc);
+      contextualiser.withVeloContext("celldoc", cellDoc.newDocument(getContext()));
+      Optional<String> scopeKey = getRenderScopeKey(cellDoc);
+      scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
+          .map(logF(getExecutionContext()::getProperty)
+              .debug(LOGGER).msg("getCellContextualiser"))
+          .flatMap(doc -> tryCast(doc, XWikiDocument.class))
+          .ifPresent(contextualiser::withDoc);
+      scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
+          .map(logF(getExecutionContext()::getProperty)
+              .debug(LOGGER).msg("getCellContextualiser"))
+          .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
+    }
     return contextualiser;
   }
 
   private Optional<String> getRenderScopeKey(XWikiDocument cellDoc) {
-    return Optional.ofNullable(cellDoc)
-        .flatMap(doc -> XWikiObjectFetcher.on(doc)
-            .filter(KeyValueClass.FIELD_KEY, "cell-render-scope")
-            .fetchField(KeyValueClass.FIELD_VALUE)
-            .stream().findFirst())
+    return XWikiObjectFetcher.on(cellDoc)
+        .filter(KeyValueClass.FIELD_KEY, "cell-render-scope")
+        .fetchField(KeyValueClass.FIELD_VALUE)
+        .stream().findFirst()
         .map(scope -> EXEC_CTX_KEY + "." + scope);
   }
 
