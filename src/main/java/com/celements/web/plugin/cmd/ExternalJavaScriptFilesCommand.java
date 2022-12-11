@@ -215,11 +215,10 @@ public class ExternalJavaScriptFilesCommand {
       @Nullable AttachmentURLCommand attUrlCmdMock) {
     final JsonBuilder jsonBuilder = new JsonBuilder();
     jsonBuilder.openDictionary();
-    jsonBuilder.addProperty("fullURL", generateUrl(extJsFileParams, attUrlCmdMock));
     jsonBuilder.addProperty("initLoad", true);
     jsonBuilder.closeDictionary();
-    return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
-        + "</span>";
+    return "<cel-lazy-load-js src=\"" + generateUrl(extJsFileParams, attUrlCmdMock)
+        + "\" loadMode=\"" + extJsFileParams.getLoadMode() + "\" />";
   }
 
   @NotEmpty
