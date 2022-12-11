@@ -33,7 +33,6 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
 import com.celements.cells.CellRenderStrategy;
-import com.celements.cells.DivWriter;
 import com.celements.cells.HtmlDoctype;
 import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
@@ -213,8 +212,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     }
     long millisec = System.currentTimeMillis();
     LOGGER.debug("renderPageLayout for layout [{}].", layoutSpaceRef);
-    IRenderStrategy cellRenderer = new CellRenderStrategy(modelContext.getXWikiContext())
-        .setOutputWriter(new DivWriter());
+    IRenderStrategy cellRenderer = new CellRenderStrategy();
     getRenderingLayoutStack().push(layoutSpaceRef);
     RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
     new Contextualiser()

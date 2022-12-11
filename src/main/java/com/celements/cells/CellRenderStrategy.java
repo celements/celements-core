@@ -19,18 +19,23 @@
  */
 package com.celements.cells;
 
+import static com.celements.common.MoreObjectsCel.*;
+import static com.celements.logging.LogUtils.*;
 import static com.celements.model.util.ReferenceSerializationMode.*;
+import static com.google.common.base.Preconditions.*;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.annotation.concurrent.Immutable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import com.celements.cells.attribute.AttributeBuilder;
@@ -40,6 +45,7 @@ import com.celements.cells.classes.CellClass;
 import com.celements.common.MoreOptional;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.context.Contextualiser;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.TreeNode;
@@ -50,14 +56,15 @@ import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.velocity.VelocityService;
+import com.celements.web.classes.KeyValueClass;
 import com.celements.web.service.CelementsWebScriptService;
 import com.google.common.primitives.Ints;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
+@Immutable
 public class CellRenderStrategy implements IRenderStrategy {
 
   public static final String EXEC_CTX_KEY = "celements.cell";
@@ -72,19 +79,21 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CellRenderStrategy.class);
 
-  private ICellWriter cellWriter;
-  private XWikiContext context;
+  private final ICellWriter cellWriter;
+  private final RenderCommand rendererCmd;
 
-  private SpaceReference spaceReference;
-
-  RenderCommand rendererCmd;
   private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
   private final ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
   private final Execution execution = Utils.getComponent(Execution.class);
   private final VelocityService velocityService = Utils.getComponent(VelocityService.class);
 
-  public CellRenderStrategy(XWikiContext context) {
-    this.context = context;
+  public CellRenderStrategy() {
+    this(new DivWriter(), new RenderCommand());
+  }
+
+  public CellRenderStrategy(ICellWriter cellWriter, RenderCommand rendererCmd) {
+    this.cellWriter = checkNotNull(cellWriter);
+    this.rendererCmd = checkNotNull(rendererCmd);
   }
 
   @Override
@@ -104,17 +113,35 @@ public class CellRenderStrategy implements IRenderStrategy {
   }
 
   @Override
-  public SpaceReference getSpaceReference() {
-    if (spaceReference == null) {
-      return getLayoutService().getDefaultLayoutSpaceReference();
-    } else {
-      return spaceReference;
-    }
+  public boolean isRenderCell(TreeNode node) {
+    return node != null;
   }
 
   @Override
-  public boolean isRenderCell(TreeNode node) {
-    return node != null;
+  public Contextualiser getContextualiser(TreeNode node) {
+    Contextualiser contextualiser = new Contextualiser();
+    if (node != null) {
+      LOGGER.trace("getContextualiser: cell [{}]", node.getDocumentReference());
+      Optional<String> scopeKey = getRenderScopeKey(node.getDocumentReference());
+      scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
+          .map(logF(getExecutionContext()::getProperty)
+              .debug(LOGGER).msg("getContextualiser"))
+          .flatMap(doc -> tryCast(doc, XWikiDocument.class))
+          .ifPresent(contextualiser::withDoc);
+      scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
+          .map(logF(getExecutionContext()::getProperty)
+              .debug(LOGGER).msg("getContextualiser"))
+          .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
+    }
+    return contextualiser;
+  }
+
+  private Optional<String> getRenderScopeKey(DocumentReference cellDocRef) {
+    return XWikiObjectFetcher.on(modelAccess.getOrCreateDocument(cellDocRef))
+        .filter(KeyValueClass.FIELD_KEY, "cell-render-scope")
+        .fetchField(KeyValueClass.FIELD_VALUE)
+        .stream().findFirst()
+        .map(scope -> EXEC_CTX_KEY + "." + scope);
   }
 
   @Override
@@ -126,7 +153,7 @@ public class CellRenderStrategy implements IRenderStrategy {
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
     AttributeBuilder attrBuilder = new DefaultAttributeBuilder().addCssClasses("cel_cell");
     DocumentReference cellDocRef = node.getDocumentReference();
-    LOGGER.debug("startRenderCell: cellDocRef [{}] db [{}].", cellDocRef, context.getDatabase());
+    LOGGER.debug("startRenderCell: cellDocRef [{}]", cellDocRef);
     collectCellAttributes(cellDocRef, attrBuilder);
     getCellTypeConfig(cellDocRef).ifPresent(cellTypeConfig -> cellTypeConfig
         .collectAttributes(attrBuilder, cellDocRef));
@@ -219,11 +246,6 @@ public class CellRenderStrategy implements IRenderStrategy {
     cellWriter.clear();
   }
 
-  public CellRenderStrategy setOutputWriter(ICellWriter newWriter) {
-    this.cellWriter = newWriter;
-    return this;
-  }
-
   @Override
   public String getAsString() {
     return cellWriter.getAsString();
@@ -235,25 +257,13 @@ public class CellRenderStrategy implements IRenderStrategy {
     try {
       LOGGER.debug("renderEmptyChildren: parent [{}].", node);
       long millisec = System.currentTimeMillis();
-      cellContent = getRendererCmd().renderCelementsCell(node.getDocumentReference());
+      cellContent = rendererCmd.renderCelementsCell(node.getDocumentReference());
       LOGGER.info("renderEmptyChildren: rendered parent [{}]. Time used in millisec: {}", node,
           (System.currentTimeMillis() - millisec));
     } catch (XWikiException exp) {
       LOGGER.error("failed to get cell [{}] document to render cell content.", node, exp);
     }
     cellWriter.appendContent(cellContent);
-  }
-
-  RenderCommand getRendererCmd() {
-    if (rendererCmd == null) {
-      rendererCmd = new RenderCommand();
-    }
-    return rendererCmd;
-  }
-
-  @Override
-  public void setSpaceReference(SpaceReference spaceReference) {
-    this.spaceReference = spaceReference;
   }
 
   IPageTypeResolverRole getPageTypeResolver() {
@@ -266,6 +276,10 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   LayoutServiceRole getLayoutService() {
     return Utils.getComponent(LayoutServiceRole.class);
+  }
+
+  private ExecutionContext getExecutionContext() {
+    return Utils.getComponent(Execution.class).getContext();
   }
 
 }
