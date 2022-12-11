@@ -19,21 +19,24 @@
  */
 package com.celements.cells;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.TreeNode;
 
 public interface IRenderingEngine {
 
-  public void renderCell(TreeNode node);
+  void renderCell(@Nullable TreeNode node);
 
   /**
    * @param spaceName
    * @deprecated since 2.14.0 use renderPageLayout(SpaceReference) instead.
    */
   @Deprecated
-  public void renderPageLayout(String spaceName);
+  void renderPageLayout(String spaceName);
 
-  public void renderPageLayout(SpaceReference spaceRef);
+  void renderPageLayout(@NotNull SpaceReference spaceRef);
 
 }

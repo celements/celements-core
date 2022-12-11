@@ -33,6 +33,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.context.Contextualiser;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWikiContext;
@@ -46,7 +47,7 @@ public class RenderingEngineTest extends AbstractComponentTest {
   private ITreeNodeService mockTreeNodeService;
 
   @Before
-  public void setUp_RenderingEngineTest() throws Exception {
+  public void prepare() throws Exception {
     renderStrategyMock = createMock(IRenderStrategy.class);
     mockTreeNodeService = createMock(ITreeNodeService.class);
     renderingEngine = new RenderingEngine().setRenderStrategy(renderStrategyMock);
@@ -55,13 +56,11 @@ public class RenderingEngineTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testRenderCell_notRender() {
+  public void test_renderCell_notRender() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     TreeNode node = new TreeNode(docRef, null, 0);
     renderStrategyMock.startRendering();
-    expectLastCall().once();
     renderStrategyMock.endRendering();
-    expectLastCall().once();
     expect(renderStrategyMock.isRenderCell(same(node))).andReturn(false).once();
     replayAll();
     renderingEngine.renderCell(node);
@@ -69,22 +68,19 @@ public class RenderingEngineTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testRenderCell_isRendering() {
+  public void test_renderCell_isRendering() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     TreeNode node = new TreeNode(docRef, null, 0);
     renderStrategyMock.startRendering();
-    expectLastCall().once();
     renderStrategyMock.endRendering();
-    expectLastCall().once();
     expect(renderStrategyMock.isRenderCell(same(node))).andReturn(true).once();
     // isFirst AND isLast because only this item and its children is
     // rendered (NO SIBLINGS!)
     boolean isLastItem = true;
     boolean isFirstItem = true;
+    expect(renderStrategyMock.getContextualiser(node)).andReturn(new Contextualiser());
     renderStrategyMock.startRenderCell(eq(node), eq(isFirstItem), eq(isLastItem));
-    expectLastCall().once();
     renderStrategyMock.endRenderCell(eq(node), eq(isFirstItem), eq(isLastItem));
-    expectLastCall().once();
     expect(renderStrategyMock.isRenderSubCells(eq(docRef))).andReturn(false).once();
     replayAll();
     renderingEngine.renderCell(node);
@@ -96,55 +92,39 @@ public class RenderingEngineTest extends AbstractComponentTest {
   public void testRenderPageLayout_notRender_deprecated() {
     String spaceName = "Skin";
     renderStrategyMock.startRendering();
-    expectLastCall().once();
     SpaceReference spaceReference = new SpaceReference(spaceName, new WikiReference(
         context.getDatabase()));
-    renderStrategyMock.setSpaceReference(eq(spaceReference));
-    expectLastCall().once();
     renderStrategyMock.endRendering();
-    expectLastCall().once();
     expect(renderStrategyMock.isRenderSubCells(eq(spaceReference))).andReturn(false).once();
-    expect(renderStrategyMock.getSpaceReference()).andReturn(spaceReference).anyTimes();
     replayAll();
     renderingEngine.renderPageLayout(spaceName);
     verifyAll();
   }
 
   @Test
-  public void testRenderPageLayout_notRender() {
+  public void test_renderPageLayout_notRender() {
     SpaceReference spaceReference = new SpaceReference("MySkin", new WikiReference(
         context.getDatabase()));
     renderStrategyMock.startRendering();
-    expectLastCall().once();
-    renderStrategyMock.setSpaceReference(eq(spaceReference));
-    expectLastCall().once();
     renderStrategyMock.endRendering();
-    expectLastCall().once();
     expect(renderStrategyMock.isRenderSubCells(eq(spaceReference))).andReturn(false).once();
-    expect(renderStrategyMock.getSpaceReference()).andReturn(spaceReference).anyTimes();
     replayAll();
     renderingEngine.renderPageLayout(spaceReference);
     verifyAll();
   }
 
   @Test
-  public void testRenderPageLayout_isRendering() {
+  public void test_renderPageLayout_isRendering() {
     SpaceReference masterPageLayoutRef = new SpaceReference("MasterPageLayout", new WikiReference(
         context.getDatabase()));
     renderStrategyMock.startRendering();
-    expectLastCall().once();
     renderStrategyMock.endRendering();
-    expectLastCall().once();
-    renderStrategyMock.setSpaceReference(eq(masterPageLayoutRef));
-    expectLastCall().once();
     expect(renderStrategyMock.isRenderSubCells(eq(masterPageLayoutRef))).andReturn(true).once();
     String menuPart = "mainPart";
     expect(renderStrategyMock.getMenuPart((TreeNode) isNull())).andReturn(menuPart);
     List<TreeNode> subCellList = new ArrayList<>();
     expect(mockTreeNodeService.getSubNodesForParent(eq(masterPageLayoutRef), eq(
         menuPart))).andReturn(subCellList);
-    expectLastCall().once();
-    expect(renderStrategyMock.getSpaceReference()).andReturn(masterPageLayoutRef).anyTimes();
     expect(renderStrategyMock.isRenderCell((TreeNode) isNull())).andReturn(false).once();
     replayAll();
     renderingEngine.renderPageLayout(masterPageLayoutRef);
@@ -152,20 +132,15 @@ public class RenderingEngineTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testRenderPageLayout_otherDB() {
+  public void test_renderPageLayout_otherDB() {
     SpaceReference layoutRef = new SpaceReference("MasterPageLayout", new WikiReference(
         "celements2web"));
     renderStrategyMock.startRendering();
-    expectLastCall().once();
     renderStrategyMock.endRendering();
-    expectLastCall().once();
-    renderStrategyMock.setSpaceReference(eq(layoutRef));
-    expectLastCall().once();
     expect(renderStrategyMock.isRenderSubCells(eq(layoutRef))).andReturn(true).once();
     expect(renderStrategyMock.getMenuPart((TreeNode) isNull())).andReturn("");
     List<TreeNode> subCellList = new ArrayList<>();
     expect(mockTreeNodeService.getSubNodesForParent(eq(layoutRef), eq(""))).andReturn(subCellList);
-    expect(renderStrategyMock.getSpaceReference()).andReturn(layoutRef).anyTimes();
     expect(renderStrategyMock.isRenderCell((TreeNode) isNull())).andReturn(false);
     replayAll();
     renderingEngine.renderPageLayout(layoutRef);
@@ -173,44 +148,43 @@ public class RenderingEngineTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testInternal_RenderCell_notRender() {
+  public void test_renderCell_internal_notRender() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "Cell2");
-    TreeNode menuItem = new TreeNode(docRef, null, 0);
-    expect(renderStrategyMock.isRenderCell(same(menuItem))).andReturn(false).once();
+    TreeNode node = new TreeNode(docRef, null, 0);
+    expect(renderStrategyMock.isRenderCell(same(node))).andReturn(false).once();
     replayAll();
-    renderingEngine.internal_renderCell(menuItem, true, false);
+    renderingEngine.renderCell(node, true, false);
     verifyAll();
   }
 
   @Test
-  public void testInternal_RenderCell_isRendering() {
+  public void test_renderCell_internal_isRendering() {
     boolean isLastItem = false;
     boolean isFirstItem = true;
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "Cell2");
-    TreeNode menuItem = new TreeNode(docRef, null, 0);
-    expect(renderStrategyMock.isRenderCell(same(menuItem))).andReturn(true).once();
-    renderStrategyMock.startRenderCell(eq(menuItem), eq(isFirstItem), eq(isLastItem));
-    expectLastCall().once();
-    renderStrategyMock.endRenderCell(eq(menuItem), eq(isFirstItem), eq(isLastItem));
-    expectLastCall().once();
+    TreeNode node = new TreeNode(docRef, null, 0);
+    expect(renderStrategyMock.isRenderCell(same(node))).andReturn(true).once();
+    expect(renderStrategyMock.getContextualiser(node)).andReturn(new Contextualiser());
+    renderStrategyMock.startRenderCell(eq(node), eq(isFirstItem), eq(isLastItem));
+    renderStrategyMock.endRenderCell(eq(node), eq(isFirstItem), eq(isLastItem));
     expect(renderStrategyMock.isRenderSubCells(eq(docRef))).andReturn(false).once();
     replayAll();
-    renderingEngine.internal_renderCell(menuItem, isFirstItem, isLastItem);
+    renderingEngine.renderCell(node, isFirstItem, isLastItem);
     verifyAll();
   }
 
   @Test
-  public void testInternal_renderSubCells_notRenderSubCells() {
+  public void test_renderSubCells_notRenderSubCells() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "Cell2");
     TreeNode node = new TreeNode(docRef, null, 1);
     expect(renderStrategyMock.isRenderSubCells(eq(docRef))).andReturn(false).once();
     replayAll();
-    renderingEngine.internal_renderSubCells(node);
+    renderingEngine.renderSubCells(node, docRef);
     verifyAll();
   }
 
   @Test
-  public void testInternal_renderSubCells_isRendering_noSubcells() {
+  public void test_renderSubCells_isRendering_noSubcells() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySkin", "Cell2");
     TreeNode node = new TreeNode(docRef, null, 1);
     expect(renderStrategyMock.isRenderSubCells(eq(docRef))).andReturn(true).once();
@@ -221,14 +195,13 @@ public class RenderingEngineTest extends AbstractComponentTest {
         subCellList);
     expect(renderStrategyMock.isRenderCell(eq(node))).andReturn(true);
     renderStrategyMock.renderEmptyChildren(eq(node));
-    expectLastCall().once();
     replayAll();
-    renderingEngine.internal_renderSubCells(node);
+    renderingEngine.renderSubCells(node, docRef);
     verifyAll();
   }
 
   @Test
-  public void testInternal_renderSubCells_isRendering_withSubcells() {
+  public void test_renderSubCells_isRendering_withSubcells() {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
     TreeNode cellNode = new TreeNode(cellRef, null, 1);
     expect(renderStrategyMock.isRenderSubCells(eq(cellRef))).andReturn(true).once();
@@ -251,43 +224,38 @@ public class RenderingEngineTest extends AbstractComponentTest {
     expect(mockTreeNodeService.getSubNodesForParent(eq(cellRef), eq(menuPart))).andReturn(
         subCellList);
     renderStrategyMock.startRenderChildren(eq(cellRef));
-    expectLastCall().once();
     renderStrategyMock.endRenderChildren(eq(cellRef));
-    expectLastCall().once();
     expect(renderStrategyMock.isRenderCell(same(subCell1))).andReturn(true).once();
+    expect(renderStrategyMock.getContextualiser(subCell1)).andReturn(new Contextualiser());
     renderStrategyMock.startRenderCell(eq(subCell1), eq(true), eq(false));
-    expectLastCall().once();
     renderStrategyMock.endRenderCell(eq(subCell1), eq(true), eq(false));
-    expectLastCall().once();
-    expect(renderStrategyMock.isRenderSubCells(eq(subCell1.getDocumentReference()))).andReturn(
-        false);
+    expect(renderStrategyMock.isRenderSubCells(eq(subCell1.getDocumentReference())))
+        .andReturn(false);
     expect(renderStrategyMock.isRenderCell(same(subCell2))).andReturn(true).once();
+    expect(renderStrategyMock.getContextualiser(subCell2)).andReturn(new Contextualiser());
     renderStrategyMock.startRenderCell(eq(subCell2), eq(false), eq(false));
-    expectLastCall().once();
     renderStrategyMock.endRenderCell(eq(subCell2), eq(false), eq(false));
-    expectLastCall().once();
-    expect(renderStrategyMock.isRenderSubCells(eq(subCell2.getDocumentReference()))).andReturn(
-        false);
+    expect(renderStrategyMock.isRenderSubCells(eq(subCell2.getDocumentReference())))
+        .andReturn(false);
     expect(renderStrategyMock.isRenderCell(same(subCell3))).andReturn(false).once();
     expect(renderStrategyMock.isRenderCell(same(subCell4))).andReturn(true).once();
+    expect(renderStrategyMock.getContextualiser(subCell4)).andReturn(new Contextualiser());
     renderStrategyMock.startRenderCell(eq(subCell4), eq(false), eq(true));
-    expectLastCall().once();
     renderStrategyMock.endRenderCell(eq(subCell4), eq(false), eq(true));
-    expectLastCall().once();
-    expect(renderStrategyMock.isRenderSubCells(eq(subCell4.getDocumentReference()))).andReturn(
-        false);
+    expect(renderStrategyMock.isRenderSubCells(eq(subCell4.getDocumentReference())))
+        .andReturn(false);
     replayAll();
-    renderingEngine.internal_renderSubCells(cellNode);
+    renderingEngine.renderSubCells(cellNode, cellRef);
     verifyAll();
   }
 
   @Test
-  public void testGetTreeNodeService_inject() {
+  public void test_getTreeNodeService_inject() {
     assertSame(mockTreeNodeService, renderingEngine.getTreeNodeService());
   }
 
   @Test
-  public void testGetTreeNodeService_defaultInstancing() {
+  public void test_getTreeNodeService_defaultInstancing() {
     renderingEngine.treeNodeService = null;
     ITreeNodeService treeNodeService = renderingEngine.getTreeNodeService();
     assertNotNull(treeNodeService);

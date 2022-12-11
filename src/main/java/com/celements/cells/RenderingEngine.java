@@ -19,7 +19,10 @@
  */
 package com.celements.cells;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +56,7 @@ public class RenderingEngine implements IRenderingEngine {
     renderStrategy.startRendering();
     // isFirst AND isLast because only this item and its children is
     // rendered (NO SIBLINGS!)
-    internal_renderCell(node, true, true);
+    renderCell(node, true, true);
     renderStrategy.endRendering();
   }
 
@@ -77,23 +80,26 @@ public class RenderingEngine implements IRenderingEngine {
    */
   @Override
   public void renderPageLayout(SpaceReference spaceRef) {
+    checkNotNull(spaceRef);
     LOGGER.debug("renderPageLayout: start rendering [{}].", spaceRef);
     renderStrategy.startRendering();
-    renderStrategy.setSpaceReference(spaceRef);
-    internal_renderSubCells(null);
+    renderSubCells(null, spaceRef);
     renderStrategy.endRendering();
   }
 
-  void internal_renderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
+  void renderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
     if (renderStrategy.isRenderCell(node)) {
-      renderStrategy.startRenderCell(node, isFirstItem, isLastItem);
-      internal_renderSubCells(node);
-      renderStrategy.endRenderCell(node, isFirstItem, isLastItem);
+      renderStrategy.getContextualiser(node).execute(() -> {
+        renderStrategy.startRenderCell(node, isFirstItem, isLastItem);
+        renderSubCells(node, Optional.ofNullable(node)
+            .map(TreeNode::getDocumentReference)
+            .orElse(null));
+        renderStrategy.endRenderCell(node, isFirstItem, isLastItem);
+      });
     }
   }
 
-  void internal_renderSubCells(TreeNode parentNode) {
-    EntityReference parentRef = getParentReference(parentNode);
+  void renderSubCells(TreeNode parentNode, EntityReference parentRef) {
     if (renderStrategy.isRenderSubCells(parentRef)) {
       List<TreeNode> children = getTreeNodeService().getSubNodesForParent(parentRef,
           renderStrategy.getMenuPart(parentNode));
@@ -104,7 +110,7 @@ public class RenderingEngine implements IRenderingEngine {
         boolean isFirstItem = true;
         for (TreeNode node : children) {
           boolean isLastItem = (children.lastIndexOf(node) == (children.size() - 1));
-          internal_renderCell(node, isFirstItem, isLastItem);
+          renderCell(node, isFirstItem, isLastItem);
           isFirstItem = false;
         }
         renderStrategy.endRenderChildren(parentRef);
@@ -112,16 +118,6 @@ public class RenderingEngine implements IRenderingEngine {
         renderStrategy.renderEmptyChildren(parentNode);
       }
     }
-  }
-
-  private EntityReference getParentReference(TreeNode parentNode) {
-    EntityReference parentRef;
-    if (parentNode != null) {
-      parentRef = parentNode.getDocumentReference();
-    } else {
-      parentRef = renderStrategy.getSpaceReference();
-    }
-    return parentRef;
   }
 
   public RenderingEngine setRenderStrategy(IRenderStrategy newStrategy) {
