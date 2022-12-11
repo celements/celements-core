@@ -68,7 +68,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_beforeGetAll() {
+  public void test_addExtJSfileOnce_beforeGetAll() {
     String file = ":celJS/prototype.js";
     String filePath = "/file/celJS/prototype.js?version=12344";
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(filePath).once();
@@ -82,7 +82,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_beforeGetAll_fileNotFound() {
+  public void test_addExtJSfileOnce_beforeGetAll_fileNotFound() {
     String fileNotFound = "Content.WebHome;blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(true).atLeastOnce();
@@ -95,7 +95,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_afterGetAll() throws XWikiException {
+  public void test_addExtJSfileOnce_afterGetAll() throws XWikiException {
     String file = "/skin/resources/celJS/prototype.js";
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
@@ -112,7 +112,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_afterGetAll_action() throws XWikiException {
+  public void test_addExtJSfileOnce_afterGetAll_action() throws XWikiException {
     String file = "/file/resources/celJS/prototype.js";
     expect(attUrlCmd.getAttachmentURL(eq(file), eq("file"), same(context))).andReturn(
         file).atLeastOnce();
@@ -131,7 +131,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_afterGetAll_action_params() throws XWikiException {
+  public void test_addExtJSfileOnce_afterGetAll_action_params() throws XWikiException {
     String file = "/file/resources/celJS/prototype.js";
     expect(attUrlCmd.getAttachmentURL(eq(file), eq("file"), same(context))).andReturn(
         file).atLeastOnce();
@@ -154,7 +154,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_afterGetAll_action_params_onDisk() throws XWikiException {
+  public void test_addExtJSfileOnce_afterGetAll_action_params_onDisk() throws XWikiException {
     String file = ":celJS/prototype.js";
     String fileURL = "/file/resources/celJS/prototype.js?version=201507061937";
     expect(attUrlCmd.getAttachmentURL(eq(file), eq("file"), same(context))).andReturn(
@@ -175,7 +175,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_afterGetAll_versioning() throws XWikiException {
+  public void test_addExtJSfileOnce_afterGetAll_versioning() throws XWikiException {
     String file = "celJS/prototype.js?version=20110401182200";
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
@@ -243,7 +243,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_afterGetAll_fileNotFound_url() throws XWikiException {
+  public void test_addExtJSfileOnce_afterGetAll_fileNotFound_url() throws XWikiException {
     String fileNotFound = "/download/Content/WebHome/blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).atLeastOnce();
@@ -261,7 +261,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_afterGetAll_fileNotFound_attUrl() throws XWikiException {
+  public void test_addExtJSfileOnce_afterGetAll_fileNotFound_attUrl() throws XWikiException {
     String fileNotFound = "Content.WebHome;blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(true).atLeastOnce();
@@ -385,7 +385,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_beforeGetAll_double() throws Exception {
+  public void test_addExtJSfileOnce_beforeGetAll_double() throws Exception {
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -440,7 +440,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddExtJSfileOnce_beforeGetAll_explicitAndImplicit_double() throws Exception {
+  public void test_addExtJSfileOnce_beforeGetAll_explicitAndImplicit_double() throws Exception {
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
         "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -506,13 +506,12 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddLazyExtJSfile() {
+  public void test_addLazyExtJSfile() {
     String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
     String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
     expect(attUrlCmd.getAttachmentURL(eq(jsFile), same(context))).andReturn(jsFileURL).once();
     replayDefault();
-    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
+    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\" />",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .build(), attUrlCmd));
@@ -520,15 +519,14 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddLazyExtJSfile_action() {
+  public void test_addLazyExtJSfile_action() {
     String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
     String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
     String action = "file";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "\", \"initLoad\" : true}";
     expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
         jsFileURL).once();
     replayDefault();
-    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
+    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\" />",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
@@ -537,15 +535,15 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddLazyExtJSfile_action_params() {
+  public void test_addLazyExtJSfile_action_params() {
     String jsFile = "mySpace.myDoc;loadTinyMCE-async.js";
     String jsFileURL = "/download/mySpace/myDoc/loadTinyMCE-async.js";
     String action = "file";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "?me=blu\", \"initLoad\" : true}";
     expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
         jsFileURL).once();
     replayDefault();
-    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
+    assertEquals(
+        "<cel-lazy-load-js src=\"" + jsFileURL + "?me=blu\" loadMode=\"SYNC\" />",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
@@ -555,16 +553,15 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testAddLazyExtJSfile_action_params_onDisk() {
+  public void test_addLazyExtJSfile_action_params_onDisk() {
     String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
     String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js"
         + "?version=201507061937";
     String action = "file";
-    String expJSON = "{\"fullURL\" : " + "\"" + jsFileURL + "&me=blu\", \"initLoad\" : true}";
     expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
         jsFileURL).once();
     replayDefault();
-    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON + "</span>",
+    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "&me=blu\" loadMode=\"SYNC\" />",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
