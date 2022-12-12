@@ -64,6 +64,9 @@ public final class JsFileEntry extends ObjectBean {
 
   @NotNull
   public JsLoadMode getLoadMode() {
+    if (isModule()) {
+      return JsLoadMode.DEFER;
+    }
     return loadMode;
   }
 

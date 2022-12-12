@@ -176,7 +176,7 @@ public class JsFileEntryTest extends AbstractComponentTest {
   @Test
   public void test_JsExtFileObj_bean() {
     DocumentReference docRef = new DocumentReference("wikiName", "space", "document");
-    jsFileEntry.addFilepath(":space.doc:attachment.js")
+    jsFileEntry.addFilepath("/space/doc/attachment.mjs")
         .addLoadMode(JsLoadMode.ASYNC);
     BaseObject jsExtFileObj = new BaseObject();
     jsExtFileObj.setXClassReference(getJavaScriptExternalFilesClassRef());
