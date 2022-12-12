@@ -68,23 +68,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         IPageTypeRole.class, LayoutServiceRole.class, VelocityService.class);
     outWriterMock = createMockAndAddToDefault(ICellWriter.class);
     context = getContext();
-    renderer = new CellRenderStrategy(context).setOutputWriter(outWriterMock);
     mockctRendererCmd = createMockAndAddToDefault(RenderCommand.class);
-    renderer.rendererCmd = mockctRendererCmd;
-  }
-
-  @Test
-  public void test_pageTypeCmd() {
-    renderer.rendererCmd = null;
-    assertNotNull(renderer.getRendererCmd());
-    assertSame("Expecting singleton.", renderer.getRendererCmd(), renderer.getRendererCmd());
-  }
-
-  @Test
-  public void test_inject_ctRendererCmd() {
-    renderer.rendererCmd = mockctRendererCmd;
-    assertNotNull(renderer.getRendererCmd());
-    assertSame("Expecting injected mock object.", mockctRendererCmd, renderer.getRendererCmd());
+    renderer = new CellRenderStrategy(outWriterMock, mockctRendererCmd);
   }
 
   @Test
@@ -144,43 +129,6 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     assertFalse(renderer.isRenderCell(null));
     assertTrue(renderer.isRenderCell(new TreeNode(cellRef, null, 0)));
-  }
-
-  @Test
-  public void test_getSpaceReference_default() {
-    renderer.setSpaceReference(null);
-    SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
-        context.getDatabase()));
-    expect(getMock(LayoutServiceRole.class).getDefaultLayoutSpaceReference())
-        .andReturn(defaultLayout);
-    replayDefault();
-    assertEquals("expecting default layout space", defaultLayout, renderer.getSpaceReference());
-    verifyDefault();
-  }
-
-  @Test
-  public void test_getSpaceReference() {
-    SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
-        context.getDatabase()));
-    renderer.setSpaceReference(layoutSpaceRef);
-    replayDefault();
-    assertEquals(layoutSpaceRef, renderer.getSpaceReference());
-    verifyDefault();
-  }
-
-  @Test
-  public void test_getSpaceReference_null_setBack() {
-    SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
-        context.getDatabase()));
-    renderer.setSpaceReference(layoutSpaceRef);
-    renderer.setSpaceReference(null);
-    SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
-        context.getDatabase()));
-    expect(getMock(LayoutServiceRole.class).getDefaultLayoutSpaceReference())
-        .andReturn(defaultLayout);
-    replayDefault();
-    assertEquals(defaultLayout, renderer.getSpaceReference());
-    verifyDefault();
   }
 
   @Test

@@ -19,10 +19,7 @@
  */
 package com.celements.rendering;
 
-import static com.celements.cells.CellRenderStrategy.*;
-import static com.celements.common.MoreObjectsCel.*;
 import static com.celements.common.lambda.LambdaExceptionUtil.*;
-import static com.celements.logging.LogUtils.*;
 import static com.google.common.base.Predicates.*;
 
 import java.util.Arrays;
@@ -39,12 +36,10 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.Contextualiser;
-import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
-import com.celements.web.classes.KeyValueClass;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -168,15 +163,18 @@ public class RenderCommand {
     String templateContent;
     Optional<XWikiDocument> templateDoc = getTemplateDoc(renderTemplatePath);
     if (!templateDoc.isPresent()) {
+      LOGGER.debug("renderTemplatePath: from disk [{}]", renderTemplatePath);
       templateContent = getWebUtilsService().getTranslatedDiscTemplateContent(renderTemplatePath,
           lang, defLang);
     } else {
+      LOGGER.debug("renderTemplatePath: from doc [{}]", templateDoc.get());
       templateContent = getTranslatedContent(templateDoc.get(), lang);
     }
     if (!StringUtils.isEmpty(templateContent)) {
-      renderedContent = getCellContextualiser(cellDoc).execute(rethrow(() -> getRenderingEngine()
-          .renderText(templateContent, templateDoc.orElse(getContext().getDoc()),
-              getContext().getDoc(), getContext())));
+      XWikiDocument contentDoc = templateDoc.orElse(getContext().getDoc());
+      LOGGER.trace("renderTemplatePath: contentDoc [{}], content: {}", contentDoc, templateContent);
+      renderedContent = getRenderingEngine().renderText(templateContent, contentDoc,
+          getContext().getDoc(), getContext());
     } else {
       LOGGER.info("renderTemplatePath: skip rendering, empty template [{}]", renderTemplatePath);
     }
@@ -189,30 +187,6 @@ public class RenderCommand {
           renderTemplatePath, DocumentReference.class));
     }
     return Optional.empty();
-  }
-
-  private Contextualiser getCellContextualiser(XWikiDocument cellDoc) {
-    Contextualiser contextualiser = new Contextualiser();
-    Optional<String> scopeKey = getRenderScopeKey(cellDoc);
-    scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
-        .map(logF(getExecutionContext()::getProperty)
-            .debug(LOGGER).msg("getCellContextualiser - cell [{}]", cellDoc))
-        .flatMap(doc -> tryCast(doc, XWikiDocument.class))
-        .ifPresent(contextualiser::withDoc);
-    scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
-        .map(logF(getExecutionContext()::getProperty)
-            .debug(LOGGER).msg("getCellContextualiser - cell [{}]", cellDoc))
-        .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
-    return contextualiser;
-  }
-
-  private Optional<String> getRenderScopeKey(XWikiDocument cellDoc) {
-    return Optional.ofNullable(cellDoc)
-        .flatMap(doc -> XWikiObjectFetcher.on(doc)
-            .filter(KeyValueClass.FIELD_KEY, "cell-render-scope")
-            .fetchField(KeyValueClass.FIELD_VALUE)
-            .stream().findFirst())
-        .map(scope -> EXEC_CTX_KEY + "." + scope);
   }
 
   public String renderDocument(DocumentReference docRef) {
