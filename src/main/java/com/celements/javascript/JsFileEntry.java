@@ -4,11 +4,12 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.UriBuilder;
 
 import com.celements.model.object.ObjectBean;
 import com.google.common.base.Strings;
@@ -75,7 +76,11 @@ public final class JsFileEntry extends ObjectBean {
   }
 
   public boolean isModule() {
-    String fileName = UriBuilder.fromUri(getFilepath()).build().getPath();
+    String fileName = getFilepath();
+    Matcher matcher = Pattern.compile(".*/([^/?]+).*").matcher(getFilepath());
+    if (matcher.matches()) {
+      fileName = matcher.group(1);
+    }
     return fileName.endsWith(".mjs");
   }
 

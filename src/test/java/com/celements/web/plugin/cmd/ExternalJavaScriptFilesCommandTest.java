@@ -236,7 +236,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   public void testGetExtStringForJsFile_jsm() {
     String url = "http://www.xyz.com/file/resources/celJS/myPath/jsfile.mjs";
     String urlEsc = "http://www.xyz.com/file/resources/celJS/myPath/jsfile.mjs";
-    String scriptStart = "<script type=\"module\" src=\"";
+    String scriptStart = "<script defer type=\"module\" src=\"";
     String scriptEnd = "\"></script>";
     JsFileEntry jsFile = new JsFileEntry().addFilepath(url);
     assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
@@ -513,7 +513,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     assertEquals(
         "<cel-lazy-load-js src=\"" + jsFileURL + "\" load-mode=\"SYNC\">"
-            + "</cel-lazy-load-js>",
+            + "<!-- test --></cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .build(), attUrlCmd));
@@ -529,7 +529,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "\" load-mode=\"SYNC\">"
-        + "</cel-lazy-load-js>",
+        + "<!-- test --></cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
@@ -546,7 +546,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "?me=blu\" load-mode=\"SYNC\">"
-        + "</cel-lazy-load-js>",
+        + "<!-- test --></cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
@@ -565,7 +565,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<cel-lazy-load-js src=\"" + jsFileURL
-        + "&me=blu\" load-mode=\"SYNC\"></cel-lazy-load-js>",
+        + "&me=blu\" load-mode=\"SYNC\"><!-- test --></cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)

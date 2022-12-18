@@ -127,6 +127,12 @@ public class JsFileEntryTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_isModule_yes_disk() {
+    jsFileEntry.setFilepath(":celJS/space/doc/attachment.mjs?version=asdf");
+    assertTrue(jsFileEntry.isModule());
+  }
+
+  @Test
   public void test_isValid_null() {
     jsFileEntry.setFilepath(null);
     assertFalse(jsFileEntry.isValid());
