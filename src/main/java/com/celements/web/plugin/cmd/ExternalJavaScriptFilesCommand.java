@@ -213,7 +213,7 @@ public class ExternalJavaScriptFilesCommand {
   String getLazyLoadTag(@NotNull ExtJsFileParameter extJsFileParams,
       @Nullable AttachmentURLCommand attUrlCmdMock) {
     return "<cel-lazy-load-js src=\"" + generateUrl(extJsFileParams, attUrlCmdMock)
-        + "\" load-mode=\"" + extJsFileParams.getLoadMode() + "\"></cel-lazy-load-js>";
+        + "\" load-mode=\"" + extJsFileParams.getLoadMode() + "\"><!-- test --></cel-lazy-load-js>";
   }
 
   @NotEmpty
