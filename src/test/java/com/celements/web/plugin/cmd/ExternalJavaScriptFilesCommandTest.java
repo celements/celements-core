@@ -512,7 +512,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.getAttachmentURL(eq(jsFile), same(context))).andReturn(jsFileURL).once();
     replayDefault();
     assertEquals(
-        "<cel-lazy-load-js src=\"" + jsFileURL + "\" load-mode=\"SYNC\">"
+        "<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\">"
             + "<!-- test --></cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
@@ -528,7 +528,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
         jsFileURL).once();
     replayDefault();
-    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "\" load-mode=\"SYNC\">"
+    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\">"
         + "<!-- test --></cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
@@ -545,7 +545,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
         jsFileURL).once();
     replayDefault();
-    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "?me=blu\" load-mode=\"SYNC\">"
+    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "?me=blu\" loadMode=\"SYNC\">"
         + "<!-- test --></cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
@@ -565,7 +565,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<cel-lazy-load-js src=\"" + jsFileURL
-        + "&me=blu\" load-mode=\"SYNC\"><!-- test --></cel-lazy-load-js>",
+        + "&me=blu\" loadMode=\"SYNC\"><!-- test --></cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
