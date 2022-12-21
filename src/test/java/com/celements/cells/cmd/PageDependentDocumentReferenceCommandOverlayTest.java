@@ -16,6 +16,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.cells.classes.PageDepCellConfigClass;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.service.ITreeNodeService;
@@ -40,7 +41,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
 
   @SuppressWarnings("unchecked")
   @Before
-  public void setUp_PageDependentDocumentReferenceCommandOverlayTest() throws Exception {
+  public void prepare() throws Exception {
     context = getContext();
     registerComponentMock(IModelAccessFacade.class);
     cellDocRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
@@ -62,20 +63,20 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @After
-  public void shutdown_EmptyCheckCommandTest() throws Exception {
+  public void teardown() throws Exception {
     getComponentManager().unregisterComponent(IWebUtilsService.class, "default");
     getComponentManager().registerComponent(webUtilsServiceDesc, savedWebUtilsService);
   }
 
   @Test
-  public void testIsInheritable() throws Exception {
+  public void test_isInheritable() throws Exception {
     replayDefault();
     assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
     verifyDefault();
   }
 
   @Test
-  public void testIsInheritable_noValue() throws Exception {
+  public void test_isInheritable_noValue() throws Exception {
     setDependentDocSpace("leftColumn", null);
     replayDefault();
     assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
@@ -83,7 +84,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testIsInheritable_zero() throws Exception {
+  public void test_isInheritable_zero() throws Exception {
     setDependentDocSpace("leftColumn", 0);
     replayDefault();
     assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
@@ -91,7 +92,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testIsInheritable_one() throws Exception {
+  public void test_isInheritable_one() throws Exception {
     setDependentDocSpace("leftColumn", 1);
     replayDefault();
     assertTrue("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
@@ -99,7 +100,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testGetDependentDocList() {
+  public void test_getDependentDocList() {
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDoc");
     List<String> expDepDocList = Arrays.asList("leftColumn_mySpace.MyDoc",
         "leftColumn_mySpace.MyParentDoc");
@@ -113,7 +114,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testGetDependentDocumentReference() throws Exception {
+  public void test_getDependentDocumentReference() throws Exception {
     context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDoc");
@@ -145,7 +146,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testGetDependentDocumentReference_defaultContent_noDefaults() throws Exception {
+  public void test_getDependentDocumentReference_defaultContent_noDefaults() throws Exception {
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(context.getDatabase(),
         PageDependentDocumentReferenceCommand.PDC_WIKIDEFAULT_SPACE_NAME + "_leftColumn",
@@ -196,7 +197,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testGetDependentDocumentReference_defaultContent_space() throws Exception {
+  public void test_getDependentDocumentReference_defaultContent_space() throws Exception {
     context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(context.getDatabase(),
@@ -250,7 +251,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testGetDependentDocumentReference_defaultContent_wiki() throws Exception {
+  public void test_getDependentDocumentReference_defaultContent_wiki() throws Exception {
     context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(context.getDatabase(),
@@ -308,7 +309,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testGetDependentDocumentReference_defaultContent_layout() throws Exception {
+  public void test_getDependentDocumentReference_defaultContent_layout() throws Exception {
     context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(context.getDatabase(),
@@ -380,7 +381,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testGetDependentDocumentReference_defaultContent_overwrite_layout() throws Exception {
+  public void test_getDependentDocumentReference_defaultContent_overwrite_layout()
+      throws Exception {
     context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(context.getDatabase(),
@@ -452,7 +454,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   }
 
   @Test
-  public void testGetDependentDocumentReference_defaultContent_centrallayout() throws Exception {
+  public void test_getDependentDocumentReference_defaultContent_centrallayout() throws Exception {
     context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(context.getDatabase(),
@@ -526,15 +528,12 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
 
   private void setDependentDocSpace(String depDocSpace, Integer isInheritable) {
     BaseObject cellConfig = new BaseObject();
-    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-        depDocSpace);
+    cellConfig.setXClassReference(PageDepCellConfigClass.CLASS_REF);
+    cellConfig.setStringValue(PageDepCellConfigClass.FIELD_SPACE_NAME.getName(), depDocSpace);
     if (isInheritable != null) {
-      cellConfig.setIntValue(PageDependentDocumentReferenceCommand.PROPNAME_IS_INHERITABLE,
-          isInheritable);
+      cellConfig.setIntValue(PageDepCellConfigClass.FIELD_IS_ACTIVE.getName(), isInheritable);
     }
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+    cellConfig.setDocumentReference(PageDepCellConfigClass.CLASS_REF.getDocRef());
+    cellDoc.addXObject(cellConfig);
   }
-
 }
