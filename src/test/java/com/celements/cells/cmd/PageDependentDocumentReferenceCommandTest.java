@@ -1,5 +1,6 @@
 package com.celements.cells.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -17,7 +18,8 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
@@ -27,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedComponentTestCase {
+public class PageDependentDocumentReferenceCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private PageDependentDocumentReferenceCommand pageDepDocRefCmd;
@@ -43,10 +45,12 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   public void setUp_PageDependentDocumentReferenceCommandTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
+    registerComponentMock(IModelAccessFacade.class);
     document = createMockAndAddToDefault(XWikiDocument.class);
     cellDocRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
     cellDoc = new XWikiDocument(cellDocRef);
-    expect(xwiki.getDocument(eq(cellDocRef), same(context))).andReturn(cellDoc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(cellDocRef)))
+        .andReturn(cellDoc).anyTimes();
     pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
     defaultValueProviderDesc = getComponentManager().getComponentDescriptor(
         EntityReferenceValueProvider.class, "default");
@@ -199,21 +203,6 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testIsCurrentDocument_Exception() {
-    try {
-      reset(xwiki);
-      expect(xwiki.getDocument(eq(cellDocRef), same(context))).andThrow(
-          new XWikiException()).atLeastOnce();
-      replayDefault();
-      assertTrue("expecting fallback to currentDoc.", pageDepDocRefCmd.isCurrentDocument(
-          cellDocRef));
-      verifyDefault();
-    } catch (XWikiException exp) {
-      fail("Expecting isCurrentDocument to catch XWikiException and returning True.");
-    }
-  }
-
-  @Test
   public void testGetDependentDocumentSpace_cellDocWithoutObject_Content() {
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myDocument");
@@ -291,29 +280,6 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
     assertEquals("mySpace_myDepSpace", pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef,
         cellDocRef).getName());
     verifyDefault();
-  }
-
-  @Test
-  public void testGetDependentDocumentSpace_Exception() {
-    try {
-      reset(xwiki);
-      expect(xwiki.getDocument(eq(cellDocRef), same(context))).andThrow(
-          new XWikiException()).atLeastOnce();
-      BaseObject cellConfig = new BaseObject();
-      cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-          "myDepSpace");
-      cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-      cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-          cellConfig));
-      DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-          "myDocument");
-      replayDefault();
-      assertEquals("mySpace", pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef,
-          cellDocRef).getName());
-      verifyDefault();
-    } catch (XWikiException exp) {
-      fail("expecting to catch exception and fallback to current space");
-    }
   }
 
   @Test

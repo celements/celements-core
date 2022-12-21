@@ -33,7 +33,8 @@ import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.access.ModelAccessStrategy;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.classes.PageTypeClass;
@@ -49,7 +50,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   private XWikiRequest request;
   private PageTypeResolverService pageTypeResolver;
   private IPageTypeRole pageTypeServiceMock;
-  private ModelAccessStrategy modelStrategyMock;
+  private IModelAccessFacade modelStrategyMock;
   private PageTypeReference richTextPTref;
   private DocumentReference docRef;
   private XWikiDocument doc;
@@ -62,7 +63,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     request = createMockAndAddToDefault(XWikiRequest.class);
     getContext().setRequest(request);
-    modelStrategyMock = registerComponentMock(ModelAccessStrategy.class);
+    modelStrategyMock = registerComponentMock(IModelAccessFacade.class);
     pageTypeServiceMock = registerComponentMock(IPageTypeRole.class);
     richTextPTref = new PageTypeReference("RichText", "xObjectProvider", Arrays.asList(""));
     expect(pageTypeServiceMock.getPageTypeReference(eq("RichText"))).andReturn(Optional.of(
@@ -85,7 +86,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getPageTypeObject_NPEs_null_doc() throws XWikiException {
+  public void test_getPageTypeObject_NPEs_null_doc() throws Exception {
     replayDefault();
     BaseObject resultPTObj = pageTypeResolver.getPageTypeObject(null);
     verifyDefault();
@@ -93,7 +94,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getPageTypeObject_NewDocFromTemplate() throws XWikiException {
+  public void test_getPageTypeObject_NewDocFromTemplate() throws Exception {
     doc.setNew(true);
     getContext().setDoc(doc);
     DocumentReference templDocRef = new DocumentReference(getContext().getDatabase(), "Blog",
@@ -112,7 +113,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getPageTypeObject_cellFromCentralDB() throws XWikiException {
+  public void test_getPageTypeObject_cellFromCentralDB() throws Exception {
     doc.setNew(true);
     getContext().setDoc(doc);
     DocumentReference centralCellDocRef = new DocumentReference("celements2web", "SimpleLayout",
@@ -241,7 +242,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_resolvePageTypeReferenceWithDefault_NewDocFromTemplate() throws XWikiException {
+  public void test_resolvePageTypeReferenceWithDefault_NewDocFromTemplate() throws Exception {
     doc.setNew(true);
     getContext().setDoc(doc);
     DocumentReference templDocRef = new DocumentReference(getContext().getDatabase(), "Blog",
@@ -328,15 +329,15 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
     assertFalse(pageTypeRef.isPresent());
   }
 
-  private XWikiDocument expectDoc(DocumentReference docRef) {
+  private XWikiDocument expectDoc(DocumentReference docRef) throws DocumentNotExistsException {
     XWikiDocument doc = new XWikiDocument(docRef);
     return expectDoc(doc);
   }
 
-  private XWikiDocument expectDoc(XWikiDocument doc) {
+  private XWikiDocument expectDoc(XWikiDocument doc) throws DocumentNotExistsException {
     doc.setNew(false);
-    expect(modelStrategyMock.exists(doc.getDocumentReference(), "")).andReturn(true).anyTimes();
-    expect(modelStrategyMock.getDocument(doc.getDocumentReference(), "")).andReturn(doc);
+    expect(modelStrategyMock.exists(doc.getDocumentReference())).andReturn(true).anyTimes();
+    expect(modelStrategyMock.getDocument(doc.getDocumentReference())).andReturn(doc);
     return doc;
   }
 

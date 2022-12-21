@@ -90,12 +90,7 @@ public class CellsScriptService implements ScriptService {
   }
 
   public String getDepCellSpaceSuffix(DocumentReference cellDocRef) {
-    try {
-      return getPageDepDocRefCmd().getDepCellSpace(cellDocRef);
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get depCellSpaceSuffix for cellDocRef [" + cellDocRef + "].", exp);
-    }
-    return "";
+    return getPageDepDocRefCmd().getDepCellSpace(cellDocRef);
   }
 
   public boolean isInheritable(DocumentReference cellDocRef) {

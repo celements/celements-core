@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -54,6 +55,7 @@ public class DocumentIteratorTest extends AbstractComponentTest {
 
   @Before
   public void setUp_DocumentIteratorTest() throws Exception {
+    registerComponentMocks(IModelAccessFacade.class);
     webUtilsMock = registerComponentMock(IWebUtilsService.class);
     _context = getContext();
     _xwiki = getWikiMock();
@@ -107,12 +109,12 @@ public class DocumentIteratorTest extends AbstractComponentTest {
     _docList.add(fullname1);
     _docList.add(fullname2);
     _iterator.setDocList(_docList);
-    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(_testDoc1).once();
-    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(_testDoc2).once();
-    expect(_xwiki.exists(eq(docRef1), same(_context))).andReturn(true).anyTimes();
-    expect(_xwiki.exists(eq(docRef2), same(_context))).andReturn(true).anyTimes();
-    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1).once();
-    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2).once();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef1))).andReturn(_testDoc1);
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef2))).andReturn(_testDoc2);
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef1))).andReturn(true).anyTimes();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef2))).andReturn(true).anyTimes();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1);
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2);
     replayDefault();
     XWikiDocument firstDoc = _iterator.getCurrentDoc();
     _iterator.moveToNextDoc();
@@ -158,13 +160,15 @@ public class DocumentIteratorTest extends AbstractComponentTest {
   public void testHasNext_true() throws Exception {
     _docList.add(fullname1);
     _docList.add(fullname2);
-    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(_testDoc1).anyTimes();
-    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(_testDoc2).anyTimes();
-    expect(_xwiki.exists(eq(docRef1), same(_context))).andReturn(true).anyTimes();
-    expect(_xwiki.exists(eq(docRef2), same(_context))).andReturn(true).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef1))).andReturn(_testDoc1)
+        .anyTimes();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef2))).andReturn(_testDoc2)
+        .anyTimes();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef1))).andReturn(true).anyTimes();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef2))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
-    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1).once();
-    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2).once();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1);
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2);
     replayDefault();
     _iterator.next();
     assertTrue(_iterator.hasNext());
@@ -177,13 +181,14 @@ public class DocumentIteratorTest extends AbstractComponentTest {
   public void testHasNext_skipDoc() throws Exception {
     _docList.add(fullname1);
     _docList.add(fullname2);
-    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(null).anyTimes();
-    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(_testDoc2).anyTimes();
-    expect(_xwiki.exists(eq(docRef1), same(_context))).andReturn(false).anyTimes();
-    expect(_xwiki.exists(eq(docRef2), same(_context))).andReturn(true).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef1))).andReturn(null).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef2))).andReturn(_testDoc2)
+        .anyTimes();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef1))).andReturn(false).anyTimes();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef2))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
-    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1).once();
-    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2).once();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1);
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2);
     replayDefault();
     assertTrue(_iterator.hasNext());
     assertNotNull(_iterator.next());
@@ -196,10 +201,11 @@ public class DocumentIteratorTest extends AbstractComponentTest {
     String fullname = "Test.Doc";
     DocumentReference docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc");
     _docList.add(fullname);
-    expect(_xwiki.getDocument(eq(docRef), same(_context))).andReturn(_testDoc1).anyTimes();
-    expect(_xwiki.exists(eq(docRef), same(_context))).andReturn(true).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(_testDoc1)
+        .anyTimes();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
-    expect(webUtilsMock.resolveDocumentReference(eq(fullname))).andReturn(docRef).once();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname))).andReturn(docRef);
     replayDefault();
     _iterator.next();
     assertEquals(false, _iterator.hasNext());
@@ -233,13 +239,13 @@ public class DocumentIteratorTest extends AbstractComponentTest {
   public void testIterator_foreach() throws Exception {
     _docList.add(fullname1);
     _docList.add(fullname2);
-    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(_testDoc1).once();
-    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(_testDoc2).once();
-    expect(_xwiki.exists(eq(docRef1), same(_context))).andReturn(true).anyTimes();
-    expect(_xwiki.exists(eq(docRef2), same(_context))).andReturn(true).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef1))).andReturn(_testDoc1);
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef2))).andReturn(_testDoc2);
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef1))).andReturn(true).anyTimes();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef2))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
-    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1).once();
-    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2).once();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1);
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2);
     replayDefault();
     int count = 0;
     List<String> resultList = new ArrayList<>();

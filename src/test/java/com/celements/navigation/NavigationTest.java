@@ -39,6 +39,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.TestMessageTool;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.presentation.DefaultPresentationType;
@@ -73,6 +74,7 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    registerComponentMock(IModelAccessFacade.class);
     currentDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     currentDoc.setNew(false);
@@ -261,8 +263,7 @@ public class NavigationTest extends AbstractComponentTest {
     ptObj.setXClassReference(new PageTypeClasses().getPageTypeClassRef(getContext().getDatabase()));
     ptObj.setStringValue(PageTypeClasses.PAGE_TYPE_FIELD, "TestPageType");
     currentDoc.addXObject(ptObj);
-    expect(getWikiMock().getDocument(eq(currentDocRef), same(getContext()))).andReturn(
-        currentDoc).once();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(currentDocRef))).andReturn(currentDoc);
     String testPageType = "TestPageType";
     expect(ptServiceMock.getPageTypeReference(testPageType)).andReturn(Optional.of(
         new PageTypeReference(testPageType, "myTestProvider", Collections.<String>emptyList())));

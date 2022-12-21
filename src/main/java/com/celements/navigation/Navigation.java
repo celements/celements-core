@@ -48,6 +48,7 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.configuration.ConfigSourceUtils;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
@@ -714,8 +715,9 @@ public class Navigation implements INavigation {
     return Optional.ofNullable(docRef)
         .filter(this::isMenuLinkTargetEnabled)
         .map(getModelAccess()::getOrCreateDocument)
-        .map(doc -> getModelAccess().getProperty(doc, MENU_ITEM_CLASS_REF.getDocRef(
-            docRef.getWikiReference()), TARGET_FIELD))
+        .flatMap(doc -> XWikiObjectEditor.on(doc)
+            .filter(MENU_ITEM_CLASS_REF).fetch().stream().findFirst())
+        .map(obj -> obj.getStringValue(TARGET_FIELD))
         .map(prop -> Objects.toString(prop, "").trim())
         .filter(not(String::isEmpty));
   }

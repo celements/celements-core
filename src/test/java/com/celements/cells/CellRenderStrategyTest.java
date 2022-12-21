@@ -42,7 +42,8 @@ import com.celements.cells.attribute.CellAttribute;
 import com.celements.cells.classes.CellAttributeClass;
 import com.celements.cells.classes.CellClass;
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.access.ModelAccessStrategy;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.navigation.TreeNode;
 import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.IPageTypeConfig;
@@ -64,7 +65,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMocks(ModelAccessStrategy.class, IPageTypeResolverRole.class,
+    registerComponentMocks(IModelAccessFacade.class, IPageTypeResolverRole.class,
         IPageTypeRole.class, LayoutServiceRole.class, VelocityService.class);
     outWriterMock = createMockAndAddToDefault(ICellWriter.class);
     context = getContext();
@@ -403,10 +404,11 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     return typeConfig;
   }
 
-  private XWikiDocument expectNewDoc(DocumentReference docRef) {
+  private XWikiDocument expectNewDoc(DocumentReference docRef) throws DocumentNotExistsException {
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setNew(false);
-    expect(getMock(ModelAccessStrategy.class).getDocument(docRef, "")).andReturn(doc).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).getDocument(docRef)).andReturn(doc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(docRef)).andReturn(doc).anyTimes();
     return doc;
   }
 

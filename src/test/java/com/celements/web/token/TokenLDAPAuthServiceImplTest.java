@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -51,6 +52,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
 
   @Before
   public void prepare() throws Exception {
+    registerComponentMocks(IModelAccessFacade.class);
     tokenAuthImpl = new TokenLDAPAuthServiceImpl();
     store = createMockAndAddToDefault(XWikiStoreInterface.class);
     expect(getWikiMock().getStore()).andReturn(store).anyTimes();
@@ -186,7 +188,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
     getContext().setRequest(request);
     expect(store.searchDocumentsNames(anyString(), eq(0), eq(0), anyObject(List.class),
         same(getContext()))).andReturn(Arrays.asList(username)).once();
-    expect(getWikiMock().getDocument(eq(userDocRef), same(getContext()))).andReturn(userDoc);
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(userDocRef))).andReturn(userDoc);
 
     replayDefault();
     assertEquals(username, tokenAuthImpl.checkAuth(getContext()).getUser());
@@ -245,7 +247,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
     getContext().setRequest(request);
     expect(store.searchDocumentsNames(anyString(), eq(0), eq(0), anyObject(List.class),
         same(getContext()))).andReturn(Arrays.asList(username)).once();
-    expect(getWikiMock().getDocument(eq(userDocRef), same(getContext()))).andReturn(userDoc);
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(userDocRef))).andReturn(userDoc);
 
     replayDefault();
     assertNull(tokenAuthImpl.checkAuth(getContext()));

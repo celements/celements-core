@@ -22,7 +22,6 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.ModelMock;
 import com.celements.model.context.ModelContext;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -35,7 +34,6 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
 
   private TestDocumentDeleteListener listener;
   private XWikiContext context;
-  private ModelMock modelMock;
   private RemoteObservationManagerContext remoteObsManContextMock;
   private ObservationManager obsManagerMock;
 
@@ -50,7 +48,6 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
   @Before
   public void prepareTest() throws Exception {
     context = getContext();
-    modelMock = ModelMock.init();
     classRef = new DocumentReference("wiki", "Classes", "SomeClass");
     docRef = new DocumentReference("wiki", "Space", "SomeDoc");
     docMock = createMockAndAddToDefault(XWikiDocument.class);
@@ -60,7 +57,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(docMock.isFromCache()).andReturn(true).anyTimes();
 
     listener = new TestDocumentDeleteListener();
-    listener.modelAccess = Utils.getComponent(IModelAccessFacade.class);
+    listener.modelAccess = registerComponentMock(IModelAccessFacade.class);
     listener.context = Utils.getComponent(ModelContext.class);
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
     listener.injectRemoteObservationManagerContext(
@@ -201,14 +198,13 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getOriginalDocument()).andReturn(null).once();
-    modelMock.registerDoc(docRef, origDocMock);
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(docRef)).andReturn(origDocMock);
     docMock.setOriginalDocument(same(origDocMock));
     expectLastCall().once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
     expectLastCall().once();
     expect(origDocMock.isFromCache()).andReturn(false).anyTimes();
-    expect(origDocMock.isNew()).andReturn(false);
 
     replayDefault();
     listener.onEvent(event, docMock, context);
