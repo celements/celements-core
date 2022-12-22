@@ -513,7 +513,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     assertEquals(
         "<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\">"
-            + "<!-- test --></cel-lazy-load-js>",
+            + "</cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .build(), attUrlCmd));
@@ -529,7 +529,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\">"
-        + "<!-- test --></cel-lazy-load-js>",
+        + "</cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
@@ -546,7 +546,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "?me=blu\" loadMode=\"SYNC\">"
-        + "<!-- test --></cel-lazy-load-js>",
+        + "</cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
@@ -565,7 +565,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         jsFileURL).once();
     replayDefault();
     assertEquals("<cel-lazy-load-js src=\"" + jsFileURL
-        + "&me=blu\" loadMode=\"SYNC\"><!-- test --></cel-lazy-load-js>",
+        + "&me=blu\" loadMode=\"SYNC\"></cel-lazy-load-js>",
         command.getLazyLoadTag(new ExtJsFileParameter.Builder()
             .setJsFile(jsFile)
             .setAction(action)
