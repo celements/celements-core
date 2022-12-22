@@ -64,6 +64,21 @@ public class JsFileEntryTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_getFilepath_disk() {
+    String fileUrl = ":celJS/space/doc/attachment.mjs?version=asdf";
+    jsFileEntry.setFilepath(fileUrl);
+    assertEquals(fileUrl, jsFileEntry.getFilepath());
+  }
+
+  @Test
+  public void test_getFilePathOnly_disk() {
+    String fileSrc = ":celJS/space/doc/attachment.mjs?version=asdf";
+    String filePath = "celJS/space/doc/attachment.mjs";
+    jsFileEntry.setFilepath(fileSrc);
+    assertEquals(filePath, jsFileEntry.getFilePathOnly());
+  }
+
+  @Test
   public void test_setFilepath() {
     String fileUrl = ":space.doc:attachment.js";
     jsFileEntry.setFilepath(fileUrl);

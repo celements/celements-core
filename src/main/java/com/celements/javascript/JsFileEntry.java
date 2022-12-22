@@ -4,12 +4,11 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
 
 import com.celements.model.object.ObjectBean;
 import com.google.common.base.Strings;
@@ -51,6 +50,14 @@ public final class JsFileEntry extends ObjectBean {
     jsFileUrl = Strings.nullToEmpty(jsFile);
   }
 
+  public String getFilePathOnly() {
+    String filepath = getFilepath();
+    if (getFilepath().startsWith(":")) {
+      filepath = filepath.substring(1);
+    }
+    return UriBuilder.fromUri(filepath).build().getPath();
+  }
+
   public void setLoadMode(@Nullable JsLoadMode loadMode) {
     this.loadMode = Optional.ofNullable(loadMode).orElse(LOAD_MODE_DEFAULT);
   }
@@ -76,12 +83,7 @@ public final class JsFileEntry extends ObjectBean {
   }
 
   public boolean isModule() {
-    String fileName = getFilepath();
-    Matcher matcher = Pattern.compile(".*/([^/?]+).*").matcher(getFilepath());
-    if (matcher.matches()) {
-      fileName = matcher.group(1);
-    }
-    return fileName.endsWith(".mjs");
+    return getFilePathOnly().endsWith(".mjs");
   }
 
   @Override
