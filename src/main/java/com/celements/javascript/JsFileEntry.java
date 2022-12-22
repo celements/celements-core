@@ -50,6 +50,14 @@ public final class JsFileEntry extends ObjectBean {
     jsFileUrl = Strings.nullToEmpty(jsFile);
   }
 
+  public String getFilePathOnly() {
+    String filepath = getFilepath();
+    if (getFilepath().startsWith(":")) {
+      filepath = filepath.substring(1);
+    }
+    return UriBuilder.fromUri(filepath).build().getPath();
+  }
+
   public void setLoadMode(@Nullable JsLoadMode loadMode) {
     this.loadMode = Optional.ofNullable(loadMode).orElse(LOAD_MODE_DEFAULT);
   }
@@ -64,6 +72,9 @@ public final class JsFileEntry extends ObjectBean {
 
   @NotNull
   public JsLoadMode getLoadMode() {
+    if (isModule()) {
+      return JsLoadMode.DEFER;
+    }
     return loadMode;
   }
 
@@ -72,8 +83,7 @@ public final class JsFileEntry extends ObjectBean {
   }
 
   public boolean isModule() {
-    String fileName = UriBuilder.fromUri(getFilepath()).build().getPath();
-    return fileName.endsWith(".mjs");
+    return getFilePathOnly().endsWith(".mjs");
   }
 
   @Override

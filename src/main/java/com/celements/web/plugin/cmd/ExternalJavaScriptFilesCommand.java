@@ -58,7 +58,6 @@ import com.celements.model.reference.RefBuilder;
 import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
-import com.celements.sajson.JsonBuilder;
 import com.celements.web.classes.CelementsClassDefinition;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Suppliers;
@@ -213,13 +212,8 @@ public class ExternalJavaScriptFilesCommand {
   @NotEmpty
   String getLazyLoadTag(@NotNull ExtJsFileParameter extJsFileParams,
       @Nullable AttachmentURLCommand attUrlCmdMock) {
-    final JsonBuilder jsonBuilder = new JsonBuilder();
-    jsonBuilder.openDictionary();
-    jsonBuilder.addProperty("fullURL", generateUrl(extJsFileParams, attUrlCmdMock));
-    jsonBuilder.addProperty("initLoad", true);
-    jsonBuilder.closeDictionary();
-    return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
-        + "</span>";
+    return "<cel-lazy-load-js src=\"" + generateUrl(extJsFileParams, attUrlCmdMock)
+        + "\" loadMode=\"" + extJsFileParams.getLoadMode() + "\"></cel-lazy-load-js>";
   }
 
   @NotEmpty
