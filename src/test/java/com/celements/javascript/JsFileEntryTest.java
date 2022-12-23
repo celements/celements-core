@@ -64,6 +64,21 @@ public class JsFileEntryTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_getFilepath_disk() {
+    String fileUrl = ":celJS/space/doc/attachment.mjs?version=asdf";
+    jsFileEntry.setFilepath(fileUrl);
+    assertEquals(fileUrl, jsFileEntry.getFilepath());
+  }
+
+  @Test
+  public void test_getFilePathOnly_disk() {
+    String fileSrc = ":celJS/space/doc/attachment.mjs?version=asdf";
+    String filePath = "celJS/space/doc/attachment.mjs";
+    jsFileEntry.setFilepath(fileSrc);
+    assertEquals(filePath, jsFileEntry.getFilePathOnly());
+  }
+
+  @Test
   public void test_setFilepath() {
     String fileUrl = ":space.doc:attachment.js";
     jsFileEntry.setFilepath(fileUrl);
@@ -127,6 +142,12 @@ public class JsFileEntryTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_isModule_yes_disk() {
+    jsFileEntry.setFilepath(":celJS/space/doc/attachment.mjs?version=asdf");
+    assertTrue(jsFileEntry.isModule());
+  }
+
+  @Test
   public void test_isValid_null() {
     jsFileEntry.setFilepath(null);
     assertFalse(jsFileEntry.isValid());
@@ -176,7 +197,7 @@ public class JsFileEntryTest extends AbstractComponentTest {
   @Test
   public void test_JsExtFileObj_bean() {
     DocumentReference docRef = new DocumentReference("wikiName", "space", "document");
-    jsFileEntry.addFilepath(":space.doc:attachment.js")
+    jsFileEntry.addFilepath("/space/doc/attachment.mjs")
         .addLoadMode(JsLoadMode.ASYNC);
     BaseObject jsExtFileObj = new BaseObject();
     jsExtFileObj.setXClassReference(getJavaScriptExternalFilesClassRef());
