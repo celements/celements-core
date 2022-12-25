@@ -19,6 +19,7 @@
  */
 package com.celements.web.css;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,7 +30,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserService;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.util.ModelUtils;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -37,8 +41,9 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
-public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
+public class CSSBaseObjectTest extends AbstractComponentTest {
 
   BaseObject bo;
   private XWikiContext context;
@@ -47,6 +52,7 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_CSSBaseObjectTest() throws Exception {
+    registerComponentMocks(UserService.class);
     context = getContext();
     bo = new BaseObject();
     docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
@@ -55,6 +61,11 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     bo.setStringValue("media", "print");
     bo.setIntValue("is_rte_content", 0);
     xwiki = getWikiMock();
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki", "user");
+    context.setUser(Utils.getComponent(ModelUtils.class).serializeRef(userDocRef));
+    User user = createMockAndAddToDefault(User.class);
+    expect(getMock(UserService.class).getUser(context.getUser())).andReturn(user).anyTimes();
+    expect(user.getDocRef()).andReturn(userDocRef).anyTimes();
   }
 
   @Test
