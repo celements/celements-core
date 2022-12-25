@@ -19,6 +19,7 @@
  */
 package com.celements.web.css;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,24 +30,34 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.auth.user.User;
+import com.celements.auth.user.UserService;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.util.ModelUtils;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
-public class CSSStringTest extends AbstractBridgedComponentTestCase {
+public class CSSStringTest extends AbstractComponentTest {
 
   private XWikiContext context;
 
   @Before
-  public void setUp_CSSStringTest() {
+  public void prepareTest() throws Exception {
+    registerComponentMocks(UserService.class);
     context = getContext();
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki", "user");
+    context.setUser(Utils.getComponent(ModelUtils.class).serializeRef(userDocRef));
+    User user = createMockAndAddToDefault(User.class);
+    expect(getMock(UserService.class).getUser(context.getUser())).andReturn(user).anyTimes();
+    expect(user.getDocRef()).andReturn(userDocRef).anyTimes();
   }
 
   @Test
-  public void testGetCSS() {
+  public void test_getCSS() {
     String url = "/skin/Space/Page/test.css";
     String attLink = "Space.Page;test.css";
     CSSString cssFile = new CSSString(attLink, context);
@@ -60,7 +71,7 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testIsAlternate() {
+  public void test_isAlternate() {
     CSSString cssFile = new CSSString("", false, "", "", false, context);
     assertFalse(cssFile.isAlternate());
     cssFile = new CSSString("", true, "", "", false, context);
@@ -68,25 +79,25 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetTitle() {
+  public void test_getTitle() {
     CSSString cssFile = new CSSString("", false, "myTitle", "", false, context);
     assertEquals("myTitle", cssFile.getTitle());
   }
 
   @Test
-  public void testGetMedia() {
+  public void test_getMedia() {
     CSSString cssFile = new CSSString("", "print", context);
     assertEquals("print", cssFile.getMedia());
   }
 
   @Test
-  public void testCSS_String_notContentCSS() {
+  public void test_CSS_String_notContentCSS() {
     CSSString cssFile = new CSSString("/test/file.css", context);
     assertFalse("Filename not ending in -content.css or _content.css", cssFile.isContentCSS());
   }
 
   @Test
-  public void testCSS_String_ContentCSS() {
+  public void test_CSS_String_ContentCSS() {
     CSSString cssFile = new CSSString("/test/file-content.css", context);
     assertTrue("Filename ending in -content.css", cssFile.isContentCSS());
     CSSString cssFile2 = new CSSString("/test/file_content.css", context);
@@ -94,7 +105,7 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testIsAttachment() {
+  public void test_isAttachment() {
     CSSString cssFile = new CSSString("XWiki.XWikiPreferences;myAttachment.css", context);
     assertTrue("attachment FullName-Link must be recognized", cssFile.isAttachment());
     CSSString cssFile2 = new CSSString("/XWiki/XWikiPreferences/myAttachment.css", context);
@@ -102,7 +113,7 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetAttachment() throws Exception {
+  public void test_getAttachment() throws Exception {
     AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
     String fullName = "XWiki.XWikiPreferences";

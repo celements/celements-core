@@ -20,13 +20,14 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -44,8 +45,8 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
+import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
-import com.celements.model.util.References;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiGroupsClass;
@@ -116,10 +117,10 @@ public class CelementsUserService implements UserService {
 
   @Override
   public DocumentReference resolveUserDocRef(String accountName) {
-    DocumentReference userDocRef = modelUtils.resolveRef(accountName, DocumentReference.class,
-        getUserSpaceRef());
-    return References.adjustRef(userDocRef, DocumentReference.class, new EntityReference(
-        XWIKI_USERS_CLASS_SPACE, EntityType.SPACE));
+    return RefBuilder.from(modelUtils.resolveRef(accountName, DocumentReference.class,
+        getUserSpaceRef()))
+        .space(XWIKI_USERS_CLASS_SPACE)
+        .build(DocumentReference.class);
   }
 
   @Override
@@ -127,6 +128,15 @@ public class CelementsUserService implements UserService {
     User user = Utils.getComponent(User.class, CelementsUser.NAME);
     user.initialize(userDocRef);
     return user;
+  }
+
+  @Override
+  public User getUser(@NotNull String accountName) throws UserInstantiationException {
+    try {
+      return getUser(resolveUserDocRef(accountName));
+    } catch (IllegalArgumentException iae) {
+      throw new UserInstantiationException(iae);
+    }
   }
 
   @Override
