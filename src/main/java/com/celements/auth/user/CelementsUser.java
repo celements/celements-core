@@ -73,11 +73,6 @@ public class CelementsUser implements User {
     return new XWikiUser(modelUtils.serializeRefLocal(getDocRef()), isGlobal());
   }
 
-  @Override
-  public Optional<String> email() {
-    return getUserFieldValue(XWikiUsersClass.FIELD_EMAIL);
-  }
-
   @Deprecated
   @Override
   public com.google.common.base.Optional<String> getEmail() {
@@ -85,8 +80,8 @@ public class CelementsUser implements User {
   }
 
   @Override
-  public Optional<String> firstName() {
-    return getUserFieldValue(XWikiUsersClass.FIELD_FIRST_NAME);
+  public Optional<String> email() {
+    return getUserFieldValue(XWikiUsersClass.FIELD_EMAIL);
   }
 
   @Deprecated
@@ -96,8 +91,8 @@ public class CelementsUser implements User {
   }
 
   @Override
-  public Optional<String> lastName() {
-    return getUserFieldValue(XWikiUsersClass.FIELD_LAST_NAME);
+  public Optional<String> firstName() {
+    return getUserFieldValue(XWikiUsersClass.FIELD_FIRST_NAME);
   }
 
   @Deprecated
@@ -107,15 +102,20 @@ public class CelementsUser implements User {
   }
 
   @Override
-  public Optional<String> prettyName() {
-    String prettyName = firstName().orElse("") + " " + lastName().orElse("");
-    return Optional.ofNullable(Strings.emptyToNull(prettyName.trim()));
+  public Optional<String> lastName() {
+    return getUserFieldValue(XWikiUsersClass.FIELD_LAST_NAME);
   }
 
   @Deprecated
   @Override
   public com.google.common.base.Optional<String> getPrettyName() {
     return com.google.common.base.Optional.fromJavaUtil(prettyName());
+  }
+
+  @Override
+  public Optional<String> prettyName() {
+    String prettyName = firstName().orElse("") + " " + lastName().orElse("");
+    return Optional.ofNullable(Strings.emptyToNull(prettyName.trim()));
   }
 
   @Override
@@ -133,15 +133,15 @@ public class CelementsUser implements User {
     return getUserFieldValue(XWikiUsersClass.FIELD_ACTIVE).orElse(false);
   }
 
-  @Override
-  public Optional<String> getAdminLang() {
-    return getUserFieldValue(XWikiUsersClass.FIELD_ADMIN_LANG);
-  }
-
   @Deprecated
   @Override
   public com.google.common.base.Optional<String> getAdminLanguage() {
     return com.google.common.base.Optional.fromJavaUtil(getAdminLang());
+  }
+
+  @Override
+  public Optional<String> getAdminLang() {
+    return getUserFieldValue(XWikiUsersClass.FIELD_ADMIN_LANG);
   }
 
   private <T> Optional<T> getUserFieldValue(ClassField<T> field) {
