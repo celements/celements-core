@@ -17,7 +17,8 @@ import org.xwiki.query.Query;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.migrations.celSubSystem.ICelementsMigrator;
-import com.celements.model.access.ModelAccessStrategy;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.pagetype.classes.PageTypePropertiesClass;
@@ -36,7 +37,7 @@ public class PageTypeCategoryMigrationTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
         getConfigurationSource());
-    registerComponentMocks(IQueryExecutionServiceRole.class, ModelAccessStrategy.class);
+    registerComponentMocks(IQueryExecutionServiceRole.class, IModelAccessFacade.class);
     migration = (PageTypeCategoryMigration) Utils.getComponent(ICelementsMigrator.class,
         PageTypeCategoryMigration.NAME);
     expectClass(getClassDef(), new WikiReference("xwikidb"));
@@ -73,8 +74,8 @@ public class PageTypeCategoryMigrationTest extends AbstractComponentTest {
     expect(getMock(IQueryExecutionServiceRole.class).executeAndGetDocRefs(anyObject(Query.class)))
         .andReturn(Arrays.asList(doc1.getDocumentReference(), doc2.getDocumentReference(),
             doc3.getDocumentReference()));
-    getMock(ModelAccessStrategy.class).saveDocument(same(doc1), eq(migration.getName()), eq(false));
-    getMock(ModelAccessStrategy.class).saveDocument(same(doc3), eq(migration.getName()), eq(false));
+    getMock(IModelAccessFacade.class).saveDocument(same(doc1), eq(migration.getName()));
+    getMock(IModelAccessFacade.class).saveDocument(same(doc3), eq(migration.getName()));
 
     replayDefault();
     migration.migrate(null, getContext());
@@ -85,7 +86,8 @@ public class PageTypeCategoryMigrationTest extends AbstractComponentTest {
     assertEquals("migration should set blank", "pageType", doc3.getStringValue(FIELD.getName()));
   }
 
-  private XWikiDocument expectPtDoc(DocumentReference docRef, String ptCategory) {
+  private XWikiDocument expectPtDoc(DocumentReference docRef, String ptCategory)
+      throws DocumentNotExistsException {
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setNew(false);
     BaseObject xObj = new BaseObject();
@@ -93,7 +95,7 @@ public class PageTypeCategoryMigrationTest extends AbstractComponentTest {
     xObj.setXClassReference(getClassDef().getClassReference());
     xObj.setStringValue(FIELD.getName(), ptCategory);
     doc.addXObject(xObj);
-    expect(getMock(ModelAccessStrategy.class).getDocument(docRef, "")).andReturn(doc);
+    expect(getMock(IModelAccessFacade.class).getDocument(docRef)).andReturn(doc);
     return doc;
   }
 }

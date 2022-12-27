@@ -35,6 +35,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -71,6 +72,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
 
   @Before
   public void setUp_DefaultPresentationTypeTest() throws Exception {
+    registerComponentMock(IModelAccessFacade.class);
     context = getContext();
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
@@ -96,9 +98,8 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     defPresType = (DefaultPresentationType) Utils.getComponent(IPresentationTypeRole.class);
     mockRightService = createMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
-    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).anyTimes();
-    expect(xwiki.getDocument(eq("MySpace.MyCurrentDoc"), same(context))).andReturn(
-        currentDoc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(currentDocRef))
+        .andReturn(currentDoc).anyTimes();
   }
 
   @Test
@@ -316,13 +317,13 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
   private void replayAll(Object... mocks) {
     replay(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock, ptResolverServiceMock,
         mockLayoutCmd, mockRightService);
-    replay(mocks);
+    replayDefault(mocks);
   }
 
   private void verifyAll(Object... mocks) {
     verify(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock, ptResolverServiceMock,
         mockLayoutCmd, mockRightService);
-    verify(mocks);
+    verifyDefault(mocks);
   }
 
 }

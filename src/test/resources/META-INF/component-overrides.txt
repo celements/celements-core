@@ -1,1 +1,0 @@
-com.celements.model.access.LegacyModelAccessStrategy

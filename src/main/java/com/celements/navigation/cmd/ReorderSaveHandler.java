@@ -32,6 +32,7 @@ import org.xwiki.model.reference.EntityReference;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.sajson.AbstractEventHandler;
@@ -48,8 +49,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
   private Integer currentPos;
   private Set<EntityReference> dirtyParents;
 
-  public ReorderSaveHandler() {
-  }
+  public ReorderSaveHandler() {}
 
   private IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
@@ -156,8 +156,9 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
             markParentDirty(getParentReference());
             updateNeeded = true;
           }
-          BaseObject menuItemObj = getModelAccess().getXObject(xdoc,
-              getNavClassConfig().getMenuItemClassRef(docRef.getWikiReference()));
+          BaseObject menuItemObj = XWikiObjectEditor.on(xdoc)
+              .filter(INavigationClassConfig.MENU_ITEM_CLASS_REF)
+              .fetch().stream().findFirst().orElse(null);
           if ((menuItemObj != null) && (menuItemObj.getIntValue(
               "menu_position") != getCurrentPos())) {
             menuItemObj.setIntValue("menu_position", getCurrentPos());
@@ -211,9 +212,4 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
   private IWebUtilsService getWebUtils() {
     return Utils.getComponent(IWebUtilsService.class);
   }
-
-  private INavigationClassConfig getNavClassConfig() {
-    return Utils.getComponent(INavigationClassConfig.class);
-  }
-
 }

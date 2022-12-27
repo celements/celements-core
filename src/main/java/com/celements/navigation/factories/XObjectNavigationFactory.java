@@ -11,17 +11,18 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.exception.DocumentLoadException;
-import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.NavigationConfig;
 import com.celements.navigation.NavigationConfig.Builder;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
@@ -59,23 +60,19 @@ public final class XObjectNavigationFactory extends AbstractNavigationFactory<Do
   @Override
   @NotNull
   public NavigationConfig getNavigationConfig(@NotNull DocumentReference configReference) {
-    return loadConfigFromObject(getConfigBaseObj(configReference));
+    return loadConfigFromObject(getConfigObjFetcher(configReference).stream()
+        .findFirst().orElse(null));
   }
 
   @Override
   public boolean hasNavigationConfig(@NotNull DocumentReference configReference) {
-    return (getConfigBaseObj(configReference) != null);
+    return getConfigObjFetcher(configReference).exists();
   }
 
-  private BaseObject getConfigBaseObj(@NotNull DocumentReference configReference) {
-    BaseObject prefObj = null;
-    try {
-      prefObj = modelAccess.getXObject(configReference, navClassConfig.getNavigationConfigClassRef(
-          configReference.getWikiReference()));
-    } catch (DocumentLoadException | DocumentNotExistsException exp) {
-      LOGGER.info("failed to load navigation from '{}'", configReference, exp);
-    }
-    return prefObj;
+  private XWikiObjectFetcher getConfigObjFetcher(@NotNull DocumentReference configReference) {
+    XWikiDocument configDoc = modelAccess.getOrCreateDocument(configReference);
+    return XWikiObjectFetcher.on(configDoc).filter(new ClassReference(
+        navClassConfig.getNavigationConfigClassRef(configReference.getWikiReference())));
   }
 
   @NotNull

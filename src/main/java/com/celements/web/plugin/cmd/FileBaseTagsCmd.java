@@ -33,6 +33,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.InternalRightsFilter;
@@ -47,11 +48,9 @@ public class FileBaseTagsCmd {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileBaseTagsCmd.class);
 
-  public final static String FILEBASE_TAG_CLASS = "Classes.FilebaseTag";
+  public static final String FILEBASE_TAG_CLASS = "Classes.FilebaseTag";
   private final ITreeNodeService treeNodeSrv = Utils.getComponent(ITreeNodeService.class);
   private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-  private final INavigationClassConfig navClassConfig = Utils.getComponent(
-      INavigationClassConfig.class);
   private final ModelConfiguration modelConfig = Utils.getComponent(ModelConfiguration.class);
   private final Execution execution = Utils.getComponent(Execution.class);
 
@@ -160,8 +159,9 @@ public class FileBaseTagsCmd {
     try {
       if (!existsTagWithName(tagName) && createIfNotExists) {
         tagDoc = modelAccess.getOrCreateDocument(getTagDocRef(tagName));
-        BaseObject menuItemObj = modelAccess.getOrCreateXObject(tagDoc,
-            navClassConfig.getMenuItemClassRef());
+        BaseObject menuItemObj = XWikiObjectEditor.on(tagDoc)
+            .filter(INavigationClassConfig.MENU_ITEM_CLASS_REF)
+            .createFirstIfNotExists();
         menuItemObj.setIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
             getAllFileBaseTags().size());
         menuItemObj.setStringValue("menu_parent", "");
@@ -174,7 +174,6 @@ public class FileBaseTagsCmd {
     try {
       return modelAccess.getDocument(getTagDocRef(tagName));
     } catch (DocumentNotExistsException exp) {
-      LOGGER.info("Failed to get tag document [{}].", getTagDocRef(tagName), exp);
       throw new FailedToCreateTagException("Failed to get tag document [" + getTagDocRef(tagName)
           + "].", exp);
     }

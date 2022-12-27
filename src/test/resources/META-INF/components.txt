@@ -1,2 +1,0 @@
-com.celements.model.access.LegacyModelAccessStrategy
-com.celements.model.access.ModelMock

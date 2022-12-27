@@ -36,7 +36,9 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.configuration.CelementsFromWikiConfigurationSource;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.XWikiDocumentCreator;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.InternalRightsFilter;
@@ -60,7 +62,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
         getConfigurationSource());
-    registerComponentMock(XWikiDocumentCreator.class);
+    registerComponentMocks(IModelAccessFacade.class, XWikiDocumentCreator.class);
     context = getContext();
     xwiki = getWikiMock();
     mockTreeNodeSrv = registerComponentMock(ITreeNodeService.class);
@@ -146,8 +148,9 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     tagDoc.setNew(false);
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
         InternalRightsFilter.class))).andReturn(Collections.<TreeNode>emptyList());
-    expect(xwiki.exists(eq(tagDoc.getDocumentReference()), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(tagDoc.getDocumentReference()), same(context))).andReturn(tagDoc);
+    expect(getMock(IModelAccessFacade.class).exists(tagDoc.getDocumentReference())).andReturn(true);
+    expect(getMock(IModelAccessFacade.class).getDocument(tagDoc.getDocumentReference()))
+        .andReturn(tagDoc);
     replayDefault();
     assertNotNull("docAlready exists: expecting existing doc", fileBaseTagCmd.getTagDocument("tag0",
         false, context));
@@ -165,7 +168,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
         celFileBaseName).anyTimes();
     DocumentReference tagDocRef = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag0");
-    expect(xwiki.exists(eq(tagDocRef), same(context))).andReturn(true).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(tagDocRef)).andReturn(true);
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
         InternalRightsFilter.class))).andReturn(Arrays.asList(new TreeNode(tagDocRef, null, 2)));
     XWikiDocument existingTagDoc = new XWikiDocument(tagDocRef);
@@ -174,7 +177,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     expectedMenuItemObj.setXClassReference(navClassConfig.getMenuItemClassRef());
     expectedMenuItemObj.setIntValue(INavigationClassConfig.MENU_POSITION_FIELD, 2);
     existingTagDoc.addXObject(expectedMenuItemObj);
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(existingTagDoc).once();
+    expect(getMock(IModelAccessFacade.class).getDocument(tagDocRef)).andReturn(existingTagDoc);
     replayDefault();
     XWikiDocument tagDocument = fileBaseTagCmd.getTagDocument("tag0", false, context);
     assertEquals("docAlready exists: expecting existing doc", tagDocRef,
@@ -198,7 +201,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
         celFileBaseName).anyTimes();
     DocumentReference tagDocRef = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag0");
-    expect(xwiki.exists(eq(tagDocRef), same(context))).andReturn(true).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(tagDocRef)).andReturn(true);
     DocumentReference tagDocRef2 = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag1");
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
@@ -206,7 +209,6 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
             0))).atLeastOnce();
     XWikiDocument existingTagDoc = new XWikiDocument(tagDocRef);
     existingTagDoc.setNew(false);
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(existingTagDoc).once();
     BaseClass menuItemBaseClass = createMockAndAddToDefault(BaseClass.class);
     expect(xwiki.getXClass(eq(navClassConfig.getMenuItemClassRef()), same(context))).andReturn(
         menuItemBaseClass).once();
@@ -214,9 +216,10 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     expectedMenuItemObj.setXClassReference(navClassConfig.getMenuItemClassRef());
     expect(menuItemBaseClass.newCustomClassInstance(same(context))).andReturn(expectedMenuItemObj);
     Capture<XWikiDocument> savedDocCapture = newCapture();
-    xwiki.saveDocument(capture(savedDocCapture), isA(String.class), eq(false), same(context));
-    expectLastCall().once();
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(existingTagDoc).once();
+    getMock(IModelAccessFacade.class).saveDocument(capture(savedDocCapture), isA(String.class));
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(tagDocRef))
+        .andReturn(existingTagDoc);
+    expect(getMock(IModelAccessFacade.class).getDocument(tagDocRef)).andReturn(existingTagDoc);
     replayDefault();
     XWikiDocument tagDocument = fileBaseTagCmd.getTagDocument("tag0", true, context);
     assertEquals("docAlready exists: expecting existing doc", tagDocRef,
@@ -243,8 +246,9 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     tagDoc.setNew(false);
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
         InternalRightsFilter.class))).andReturn(Collections.<TreeNode>emptyList());
-    expect(xwiki.exists(eq(tagDoc.getDocumentReference()), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(tagDoc.getDocumentReference()), same(context))).andReturn(tagDoc);
+    expect(getMock(IModelAccessFacade.class).exists(tagDoc.getDocumentReference())).andReturn(true);
+    expect(getMock(IModelAccessFacade.class).getDocument(tagDoc.getDocumentReference()))
+        .andReturn(tagDoc);
     replayDefault();
     assertNotNull("docAlready exists: expecting existing doc",
         fileBaseTagCmd.getOrCreateTagDocument("tag0", false));
@@ -261,7 +265,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
         celFileBaseName).anyTimes();
     DocumentReference tagDocRef = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag0");
-    expect(xwiki.exists(eq(tagDocRef), same(context))).andReturn(true).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(tagDocRef)).andReturn(true);
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
         InternalRightsFilter.class))).andReturn(Arrays.asList(new TreeNode(tagDocRef, null, 0)));
     XWikiDocument existingTagDoc = new XWikiDocument(tagDocRef);
@@ -270,7 +274,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     expectedMenuItemObj.setXClassReference(navClassConfig.getMenuItemClassRef());
     expectedMenuItemObj.setIntValue(INavigationClassConfig.MENU_POSITION_FIELD, 2);
     existingTagDoc.addXObject(expectedMenuItemObj);
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(existingTagDoc).once();
+    expect(getMock(IModelAccessFacade.class).getDocument(tagDocRef)).andReturn(existingTagDoc);
     replayDefault();
     XWikiDocument tagDocument = fileBaseTagCmd.getOrCreateTagDocument("tag0", false);
     assertEquals("docAlready exists: expecting existing doc", tagDocRef,
@@ -293,7 +297,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
         celFileBaseName).anyTimes();
     DocumentReference tagDocRef = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag0");
-    expect(xwiki.exists(eq(tagDocRef), same(context))).andReturn(true).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(tagDocRef)).andReturn(true);
     DocumentReference tagDocRef2 = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag1");
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
@@ -301,7 +305,6 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
             0))).atLeastOnce();
     XWikiDocument existingTagDoc = new XWikiDocument(tagDocRef);
     existingTagDoc.setNew(false);
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(existingTagDoc).once();
     BaseClass menuItemBaseClass = createMockAndAddToDefault(BaseClass.class);
     expect(xwiki.getXClass(eq(navClassConfig.getMenuItemClassRef()), same(context))).andReturn(
         menuItemBaseClass).once();
@@ -309,9 +312,10 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     expectedMenuItemObj.setXClassReference(navClassConfig.getMenuItemClassRef());
     expect(menuItemBaseClass.newCustomClassInstance(same(context))).andReturn(expectedMenuItemObj);
     Capture<XWikiDocument> savedDocCapture = newCapture();
-    xwiki.saveDocument(capture(savedDocCapture), isA(String.class), eq(false), same(context));
-    expectLastCall().once();
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(existingTagDoc).once();
+    getMock(IModelAccessFacade.class).saveDocument(capture(savedDocCapture), isA(String.class));
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(tagDocRef))
+        .andReturn(existingTagDoc);
+    expect(getMock(IModelAccessFacade.class).getDocument(tagDocRef)).andReturn(existingTagDoc);
     replayDefault();
     XWikiDocument tagDocument = fileBaseTagCmd.getOrCreateTagDocument("tag0", true);
     assertEquals("docAlready exists: expecting existing doc", tagDocRef,
@@ -336,17 +340,16 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     DocumentReference tagDocRef = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag0");
     XWikiDocument inExistTagDoc = new XWikiDocument(tagDocRef);
-    expect(xwiki.exists(eq(tagDocRef), same(context))).andReturn(false);
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(inExistTagDoc).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(tagDocRef)).andReturn(true);
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(tagDocRef))
+        .andReturn(inExistTagDoc);
+    expect(getMock(IModelAccessFacade.class).getDocument(tagDocRef))
+        .andThrow(new DocumentNotExistsException(tagDocRef));
     DocumentReference tagDocRef2 = new DocumentReference(context.getDatabase(), celFileBaseName,
         "tag1");
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
         InternalRightsFilter.class))).andReturn(Arrays.asList(new TreeNode(tagDocRef2, null,
             0))).atLeastOnce();
-    XWikiDocument existingTagDoc = new XWikiDocument(tagDocRef);
-    existingTagDoc.setNew(false);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(tagDocRef), eq(""))).andReturn(
-        existingTagDoc);
     BaseClass menuItemBaseClass = createMockAndAddToDefault(BaseClass.class);
     expect(xwiki.getXClass(eq(navClassConfig.getMenuItemClassRef()), same(context))).andReturn(
         menuItemBaseClass).once();
@@ -354,8 +357,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     expectedMenuItemObj.setXClassReference(navClassConfig.getMenuItemClassRef());
     expect(menuItemBaseClass.newCustomClassInstance(same(context))).andReturn(expectedMenuItemObj);
     Capture<XWikiDocument> savedDocCapture = newCapture();
-    xwiki.saveDocument(capture(savedDocCapture), isA(String.class), eq(false), same(context));
-    expectLastCall().once();
+    getMock(IModelAccessFacade.class).saveDocument(capture(savedDocCapture), isA(String.class));
     replayDefault();
     try {
       fileBaseTagCmd.getOrCreateTagDocument("tag0", true);

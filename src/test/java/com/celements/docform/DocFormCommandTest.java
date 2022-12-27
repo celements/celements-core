@@ -41,8 +41,10 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.docform.IDocForm.ResponseState;
-import com.celements.model.access.ModelAccessStrategy;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.XWikiDocumentCreator;
+import com.celements.model.access.exception.DocumentAccessException;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
@@ -73,7 +75,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
         getConfigurationSource());
-    registerComponentMocks(ModelAccessStrategy.class);
+    registerComponentMocks(IModelAccessFacade.class);
     getContext().setDatabase(wiki.getName());
     docRef = new DocumentReference(wiki.getName(), "Space", "Doc");
     parser = new DocFormRequestKeyParser(docRef);
@@ -325,8 +327,6 @@ public class DocFormCommandTest extends AbstractComponentTest {
     List<DocFormRequestParam> params = parseParams(ImmutableMap.of());
     xdoc.setNew(true);
     expectDocWithSave(xdoc);
-    expect(getMock(ModelAccessStrategy.class).createDocument(xdoc.getDocumentReference(), ""))
-        .andReturn(xdoc);
 
     getContext().setRequest(createMockAndAddToDefault(XWikiRequest.class));
     expect(getContext().getRequest().get(eq("template"))).andReturn("Tmpl.MyTmpl");
@@ -370,7 +370,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     docFormCmd.addTranslationCmd = createMockAndAddToDefault(AddTranslationCommand.class);
     expect(docFormCmd.addTranslationCmd.getTranslatedDoc(same(xdoc), eq(tdoc.getLanguage())))
         .andReturn(tdoc);
-    expectDocWithSave(tdoc);
+    getMock(IModelAccessFacade.class).saveDocument(tdoc, "updateAndSaveDocFormRequest");
 
     replayDefault();
     docFormCmd.updateDocs(params);
@@ -407,8 +407,6 @@ public class DocFormCommandTest extends AbstractComponentTest {
     List<DocFormRequestParam> params = parseParams(ImmutableMap.of("A.B_0_foo", "val"));
     xdoc.setNew(true);
     expectDoc(xdoc);
-    expect(getMock(ModelAccessStrategy.class).createDocument(xdoc.getDocumentReference(), ""))
-        .andReturn(xdoc);
 
     replayDefault();
     docFormCmd.updateDocs(params);
@@ -469,17 +467,19 @@ public class DocFormCommandTest extends AbstractComponentTest {
     return obj;
   }
 
-  private XWikiDocument expectDoc(XWikiDocument doc) {
-    expect(getMock(ModelAccessStrategy.class).exists(doc.getDocumentReference(), ""))
+  private XWikiDocument expectDoc(XWikiDocument doc) throws DocumentNotExistsException {
+    expect(getMock(IModelAccessFacade.class).exists(doc.getDocumentReference()))
         .andReturn(true).anyTimes();
-    expect(getMock(ModelAccessStrategy.class).getDocument(doc.getDocumentReference(), ""))
+    expect(getMock(IModelAccessFacade.class).getDocument(doc.getDocumentReference()))
+        .andReturn(doc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(doc.getDocumentReference()))
         .andReturn(doc).anyTimes();
     return doc;
   }
 
-  private XWikiDocument expectDocWithSave(XWikiDocument doc) throws DocumentSaveException {
+  private XWikiDocument expectDocWithSave(XWikiDocument doc) throws DocumentAccessException {
     expectDoc(doc);
-    getMock(ModelAccessStrategy.class).saveDocument(doc, "updateAndSaveDocFormRequest", false);
+    getMock(IModelAccessFacade.class).saveDocument(doc, "updateAndSaveDocFormRequest");
     return doc;
   }
 
