@@ -9,7 +9,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.web.comparators.BaseObjectComparator;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -32,8 +32,10 @@ public class CollectionsService implements ICollectionsService {
     if (doc == null) {
       return new ArrayList<>();
     }
-    return XWikiObjectFetcher.on(doc)
+    return XWikiObjectEditor
+        .on(doc)
         .filter(new ClassReference(classRef))
+        .fetch()
         .stream()
         .sorted(BaseObjectComparator.create(orderField1, asc1)
             .thenComparing(BaseObjectComparator.create(orderField2, asc2)))
