@@ -36,6 +36,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -75,7 +76,6 @@ import com.celements.web.plugin.cmd.DocMetaTagsCmd;
 import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.ParseObjStoreCommand;
-import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
@@ -235,9 +235,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String convertToPlainText(String htmlContent) {
-    LOGGER.trace("convertToPlainText called on celementsweb script service for [" + htmlContent
-        + "].");
-    return new PlainTextCommand().convertToPlainText(htmlContent);
+    return Jsoup.parse(htmlContent).text();
   }
 
   /**
