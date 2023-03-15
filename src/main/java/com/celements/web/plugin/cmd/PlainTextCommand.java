@@ -19,9 +19,9 @@
  */
 package com.celements.web.plugin.cmd;
 
-import org.jsoup.Jsoup;
+import static com.google.common.base.Strings.*;
 
-import com.google.common.base.Strings;
+import org.jsoup.Jsoup;
 
 @Deprecated
 public class PlainTextCommand {
@@ -48,7 +48,7 @@ public class PlainTextCommand {
   }
 
   private String internalConvert(String htmlContent) {
-    return Jsoup.parse(Strings.nullToEmpty(htmlContent)).text();
+    return Jsoup.parse(nullToEmpty(htmlContent)).text();
   }
 
 }
