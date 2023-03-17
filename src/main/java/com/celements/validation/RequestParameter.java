@@ -22,6 +22,12 @@ package com.celements.validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.celements.docform.DocFormRequestKey;
+
+/**
+ * @deprecated instead use {@link DocFormRequestKey}
+ */
+@Deprecated
 public final class RequestParameter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RequestParameter.class);

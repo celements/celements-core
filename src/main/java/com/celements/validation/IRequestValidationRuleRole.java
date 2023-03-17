@@ -24,6 +24,11 @@ import java.util.Set;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+/**
+ * @deprecated instead use {@link IRequestValidationRule}
+ *
+ */
+@Deprecated
 @ComponentRole
 public interface IRequestValidationRuleRole {
 
@@ -35,7 +40,7 @@ public interface IRequestValidationRuleRole {
    *         VALUE = map [KEY = validation type / VALUE = set of validation messages
    *         (dictionary keys possible)]]
    */
-  public Map<String, Map<ValidationType, Set<String>>> validateRequest(
+  Map<String, Map<ValidationType, Set<String>>> validateRequest(
       Map<RequestParameter, String[]> requestMap);
 
 }
