@@ -19,6 +19,8 @@
  */
 package com.celements.web.service;
 
+import static com.google.common.base.Strings.*;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.text.NumberFormat;
@@ -235,7 +237,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String convertToPlainText(String htmlContent) {
-    return Jsoup.parse(htmlContent).text();
+    return Jsoup.parse(nullToEmpty(htmlContent)).text();
   }
 
   /**
