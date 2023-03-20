@@ -94,10 +94,10 @@ public class FormValidationService implements IFormValidationServiceRole {
   public List<ValidationResult> validate(List<DocFormRequestParam> params) {
     List<ValidationResult> ret = validateLegacy(params);
     for (IRequestValidationRule validationRule : requestValidationRules.values()) {
-      LOGGER.trace("validateRequest - for rule: {}", validationRule);
+      LOGGER.trace("validate - for rule: {}", validationRule);
       ret.addAll(validationRule.validate(params));
     }
-    LOGGER.trace("validateRequest - params [{}], result [{}]", params, ret);
+    LOGGER.debug("validate - params [{}], result [{}]", params, ret);
     return ret;
   }
 
@@ -106,13 +106,14 @@ public class FormValidationService implements IFormValidationServiceRole {
         p -> RequestParameter.create(p.getKey().getKeyString()),
         p -> p.getValues().toArray(new String[0]))
         .filterKeys(Objects::nonNull)
-        .toMap();
+        .toImmutableMap();
     List<ValidationResult> ret = new ArrayList<>();
     for (IRequestValidationRuleRole validationRule : legacyRequestValidationRules.values()) {
-      LOGGER.error("validateRequest - for rule: {}", validationRule);
+      LOGGER.trace("validateLegacy - for rule: {}", validationRule);
       validationRule.validateRequest(paramMap).forEach((name, x) -> x.forEach((type, msgs) -> msgs
           .forEach(msg -> ret.add(new ValidationResult(type, name, msg)))));
     }
+    LOGGER.debug("validateLegacy - params [{}], result [{}]", paramMap, ret);
     return ret;
   }
 

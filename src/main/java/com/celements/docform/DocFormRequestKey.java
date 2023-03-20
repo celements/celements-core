@@ -29,13 +29,13 @@ public class DocFormRequestKey implements Comparable<DocFormRequestKey> {
   private final boolean remove;
   private final String fieldName;
 
-  static DocFormRequestKey createDocFieldKey(String key,
+  public static DocFormRequestKey createDocFieldKey(String key,
       DocumentReference docRef, String fieldName) {
     checkArgument(emptyToNull(fieldName) != null, key);
     return new DocFormRequestKey(key, Type.DOC_FIELD, docRef, null, 0, false, fieldName);
   }
 
-  static DocFormRequestKey createObjFieldKey(String key,
+  public static DocFormRequestKey createObjFieldKey(String key,
       DocumentReference docRef, ClassReference classRef, Integer objNb, String fieldName) {
     checkArgument(classRef != null, key);
     checkArgument(objNb != null, key);
@@ -44,7 +44,7 @@ public class DocFormRequestKey implements Comparable<DocFormRequestKey> {
         false, fieldName);
   }
 
-  static DocFormRequestKey createObjRemoveKey(String key,
+  public static DocFormRequestKey createObjRemoveKey(String key,
       DocumentReference docRef, ClassReference classRef, Integer objNb) {
     checkArgument(classRef != null, key);
     checkArgument(objNb != null, key);
