@@ -41,7 +41,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testValidate_empty() throws XWikiException {
+  public void test_validate_empty() throws XWikiException {
     replayDefault();
     List<ValidationResult> result = xClassRegexRule.validate(ImmutableList.of());
     verifyDefault();
@@ -51,7 +51,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testValidate_valid() throws XWikiException {
+  public void test_validate_valid() throws XWikiException {
     BaseClass bclass = getBaseClass("testField");
     DocumentReference bclassDocRef1 = new DocumentReference(getContext().getDatabase(), "Test",
         "TestClass1");
@@ -81,7 +81,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testValidate_invalid() throws XWikiException {
+  public void test_validate_invalid() throws XWikiException {
     BaseClass bclass = getBaseClass("testField");
     DocumentReference bclassDocRef1 = new DocumentReference(getContext().getDatabase(), "Test",
         "TestClass1");
@@ -95,7 +95,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
     Map<String, String[]> requestMap = new HashMap<>();
     String param1 = "Test.TestClass1_0_testField";
     String param2 = "Test.TestClass2_0_testField";
-    requestMap.put(param1, new String[] { "" });
+    requestMap.put(param1, new String[0]);
     requestMap.put(param2, new String[] { "", "" });
 
     expect(getWikiMock().getDocument(eq(bclassDocRef1), same(getContext()))).andReturn(doc1);
@@ -120,7 +120,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testValidateField_valid() throws XWikiException {
+  public void test_validateField_valid() throws XWikiException {
     BaseClass bclass = getBaseClass("testField");
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
     doc.setXClass(bclass);
@@ -136,7 +136,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testValidateField_invalid() throws XWikiException {
+  public void test_validateField_invalid() throws XWikiException {
     BaseClass bclass = getBaseClass("testField");
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
     doc.setXClass(bclass);
@@ -156,7 +156,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testValidateField_invalidKey_class() throws XWikiException {
+  public void test_validateField_invalidKey_class() throws XWikiException {
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
 
     expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))).andReturn(doc).once();
@@ -170,7 +170,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testValidateField_invalidKey_field() throws XWikiException {
+  public void test_validateField_invalidKey_field() throws XWikiException {
     BaseClass bclass = getBaseClass("testFieldOther");
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
     doc.setXClass(bclass);
@@ -186,7 +186,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testValidateField_invalidKey_notIgnore() throws XWikiException {
+  public void test_validateField_invalidKey_notIgnore() throws XWikiException {
     xClassRegexRule.configSrc = createMockAndAddToDefault(ConfigurationSource.class);
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
 
@@ -207,6 +207,19 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
         ValidationType.ERROR).iterator().next());
 
     xClassRegexRule.configSrc = Utils.getComponent(ConfigurationSource.class);
+  }
+
+  @Test
+  public void test_validate_docField() throws XWikiException {
+    Map<String, String[]> requestMap = new HashMap<>();
+    requestMap.put("title", new String[] { "value1" });
+
+    replayDefault();
+    List<ValidationResult> result = xClassRegexRule.validate(parser.parseParameterMap(requestMap));
+    verifyDefault();
+
+    assertTrue("Successful validation should result in an empty map", (result != null)
+        && result.isEmpty());
   }
 
   private BaseClass getBaseClass(String fieldName) {

@@ -47,6 +47,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 import one.util.streamex.EntryStream;
+import one.util.streamex.StreamEx;
 
 @Component("XClassRegexValidation")
 public class XClassRegexRule implements IRequestValidationRule, IFieldValidationRuleRole {
@@ -72,7 +73,8 @@ public class XClassRegexRule implements IRequestValidationRule, IFieldValidation
   @Override
   public List<ValidationResult> validate(List<DocFormRequestParam> params) {
     List<ValidationResult> ret = new ArrayList<>();
-    for (DocFormRequestParam param : params) {
+    for (DocFormRequestParam param : StreamEx.of(params)
+        .filter(p -> p.getKey().getClassRef() != null)) {
       if (param.getValues().isEmpty()) {
         validateField(param.getKey(), "").forEach(ret::add);
       } else {
