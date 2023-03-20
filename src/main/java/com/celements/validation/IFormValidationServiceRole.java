@@ -19,13 +19,24 @@
  */
 package com.celements.validation;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
+
+import com.celements.docform.DocFormRequestParam;
 
 @ComponentRole
 public interface IFormValidationServiceRole {
+
+  /**
+   * validates the given form fields by all {@link IRequestValidationRule} implementations
+   */
+  @NotNull
+  List<ValidationResult> validate(@NotNull List<DocFormRequestParam> params);
 
   /**
    * validates any form fields in the given http request for all validationRule
@@ -34,7 +45,7 @@ public interface IFormValidationServiceRole {
    * @return map [KEY = request field-name / VALUE = map [KEY = validation type / VALUE =
    *         set of validation messages (dictionary keys possible)]]
    */
-  public Map<String, Map<ValidationType, Set<String>>> validateRequest();
+  Map<String, Map<ValidationType, Set<String>>> validateRequest();
 
   /**
    * validates any form fields in the given Map for all validationRule implementations
@@ -42,7 +53,7 @@ public interface IFormValidationServiceRole {
    * @return map [KEY = request field-name / VALUE = map [KEY = validation type / VALUE =
    *         set of validation messages (dictionary keys possible)]]
    */
-  public Map<String, Map<ValidationType, Set<String>>> validateMap(
+  Map<String, Map<ValidationType, Set<String>>> validateMap(
       Map<String, String[]> requestMap);
 
   /**
@@ -55,7 +66,7 @@ public interface IFormValidationServiceRole {
    * @return map [KEY = validation type / VALUE = set of validation messages (dictionary
    *         keys possible)]]
    */
-  public Map<ValidationType, Set<String>> validateField(String className, String fieldName,
+  Map<ValidationType, Set<String>> validateField(String className, String fieldName,
       String value);
 
 }

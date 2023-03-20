@@ -22,7 +22,7 @@ public class DocFormRequestParam implements Comparable<DocFormRequestParam> {
   private final DocFormRequestKey key;
   private final ImmutableList<String> values;
 
-  DocFormRequestParam(DocFormRequestKey key, List<String> values) {
+  public DocFormRequestParam(DocFormRequestKey key, List<String> values) {
     this.key = checkNotNull(key);
     this.values = values.stream()
         .map(s -> nullToEmpty(s).trim())

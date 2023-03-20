@@ -55,13 +55,27 @@ public class DocFormScriptService implements ScriptService {
     return context.getXWikiContext();
   }
 
+  public List<DocFormRequestParam> parseRequestParams() {
+    return parseParams(context.getDocRef().orElse(null), getRequestParameterMap());
+  }
+
   public Map<String, Set<DocumentReference>> updateAndSaveDocFromMap(
       DocumentReference docRef, Map<String, ?> map) {
+    return updateAndSaveDoc(docRef, parseParams(docRef, map));
+  }
+
+  private List<DocFormRequestParam> parseParams(DocumentReference docRef, Map<String, ?> map) {
+    docRef = Optional.ofNullable(docRef).orElseGet(() -> context.getDocRef().orElse(null));
+    map = Optional.ofNullable(map).orElseGet(Collections::emptyMap);
+    DocFormRequestKeyParser parser = new DocFormRequestKeyParser(docRef);
+    return parser.parseParameterMap(map);
+  }
+
+  public Map<String, Set<DocumentReference>> updateAndSaveDoc(DocumentReference docRef,
+      List<DocFormRequestParam> requestParams) {
     try {
-      docRef = Optional.ofNullable(docRef).orElseGet(() -> context.getCurrentDocRef().get());
-      map = Optional.ofNullable(map).orElseGet(Collections::emptyMap);
-      DocFormRequestKeyParser parser = new DocFormRequestKeyParser(docRef);
-      List<DocFormRequestParam> requestParams = parser.parseParameterMap(map);
+      docRef = Optional.ofNullable(docRef).orElseGet(() -> context.getDocRef().orElse(null));
+      requestParams = Optional.ofNullable(requestParams).orElseGet(Collections::emptyList);
       IDocForm docForm = getDocFormCommand(docRef);
       if (hasEditOnAllDocs(requestParams)) {
         docForm.updateDocs(requestParams);
@@ -70,7 +84,7 @@ public class DocFormScriptService implements ScriptService {
           .entrySet().stream()
           .collect(toImmutableMap(entry -> entry.getKey().name(), Entry::getValue));
     } catch (Exception exc) {
-      LOGGER.error("updateAndSaveDocFromMap: failed for map [{}]", map, exc);
+      LOGGER.error("updateAndSaveDocFromMap: failed for map [{}]", requestParams, exc);
       return ImmutableMap.of();
     }
   }
@@ -85,8 +99,8 @@ public class DocFormScriptService implements ScriptService {
 
   @SuppressWarnings("unchecked")
   private <T> Map<String, T> getRequestParameterMap() {
-    return context.getRequest().transform(XWikiRequest::getParameterMap)
-        .or(Collections.emptyMap());
+    return context.request().map(XWikiRequest::getParameterMap)
+        .orElseGet(Collections::emptyMap);
   }
 
   boolean hasEditOnAllDocs(List<DocFormRequestParam> requestParams) {
