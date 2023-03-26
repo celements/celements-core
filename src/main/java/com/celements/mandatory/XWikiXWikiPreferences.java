@@ -130,7 +130,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     }
     String centralfilebaseConfig = prefsObj.getStringValue("cel_centralfilebase");
     if (StringUtils.isEmpty(centralfilebaseConfig)) {
-      prefsObj.set("cel_centralfilebase", IFileBaseAccessRole.FILE_BASE_DEFAULT_DOC,
+      prefsObj.set("cel_centralfilebase", IFileBaseAccessRole.FILE_BASE_DEFAULT_DOC_FN,
           modelContext.getXWikiContext());
       LOGGER.debug("XWikiPreferences missing cel_centralfilebase configuration added for"
           + " database [{}].", getWiki());
