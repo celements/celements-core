@@ -120,6 +120,20 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_validate_illegalType() throws XWikiException {
+    Map<String, String[]> requestMap = new HashMap<>();
+    requestMap.put("title", new String[] { "value" }); // Type.DOC_FIELD
+    requestMap.put("Test.TestClass_^0_toDel", new String[] { "value" }); // Type.OBJ_REMOVE
+
+    replayDefault();
+    List<ValidationResult> result = xClassRegexRule.validate(parser.parseParameterMap(requestMap));
+    verifyDefault();
+
+    assertTrue("Successful validation should result in an empty map", (result != null)
+        && result.isEmpty());
+  }
+
+  @Test
   public void test_validateField_valid() throws XWikiException {
     BaseClass bclass = getBaseClass("testField");
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
