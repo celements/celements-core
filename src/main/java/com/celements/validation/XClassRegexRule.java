@@ -37,6 +37,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 
 import com.celements.docform.DocFormRequestKey;
+import com.celements.docform.DocFormRequestKey.Type;
 import com.celements.docform.DocFormRequestParam;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.collect.ImmutableMap;
@@ -74,7 +75,7 @@ public class XClassRegexRule implements IRequestValidationRule, IFieldValidation
   public List<ValidationResult> validate(List<DocFormRequestParam> params) {
     List<ValidationResult> ret = new ArrayList<>();
     for (DocFormRequestParam param : StreamEx.of(params)
-        .filter(p -> p.getKey().getClassRef() != null)) {
+        .filter(p -> p.getKey().getType() == Type.OBJ_FIELD)) {
       if (param.getValues().isEmpty()) {
         validateField(param.getKey(), "").forEach(ret::add);
       } else {
