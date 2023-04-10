@@ -19,11 +19,12 @@
  */
 package com.celements.pagetype.java;
 
+import static com.google.common.collect.ImmutableMap.*;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -31,6 +32,7 @@ import org.xwiki.component.annotation.Requirement;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
+import com.google.common.base.Suppliers;
 
 @Component(JavaPageTypeProvider.PROVIDER_HINT)
 public class JavaPageTypeProvider implements IPageTypeProviderRole {
@@ -38,38 +40,26 @@ public class JavaPageTypeProvider implements IPageTypeProviderRole {
   public static final String PROVIDER_HINT = "com.celements.JavaPageTypeProvider";
 
   @Requirement
-  Map<String, IJavaPageTypeRole> javaPageTypesMap;
+  private List<IJavaPageTypeRole> javaPageTypes;
 
-  volatile Map<PageTypeReference, IJavaPageTypeRole> javaPageTypeRefsMap;
+  private final Supplier<Map<PageTypeReference, IJavaPageTypeRole>> javaPageTypeRefs = Suppliers
+      .memoize(this::buildTypeRefsMap);
 
   @Override
   public List<PageTypeReference> getPageTypes() {
-    return new ArrayList<>(getPageTypeRefsMap().keySet());
+    return new ArrayList<>(javaPageTypeRefs.get().keySet());
   }
 
-  private Map<PageTypeReference, IJavaPageTypeRole> getPageTypeRefsMap() {
-    if (javaPageTypeRefsMap == null) {
-      initilizeTypeRefsMap();
-    }
-    return javaPageTypeRefsMap;
-  }
-
-  synchronized void initilizeTypeRefsMap() {
-    if (javaPageTypeRefsMap == null) {
-      Map<PageTypeReference, IJavaPageTypeRole> theNewMap = new HashMap<>();
-      for (IJavaPageTypeRole javaPageType : javaPageTypesMap.values()) {
-        PageTypeReference thePageTypeRef = new PageTypeReference(javaPageType.getName(),
-            PROVIDER_HINT, new ArrayList<>(javaPageType.getCategoryNames()));
-        theNewMap.put(thePageTypeRef, javaPageType);
-      }
-      javaPageTypeRefsMap = Collections.unmodifiableMap(theNewMap);
-    }
+  Map<PageTypeReference, IJavaPageTypeRole> buildTypeRefsMap() {
+    return javaPageTypes.stream().collect(toImmutableMap(
+        pt -> new PageTypeReference(pt.getName(), PROVIDER_HINT, pt.getCategoryNames()),
+        pt -> pt));
   }
 
   @Override
   public IPageTypeConfig getPageTypeByReference(PageTypeReference pageTypeRef) {
-    if (getPageTypeRefsMap().containsKey(pageTypeRef)) {
-      return new DefaultPageTypeConfig(getPageTypeRefsMap().get(pageTypeRef));
+    if (javaPageTypeRefs.get().containsKey(pageTypeRef)) {
+      return new DefaultPageTypeConfig(javaPageTypeRefs.get().get(pageTypeRef));
     }
     return null;
   }

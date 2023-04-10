@@ -19,10 +19,12 @@
  */
 package com.celements.pagetype;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.concurrent.Immutable;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * PageTypeReference is used to represent one pagetype 'id'. Instances of this class may
@@ -38,10 +40,10 @@ public class PageTypeReference {
 
   private final List<String> categories;
 
-  public PageTypeReference(String configName, String providerHint, List<String> categories) {
+  public PageTypeReference(String configName, String providerHint, Collection<String> categories) {
     this.configName = configName;
     this.providerHint = providerHint;
-    this.categories = new ArrayList<>(categories);
+    this.categories = ImmutableList.copyOf(categories);
   }
 
   public String getConfigName() {
@@ -49,7 +51,7 @@ public class PageTypeReference {
   }
 
   public List<String> getCategories() {
-    return new ArrayList<>(categories);
+    return categories;
   }
 
   public String getProviderHint() {
