@@ -40,6 +40,10 @@ public class PageTypeReference {
 
   private final List<String> categories;
 
+  public PageTypeReference(String configName, String providerHint, List<String> categories) {
+    this(configName, providerHint, (Collection<String>) categories);
+  }
+
   public PageTypeReference(String configName, String providerHint, Collection<String> categories) {
     this.configName = configName;
     this.providerHint = providerHint;
