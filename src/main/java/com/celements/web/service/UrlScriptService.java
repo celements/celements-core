@@ -2,6 +2,8 @@ package com.celements.web.service;
 
 import static com.google.common.base.MoreObjects.*;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
@@ -24,19 +26,24 @@ public class UrlScriptService implements ScriptService {
   @Requirement
   private ModelContext context;
 
+  @NotNull
   public String getURL() {
     return getURL(null);
   }
 
-  public String getURL(EntityReference ref) {
+  @NotNull
+  public String getURL(@Nullable EntityReference ref) {
     return getURL(ref, null);
   }
 
-  public String getURL(EntityReference ref, String action) {
+  @NotNull
+  public String getURL(@Nullable EntityReference ref, @Nullable String action) {
     return getURL(ref, action, null);
   }
 
-  public String getURL(EntityReference ref, String action, String queryString) {
+  @NotNull
+  public String getURL(@Nullable EntityReference ref, @Nullable String action,
+      @Nullable String queryString) {
     try {
       return urlService.getURL(firstNonNull(ref, getCurrentReference()), action, queryString);
     } catch (Exception iae) {
@@ -45,19 +52,24 @@ public class UrlScriptService implements ScriptService {
     }
   }
 
+  @NotNull
   public String getExternalURL() {
     return getExternalURL(null);
   }
 
-  public String getExternalURL(EntityReference ref) {
+  @NotNull
+  public String getExternalURL(@Nullable EntityReference ref) {
     return getExternalURL(ref, null);
   }
 
-  public String getExternalURL(EntityReference ref, String action) {
+  @NotNull
+  public String getExternalURL(@Nullable EntityReference ref, @Nullable String action) {
     return getExternalURL(ref, action, null);
   }
 
-  public String getExternalURL(EntityReference ref, String action, String queryString) {
+  @NotNull
+  public String getExternalURL(@Nullable EntityReference ref, @Nullable String action,
+      @Nullable String queryString) {
     try {
       return urlService.getExternalURL(firstNonNull(ref, getCurrentReference()), action,
           queryString);
@@ -67,15 +79,18 @@ public class UrlScriptService implements ScriptService {
     }
   }
 
+  @NotNull
   public UriBuilder createURIBuilder() {
     return createURIBuilder(null);
   }
 
-  UriBuilder createURIBuilder(EntityReference ref) {
+  @NotNull
+  UriBuilder createURIBuilder(@Nullable EntityReference ref) {
     return createURIBuilder(ref, null);
   }
 
-  UriBuilder createURIBuilder(EntityReference ref, String action) {
+  @NotNull
+  UriBuilder createURIBuilder(@Nullable EntityReference ref, @Nullable String action) {
     try {
       return urlService.createURIBuilder(firstNonNull(ref, getCurrentReference()), action);
     } catch (Exception iae) {
