@@ -44,7 +44,6 @@ public class GetCellDocumentTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void prepareTest() throws Exception {
-    super.setUp();
     cmd = new GetCellDocument();
     context = getContext();
     xwiki = createMock(XWiki.class);

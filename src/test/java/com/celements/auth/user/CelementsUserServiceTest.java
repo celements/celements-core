@@ -451,8 +451,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     return userXClass;
   }
 
-  private static XWikiDocument expectDoc(DocumentReference docRef)
-      throws DocumentNotExistsException {
+  private XWikiDocument expectDoc(DocumentReference docRef) throws DocumentNotExistsException {
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setNew(false);
     expect(getMock(IModelAccessFacade.class).getDocument(docRef)).andReturn(doc).anyTimes();
