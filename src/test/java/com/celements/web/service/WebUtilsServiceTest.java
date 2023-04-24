@@ -917,7 +917,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     Map<String, String[]> requestMap = webUtilsService.getRequestParameterMap();
     verifyDefault();
 
-    assertNull(requestMap);
+    assertNotNull(requestMap);
+    assertTrue(requestMap.isEmpty());
   }
 
   @Test
