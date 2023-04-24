@@ -924,8 +924,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testGetRequestParameterMap() {
     XWikiRequest mockXWikiRequest = createMock(XWikiRequest.class);
     context.setRequest(mockXWikiRequest);
-    Map<Object, Object> requestMap = new HashMap<>();
-    requestMap.put("asdf", "1");
+    Map<String, String[]> requestMap = new HashMap<>();
+    requestMap.put("asdf", new String[] { "1" });
     requestMap.put("qwer", new String[] { "2", "3" });
 
     expect(mockXWikiRequest.getParameterMap()).andReturn(requestMap).once();

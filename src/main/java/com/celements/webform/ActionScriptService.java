@@ -22,7 +22,6 @@ public class ActionScriptService implements ScriptService {
   @Requirement
   private Execution execution;
 
-  @SuppressWarnings("unchecked")
   public boolean executeAction(Document actionDoc) {
     return actionService.executeAction(actionDoc, getContext().getRequest().getParameterMap(),
         getContext().getDoc(), getContext());

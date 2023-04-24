@@ -5,10 +5,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
@@ -28,12 +27,17 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.celements.rendering.RenderCommand;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
+
+import one.util.streamex.EntryStream;
 
 @Component
 public class CelementsWebService implements ICelementsWebServiceRole {
@@ -108,25 +112,19 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     return userService.createNewUser(userData, validate).asXWikiUser();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Map<String, String> getUniqueNameValueRequestMap() {
-    Map<String, String[]> params = context.getRequest().get().getParameterMap();
-    Map<String, String> resultMap = new HashMap<>();
-    for (String key : params.keySet()) {
-      if ((params.get(key) != null) && (params.get(key).length > 0)) {
-        resultMap.put(key, params.get(key)[0]);
-      } else {
-        resultMap.put(key, "");
-      }
-    }
-    return resultMap;
+    return EntryStream.of(context.request()
+        .map(XWikiRequest::getParameterMap)
+        .orElse(ImmutableMap.of()))
+        .mapValues(values -> Stream.of(values).findFirst().orElse(""))
+        .toMap();
   }
 
   @Override
   public List<String> getSupportedAdminLanguages() {
     if (supportedAdminLangList == null) {
-      supportedAdminLangList = Arrays.asList(new String[] { "de", "fr", "en", "it" });
+      supportedAdminLangList = ImmutableList.of("de", "fr", "en", "it");
     }
     return supportedAdminLangList;
   }

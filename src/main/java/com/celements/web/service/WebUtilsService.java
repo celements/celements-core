@@ -1119,29 +1119,13 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
+  @Deprecated
   public Map<String, String[]> getRequestParameterMap() {
     XWikiRequest request = getContext().getRequest();
     if (request != null) {
-      Map<?, ?> requestMap = request.getParameterMap();
-      Map<String, String[]> convertedMap = new HashMap<>();
-      for (Object keyObj : requestMap.keySet()) {
-        String key = keyObj.toString();
-        String[] value = getValueAsStringArray(requestMap.get(keyObj));
-        convertedMap.put(key, value);
-      }
-      return convertedMap;
+      return request.getParameterMap();
     } else {
-      return null;
-    }
-  }
-
-  private String[] getValueAsStringArray(Object value) {
-    if (value instanceof String) {
-      return new String[] { value.toString() };
-    } else if (value instanceof String[]) {
-      return (String[]) value;
-    } else {
-      throw new IllegalArgumentException("Invalid requestMap value type");
+      return new HashMap<>();
     }
   }
 
