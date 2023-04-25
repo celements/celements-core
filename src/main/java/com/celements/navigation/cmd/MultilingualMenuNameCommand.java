@@ -52,6 +52,7 @@ public class MultilingualMenuNameCommand {
 
   public String getMultilingualMenuName(String fullName, String language, XWikiContext context) {
     try {
+      LOGGER.debug("getMultilingualMenuName: for '{}' and lang '{}'", fullName, language);
       return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName, language, context),
           false, context);
     } catch (XWikiException exp) {
@@ -92,6 +93,8 @@ public class MultilingualMenuNameCommand {
 
   private String getMenuNameFromBaseObject(String fullName, BaseObject menuNameObj,
       boolean allowEmptyMenuNames, XWikiContext context) throws XWikiException {
+    LOGGER.debug("getMenuNameFromBaseObject: for '{}' and has object '{}'", fullName,
+        menuNameObj != null);
     String menuName = "";
     if (menuNameObj != null) {
       menuName = menuNameObj.getStringValue("menu_name");
@@ -99,6 +102,7 @@ public class MultilingualMenuNameCommand {
     if (!allowEmptyMenuNames && Strings.isNullOrEmpty(menuName)) {
       menuName = getFallbackMenuName(fullName, allowEmptyMenuNames);
     }
+    LOGGER.info("getMenuNameFromBaseObject: for '{}' returning '{}'", fullName, menuName);
     return menuName;
   }
 
