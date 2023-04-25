@@ -112,6 +112,8 @@ public class MultilingualMenuNameCommand {
       LOGGER.info("Failed to get MenuName for [{}].", fullName, exp);
       String dictKey = "menuname_" + fullName;
       String menuNameDict = getWebUtilsService().getAdminMessageTool().get(dictKey);
+      LOGGER.debug("Dictionary MenuName [{}] for [{}] and key [{}].", menuNameDict, fullName,
+          dictKey);
       if (!dictKey.equals(menuNameDict)) {
         return menuNameDict;
       }
