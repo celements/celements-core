@@ -19,7 +19,6 @@
  */
 package com.celements.navigation.cmd;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
@@ -27,6 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -96,11 +96,25 @@ public class MultilingualMenuNameCommand {
     if (menuNameObj != null) {
       menuName = menuNameObj.getStringValue("menu_name");
     }
-    // if menuName is empty give back the DocURLname
-    if ((!allowEmptyMenuNames) && StringUtils.isEmpty(menuName)) {
-      menuName = fullName.substring(fullName.indexOf('.') + 1);
+    if (!allowEmptyMenuNames && Strings.isNullOrEmpty(menuName)) {
+      menuName = getFallbackMenuName(fullName, allowEmptyMenuNames);
     }
     return menuName;
+  }
+
+  private String getFallbackMenuName(String fullName, boolean allowEmptyMenuNames) {
+    String dictKey = "menuname_" + fullName;
+    String menuNameDict = getWebUtilsService().getAdminMessageTool().get(dictKey);
+    LOGGER.debug("Dictionary MenuName [{}] for [{}] and key [{}].", menuNameDict, fullName,
+        dictKey);
+    if (!dictKey.equals(menuNameDict)) {
+      return menuNameDict;
+    }
+    // if menuName is empty and no dictionary entry available, give back the DocURLname
+    if (!allowEmptyMenuNames) {
+      return fullName.substring(fullName.indexOf('.') + 1);
+    }
+    return "";
   }
 
   public String getMultilingualMenuNameOnly(String fullName, String language,
@@ -110,18 +124,7 @@ public class MultilingualMenuNameCommand {
           allowEmptyMenuNames, context);
     } catch (XWikiException exp) {
       LOGGER.info("Failed to get MenuName for [{}].", fullName, exp);
-      String dictKey = "menuname_" + fullName;
-      String menuNameDict = getWebUtilsService().getAdminMessageTool().get(dictKey);
-      LOGGER.debug("Dictionary MenuName [{}] for [{}] and key [{}].", menuNameDict, fullName,
-          dictKey);
-      if (!dictKey.equals(menuNameDict)) {
-        return menuNameDict;
-      }
-      if (allowEmptyMenuNames) {
-        return "";
-      } else {
-        return fullName.split("\\.")[1];
-      }
+      return getFallbackMenuName(fullName, allowEmptyMenuNames);
     }
   }
 
