@@ -394,15 +394,15 @@ public class Navigation implements INavigation {
 
   void addNavigationForParent(StringBuilder outStream, EntityReference parentRef, int numMoreLevels)
       throws XWikiException {
-    LOGGER.debug("addNavigationForParent: parent [" + parentRef + "] numMoreLevels ["
-        + numMoreLevels + "].");
+    LOGGER.debug("addNavigationForParent: parent [{}] numMoreLevels [{}].", parentRef,
+        numMoreLevels);
     if (numMoreLevels > 0) {
       String parent = "";
       if (parentRef != null) {
         parent = getWebUtilsService().getRefLocalSerializer().serialize(parentRef);
       }
       List<TreeNode> currentMenuItems = getCurrentMenuItems(numMoreLevels, parent);
-      if (currentMenuItems.size() > 0) {
+      if (!currentMenuItems.isEmpty()) {
         outStream.append("<ul " + addUniqueContainerId(parent) + " " + getMainUlCSSClasses() + ">");
         boolean isFirstItem = true;
         int numItem = 0;
@@ -420,9 +420,9 @@ public class Navigation implements INavigation {
         }
         outStream.append("</ul>");
       } else if ((getCurrentLevel(numMoreLevels) == 1) && hasedit()) {
-        LOGGER.trace("addNavigationForParent: empty navigation hint for parent [" + parentRef
-            + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
-            + getCurrentLevel(numMoreLevels) + "].");
+        LOGGER.trace("addNavigationForParent: empty navigation hint for parent [{}]"
+            + " numMoreLevels [{}], currentLevel [{}].", parentRef, numMoreLevels,
+            getCurrentLevel(numMoreLevels));
         // is main Menu and no mainMenuItem found ; user has edit rights
         outStream.append("<ul class=\"cel_nav_empty\">");
         openMenuItemOut(outStream, null, true, true, false, 1);
@@ -433,9 +433,9 @@ public class Navigation implements INavigation {
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
       } else {
-        LOGGER.debug("addNavigationForParent: empty output for parent [" + parentRef
-            + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
-            + getCurrentLevel(numMoreLevels) + "], hasEdit [" + hasedit() + "].");
+        LOGGER.debug("addNavigationForParent: empty output for parent [{}]"
+            + " numMoreLevels [{}], currentLevel [{}], hasEdit [{}].", parentRef, numMoreLevels,
+            getCurrentLevel(numMoreLevels), hasedit());
       }
     }
   }
