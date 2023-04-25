@@ -40,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -210,12 +211,12 @@ public class Navigation implements INavigation {
   public void setPresentationType(String presentationTypeHint) {
     if (presentationTypeHint != null) {
       try {
-        LOGGER.info("setPresentationType to [" + presentationTypeHint + "].");
-        setPresentationType(Utils.getComponent(IWebUtilsService.class).lookup(
+        LOGGER.info("setPresentationType to [{}].", presentationTypeHint);
+        setPresentationType(Utils.getComponent(ComponentManager.class).lookup(
             IPresentationTypeRole.class, presentationTypeHint));
       } catch (ComponentLookupException failedToLoadException) {
-        LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint ["
-            + presentationTypeHint + "].", failedToLoadException);
+        LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint [{}].",
+            presentationTypeHint, failedToLoadException);
         this.presentationType = null;
       }
     } else {

@@ -377,7 +377,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public String getAdminLanguage() {
-    return getAdminLanguage(context.getCurrentUser().orNull());
+    return getAdminLanguage(context.user().orElse(null));
   }
 
   @Deprecated
