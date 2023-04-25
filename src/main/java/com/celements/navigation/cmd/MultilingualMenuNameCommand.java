@@ -25,9 +25,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -40,14 +39,14 @@ public class MultilingualMenuNameCommand {
   public static final String MENU_NAME_CLASS_SPACE = "Celements2";
   public static final String MENU_NAME_CLASS_DOC = "MenuName";
 
+  AttachmentURLCommand attCmd = new AttachmentURLCommand();
+
   public DocumentReference getMenuNameClassRef() {
     return new DocumentReference(getContext().getDatabase(), MENU_NAME_CLASS_SPACE,
         MENU_NAME_CLASS_DOC);
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MultilingualMenuNameCommand.class);
-
-  private IWebUtils webUtils = WebUtils.getInstance();
 
   public MultilingualMenuNameCommand() {}
 
@@ -110,7 +109,12 @@ public class MultilingualMenuNameCommand {
       return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName, language, context),
           allowEmptyMenuNames, context);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get MenuName for [" + fullName + "].", exp);
+      LOGGER.info("Failed to get MenuName for [{}].", fullName, exp);
+      String dictKey = "menuname_" + fullName;
+      String menuNameDict = getWebUtilsService().getAdminMessageTool().get(dictKey);
+      if (!dictKey.equals(menuNameDict)) {
+        return menuNameDict;
+      }
       if (allowEmptyMenuNames) {
         return "";
       } else {
@@ -156,7 +160,7 @@ public class MultilingualMenuNameCommand {
     String menuItemHTML = "";
     BaseObject menuNameObj = getMenuNameBaseObject(fullName, language, context);
     if (menuNameObj != null) {
-      String attURL = webUtils.getAttachmentURL(menuNameObj.getStringValue("image"), context);
+      String attURL = attCmd.getAttachmentURL(menuNameObj.getStringValue("image"), context);
       if ((attURL != null) && (!"".equals(attURL))) {
         menuItemHTML += " style=\"background-image:url(" + attURL + ")\"";
       }
@@ -174,10 +178,6 @@ public class MultilingualMenuNameCommand {
       }
     }
     return "";
-  }
-
-  void inject_webUtils(IWebUtils webUtils) {
-    this.webUtils = webUtils;
   }
 
   private XWikiContext getContext() {
