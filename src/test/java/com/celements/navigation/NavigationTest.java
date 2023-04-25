@@ -90,7 +90,6 @@ public class NavigationTest extends AbstractComponentTest {
     wUServiceMock = registerComponentMock(IWebUtilsService.class);
     expect(wUServiceMock.getRefLocalSerializer()).andReturn(Utils.getComponent(
         EntityReferenceSerializer.class, "local")).anyTimes();
-    // nav.injected_WebUtilsService = wUServiceMock;
     ptResolverServiceMock = createMockAndAddToDefault(PageTypeResolverService.class);
     nav.injected_PageTypeResolverService = ptResolverServiceMock;
     mockLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);

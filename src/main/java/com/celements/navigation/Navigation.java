@@ -147,8 +147,6 @@ public class Navigation implements INavigation {
 
   public ITreeNodeService injected_TreeNodeService;
 
-  public IWebUtilsService injected_WebUtilsService;
-
   public PageTypeResolverService injected_PageTypeResolverService;
 
   public Navigation(String navUniqueId) {
@@ -1058,9 +1056,6 @@ public class Navigation implements INavigation {
   }
 
   private IWebUtilsService getWebUtilsService() {
-    if (injected_WebUtilsService != null) {
-      return injected_WebUtilsService;
-    }
     return Utils.getComponent(IWebUtilsService.class);
   }
 
