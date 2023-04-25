@@ -17,7 +17,6 @@ import com.celements.navigation.INavigation;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.NavigationConfig;
 import com.celements.navigation.presentation.IPresentationTypeRole;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -40,7 +39,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        new WikiReference(getContext().getDatabase())));
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
     SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
@@ -60,7 +59,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        new WikiReference(getContext().getDatabase())));
     String nodeSpaceName = "theMenuSpace";
     navConfigObj.setStringValue("menu_space", nodeSpaceName);
     SpaceReference parentSpaceRef = new SpaceReference(nodeSpaceName, new WikiReference(
@@ -78,7 +77,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        new WikiReference(getContext().getDatabase())));
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
     EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
@@ -96,14 +95,11 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        new WikiReference(getContext().getDatabase())));
     navConfigObj.setStringValue(INavigationClassConfig.PRESENTATION_TYPE_FIELD,
         "testPresentationType");
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
-    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        "testPresentationType"))).andReturn(componentInstance);
+    IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
+        "testPresentationType");
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.loadConfigFromObject(navConfigObj);
     assertSame(componentInstance, navConfig.getPresentationType().get());
@@ -120,7 +116,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
@@ -143,7 +139,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
@@ -167,7 +163,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
@@ -187,7 +183,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
@@ -233,7 +229,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
