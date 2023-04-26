@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.presentation.IPresentationTypeRole;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -239,12 +239,12 @@ public final class NavigationConfig {
   public Optional<IPresentationTypeRole> getPresentationType() {
     String thePresentationTypeHint = presentationTypeHint.or("default");
     try {
-      LOGGER.info("setPresentationType to [" + thePresentationTypeHint + "].");
-      return Optional.of(Utils.getComponent(IWebUtilsService.class).lookup(
+      LOGGER.info("setPresentationType to [{}].", thePresentationTypeHint);
+      return Optional.of(Utils.getComponent(ComponentManager.class).lookup(
           IPresentationTypeRole.class, thePresentationTypeHint));
     } catch (ComponentLookupException failedToLoadException) {
-      LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint ["
-          + thePresentationTypeHint + "].", failedToLoadException);
+      LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint [{}].",
+          thePresentationTypeHint, failedToLoadException);
     }
     return Optional.absent();
   }
