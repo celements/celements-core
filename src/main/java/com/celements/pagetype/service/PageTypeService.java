@@ -54,7 +54,7 @@ public class PageTypeService implements IPageTypeRole {
   private static final Logger LOGGER = LoggerFactory.getLogger(PageTypeService.class);
 
   @Requirement
-  Map<String, IPageTypeProviderRole> pageTypeProviders;
+  private Map<String, IPageTypeProviderRole> pageTypeProviders;
 
   @Requirement
   private IPageTypeClassConfig pageTypeClassConf;

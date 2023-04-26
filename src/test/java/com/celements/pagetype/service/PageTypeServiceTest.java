@@ -56,12 +56,10 @@ public class PageTypeServiceTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    super.setUp();
+    getComponentManager().getComponentDescriptorList(IPageTypeProviderRole.class)
+        .forEach(d -> getComponentManager().unregisterComponent(d.getRole(), d.getRoleHint()));
     providerMock = registerComponentMock(IPageTypeProviderRole.class, MOCK_PROVIDER);
     ptService = (PageTypeService) Utils.getComponent(IPageTypeRole.class);
-    ptService.pageTypeProviders.clear();
-    ptService.pageTypeProviders.put(MOCK_PROVIDER, providerMock);
-
   }
 
   @Test

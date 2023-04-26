@@ -67,10 +67,11 @@ public class PageTypeReferenceTest {
     List<String> categories = new ArrayList<>();
     categories.add("cat1");
     PageTypeReference pageTypeRef2 = new PageTypeReference(CONFIG_NAME, PROVIDER_HIND, categories);
-    categories = pageTypeRef2.getCategories();
-    categories.add("cat2");
+    List<String> ret = pageTypeRef2.getCategories();
+    assertThrows("category list must not be modifiable throught getCategories output",
+        UnsupportedOperationException.class, () -> ret.add("cat2"));
     assertEquals("category list must not be modifiable throught getCategories output",
-        Arrays.asList("cat1"), pageTypeRef2.getCategories());
+        ret, pageTypeRef2.getCategories());
   }
 
   @Test

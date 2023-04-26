@@ -25,8 +25,8 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,19 +46,13 @@ public class JavaPageTypeProviderTest extends AbstractComponentTest {
 
   @Before
   public void setUp_JavaPageTypeProviderTest() throws Exception {
+    testPageType = registerComponentMock(IJavaPageTypeRole.class, _TEST_PAGE_TYPE);
     ptProvider = (JavaPageTypeProvider) Utils.getComponent(IPageTypeProviderRole.class,
         JavaPageTypeProvider.PROVIDER_HINT);
-    testPageType = createMockAndAddToDefault(IJavaPageTypeRole.class);
-    ptProvider.javaPageTypesMap.put(_TEST_PAGE_TYPE, testPageType);
     pageTypeRef = new PageTypeReference(_TEST_PAGE_TYPE, JavaPageTypeProvider.PROVIDER_HINT,
         Arrays.asList(""));
     expect(testPageType.getName()).andReturn(_TEST_PAGE_TYPE).anyTimes();
     expect(testPageType.getCategoryNames()).andReturn(Sets.newHashSet("", "pageType")).anyTimes();
-  }
-
-  @After
-  public void tearDown_JavaPageTypeProviderTest() {
-    ptProvider.javaPageTypesMap.remove(_TEST_PAGE_TYPE);
   }
 
   @Test
@@ -79,24 +73,12 @@ public class JavaPageTypeProviderTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_initilizeTypeRefsMap() {
-    ptProvider.javaPageTypesMap.clear();
-    assertNull(ptProvider.javaPageTypeRefsMap);
+  public void test_buildTypeRefsMap() {
     replayDefault();
-    ptProvider.initilizeTypeRefsMap();
+    Map<PageTypeReference, IJavaPageTypeRole> map = ptProvider.buildTypeRefsMap();
     verifyDefault();
-    assertNotNull(ptProvider.javaPageTypeRefsMap);
-    assertEquals(ptProvider.javaPageTypeRefsMap.size(), 0);
-  }
-
-  @Test
-  public void test_initilizeTypeRefsMap_withElement() {
-    assertNull(ptProvider.javaPageTypeRefsMap);
-    replayDefault();
-    ptProvider.initilizeTypeRefsMap();
-    verifyDefault();
-    assertNotNull(ptProvider.javaPageTypeRefsMap);
-    assertTrue("expecting at least the TestPageType", ptProvider.javaPageTypeRefsMap.size() >= 1);
+    assertNotNull(map);
+    assertTrue("expecting at least the TestPageType", map.size() >= 1);
   }
 
 }
