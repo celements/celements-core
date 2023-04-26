@@ -24,13 +24,11 @@ public class WebFormScriptService implements ScriptService {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  @SuppressWarnings("unchecked")
   public boolean isFormFilled() {
     return webFormService.isFormFilled(getContext().getRequest().getParameterMap(),
         Collections.<String>emptySet());
   }
 
-  @SuppressWarnings("unchecked")
   public boolean isFormFilled(String excludeFields) {
     Set<String> excludeSet = new HashSet<>();
     for (String field : excludeFields.split(",")) {

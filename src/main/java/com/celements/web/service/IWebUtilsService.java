@@ -54,6 +54,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
 
 @ComponentRole
 public interface IWebUtilsService {
@@ -412,6 +413,10 @@ public interface IWebUtilsService {
   @Deprecated
   String serializeRef(EntityReference entityRef, boolean local);
 
+  /**
+   * @deprecated since 6.0 instead use {@link XWikiRequest#getParameterMap()}
+   */
+  @Deprecated
   Map<String, String[]> getRequestParameterMap();
 
   String getInheritedTemplatedPath(DocumentReference localTemplateRef);

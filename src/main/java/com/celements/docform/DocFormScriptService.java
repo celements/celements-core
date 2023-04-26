@@ -97,8 +97,7 @@ public class DocFormScriptService implements ScriptService {
     return updateAndSaveDocFromMap(docRef, getRequestParameterMap());
   }
 
-  @SuppressWarnings("unchecked")
-  private <T> Map<String, T> getRequestParameterMap() {
+  private Map<String, String[]> getRequestParameterMap() {
     return context.request().map(XWikiRequest::getParameterMap)
         .orElseGet(Collections::emptyMap);
   }
@@ -112,7 +111,7 @@ public class DocFormScriptService implements ScriptService {
   }
 
   public boolean isCreateAllowed() {
-    return toBoolean(context.getRequestParameter("createIfNotExists").or(""));
+    return toBoolean(context.getRequestParam("createIfNotExists").orElse(""));
   }
 
   private IDocForm getDocFormCommand(DocumentReference docRef) {
