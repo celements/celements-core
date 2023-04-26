@@ -19,15 +19,14 @@
  */
 package com.celements.navigation.cmd;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -40,6 +39,8 @@ public class MultilingualMenuNameCommand {
   public static final String MENU_NAME_CLASS_SPACE = "Celements2";
   public static final String MENU_NAME_CLASS_DOC = "MenuName";
 
+  AttachmentURLCommand attCmd = new AttachmentURLCommand();
+
   public DocumentReference getMenuNameClassRef() {
     return new DocumentReference(getContext().getDatabase(), MENU_NAME_CLASS_SPACE,
         MENU_NAME_CLASS_DOC);
@@ -47,12 +48,11 @@ public class MultilingualMenuNameCommand {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MultilingualMenuNameCommand.class);
 
-  private IWebUtils webUtils = WebUtils.getInstance();
-
   public MultilingualMenuNameCommand() {}
 
   public String getMultilingualMenuName(String fullName, String language, XWikiContext context) {
     try {
+      LOGGER.debug("getMultilingualMenuName: for '{}' and lang '{}'", fullName, language);
       return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName, language, context),
           false, context);
     } catch (XWikiException exp) {
@@ -93,15 +93,32 @@ public class MultilingualMenuNameCommand {
 
   private String getMenuNameFromBaseObject(String fullName, BaseObject menuNameObj,
       boolean allowEmptyMenuNames, XWikiContext context) throws XWikiException {
+    LOGGER.debug("getMenuNameFromBaseObject: for '{}' and has object '{}'", fullName,
+        menuNameObj != null);
     String menuName = "";
     if (menuNameObj != null) {
       menuName = menuNameObj.getStringValue("menu_name");
     }
-    // if menuName is empty give back the DocURLname
-    if ((!allowEmptyMenuNames) && StringUtils.isEmpty(menuName)) {
-      menuName = fullName.substring(fullName.indexOf('.') + 1);
+    if (!allowEmptyMenuNames && Strings.isNullOrEmpty(menuName)) {
+      menuName = getFallbackMenuName(fullName, allowEmptyMenuNames);
     }
+    LOGGER.info("getMenuNameFromBaseObject: for '{}' returning '{}'", fullName, menuName);
     return menuName;
+  }
+
+  private String getFallbackMenuName(String fullName, boolean allowEmptyMenuNames) {
+    String dictKey = "menuname_" + fullName;
+    String menuNameDict = getWebUtilsService().getAdminMessageTool().get(dictKey);
+    LOGGER.debug("Dictionary MenuName [{}] for [{}] and key [{}].", menuNameDict, fullName,
+        dictKey);
+    if (!dictKey.equals(menuNameDict)) {
+      return menuNameDict;
+    }
+    // if menuName is empty and no dictionary entry available, give back the DocURLname
+    if (!allowEmptyMenuNames) {
+      return fullName.substring(fullName.indexOf('.') + 1);
+    }
+    return "";
   }
 
   public String getMultilingualMenuNameOnly(String fullName, String language,
@@ -110,12 +127,8 @@ public class MultilingualMenuNameCommand {
       return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName, language, context),
           allowEmptyMenuNames, context);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get MenuName for [" + fullName + "].", exp);
-      if (allowEmptyMenuNames) {
-        return "";
-      } else {
-        return fullName.split("\\.")[1];
-      }
+      LOGGER.info("Failed to get MenuName for [{}].", fullName, exp);
+      return getFallbackMenuName(fullName, allowEmptyMenuNames);
     }
   }
 
@@ -156,7 +169,7 @@ public class MultilingualMenuNameCommand {
     String menuItemHTML = "";
     BaseObject menuNameObj = getMenuNameBaseObject(fullName, language, context);
     if (menuNameObj != null) {
-      String attURL = webUtils.getAttachmentURL(menuNameObj.getStringValue("image"), context);
+      String attURL = attCmd.getAttachmentURL(menuNameObj.getStringValue("image"), context);
       if ((attURL != null) && (!"".equals(attURL))) {
         menuItemHTML += " style=\"background-image:url(" + attURL + ")\"";
       }
@@ -174,10 +187,6 @@ public class MultilingualMenuNameCommand {
       }
     }
     return "";
-  }
-
-  void inject_webUtils(IWebUtils webUtils) {
-    this.webUtils = webUtils;
   }
 
   private XWikiContext getContext() {

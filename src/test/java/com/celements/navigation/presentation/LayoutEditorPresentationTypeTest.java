@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.presentation;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,11 +30,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.cells.CellsClasses;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -52,7 +54,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
-public class LayoutEditorPresentationTypeTest extends AbstractBridgedComponentTestCase {
+public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
 
   private Navigation nav;
   private XWiki xwiki;
@@ -84,10 +86,9 @@ public class LayoutEditorPresentationTypeTest extends AbstractBridgedComponentTe
     nav.testInjectUtils(utils);
     tNServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
-    wUServiceMock = createMockAndAddToDefault(IWebUtilsService.class);
+    wUServiceMock = registerComponentMock(IWebUtilsService.class);
     expect(wUServiceMock.getRefLocalSerializer()).andReturn(Utils.getComponent(
-        IWebUtilsService.class).getRefLocalSerializer()).anyTimes();
-    nav.injected_WebUtilsService = wUServiceMock;
+        EntityReferenceSerializer.class, "local")).anyTimes();
     ptResolverServiceMock = createMockAndAddToDefault(PageTypeResolverService.class);
     nav.injected_PageTypeResolverService = ptResolverServiceMock;
     layoutEditorPresType = (LayoutEditorPresentationType) Utils.getComponent(

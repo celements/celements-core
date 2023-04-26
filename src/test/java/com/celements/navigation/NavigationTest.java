@@ -27,13 +27,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -86,10 +87,9 @@ public class NavigationTest extends AbstractComponentTest {
     nav.testInjectUtils(utils);
     tNServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
-    wUServiceMock = createMockAndAddToDefault(IWebUtilsService.class);
+    wUServiceMock = registerComponentMock(IWebUtilsService.class);
     expect(wUServiceMock.getRefLocalSerializer()).andReturn(Utils.getComponent(
-        IWebUtilsService.class).getRefLocalSerializer()).anyTimes();
-    nav.injected_WebUtilsService = wUServiceMock;
+        EntityReferenceSerializer.class, "local")).anyTimes();
     ptResolverServiceMock = createMockAndAddToDefault(PageTypeResolverService.class);
     nav.injected_PageTypeResolverService = ptResolverServiceMock;
     mockLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
@@ -98,6 +98,11 @@ public class NavigationTest extends AbstractComponentTest {
     mockRightService = createMockAndAddToDefault(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(mockRightService).anyTimes();
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
+  }
+
+  @After
+  public void tearDownTest() {
+    reset(wUServiceMock);
   }
 
   @Test
@@ -903,11 +908,8 @@ public class NavigationTest extends AbstractComponentTest {
         getContext().getDatabase()));
     navConfigObj.setStringValue(INavigationClassConfig.PRESENTATION_TYPE_FIELD,
         "testPresentationType");
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+    IPresentationTypeRole componentInstance = registerComponentMock(
         IPresentationTypeRole.class);
-    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        "testPresentationType"))).andReturn(componentInstance);
     replayDefault();
     nav.loadConfigFromObject(navConfigObj);
     verifyDefault();
@@ -958,11 +960,8 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testLoadConfig_presentationType_notEmpty() throws Exception {
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+    IPresentationTypeRole componentInstance = registerComponentMock(
         IPresentationTypeRole.class);
-    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        "testPresentationType"))).andReturn(componentInstance);
     String presentationTypeHint = "testPresentationType";
     NavigationConfig navConfig = new NavigationConfig.Builder().presentationTypeHint(
         presentationTypeHint).build();
@@ -975,11 +974,8 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testSetPresentationType() throws Exception {
-    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+    IPresentationTypeRole componentInstance = registerComponentMock(
         IPresentationTypeRole.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        "testPresentationType"))).andReturn(componentInstance);
     replayDefault();
     nav.setPresentationType("testPresentationType");
     verifyDefault();
@@ -1000,9 +996,6 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testSetPresentationType_NotFoundException() throws Exception {
-    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        "testNotFoundPresentationType"))).andThrow(new ComponentLookupException("not found"));
     replayDefault();
     nav.setPresentationType("testNotFoundPresentationType");
     verifyDefault();
@@ -1010,7 +1003,7 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testWriteMenuItemContent_PresentationType() throws Exception {
-    IPresentationTypeRole<INavigation> componentInstance = createMockAndAddToDefault(
+    IPresentationTypeRole<INavigation> componentInstance = registerComponentMock(
         IPresentationTypeRole.class);
     nav.setPresentationType(componentInstance);
     StringBuilder outStream = new StringBuilder();
@@ -1163,6 +1156,9 @@ public class NavigationTest extends AbstractComponentTest {
         new XWikiDocument(homeDocRef)).atLeastOnce();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq("MySpace.Home"),
         same(getContext()))).andReturn(true).atLeastOnce();
+    String dictMenuNameKey = "menuname_MySpace.Home";
+    getMessageToolStub().injectMessage(dictMenuNameKey, dictMenuNameKey);
+    expect(wUServiceMock.getAdminMessageTool()).andReturn(getMessageToolStub()).anyTimes();
     replayDefault();
     assertEquals("one tree node for level 1. Thus output expected.", "<ul"
         + " id=\"CN1:MySpace::\" ><li class=\"first last cel_nav_odd cel_nav_item1"
