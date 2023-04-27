@@ -36,9 +36,9 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.configuration.CelementsFromWikiConfigurationSource;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -48,14 +48,13 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private ReorderSaveHandler restrSaveCmd;
-  private XWiki wiki;
 
   @Before
   public void setUp_RestructureSaveCommandTest() throws Exception {
+    registerComponentMocks(IModelAccessFacade.class);
     registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
         getConfigurationSource());
     context = getContext();
-    wiki = getWikiMock();
     restrSaveCmd = new ReorderSaveHandler();
   }
 
@@ -104,7 +103,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
   public void testReadPropertyKey() {
     restrSaveCmd.inject_current(EReorderLiteral.PARENT_CHILDREN_PROPERTY);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef))).andReturn(true);
     replayDefault();
     restrSaveCmd.readPropertyKey("CN1:MySpace:MySpace.MyDoc");
     assertEquals("MySpace.MyDoc", restrSaveCmd.getParentFN());
@@ -194,7 +193,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
   public void testReadPropertyKey_notexists() {
     restrSaveCmd.inject_current(EReorderLiteral.PARENT_CHILDREN_PROPERTY);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(false);
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef))).andReturn(false);
     replayDefault();
     restrSaveCmd.readPropertyKey("CN1:MySpace:MySpace.MyDoc");
     assertEquals("", restrSaveCmd.getParentFN());
@@ -208,7 +207,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     xdoc.setNew(false);
     xdoc.setParentReference(parentRef);
@@ -216,9 +215,8 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 12);
     xdoc.setXObject(0, menuItemObj);
-    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
-    wiki.saveDocument(same(xdoc), eq("Restructuring"), eq(false), same(context));
-    expectLastCall();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(xdoc);
+    getMock(IModelAccessFacade.class).saveDocument(same(xdoc), eq("Restructuring"));
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
@@ -236,7 +234,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     xdoc.setNew(false);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -246,9 +244,8 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 0);
     xdoc.setXObject(0, menuItemObj);
-    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
-    wiki.saveDocument(same(xdoc), eq("Restructuring"), eq(false), same(context));
-    expectLastCall();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(xdoc);
+    getMock(IModelAccessFacade.class).saveDocument(same(xdoc), eq("Restructuring"));
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
@@ -268,7 +265,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     xdoc.setNew(false);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -278,9 +275,8 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 12);
     xdoc.setXObject(0, menuItemObj);
-    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
-    wiki.saveDocument(same(xdoc), eq("Restructuring"), eq(false), same(context));
-    expectLastCall();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(xdoc);
+    getMock(IModelAccessFacade.class).saveDocument(same(xdoc), eq("Restructuring"));
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
@@ -299,7 +295,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
     restrSaveCmd.inject_ParentRef(null);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     xdoc.setNew(false);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -309,9 +305,8 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 12);
     xdoc.setXObject(0, menuItemObj);
-    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
-    wiki.saveDocument(same(xdoc), eq("Restructuring"), eq(false), same(context));
-    expectLastCall();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(xdoc);
+    getMock(IModelAccessFacade.class).saveDocument(same(xdoc), eq("Restructuring"));
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
@@ -328,14 +323,14 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).exists(eq(docRef))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     xdoc.setParentReference(parentRef);
     BaseObject menuItemObj = new BaseObject();
     menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 0);
     xdoc.setXObject(0, menuItemObj);
-    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(xdoc);
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());

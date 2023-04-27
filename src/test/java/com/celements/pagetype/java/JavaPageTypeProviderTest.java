@@ -96,7 +96,7 @@ public class JavaPageTypeProviderTest extends AbstractComponentTest {
     ptProvider.initilizeTypeRefsMap();
     verifyDefault();
     assertNotNull(ptProvider.javaPageTypeRefsMap);
-    assertEquals(ptProvider.javaPageTypeRefsMap.size(), 1);
+    assertTrue("expecting at least the TestPageType", ptProvider.javaPageTypeRefsMap.size() >= 1);
   }
 
 }

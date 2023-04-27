@@ -40,7 +40,7 @@ public class SchedulerClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(docRef);
+    bclass.setXClassReference(docRef);
     needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_JOB_NAME, "Job Name", 60);
     needsUpdate |= bclass.addTextAreaField(ISchedulerClassConfig.PROP_JOB_DESCRIPTION,
         "Job Description", 45, 10);

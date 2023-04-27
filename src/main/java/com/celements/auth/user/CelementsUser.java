@@ -1,6 +1,7 @@
 package com.celements.auth.user;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -18,10 +19,8 @@ import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.celements.web.classes.oldcore.XWikiUsersClass.Type;
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 @NotThreadSafe
@@ -74,53 +73,79 @@ public class CelementsUser implements User {
     return new XWikiUser(modelUtils.serializeRefLocal(getDocRef()), isGlobal());
   }
 
+  @Deprecated
   @Override
-  public Optional<String> getEmail() {
+  public com.google.common.base.Optional<String> getEmail() {
+    return com.google.common.base.Optional.fromJavaUtil(email());
+  }
+
+  @Override
+  public Optional<String> email() {
     return getUserFieldValue(XWikiUsersClass.FIELD_EMAIL);
   }
 
+  @Deprecated
   @Override
-  public Optional<String> getFirstName() {
+  public com.google.common.base.Optional<String> getFirstName() {
+    return com.google.common.base.Optional.fromJavaUtil(firstName());
+  }
+
+  @Override
+  public Optional<String> firstName() {
     return getUserFieldValue(XWikiUsersClass.FIELD_FIRST_NAME);
   }
 
+  @Deprecated
   @Override
-  public Optional<String> getLastName() {
-    return getUserFieldValue(XWikiUsersClass.FIELD_LAST_NAME);
+  public com.google.common.base.Optional<String> getLastName() {
+    return com.google.common.base.Optional.fromJavaUtil(lastName());
   }
 
   @Override
-  public Optional<String> getPrettyName() {
-    String prettyName = getFirstName().or("") + " " + getLastName().or("");
-    return Optional.fromNullable(Strings.emptyToNull(prettyName.trim()));
+  public Optional<String> lastName() {
+    return getUserFieldValue(XWikiUsersClass.FIELD_LAST_NAME);
+  }
+
+  @Deprecated
+  @Override
+  public com.google.common.base.Optional<String> getPrettyName() {
+    return com.google.common.base.Optional.fromJavaUtil(prettyName());
+  }
+
+  @Override
+  public Optional<String> prettyName() {
+    String prettyName = firstName().orElse("") + " " + lastName().orElse("");
+    return Optional.ofNullable(Strings.emptyToNull(prettyName.trim()));
   }
 
   @Override
   public Type getType() {
-    return getUserFieldValue(XWikiUsersClass.FIELD_TYPE).or(Type.Simple);
+    return getUserFieldValue(XWikiUsersClass.FIELD_TYPE).orElse(Type.Simple);
   }
 
   @Override
   public boolean isSuspended() {
-    return getUserFieldValue(XWikiUsersClass.FIELD_SUSPENDED).or(false);
+    return getUserFieldValue(XWikiUsersClass.FIELD_SUSPENDED).orElse(false);
   }
 
   @Override
   public boolean isActive() {
-    return getUserFieldValue(XWikiUsersClass.FIELD_ACTIVE).or(false);
+    return getUserFieldValue(XWikiUsersClass.FIELD_ACTIVE).orElse(false);
+  }
+
+  @Deprecated
+  @Override
+  public com.google.common.base.Optional<String> getAdminLanguage() {
+    return com.google.common.base.Optional.fromJavaUtil(getAdminLang());
   }
 
   @Override
-  public Optional<String> getAdminLanguage() {
+  public Optional<String> getAdminLang() {
     return getUserFieldValue(XWikiUsersClass.FIELD_ADMIN_LANG);
   }
 
   private <T> Optional<T> getUserFieldValue(ClassField<T> field) {
-    return modelAccess.getFieldValue(getUserObject(), field);
-  }
-
-  private BaseObject getUserObject() {
-    return getUserObjectFetcher().first().get();
+    return getUserObjectFetcher().fetchField(field).stream().findFirst();
   }
 
   private XWikiObjectFetcher getUserObjectFetcher() {

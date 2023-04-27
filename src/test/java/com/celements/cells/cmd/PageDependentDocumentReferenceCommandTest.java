@@ -1,9 +1,9 @@
 package com.celements.cells.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,7 +17,9 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.cells.classes.PageDepCellConfigClass;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
@@ -27,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedComponentTestCase {
+public class PageDependentDocumentReferenceCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private PageDependentDocumentReferenceCommand pageDepDocRefCmd;
@@ -40,13 +42,15 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   private EntityReferenceValueProvider defValueProviderMock;
 
   @Before
-  public void setUp_PageDependentDocumentReferenceCommandTest() throws Exception {
+  public void prepare() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
+    registerComponentMock(IModelAccessFacade.class);
     document = createMockAndAddToDefault(XWikiDocument.class);
     cellDocRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
     cellDoc = new XWikiDocument(cellDocRef);
-    expect(xwiki.getDocument(eq(cellDocRef), same(context))).andReturn(cellDoc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(cellDocRef)))
+        .andReturn(cellDoc).anyTimes();
     pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
     defaultValueProviderDesc = getComponentManager().getComponentDescriptor(
         EntityReferenceValueProvider.class, "default");
@@ -64,7 +68,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetPageLayoutCmd() {
+  public void test_getPageLayoutCmd() {
     pageDepDocRefCmd.pageLayoutCmd = null;
     replayDefault();
     assertNotNull(pageDepDocRefCmd.getPageLayoutCmd());
@@ -72,7 +76,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testInject_pageLayoutCmdMock() {
+  public void test_inject_pageLayoutCmdMock() {
     PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
     pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
     replayDefault();
@@ -81,7 +85,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetPageDepCellConfigClassDocRef() {
+  public void test_getPageDepCellConfigClassDocRef() {
     replayDefault();
     assertEquals(new DocumentReference(context.getDatabase(),
         PageDependentDocumentReferenceCommand.PAGE_DEP_CELL_CONFIG_CLASS_SPACE,
@@ -91,7 +95,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetCurrentLayoutRef() {
+  public void test_getCurrentLayoutRef() {
     PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
     pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
     SpaceReference expectedLayoutRef = new SpaceReference("MyLayout", new WikiReference(
@@ -103,7 +107,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetCurrentLayoutRef_injectLayout() {
+  public void test_getCurrentLayoutRef_injectLayout() {
     PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
     pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
     SpaceReference expectedLayoutRef = new SpaceReference("MyLayout", new WikiReference(
@@ -115,7 +119,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetCurrentDocumentSpaceName_ZeroSpaces() {
+  public void test_getCurrentDocumentSpaceName_ZeroSpaces() {
     DocumentReference currentDocRef = createMockAndAddToDefault(DocumentReference.class);
     List<SpaceReference> emptySpaceRefList = Collections.emptyList();
     expect(currentDocRef.getSpaceReferences()).andReturn(emptySpaceRefList);
@@ -128,7 +132,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetCurrentDocumentSpaceName_greaterZeroSpaces() {
+  public void test_getCurrentDocumentSpaceName_greaterZeroSpaces() {
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myDocument");
     replayDefault();
@@ -137,84 +141,53 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDepCellSpace_cellDocWithoutObject() throws Exception {
+  public void test_getDepCellSpace_cellDocWithoutObject() throws Exception {
     replayDefault();
     assertEquals("", pageDepDocRefCmd.getDepCellSpace(cellDocRef));
     verifyDefault();
   }
 
   @Test
-  public void testGetDepCellSpace_cellDocWithEmptyObject() throws Exception {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_getDepCellSpace_cellDocWithEmptyObject() throws Exception {
+    setDependentDocSpace(null, null);
     replayDefault();
     assertEquals("", pageDepDocRefCmd.getDepCellSpace(cellDocRef));
     verifyDefault();
   }
 
   @Test
-  public void testGetDepCellSpace_cellDocWithNonEmptyObject() throws Exception {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-        "myDepSpace");
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_getDepCellSpace_cellDocWithNonEmptyObject() throws Exception {
+    setDependentDocSpace("myDepSpace", null);
     replayDefault();
     assertEquals("myDepSpace", pageDepDocRefCmd.getDepCellSpace(cellDocRef));
     verifyDefault();
   }
 
   @Test
-  public void testIsCurrentDocument_cellDocWithoutObject() throws Exception {
+  public void test_isCurrentDocument_cellDocWithoutObject() throws Exception {
     replayDefault();
     assertTrue(pageDepDocRefCmd.isCurrentDocument(cellDocRef));
     verifyDefault();
   }
 
   @Test
-  public void testIsCurrentDocument_cellDocWithEmptyObject() throws Exception {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_isCurrentDocument_cellDocWithEmptyObject() throws Exception {
+    setDependentDocSpace(null, null);
     replayDefault();
     assertTrue(pageDepDocRefCmd.isCurrentDocument(cellDocRef));
     verifyDefault();
   }
 
   @Test
-  public void testIsCurrentDocument_cellDocWithNonEmptyObject() throws Exception {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-        "myDepSpace");
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_isCurrentDocument_cellDocWithNonEmptyObject() throws Exception {
+    setDependentDocSpace("myDepSpace", null);
     replayDefault();
     assertFalse(pageDepDocRefCmd.isCurrentDocument(cellDocRef));
     verifyDefault();
   }
 
   @Test
-  public void testIsCurrentDocument_Exception() {
-    try {
-      reset(xwiki);
-      expect(xwiki.getDocument(eq(cellDocRef), same(context))).andThrow(
-          new XWikiException()).atLeastOnce();
-      replayDefault();
-      assertTrue("expecting fallback to currentDoc.", pageDepDocRefCmd.isCurrentDocument(
-          cellDocRef));
-      verifyDefault();
-    } catch (XWikiException exp) {
-      fail("Expecting isCurrentDocument to catch XWikiException and returning True.");
-    }
-  }
-
-  @Test
-  public void testGetDependentDocumentSpace_cellDocWithoutObject_Content() {
+  public void test_getDependentDocumentSpace_cellDocWithoutObject_Content() {
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myDocument");
     replayDefault();
@@ -224,7 +197,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDependentDocumentSpace_cellDocWithoutObject_anySpace() {
+  public void test_getDependentDocumentSpace_cellDocWithoutObject_anySpace() {
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     replayDefault();
@@ -234,11 +207,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDependentDocumentSpace_cellDocWithEmptyObject_Content() {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_getDependentDocumentSpace_cellDocWithEmptyObject_Content() {
+    setDependentDocSpace(null, null);
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myDocument");
     replayDefault();
@@ -248,11 +218,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDependentDocumentSpace_cellDocWithEmptyObject_anySpace() {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_getDependentDocumentSpace_cellDocWithEmptyObject_anySpace() {
+    setDependentDocSpace(null, null);
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "MySpace",
         "myDocument");
     replayDefault();
@@ -262,13 +229,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDependentDocumentSpace_cellDocWithNonEmptyObject_Content() {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-        "myDepSpace");
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_getDependentDocumentSpace_cellDocWithNonEmptyObject_Content() {
+    setDependentDocSpace("myDepSpace", null);
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myDocument");
     replayDefault();
@@ -278,13 +240,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDependentDocumentSpace_cellDocWithNonEmptyObject_anySpace() {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-        "myDepSpace");
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_getDependentDocumentSpace_cellDocWithNonEmptyObject_anySpace() {
+    setDependentDocSpace("myDepSpace", null);
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     replayDefault();
@@ -294,30 +251,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDependentDocumentSpace_Exception() {
-    try {
-      reset(xwiki);
-      expect(xwiki.getDocument(eq(cellDocRef), same(context))).andThrow(
-          new XWikiException()).atLeastOnce();
-      BaseObject cellConfig = new BaseObject();
-      cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-          "myDepSpace");
-      cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-      cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-          cellConfig));
-      DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-          "myDocument");
-      replayDefault();
-      assertEquals("mySpace", pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef,
-          cellDocRef).getName());
-      verifyDefault();
-    } catch (XWikiException exp) {
-      fail("expecting to catch exception and fallback to current space");
-    }
-  }
-
-  @Test
-  public void testGetDocumentReference_isCurrent() {
+  public void test_getDocumentReference_isCurrent() {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     replayDefault();
@@ -326,13 +260,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDocumentReference_isNotCurrent() {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-        "myDepSpace");
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_getDocumentReference_isNotCurrent() {
+    setDependentDocSpace("myDepSpace", null);
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
@@ -343,7 +272,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDocumentReference_isCurrent_inheritable() {
+  public void test_getDocumentReference_isCurrent_inheritable() {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     replayDefault();
@@ -353,13 +282,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDocumentReference_isNotCurrent_inheritable() {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-        "myDepSpace");
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_getDocumentReference_isNotCurrent_inheritable() {
+    setDependentDocSpace("myDepSpace", null);
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
@@ -371,7 +295,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDocument_isCurrent() throws XWikiException {
+  public void test_getDocument_isCurrent() throws XWikiException {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     expect(document.getDocumentReference()).andReturn(expectedDocRef).atLeastOnce();
@@ -381,13 +305,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetDocument_isNotCurrent() throws XWikiException {
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-        "myDepSpace");
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+  public void test_getDocument_isNotCurrent() throws XWikiException {
+    setDependentDocSpace("myDepSpace", null);
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     expect(document.getDocumentReference()).andReturn(currentDocRef).atLeastOnce();
@@ -401,7 +320,7 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetTranslatedDocument_isCurrent() throws XWikiException {
+  public void test_getTranslatedDocument_isCurrent() throws XWikiException {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     expect(document.getDocumentReference()).andReturn(expectedDocRef).atLeastOnce();
@@ -411,15 +330,10 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
   }
 
   @Test
-  public void testGetTranslatedDocument_isNotCurrent() throws XWikiException {
+  public void test_getTranslatedDocument_isNotCurrent() throws XWikiException {
     String contextLang = "fr";
     context.setLanguage(contextLang);
-    BaseObject cellConfig = new BaseObject();
-    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
-        "myDepSpace");
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(), Arrays.asList(
-        cellConfig));
+    setDependentDocSpace("myDepSpace", null);
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     expect(document.getDocumentReference()).andReturn(currentDocRef).atLeastOnce();
@@ -435,4 +349,14 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractBridgedCo
     verifyDefault();
   }
 
+  private void setDependentDocSpace(String depDocSpace, Integer isInheritable) {
+    BaseObject cellConfig = new BaseObject();
+    cellConfig.setXClassReference(PageDepCellConfigClass.CLASS_REF);
+    cellConfig.setStringValue(PageDepCellConfigClass.FIELD_SPACE_NAME.getName(), depDocSpace);
+    if (isInheritable != null) {
+      cellConfig.setIntValue(PageDepCellConfigClass.FIELD_IS_ACTIVE.getName(), isInheritable);
+    }
+    cellConfig.setDocumentReference(PageDepCellConfigClass.CLASS_REF.getDocRef());
+    cellDoc.addXObject(cellConfig);
+  }
 }

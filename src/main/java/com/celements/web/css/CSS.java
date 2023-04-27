@@ -19,6 +19,8 @@
  */
 package com.celements.web.css;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.context.Execution;
 
@@ -37,6 +39,7 @@ import com.xpn.xwiki.web.Utils;
  *
  * @author edoardo
  */
+@NotThreadSafe
 public abstract class CSS extends Api {
 
   private static XWikiContext getContext() {

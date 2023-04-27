@@ -40,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -48,6 +49,7 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.configuration.ConfigSourceUtils;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
@@ -145,8 +147,6 @@ public class Navigation implements INavigation {
 
   public ITreeNodeService injected_TreeNodeService;
 
-  public IWebUtilsService injected_WebUtilsService;
-
   public PageTypeResolverService injected_PageTypeResolverService;
 
   public Navigation(String navUniqueId) {
@@ -209,12 +209,12 @@ public class Navigation implements INavigation {
   public void setPresentationType(String presentationTypeHint) {
     if (presentationTypeHint != null) {
       try {
-        LOGGER.info("setPresentationType to [" + presentationTypeHint + "].");
-        setPresentationType(Utils.getComponent(IWebUtilsService.class).lookup(
+        LOGGER.info("setPresentationType to [{}].", presentationTypeHint);
+        setPresentationType(Utils.getComponent(ComponentManager.class).lookup(
             IPresentationTypeRole.class, presentationTypeHint));
       } catch (ComponentLookupException failedToLoadException) {
-        LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint ["
-            + presentationTypeHint + "].", failedToLoadException);
+        LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint [{}].",
+            presentationTypeHint, failedToLoadException);
         this.presentationType = null;
       }
     } else {
@@ -393,15 +393,15 @@ public class Navigation implements INavigation {
 
   void addNavigationForParent(StringBuilder outStream, EntityReference parentRef, int numMoreLevels)
       throws XWikiException {
-    LOGGER.debug("addNavigationForParent: parent [" + parentRef + "] numMoreLevels ["
-        + numMoreLevels + "].");
+    LOGGER.debug("addNavigationForParent: parent [{}] numMoreLevels [{}].", parentRef,
+        numMoreLevels);
     if (numMoreLevels > 0) {
       String parent = "";
       if (parentRef != null) {
         parent = getWebUtilsService().getRefLocalSerializer().serialize(parentRef);
       }
       List<TreeNode> currentMenuItems = getCurrentMenuItems(numMoreLevels, parent);
-      if (currentMenuItems.size() > 0) {
+      if (!currentMenuItems.isEmpty()) {
         outStream.append("<ul " + addUniqueContainerId(parent) + " " + getMainUlCSSClasses() + ">");
         boolean isFirstItem = true;
         int numItem = 0;
@@ -419,9 +419,9 @@ public class Navigation implements INavigation {
         }
         outStream.append("</ul>");
       } else if ((getCurrentLevel(numMoreLevels) == 1) && hasedit()) {
-        LOGGER.trace("addNavigationForParent: empty navigation hint for parent [" + parentRef
-            + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
-            + getCurrentLevel(numMoreLevels) + "].");
+        LOGGER.trace("addNavigationForParent: empty navigation hint for parent [{}]"
+            + " numMoreLevels [{}], currentLevel [{}].", parentRef, numMoreLevels,
+            getCurrentLevel(numMoreLevels));
         // is main Menu and no mainMenuItem found ; user has edit rights
         outStream.append("<ul class=\"cel_nav_empty\">");
         openMenuItemOut(outStream, null, true, true, false, 1);
@@ -432,9 +432,9 @@ public class Navigation implements INavigation {
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
       } else {
-        LOGGER.debug("addNavigationForParent: empty output for parent [" + parentRef
-            + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
-            + getCurrentLevel(numMoreLevels) + "], hasEdit [" + hasedit() + "].");
+        LOGGER.debug("addNavigationForParent: empty output for parent [{}]"
+            + " numMoreLevels [{}], currentLevel [{}], hasEdit [{}].", parentRef, numMoreLevels,
+            getCurrentLevel(numMoreLevels), hasedit());
       }
     }
   }
@@ -714,8 +714,9 @@ public class Navigation implements INavigation {
     return Optional.ofNullable(docRef)
         .filter(this::isMenuLinkTargetEnabled)
         .map(getModelAccess()::getOrCreateDocument)
-        .map(doc -> getModelAccess().getProperty(doc, MENU_ITEM_CLASS_REF.getDocRef(
-            docRef.getWikiReference()), TARGET_FIELD))
+        .flatMap(doc -> XWikiObjectEditor.on(doc)
+            .filter(MENU_ITEM_CLASS_REF).fetch().stream().findFirst())
+        .map(obj -> obj.getStringValue(TARGET_FIELD))
         .map(prop -> Objects.toString(prop, "").trim())
         .filter(not(String::isEmpty));
   }
@@ -1055,9 +1056,6 @@ public class Navigation implements INavigation {
   }
 
   private IWebUtilsService getWebUtilsService() {
-    if (injected_WebUtilsService != null) {
-      return injected_WebUtilsService;
-    }
     return Utils.getComponent(IWebUtilsService.class);
   }
 

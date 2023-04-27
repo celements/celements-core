@@ -16,20 +16,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.common.test.ExceptionAsserter;
 import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.ModelAccessStrategy;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
+import com.celements.model.field.FieldAccessor;
+import com.celements.model.field.XObjectFieldAccessor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
@@ -45,21 +44,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
 public class CelementsUserServiceTest extends AbstractComponentTest {
 
   private CelementsUserService service;
 
-  private final DocumentReference userDocRef = new ImmutableDocumentReference("xwikidb", "XWiki",
-      "msladek");
+  private final DocumentReference userDocRef = new DocumentReference("xwikidb", "XWiki", "msladek");
 
   @Before
   public void prepareTest() throws Exception {
     registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
         getConfigurationSource());
-    registerComponentMocks(ModelAccessStrategy.class, IWebUtilsService.class, QueryManager.class,
+    registerComponentMocks(IModelAccessFacade.class, IWebUtilsService.class, QueryManager.class,
         IQueryExecutionServiceRole.class);
     service = (CelementsUserService) Utils.getComponent(UserService.class);
     expect(getMock(IWebUtilsService.class).getAdminMessageTool()).andReturn(
@@ -95,18 +92,11 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getUser_DocumentNotExistsException() throws Exception {
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    expect(getMock(ModelAccessStrategy.class).getDocument(userDocRef, "")).andReturn(userDoc);
+    expect(getMock(IModelAccessFacade.class).getDocument(userDocRef)).andReturn(userDoc);
     userDoc.setNew(true);
 
     replayDefault();
-    assertSame(DocumentNotExistsException.class, new ExceptionAsserter<UserInstantiationException>(
-        UserInstantiationException.class) {
-
-      @Override
-      protected void execute() throws UserInstantiationException {
-        service.getUser(userDocRef);
-      }
-    }.evaluate().getCause().getClass());
+    assertThrows(UserInstantiationException.class, () -> service.getUser(userDocRef));
     verifyDefault();
   }
 
@@ -115,13 +105,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     expectDoc(userDocRef);
 
     replayDefault();
-    new ExceptionAsserter<UserInstantiationException>(UserInstantiationException.class) {
-
-      @Override
-      protected void execute() throws UserInstantiationException {
-        service.getUser(userDocRef);
-      }
-    }.evaluate();
+    assertThrows(UserInstantiationException.class, () -> service.getUser(userDocRef));
     verifyDefault();
   }
 
@@ -160,26 +144,16 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getUserForLoginField_null() throws XWikiException {
     replayDefault();
-    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
-
-      @Override
-      protected void execute() throws Exception {
-        service.getUserForLoginField(null, Collections.<String>emptyList());
-      }
-    }.evaluate();
+    assertThrows(IllegalArgumentException.class,
+        () -> service.getUserForLoginField(null, Collections.<String>emptyList()));
     verifyDefault();
   }
 
   @Test
   public void test_getUserForLoginField_empty() throws XWikiException {
     replayDefault();
-    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
-
-      @Override
-      protected void execute() throws Exception {
-        service.getUserForLoginField(" \t", Collections.<String>emptyList());
-      }
-    }.evaluate();
+    assertThrows(IllegalArgumentException.class,
+        () -> service.getUserForLoginField(" \t", Collections.<String>emptyList()));
     verifyDefault();
   }
 
@@ -213,7 +187,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     String login = "mSladek";
     XWikiDocument userDoc = new XWikiDocument(service.resolveUserDocRef(login));
     userDoc.setNew(true);
-    expect(getMock(ModelAccessStrategy.class).getDocument(userDoc.getDocumentReference(), ""))
+    expect(getMock(IModelAccessFacade.class).getDocument(userDoc.getDocumentReference()))
         .andReturn(userDoc);
     expectUserQuery(login, Arrays.asList(UserService.DEFAULT_LOGIN_FIELD), Arrays.asList(
         userDocRef));
@@ -256,7 +230,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     String login = "mSladek";
     XWikiDocument userDoc = new XWikiDocument(service.resolveUserDocRef(login));
     userDoc.setNew(true);
-    expect(getMock(ModelAccessStrategy.class).getDocument(userDoc.getDocumentReference(), ""))
+    expect(getMock(IModelAccessFacade.class).getDocument(userDoc.getDocumentReference()))
         .andReturn(userDoc);
     expectUserQuery(login, Arrays.asList(UserService.DEFAULT_LOGIN_FIELD),
         Collections.<DocumentReference>emptyList());
@@ -309,7 +283,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getOrGenerateUserDocRef() throws Exception {
     String accountName = "msladek";
-    expect(getMock(ModelAccessStrategy.class).exists(userDocRef, "")).andReturn(false);
+    expect(getMock(IModelAccessFacade.class).exists(userDocRef)).andReturn(false);
 
     replayDefault();
     DocumentReference docRef = service.getOrGenerateUserDocRef(accountName);
@@ -321,9 +295,9 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   @Test
   public void test_getOrGenerateUserDocRef_alreadyExists() throws Exception {
     String accountName = "msladek";
-    expect(getMock(ModelAccessStrategy.class).exists(userDocRef, "")).andReturn(true);
-    expect(getMock(ModelAccessStrategy.class).exists(anyObject(DocumentReference.class), eq(
-        ""))).andReturn(false);
+    expect(getMock(IModelAccessFacade.class).exists(userDocRef)).andReturn(true);
+    expect(getMock(IModelAccessFacade.class).exists(anyObject(DocumentReference.class)))
+        .andReturn(false);
 
     replayDefault();
     DocumentReference docRef = service.getOrGenerateUserDocRef(accountName);
@@ -336,8 +310,8 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_getOrGenerateUserDocRef_noAccountName() throws Exception {
-    expect(getMock(ModelAccessStrategy.class).exists(anyObject(DocumentReference.class), eq(
-        ""))).andReturn(false);
+    expect(getMock(IModelAccessFacade.class).exists(anyObject(DocumentReference.class)))
+        .andReturn(false);
 
     replayDefault();
     DocumentReference docRef = service.getOrGenerateUserDocRef(null);
@@ -398,7 +372,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     XWikiDocument othGrpDoc = expectGroupAdd(groups.get(1));
     User user = createMockAndAddToDefault(User.class);
     expect(user.getDocRef()).andReturn(userDocRef).atLeastOnce();
-    expect(user.asXWikiUser()).andReturn(new XWikiUser("XWiki.msladek")).atLeastOnce();
 
     replayDefault();
     service.addUserToDefaultGroups(user);
@@ -414,10 +387,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   private XWikiDocument expectGroupAdd(String group) throws Exception {
     XWikiDocument grpDoc = expectDoc(DOC_REF_RESOLVER.apply(group));
     expectClassWithNewObj(getGroupsClass(), userDocRef.getWikiReference());
-    getMock(ModelAccessStrategy.class).saveDocument(same(grpDoc), anyObject(String.class), eq(
-        false));
-    getMock(XWikiGroupService.class).addUserToGroup("XWiki.msladek",
-        userDocRef.getWikiReference().getName(), group, getContext());
+    getMock(IModelAccessFacade.class).saveDocument(same(grpDoc), anyObject(String.class));
     return grpDoc;
   }
 
@@ -428,17 +398,16 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     userDoc.setNew(false);
 
-    expect(getMock(ModelAccessStrategy.class).exists(userDocRef, "")).andReturn(false).times(2);
-    expect(getMock(ModelAccessStrategy.class).createDocument(userDocRef, "")).andReturn(userDoc);
+    expect(getMock(IModelAccessFacade.class).exists(userDocRef)).andReturn(false);
+    expect(getMock(IModelAccessFacade.class).createDocument(userDocRef)).andReturn(userDoc);
     expectPossibleLoginFields(null);
     expectUserClassFromMap(userData);
     expectClassWithNewObj(getRightsClass(), userDocRef.getWikiReference());
-    getMock(ModelAccessStrategy.class).saveDocument(same(userDoc), anyObject(String.class), eq(
-        false));
+    getMock(IModelAccessFacade.class).saveDocument(same(userDoc), anyObject(String.class));
     expectInitialGroups(Collections.<String>emptyList());
     expectGroupAdd(XWIKI_ALL_GROUP_FN);
 
-    expect(getMock(ModelAccessStrategy.class).getDocument(userDocRef, "")).andReturn(userDoc);
+    expect(getMock(IModelAccessFacade.class).getDocument(userDocRef)).andReturn(userDoc);
 
     replayDefault();
     User user = service.createNewUser(userData, false);
@@ -456,23 +425,16 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     userData.put("xwikiname", "msladek");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
 
-    expect(getMock(ModelAccessStrategy.class).exists(userDocRef, "")).andReturn(false).times(2);
-    expect(getMock(ModelAccessStrategy.class).createDocument(userDocRef, "")).andReturn(userDoc);
+    expect(getMock(IModelAccessFacade.class).exists(userDocRef)).andReturn(false);
+    expect(getMock(IModelAccessFacade.class).createDocument(userDocRef)).andReturn(userDoc);
     expectPossibleLoginFields(null);
     expectUserClassFromMap(userData);
     expectClassWithNewObj(getRightsClass(), userDocRef.getWikiReference());
-    getMock(ModelAccessStrategy.class).saveDocument(same(userDoc), anyObject(String.class), eq(
-        false));
+    getMock(IModelAccessFacade.class).saveDocument(same(userDoc), anyObject(String.class));
     expectLastCall().andThrow(cause);
 
     replayDefault();
-    assertSame(cause, new ExceptionAsserter<UserCreateException>(UserCreateException.class) {
-
-      @Override
-      protected void execute() throws Exception {
-        service.createNewUser(userData, false);
-      }
-    }.evaluate().getCause());
+    assertThrows(UserCreateException.class, () -> service.createNewUser(userData, false));
     verifyDefault();
   }
 
@@ -489,15 +451,22 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     return userXClass;
   }
 
-  private static XWikiDocument expectDoc(DocumentReference docRef) {
+  private static XWikiDocument expectDoc(DocumentReference docRef)
+      throws DocumentNotExistsException {
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setNew(false);
-    expect(getMock(ModelAccessStrategy.class).getDocument(docRef, "")).andReturn(doc);
+    expect(getMock(IModelAccessFacade.class).getDocument(docRef)).andReturn(doc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(docRef)).andReturn(doc).anyTimes();
     return doc;
   }
 
   private static <T> T getValue(BaseObject obj, ClassField<T> field) {
-    return Utils.getComponent(IModelAccessFacade.class).getFieldValue(obj, field).get();
+    return getFieldAccessor().get(obj, field).get();
+  }
+
+  @SuppressWarnings("unchecked")
+  private static FieldAccessor<BaseObject> getFieldAccessor() {
+    return Utils.getComponent(FieldAccessor.class, XObjectFieldAccessor.NAME);
   }
 
   private static ClassDefinition getUserClass() {

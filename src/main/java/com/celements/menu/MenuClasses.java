@@ -60,7 +60,7 @@ public class MenuClasses extends CelementsClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("name", "Name (dictionary possible)", 30);
     needsUpdate |= bclass.addNumberField("header_id", "Header Id", 10, "integer");
     needsUpdate |= bclass.addNumberField("pos", "Position", 10, "integer");
@@ -85,7 +85,7 @@ public class MenuClasses extends CelementsClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("name", "Name (dictionary possible)", 30);
     needsUpdate |= bclass.addNumberField("header_id", "Header Id", 10, "integer");
     needsUpdate |= bclass.addNumberField("itempos", "Position", 10, "integer");

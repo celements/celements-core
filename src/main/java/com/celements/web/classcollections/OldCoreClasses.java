@@ -25,7 +25,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.AbstractClassCollection;
-import com.celements.rteConfig.classes.RTEConfigClasses;
+import com.celements.javascript.JavaScriptExternalFilesClass;
+import com.celements.web.classes.KeyValueClass;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -86,18 +87,11 @@ public class OldCoreClasses extends AbstractClassCollection {
       + RTE_CONFIG_TYPE_CLASS_DOC;
 
   @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
+  public static final String KEY_VALUE_CLASS_DOC = KeyValueClass.DOC_NAME;
   @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE;
+  public static final String KEY_VALUE_CLASS_SPACE = KeyValueClass.SPACE_NAME;
   @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS;
-
-  @Deprecated
-  public static final String KEY_VALUE_CLASS_DOC = "KeyValueClass";
-  @Deprecated
-  public static final String KEY_VALUE_CLASS_SPACE = "Classes";
-  @Deprecated
-  public static final String KEY_VALUE_CLASS = KEY_VALUE_CLASS_SPACE + "." + KEY_VALUE_CLASS_DOC;
+  public static final String KEY_VALUE_CLASS = KeyValueClass.CLASS_DEF_HINT;
 
   @Deprecated
   public static final String TOKEN_CLASS_DOC = "TokenClass";
@@ -184,10 +178,19 @@ public class OldCoreClasses extends AbstractClassCollection {
   @Deprecated
   public static final String USER_CSS_CLASS = USER_CSS_CLASS_SPACE + "." + USER_CSS_CLASS_DOC;
 
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC
+   */
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC = "ExternalFiles";
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
+   */
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE = "JavaScript";
+  /**
+   * @deprecated since 4.0 instead use IOldCoreClassConfig.JAVA_SCRIPTS_EXTERNAL_FILES_CLASS
+   */
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS = JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
       + "." + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC;
@@ -222,11 +225,10 @@ public class OldCoreClasses extends AbstractClassCollection {
     getActionTypePropertiesClass();
     getFormStorageClass();
     getReceiverEMailClass();
-    getJavaScriptExternalFilesClass();
+    // getJavaScriptExternalFilesClass();
     getContextMenuItemClass();
     getPanelConfigClass();
     getRTEConfigTypeClass();
-    getTagValueClass();
     getTokenClass();
     getOverlayConfigClass();
     getRedirectClass();
@@ -250,7 +252,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("redirect", "Redirect", 30);
     needsUpdate |= bclass.addTextField("querystr", "Query String", 30);
     needsUpdate |= addBooleanField(bclass, "show_included", "Show Included", "yesno", 0);
@@ -281,7 +283,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextAreaField("cmi_link", "CMItem Link (velocity code)", 80, 20);
     needsUpdate |= bclass.addTextField("cmi_text", "CMItem Link Name", 30);
     needsUpdate |= bclass.addTextField("cmi_icon", "optional CMItem icon", 30);
@@ -309,7 +311,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addStaticListField("config_name", "Panel Config Type", 1, false,
         "leftPanels|rightPanels", "select");
     needsUpdate |= bclass.addBooleanField("show_panels", "Display the panel column", "yesno");
@@ -338,7 +340,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("cel_centralfilebase", "Central Filebase", 30);
     needsUpdate |= bclass.addStaticListField("celements_version", "Celements Version Mode", 1,
         false, "---|celements2|celements3", "select");
@@ -391,7 +393,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addBooleanField("force_pwd_change", "force_pwd_change", "yesno");
     needsUpdate |= bclass.addTextField("admin_language", "User Edit-Interface Language", 4);
     needsUpdate |= addBooleanField(bclass, "suspended", "Suspended", "yesno", 0);
@@ -422,7 +424,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("name", "name", 30);
     needsUpdate |= bclass.addTextField("emailFrom", "emailFrom", 30);
     needsUpdate |= bclass.addTextField("emailFields", "emailFields", 30);
@@ -450,7 +452,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("title", "title", 30);
     needsUpdate |= bclass.addTextAreaField("description", "description", 30, 15);
     needsUpdate |= bclass.addNumberField("height", "humbnail Height", 30, "integer");
@@ -490,7 +492,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("attachment", "attachment", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
@@ -515,7 +517,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("filebaseTagDocName", "filebaseTagDocName", 30);
     needsUpdate |= bclass.addTextField("preimport_link", "preimport_link", 30);
     needsUpdate |= bclass.addTextField("allowed_file_extentions", "allowed_file_extentions", 30);
@@ -529,32 +531,6 @@ public class OldCoreClasses extends AbstractClassCollection {
 
   public DocumentReference getUserCssClassRef(String wikiName) {
     return new DocumentReference(wikiName, USER_CSS_CLASS_SPACE, USER_CSS_CLASS_DOC);
-  }
-
-  private BaseClass getUserCSSClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = getUserCssClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + USER_CSS_CLASS + " class document. ", exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("cssname", "CSS Filename", 30);
-    needsUpdate |= bclass.addBooleanField("alternate", "alternate", "yesno");
-    needsUpdate |= bclass.addTextField("title", "Title", 30);
-    needsUpdate |= bclass.addBooleanField("is_rte_content", "Is RTE-Content", "yesno");
-    needsUpdate |= bclass.addStaticListField("media", "Media",
-        "all|aural|braille|embossed|handheld|print|projection|screen|tty|tv");
-
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
   }
 
   public DocumentReference getFormActionClassRef(String wikiName) {
@@ -575,7 +551,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("doc_fullName", "doc_fullName", 30);
     needsUpdate |= bclass.addTextAreaField("completeRuleSnippet", "is Form complete Rule", 80, 15);
 
@@ -609,7 +585,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("action_type", "Action Type", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
@@ -635,7 +611,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("action_exec", "Action Exec Template", 30);
     needsUpdate |= bclass.addTextField("action_name", "Action Pretty Name", 30);
     needsUpdate |= bclass.addTextField("action_edit", "Action Edit Template", 30);
@@ -666,7 +642,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("storageLocation", "Storage Location", 30);
     needsUpdate |= bclass.addTextField("storageClassname", "Storage Classname", 30);
     needsUpdate |= bclass.addTextAreaField("storeMapping", "Store Mapping", 80, 15);
@@ -694,7 +670,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("email", "email", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
@@ -706,27 +682,10 @@ public class OldCoreClasses extends AbstractClassCollection {
         JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC);
   }
 
-  private BaseClass getJavaScriptExternalFilesClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = getJavaScriptExternalFilesClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS + " class document. ", exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("filepath", "filepath", 50);
-
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
-  }
-
+  /**
+   * @deprecated since 5.4, instead use {@link JavaScriptExternalFilesClass#getClassRef()}
+   */
+  @Deprecated
   public DocumentReference getRTEConfigTypeClassRef(String wikiName) {
     return new DocumentReference(wikiName, RTE_CONFIG_TYPE_CLASS_SPACE, RTE_CONFIG_TYPE_CLASS_DOC);
   }
@@ -745,7 +704,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField("rteconfig", "RichTextEditor Config Document", 30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
@@ -757,44 +716,9 @@ public class OldCoreClasses extends AbstractClassCollection {
     return bclass;
   }
 
-  /**
-   * @deprecated instead use IRTEConfigClassConfig.getRTEConfigTypePropertiesClassRef
-   */
   @Deprecated
-  public DocumentReference getRTEConfigTypePropertiesClassRef(String wikiName) {
-    return new DocumentReference(wikiName, RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE,
-        RTE_CONFIG_TYPE_PRPOP_CLASS_DOC);
-  }
-
   public DocumentReference getTagValueClassRef(String wikiName) {
     return new DocumentReference(wikiName, KEY_VALUE_CLASS_SPACE, KEY_VALUE_CLASS_DOC);
-  }
-
-  private BaseClass getTagValueClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = getTagValueClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + KEY_VALUE_CLASS_DOC + " class document. ", exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("key", "Key", 30);
-    needsUpdate |= bclass.addTextAreaField("value", "Value", 80, 15);
-
-    if (!"internal".equals(bclass.getCustomMapping())) {
-      needsUpdate = true;
-      bclass.setCustomMapping("internal");
-    }
-
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
   }
 
   public DocumentReference getTokenClassRef(String wikiName) {
@@ -815,7 +739,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addPasswordField("tokenvalue", "Token value", 30);
     needsUpdate |= bclass.addDateField("validuntil", "Valid until");
 
@@ -846,7 +770,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addBooleanField("loadAdminMenuBar", "Load admin menu bar", "yesno");
     needsUpdate |= bclass.addBooleanField("showOverlayLanguageBar", "Show overlay language bar",
         "yesno");

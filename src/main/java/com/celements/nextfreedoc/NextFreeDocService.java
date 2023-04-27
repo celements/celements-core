@@ -155,10 +155,6 @@ public class NextFreeDocService implements INextFreeDocRole {
     return num;
   }
 
-  void injectQueryManager(QueryManager queryManager) {
-    this.queryManager = queryManager;
-  }
-
   /**
    * USE FOR TEST PURPOSES ONLY
    */

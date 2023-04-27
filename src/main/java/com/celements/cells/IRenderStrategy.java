@@ -19,37 +19,41 @@
  */
 package com.celements.cells;
 
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
+import org.xwiki.model.reference.EntityReference;
+
+import com.celements.model.context.Contextualiser;
 import com.celements.navigation.TreeNode;
 
 public interface IRenderStrategy {
 
-  public boolean isRenderCell(TreeNode node);
+  boolean isRenderCell(@Nullable TreeNode node);
 
-  public void startRendering();
+  @NotNull
+  Contextualiser getContextualiser(@Nullable TreeNode node);
 
-  public void endRendering();
+  void startRendering();
 
-  public SpaceReference getSpaceReference();
+  void endRendering();
 
-  public String getMenuPart(TreeNode node);
+  @NotNull
+  String getMenuPart(@Nullable TreeNode node);
 
-  public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem);
+  void startRenderCell(@Nullable TreeNode node, boolean isFirstItem, boolean isLastItem);
 
-  public void startRenderChildren(EntityReference parentRef);
+  void startRenderChildren(@Nullable EntityReference parentRef);
 
-  public void endRenderChildren(EntityReference parentRef);
+  void endRenderChildren(@Nullable EntityReference parentRef);
 
-  public void endRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem);
+  void endRenderCell(@Nullable TreeNode node, boolean isFirstItem, boolean isLastItem);
 
-  public boolean isRenderSubCells(EntityReference parentRef);
+  boolean isRenderSubCells(@Nullable EntityReference parentRef);
 
-  public String getAsString();
+  @NotNull
+  String getAsString();
 
-  public void renderEmptyChildren(TreeNode node);
-
-  public void setSpaceReference(SpaceReference spaceReference);
+  void renderEmptyChildren(@Nullable TreeNode node);
 
 }

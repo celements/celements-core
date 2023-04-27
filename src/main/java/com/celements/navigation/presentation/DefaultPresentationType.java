@@ -50,10 +50,10 @@ public class DefaultPresentationType implements IPresentationTypeRole<INavigatio
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation) {
     try {
-      LOGGER.debug("writeNodeContent for [" + docRef + "].");
+      LOGGER.debug("writeNodeContent for [{}].", docRef);
       appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem, navigation);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to writeNodeContent for docRef [" + docRef + "].", exp);
+      LOGGER.error("Failed to writeNodeContent for docRef [{}].", docRef, exp);
     }
   }
 

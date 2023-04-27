@@ -33,7 +33,9 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.configuration.CelementsFromWikiConfigurationSource;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.XWikiDocumentCreator;
+import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -48,7 +50,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
         getConfigurationSource());
-    registerComponentMock(XWikiDocumentCreator.class);
+    registerComponentMocks(IModelAccessFacade.class, XWikiDocumentCreator.class);
     pageTypeServiceMock = registerComponentMock(IPageTypeRole.class);
     createDocumentCmd = new CreateDocumentCommand();
   }
@@ -58,7 +60,8 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
     String pageType = "RichText";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
         "myNewDocument");
-    expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(true).once();
+    expect(getMock(IModelAccessFacade.class).createDocument(docRef))
+        .andThrow(new DocumentAlreadyExistsException(docRef));
     replayDefault();
     assertNull("only create document if NOT exists.", createDocumentCmd.createDocument(docRef,
         pageType));
@@ -69,14 +72,12 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
   public void testCreateDocument_noPageType() throws Exception {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
         "myNewDocument");
-    expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theNewDoc);
+    expect(getMock(IModelAccessFacade.class).createDocument(docRef)).andReturn(theNewDoc);
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(""))).andReturn(null).once();
     Capture<XWikiDocument> docCaptcher = newCapture();
-    getWikiMock().saveDocument(capture(docCaptcher), eq("init document"), eq(false), same(
-        getContext()));
-    expectLastCall().once();
+    getMock(IModelAccessFacade.class).saveDocument(capture(docCaptcher), eq("init document"),
+        eq(false));
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, null);
     assertNotNull(theDoc);
@@ -92,16 +93,15 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
     String pageType = "RichText";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
         "myNewDocument");
-    expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theNewDoc);
+    expect(getMock(IModelAccessFacade.class).createDocument(docRef)).andReturn(theNewDoc);
     PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
     Capture<XWikiDocument> docCaptcher = newCapture();
     expect(pageTypeServiceMock.setPageType(capture(docCaptcher), eq(ptRef))).andReturn(true).once();
     Capture<XWikiDocument> docCaptcher2 = newCapture();
-    getWikiMock().saveDocument(capture(docCaptcher2), eq("init RichText-document"), eq(false), same(
-        getContext()));
+    getMock(IModelAccessFacade.class).saveDocument(capture(docCaptcher2),
+        eq("init RichText-document"), eq(false));
     expectLastCall().once();
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType);
@@ -120,9 +120,8 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
     String pageType = "RichText";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
         "myNewDocument");
-    expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theNewDoc);
+    expect(getMock(IModelAccessFacade.class).createDocument(docRef)).andReturn(theNewDoc);
     PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
     Capture<XWikiDocument> docCaptcher = newCapture();

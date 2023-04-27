@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.docform.DocFormRequestKeyParser.DocFormRequestParseException;
@@ -31,7 +30,7 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
   @Before
   public void prepare() throws Exception {
     db = getContext().getDatabase();
-    defaultDocRef = new ImmutableDocumentReference(db, "Space", "DefaultDoc");
+    defaultDocRef = new DocumentReference(db, "Space", "DefaultDoc");
     parser = new DocFormRequestKeyParser(defaultDocRef);
   }
 

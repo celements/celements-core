@@ -19,10 +19,11 @@
  */
 package com.celements.web.service;
 
+import static com.google.common.base.Strings.*;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -37,6 +38,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -64,7 +66,6 @@ import com.celements.navigation.service.ITreeNodeService;
 import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.pagetype.service.PageTypeScriptService;
 import com.celements.rendering.RenderCommand;
-import com.celements.rteConfig.IRTEConfigTemplateRole;
 import com.celements.sajson.Builder;
 import com.celements.sajson.JsonScriptService;
 import com.celements.validation.ValidationType;
@@ -77,7 +78,6 @@ import com.celements.web.plugin.cmd.DocMetaTagsCmd;
 import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.ParseObjStoreCommand;
-import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
@@ -99,7 +99,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
 
-  private static final String CEL_GLOBALVAL_PREFIX = "celements.globalvalues.";
+  public static final String CEL_GLOBALVAL_PREFIX = "celements.globalvalues.";
 
   private static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
@@ -130,9 +130,6 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement("treeNode")
   ScriptService treeNodeScriptService;
-
-  @Requirement
-  IRTEConfigTemplateRole rteConfigTemplateService;
 
   @Requirement
   IClassesCompositorComponent classesComp;
@@ -240,9 +237,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String convertToPlainText(String htmlContent) {
-    LOGGER.trace("convertToPlainText called on celementsweb script service for [" + htmlContent
-        + "].");
-    return new PlainTextCommand().convertToPlainText(htmlContent);
+    return Jsoup.parse(nullToEmpty(htmlContent)).text();
   }
 
   /**
@@ -439,8 +434,8 @@ public class CelementsWebScriptService implements ScriptService {
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
     // we must not get here for !getService().isAppScriptRequest()
     if ("view".equals(getContext().getAction()) && renderDoc.isNew()) {
-      LOGGER.info("renderCelementsDocument: Failed to get xwiki document for"
-          + renderDoc.getFullName() + " no rendering applied.");
+      LOGGER.info("renderCelementsDocument: Failed to get xwiki document for [{}] no rendering"
+          + " applied.", renderDoc.getFullName());
       return "";
     } else {
       return renderCelementsDocument(renderDoc.getDocumentReference(), renderDoc.getLanguage(),
@@ -449,31 +444,30 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String renderDocument(DocumentReference docRef) {
-    LOGGER.trace("renderDocument: docRef [" + docRef + "].");
+    LOGGER.trace("renderDocument: docRef [{}].", docRef);
     return new RenderCommand().renderDocument(docRef);
   }
 
   public String renderDocument(DocumentReference docRef, DocumentReference includeDocRef) {
-    LOGGER.trace("renderDocument: docRef [" + docRef + "] and includeDocRef [" + includeDocRef
-        + "].");
+    LOGGER.trace("renderDocument: docRef [{}] and includeDocRef [{}].", docRef, includeDocRef);
     return new RenderCommand().renderDocument(docRef, includeDocRef);
   }
 
   public String renderDocument(DocumentReference docRef, String lang) {
-    LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "].");
+    LOGGER.trace("renderDocument: lang [{}] docRef [{}].", lang, docRef);
     return new RenderCommand().renderDocument(docRef, lang);
   }
 
   public String renderDocument(DocumentReference docRef, DocumentReference includeDocRef,
       String lang) {
-    LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "] and includeDocRef ["
-        + includeDocRef + "].");
+    LOGGER.trace("renderDocument: lang [{}] docRef [{}] and includeDocRef [{}].", lang, docRef,
+        includeDocRef);
     return new RenderCommand().renderDocument(docRef, includeDocRef, lang);
   }
 
   public String renderDocument(Document renderDoc) {
-    LOGGER.trace("renderDocument: renderDocLang [" + renderDoc.getLanguage() + "] renderDoc ["
-        + renderDoc.getDocumentReference() + "].");
+    LOGGER.trace("renderDocument: renderDocLang [{}] renderDoc [{}].", renderDoc.getLanguage(),
+        renderDoc.getDocumentReference());
     return new RenderCommand().renderDocument(renderDoc.getDocumentReference(),
         renderDoc.getLanguage());
   }
@@ -485,8 +479,7 @@ public class CelementsWebScriptService implements ScriptService {
       renderCommand.initRenderingEngine(rendererNameList);
       return renderCommand.renderDocument(docRef, lang);
     } catch (XWikiException exp) {
-      LOGGER.error("renderCelementsDocument: Failed to render [" + docRef + "] lang [" + lang
-          + "].", exp);
+      LOGGER.error("renderCelementsDocument: Failed to render [{}] lang [{}].", docRef, lang, exp);
     }
     return "";
   }
@@ -1020,20 +1013,6 @@ public class CelementsWebScriptService implements ScriptService {
       return true;
     }
     return false;
-  }
-
-  public List<com.xpn.xwiki.api.Object> getRTETemplateList() {
-    try {
-      List<BaseObject> rteTemplateList = rteConfigTemplateService.getRTETemplateList();
-      List<com.xpn.xwiki.api.Object> rteTemplateListExternal = new ArrayList<>();
-      for (BaseObject rteTmpl : rteTemplateList) {
-        rteTemplateListExternal.add(rteTmpl.newObjectApi(rteTmpl, getContext()));
-      }
-      return rteTemplateListExternal;
-    } catch (XWikiException exp) {
-      LOGGER.error("getRTETemplateList failed.", exp);
-    }
-    return Collections.emptyList();
   }
 
   public EntityReference getParentReference(DocumentReference docRef) {

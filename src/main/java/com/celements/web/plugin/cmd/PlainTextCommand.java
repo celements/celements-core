@@ -19,19 +19,17 @@
  */
 package com.celements.web.plugin.cmd;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import static com.google.common.base.Strings.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jsoup.Jsoup;
 
-import com.celements.web.utils.Html2Text;
-
+@Deprecated
 public class PlainTextCommand {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PlainTextCommand.class);
-
+  /**
+   * @deprecated since 5.9, instead use Jsoup.parse(String).text()
+   */
+  @Deprecated
   public String convertHtmlToPlainText(String htmlContent) throws ConvertToPlainTextException {
     try {
       return internalConvert(htmlContent);
@@ -46,20 +44,11 @@ public class PlainTextCommand {
    */
   @Deprecated
   public String convertToPlainText(String htmlContent) {
-    try {
-      return internalConvert(htmlContent);
-    } catch (IOException ioExp) {
-      LOGGER.error("Fail to convertToPlainText: ", ioExp);
-    }
-    return "";
+    return internalConvert(htmlContent);
   }
 
-  private String internalConvert(String htmlContent) throws IOException {
-    Reader in = new StringReader(htmlContent);
-    Html2Text parser = new Html2Text();
-    parser.parse(in);
-    in.close();
-    return parser.getText();
+  private String internalConvert(String htmlContent) {
+    return Jsoup.parse(nullToEmpty(htmlContent)).text();
   }
 
 }

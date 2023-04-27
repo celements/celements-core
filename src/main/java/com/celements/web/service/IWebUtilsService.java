@@ -41,9 +41,11 @@ import com.celements.auth.user.User;
 import com.celements.auth.user.UserService;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
+import com.celements.web.CelConstant;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
@@ -56,12 +58,12 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 @ComponentRole
 public interface IWebUtilsService {
 
-  public static final Date DATE_LOW = new Date(-62135773200000L);
+  Date DATE_LOW = new Date(-62135773200000L);
 
   /**
    * {@value #DATE_HIGH} has the value [Fri Dec 31 23:59:00 CET 9999]
    */
-  public static final Date DATE_HIGH = new Date(253402297140000L);
+  Date DATE_HIGH = new Date(253402297140000L);
 
   /**
    * Returns level of hierarchy with level=1 returning root which is null, else
@@ -72,7 +74,7 @@ public interface IWebUtilsService {
    * @throws IndexOutOfBoundsException
    *           - if level above root or below lowest
    */
-  public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
+  DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
 
   /**
    * @deprecated since 2.63.0
@@ -80,132 +82,132 @@ public interface IWebUtilsService {
    *             DocumentReference docRef, boolean includeDoc)
    */
   @Deprecated
-  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
+  List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc);
 
-  public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section)
+  String getDocSectionAsJSON(String regex, DocumentReference docRef, int section)
       throws XWikiException;
 
-  public String getDocSection(String regex, DocumentReference docRef, int section)
+  String getDocSection(String regex, DocumentReference docRef, int section)
       throws XWikiException;
 
-  public int countSections(String regex, DocumentReference docRef) throws XWikiException;
+  int countSections(String regex, DocumentReference docRef) throws XWikiException;
 
-  public List<String> getAllowedLanguages();
+  List<String> getAllowedLanguages();
 
-  public List<String> getAllowedLanguages(String spaceName);
+  List<String> getAllowedLanguages(String spaceName);
 
-  public List<String> getAllowedLanguages(SpaceReference spaceRef);
+  List<String> getAllowedLanguages(SpaceReference spaceRef);
 
-  public Date parseDate(String date, String format);
+  Date parseDate(String date, String format);
 
-  public XWikiMessageTool getMessageTool(String adminLanguage);
+  XWikiMessageTool getMessageTool(String adminLanguage);
 
-  public XWikiMessageTool getAdminMessageTool();
-
-  @NotNull
-  public String getDefaultAdminLanguage();
+  XWikiMessageTool getAdminMessageTool();
 
   @NotNull
-  public String getAdminLanguage();
+  String getDefaultAdminLanguage();
+
+  @NotNull
+  String getAdminLanguage();
 
   /**
    * @deprecated since 2.34.0 instead use getAdminLanguage(User user)
    */
   @Deprecated
-  public String getAdminLanguage(String userFullName);
+  String getAdminLanguage(String userFullName);
 
   @NotNull
-  public String getAdminLanguage(@Nullable DocumentReference userDocRef);
+  String getAdminLanguage(@Nullable DocumentReference userDocRef);
 
   @NotNull
-  public String getAdminLanguage(@Nullable User user);
+  String getAdminLanguage(@Nullable User user);
 
   /**
    * @deprecated instead use {@link ModelContext#getDefaultLanguage()}
    */
   @Deprecated
-  public String getDefaultLanguage();
+  String getDefaultLanguage();
 
   /**
    * @deprecated instead use {@link ModelContext#getDefaultLanguage(EntityReference)}
    */
   @Deprecated
-  public String getDefaultLanguage(String spaceName);
+  String getDefaultLanguage(String spaceName);
 
   /**
    * @deprecated instead use {@link ModelContext#getDefaultLanguage(EntityReference)}
    */
   @Deprecated
-  public String getDefaultLanguage(SpaceReference spaceRef);
+  String getDefaultLanguage(SpaceReference spaceRef);
 
-  public boolean hasParentSpace();
+  boolean hasParentSpace();
 
-  public boolean hasParentSpace(String spaceName);
+  boolean hasParentSpace(String spaceName);
 
-  public String getParentSpace();
+  String getParentSpace();
 
-  public String getParentSpace(String spaceName);
-
-  /**
-   * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
-   */
-  @Deprecated
-  public DocumentReference resolveDocumentReference(String fullName);
+  String getParentSpace(String spaceName);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  public DocumentReference resolveDocumentReference(String fullName, WikiReference wikiRef);
+  DocumentReference resolveDocumentReference(String fullName);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  public EntityReference resolveRelativeEntityReference(String name, EntityType type);
+  DocumentReference resolveDocumentReference(String fullName, WikiReference wikiRef);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  public SpaceReference resolveSpaceReference(String spaceName);
+  EntityReference resolveRelativeEntityReference(String name, EntityType type);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef);
+  SpaceReference resolveSpaceReference(String spaceName);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  public WikiReference resolveWikiReference(@Nullable String wikiName);
+  SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  public AttachmentReference resolveAttachmentReference(String fullName);
+  WikiReference resolveWikiReference(@Nullable String wikiName);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  public AttachmentReference resolveAttachmentReference(String fullName, WikiReference wikiRef);
+  AttachmentReference resolveAttachmentReference(String fullName);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  public EntityReference resolveEntityReference(String name, EntityType type);
+  AttachmentReference resolveAttachmentReference(String fullName, WikiReference wikiRef);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  public EntityReference resolveEntityReference(String name, EntityType type,
+  EntityReference resolveEntityReference(String name, EntityType type);
+
+  /**
+   * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
+  EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef);
 
   /**
@@ -213,7 +215,7 @@ public interface IWebUtilsService {
    */
   @Deprecated
   @NotNull
-  public <T extends EntityReference> T resolveReference(@NotNull String name,
+  <T extends EntityReference> T resolveReference(@NotNull String name,
       @NotNull Class<T> token);
 
   /**
@@ -221,45 +223,45 @@ public interface IWebUtilsService {
    */
   @Deprecated
   @NotNull
-  public <T extends EntityReference> T resolveReference(@NotNull String name,
+  <T extends EntityReference> T resolveReference(@NotNull String name,
       @NotNull Class<T> token, @Nullable EntityReference baseRef);
 
   /**
    * @deprecated instead use {@link IRightsAccessFacadeRole#isAdmin()}
    */
   @Deprecated
-  public boolean isAdminUser();
+  boolean isAdminUser();
 
   /**
    * @deprecated instead use {@link IRightsAccessFacadeRole#isAdvancedAdmin()}
    */
   @Deprecated
-  public boolean isAdvancedAdmin();
+  boolean isAdvancedAdmin();
 
   /**
    * @deprecated instead use {@link IRightsAccessFacadeRole#isSuperAdmin()}
    */
   @Deprecated
-  public boolean isSuperAdminUser();
+  boolean isSuperAdminUser();
 
   /**
    * @deprecated instead use {@link IRightsAccessFacadeRole#isLayoutEditor()}
    */
   @Deprecated
-  public boolean isLayoutEditor();
+  boolean isLayoutEditor();
 
   /**
    * instead use IRightsAccessFacadeRole.hasAccessLevel(EntityReference, EAccessLevel)
    */
   @Deprecated
-  public boolean hasAccessLevel(EntityReference ref, EAccessLevel level);
+  boolean hasAccessLevel(EntityReference ref, EAccessLevel level);
 
   /**
    * use IRightsAccessFacadeRole.hasAccessLevel(EntityReference, EAccessLevel, XWikiUser)
    * instead
    */
   @Deprecated
-  public boolean hasAccessLevel(EntityReference ref, EAccessLevel level, XWikiUser user);
+  boolean hasAccessLevel(EntityReference ref, EAccessLevel level, XWikiUser user);
 
   /**
    * CAUTION: this method returns attachments which start with the attRef.name if no exact
@@ -269,28 +271,28 @@ public interface IWebUtilsService {
    *             IAttachmentServiceRole.getAttachmentsNameMatch
    */
   @Deprecated
-  public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
+  XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
 
-  public Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException;
+  Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException;
 
   /**
    * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator)}
    */
   @Deprecated
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator)
+  List<Attachment> getAttachmentListSorted(Document doc, String comparator)
       throws ClassNotFoundException;
 
-  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
+  List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator);
 
   /**
    * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator, boolean)}
    */
   @Deprecated
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+  List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly);
 
-  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
+  List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator, boolean imagesOnly);
 
   /**
@@ -298,157 +300,165 @@ public interface IWebUtilsService {
    *             {@link #getAttachmentListSorted(XWikiDocument, Comparator, boolean, int, int)}
    */
   @Deprecated
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+  List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb);
 
-  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
+  List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator, boolean imagesOnly, int start, int nb);
 
   // TODO change signature requirement to XWikiDocument instead of document and mark
   // the old version as deprecated
-  public List<Attachment> getAttachmentListSortedSpace(String spaceName, String comparator,
+  List<Attachment> getAttachmentListSortedSpace(String spaceName, String comparator,
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException;
 
   // TODO change signature requirement to XWikiDocument instead of document and mark
   // the old version as deprecated
-  public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
+  List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
       String comparator, boolean imagesOnly, int start, int nb);
 
   // TODO change signature requirement to XWikiDocument instead of document and mark
   // the old version as deprecated
-  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName, String tagName,
+  List<Attachment> getAttachmentListForTagSortedSpace(String spaceName, String tagName,
       String comparator, boolean imagesOnly, int start, int nb) throws ClassNotFoundException;
 
   // TODO change signature requirement to XWikiDocument instead of document and mark
   // the old version as deprecated
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly);
+  String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly);
 
   // TODO change signature requirement to XWikiDocument instead of document and mark
   // the old version as deprecated
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly,
+  String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly,
       int start, int nb);
 
-  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+  /**
+   * @since 5.8 instead use {@link XWikiObjectFetcher}
+   */
+  @Deprecated
+  List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField, boolean asc);
 
-  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+  /**
+   * @since 5.8 instead use {@link XWikiObjectFetcher}
+   */
+  @Deprecated
+  List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2);
 
-  public String[] splitStringByLength(String inStr, int maxLength);
+  String[] splitStringByLength(String inStr, int maxLength);
 
-  public String getJSONContent(XWikiDocument cdoc);
+  String getJSONContent(XWikiDocument cdoc);
 
-  public String getJSONContent(DocumentReference docRef);
+  String getJSONContent(DocumentReference docRef);
 
   /**
    * @deprecated instead use {@link UserService#getUser(DocumentReference)} with
    *             {@link User#getPrettyName()}
    */
   @Deprecated
-  public String getUserNameForDocRef(DocumentReference userDocRef) throws XWikiException;
+  String getUserNameForDocRef(DocumentReference userDocRef) throws XWikiException;
 
-  public String getMajorVersion(XWikiDocument doc);
+  String getMajorVersion(XWikiDocument doc);
 
   /**
    * @deprecated instead use {@link ModelContext#getWiki()}
    */
   @Deprecated
-  public WikiReference getWikiRef();
+  WikiReference getWikiRef();
 
   /**
    * @deprecated instead use {@link ModelUtils#extractRef(EntityReference, EntityReference, Class)}
    */
   @Deprecated
-  public WikiReference getWikiRef(XWikiDocument doc);
+  WikiReference getWikiRef(XWikiDocument doc);
 
   /**
    * @deprecated instead use {@link ModelUtils#extractRef(EntityReference, EntityReference, Class)}
    */
   @Deprecated
-  public WikiReference getWikiRef(DocumentReference docRef);
+  WikiReference getWikiRef(DocumentReference docRef);
 
   /**
    * @deprecated instead use {@link ModelUtils#extractRef(EntityReference, EntityReference, Class)}
    */
   @Deprecated
-  public WikiReference getWikiRef(EntityReference ref);
+  WikiReference getWikiRef(EntityReference ref);
 
-  public DocumentReference getWikiTemplateDocRef();
+  DocumentReference getWikiTemplateDocRef();
 
-  public XWikiDocument getWikiTemplateDoc();
+  XWikiDocument getWikiTemplateDoc();
 
   /**
    * @deprecated instead use {@link ModelUtils#serializeRef(EntityReference)}
    */
   @Deprecated
-  public EntityReferenceSerializer<String> getRefDefaultSerializer();
+  EntityReferenceSerializer<String> getRefDefaultSerializer();
 
   /**
    * @deprecated instead use {@link ModelUtils#serializeRefLocal(EntityReference)}
    */
   @Deprecated
-  public EntityReferenceSerializer<String> getRefLocalSerializer();
+  EntityReferenceSerializer<String> getRefLocalSerializer();
 
   /**
    * @deprecated instead use {@link ModelUtils#serializeRef(EntityReference)}
    */
   @Deprecated
-  public String serializeRef(EntityReference entityRef);
+  String serializeRef(EntityReference entityRef);
 
   /**
    * @deprecated instead use {@link ModelUtils#serializeRef(EntityReference)} or
    *             {@link ModelUtils#serializeRefLocal(EntityReference)}
    */
   @Deprecated
-  public String serializeRef(EntityReference entityRef, boolean local);
+  String serializeRef(EntityReference entityRef, boolean local);
 
-  public Map<String, String[]> getRequestParameterMap();
+  Map<String, String[]> getRequestParameterMap();
 
-  public String getInheritedTemplatedPath(DocumentReference localTemplateRef);
+  String getInheritedTemplatedPath(DocumentReference localTemplateRef);
 
   /**
    * @deprecated instead use
    *             {@link IModelAccessFacade#deleteDocumentWithoutTranslations(XWikiDocument, boolean)}
    */
   @Deprecated
-  public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException;
+  void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException;
 
   /**
    * @deprecated instead use {@link IModelAccessFacade#deleteDocument(XWikiDocument, boolean)}
    */
   @Deprecated
-  public void deleteAllDocuments(XWikiDocument doc, boolean totrash) throws XWikiException;
+  void deleteAllDocuments(XWikiDocument doc, boolean totrash) throws XWikiException;
 
-  public String getTemplatePathOnDisk(String renderTemplatePath);
+  String getTemplatePathOnDisk(String renderTemplatePath);
 
-  public String getTemplatePathOnDisk(String renderTemplatePath, String lang);
+  String getTemplatePathOnDisk(String renderTemplatePath, String lang);
 
-  public String renderInheritableDocument(DocumentReference docRef, String lang)
+  String renderInheritableDocument(DocumentReference docRef, String lang)
       throws XWikiException;
 
-  public String renderInheritableDocument(DocumentReference docRef, String lang, String defLang)
+  String renderInheritableDocument(DocumentReference docRef, String lang, String defLang)
       throws XWikiException;
 
   @Deprecated
-  public String cleanupXHTMLtoHTML5(String xhtml);
+  String cleanupXHTMLtoHTML5(String xhtml);
 
   @Deprecated
-  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference doc);
+  String cleanupXHTMLtoHTML5(String xhtml, DocumentReference doc);
 
   @Deprecated
-  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
+  String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
 
-  public List<Attachment> getAttachmentsForDocs(List<String> docsFN);
+  List<Attachment> getAttachmentsForDocs(List<String> docsFN);
 
-  public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
+  String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
       String defLang);
 
-  public boolean existsInheritableDocument(@NotNull DocumentReference docRef);
+  boolean existsInheritableDocument(@NotNull DocumentReference docRef);
 
-  public boolean existsInheritableDocument(@NotNull DocumentReference docRef,
+  boolean existsInheritableDocument(@NotNull DocumentReference docRef,
       @Nullable String lang);
 
-  public boolean existsInheritableDocument(@NotNull DocumentReference docRef, @Nullable String lang,
+  boolean existsInheritableDocument(@NotNull DocumentReference docRef, @Nullable String lang,
       @Nullable String defLang);
 
   /**
@@ -463,77 +473,81 @@ public interface IWebUtilsService {
    * @param params
    *          list of strings passed through to dictionary subject resolving
    */
-  public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
+  void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
       List<String> params);
 
-  public WikiReference getCentralWikiRef();
+  /**
+   * @deprecated instead use {@link CelConstant#CENTRAL_WIKI}
+   */
+  @Deprecated
+  WikiReference getCentralWikiRef();
 
   /**
    * @deprecated instead use {@link ModelUtils#identifyClassFromName(String)}
    */
   @Deprecated
-  public EntityType resolveEntityTypeForFullName(String fullName);
+  EntityType resolveEntityTypeForFullName(String fullName);
 
   /**
    * @deprecated instead use {@link ModelUtils#identifyClassFromName(String)}
    */
   @Deprecated
-  public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType);
+  EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType);
 
   /**
    * only used as an adapter for unstable 2
    */
-  public <T> T lookup(Class<T> role) throws ComponentLookupException;
+  <T> T lookup(Class<T> role) throws ComponentLookupException;
 
   /**
    * only used as an adapter for unstable 2
    */
-  public <T> T lookup(Class<T> role, String roleHint) throws ComponentLookupException;
+  <T> T lookup(Class<T> role, String roleHint) throws ComponentLookupException;
 
   /**
    * only used as an adapter for unstable 2
    */
-  public <T> List<T> lookupList(Class<T> role) throws ComponentLookupException;
+  <T> List<T> lookupList(Class<T> role) throws ComponentLookupException;
 
   /**
    * only used as an adapter for unstable 2
    */
-  public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException;
+  <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException;
 
   /**
    * @deprecated instead use {@link ModelUtils#adjustRef(EntityReference, Class, EntityReference)}
    */
   @Deprecated
-  public DocumentReference checkWikiRef(DocumentReference docRef);
+  DocumentReference checkWikiRef(DocumentReference docRef);
 
   /**
    * @deprecated instead use {@link ModelUtils#adjustRef(EntityReference, Class, EntityReference)}
    */
   @Deprecated
-  public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc);
+  DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc);
 
   /**
    * @deprecated instead use {@link ModelUtils#adjustRef(EntityReference, Class, EntityReference)}
    */
   @Deprecated
-  public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef);
+  DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef);
 
   /**
    * @deprecated instead use {@link ModelUtils#adjustRef(EntityReference, Class, EntityReference)}
    */
   @Deprecated
-  public DocumentReference setWikiReference(DocumentReference docRef, String wikiName);
+  DocumentReference setWikiReference(DocumentReference docRef, String wikiName);
 
   /**
    * @deprecated instead use {@link ModelUtils#adjustRef(EntityReference, Class, EntityReference)}
    */
   @Deprecated
-  public DocumentReference setWikiReference(DocumentReference docRef, WikiReference wikiRef);
+  DocumentReference setWikiReference(DocumentReference docRef, WikiReference wikiRef);
 
   /**
    * @deprecated instead use {@link ModelContext#setUser}
    */
   @Deprecated
-  public void setUser(DocumentReference userReference, boolean main);
+  void setUser(DocumentReference userReference, boolean main);
 
 }

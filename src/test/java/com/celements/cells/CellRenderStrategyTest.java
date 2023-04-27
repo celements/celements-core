@@ -32,22 +32,26 @@ import java.util.Optional;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.cells.attribute.CellAttribute;
+import com.celements.cells.classes.CellAttributeClass;
 import com.celements.cells.classes.CellClass;
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.access.ModelAccessStrategy;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.navigation.TreeNode;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.celements.velocity.VelocityService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -58,33 +62,15 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   private ICellWriter outWriterMock;
   private XWikiContext context;
   private RenderCommand mockctRendererCmd;
-  private PageLayoutCommand pageLayoutCmdMock;
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMocks(ModelAccessStrategy.class, IPageTypeResolverRole.class,
-        IPageTypeRole.class);
+    registerComponentMocks(IModelAccessFacade.class, IPageTypeResolverRole.class,
+        IPageTypeRole.class, LayoutServiceRole.class, VelocityService.class);
     outWriterMock = createMockAndAddToDefault(ICellWriter.class);
     context = getContext();
-    renderer = new CellRenderStrategy(context).setOutputWriter(outWriterMock);
     mockctRendererCmd = createMockAndAddToDefault(RenderCommand.class);
-    renderer.rendererCmd = mockctRendererCmd;
-    pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
-    renderer.pageLayoutCmd = pageLayoutCmdMock;
-  }
-
-  @Test
-  public void test_pageTypeCmd() {
-    renderer.rendererCmd = null;
-    assertNotNull(renderer.getRendererCmd());
-    assertSame("Expecting singleton.", renderer.getRendererCmd(), renderer.getRendererCmd());
-  }
-
-  @Test
-  public void test_inject_ctRendererCmd() {
-    renderer.rendererCmd = mockctRendererCmd;
-    assertNotNull(renderer.getRendererCmd());
-    assertSame("Expecting injected mock object.", mockctRendererCmd, renderer.getRendererCmd());
+    renderer = new CellRenderStrategy(outWriterMock, mockctRendererCmd);
   }
 
   @Test
@@ -144,41 +130,6 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     assertFalse(renderer.isRenderCell(null));
     assertTrue(renderer.isRenderCell(new TreeNode(cellRef, null, 0)));
-  }
-
-  @Test
-  public void test_getSpaceReference_default() {
-    renderer.setSpaceReference(null);
-    SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
-        context.getDatabase()));
-    expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(defaultLayout);
-    replayDefault();
-    assertEquals("expecting default layout space", defaultLayout, renderer.getSpaceReference());
-    verifyDefault();
-  }
-
-  @Test
-  public void test_getSpaceReference() {
-    SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
-        context.getDatabase()));
-    renderer.setSpaceReference(layoutSpaceRef);
-    replayDefault();
-    assertEquals(layoutSpaceRef, renderer.getSpaceReference());
-    verifyDefault();
-  }
-
-  @Test
-  public void test_getSpaceReference_null_setBack() {
-    SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
-        context.getDatabase()));
-    renderer.setSpaceReference(layoutSpaceRef);
-    renderer.setSpaceReference(null);
-    SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
-        context.getDatabase()));
-    expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(defaultLayout);
-    replayDefault();
-    assertEquals(defaultLayout, renderer.getSpaceReference());
-    verifyDefault();
   }
 
   @Test
@@ -347,14 +298,30 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
+    BaseObject attrObj1 = addObj(doc, CellAttributeClass.CLASS_REF);
+    attrObj1.setStringValue("name", "custom-x");
+    attrObj1.setStringValue("value", "custom velocity x");
+    BaseObject attrObj2 = addObj(doc, CellAttributeClass.CLASS_REF);
+    attrObj2.setStringValue("name", "custom-y");
+    attrObj2.setStringValue("value", "custom velocity y");
     Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
     IPageTypeConfig typeConfig = expectCellTypeConfig(cellRef, (String) null);
     typeConfig.collectAttributes(isA(AttributeBuilder.class), eq(cellRef));
+    expect(getMock(VelocityService.class).evaluateVelocityText("custom velocity x"))
+        .andReturn("custom_evaluated_x");
+    expect(getMock(VelocityService.class).evaluateVelocityText("custom velocity y"))
+        .andReturn("");
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    assertDefaultAttributes(cssClasses, idname, cellFN, cssStyles, capturedAttrList);
     verifyDefault();
+    Map<String, CellAttribute> attrMap = assertDefaultAttributes(cssClasses, idname, cellFN,
+        cssStyles, capturedAttrList);
+    assertTrue(attrMap.containsKey("custom-x"));
+    assertTrue(attrMap.get("custom-x").getValue().isPresent());
+    assertEquals("custom_evaluated_x", attrMap.get("custom-x").getValue().get());
+    assertTrue(attrMap.containsKey("custom-y"));
+    assertFalse(attrMap.get("custom-y").getValue().isPresent());
   }
 
   @Test
@@ -365,7 +332,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     expect(mockctRendererCmd.renderCelementsCell(eq(cellRef))).andReturn(
         cellContentExpected).once();
     // ASSERT
-    outWriterMock.appendContent(eq(cellContentExpected));
+    expect(outWriterMock.appendContent(eq(cellContentExpected))).andReturn(outWriterMock);
     replayDefault();
     renderer.renderEmptyChildren(cellNode);
     verifyDefault();
@@ -437,17 +404,22 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     return typeConfig;
   }
 
-  private XWikiDocument expectNewDoc(DocumentReference docRef) {
+  private XWikiDocument expectNewDoc(DocumentReference docRef) throws DocumentNotExistsException {
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setNew(false);
-    expect(getMock(ModelAccessStrategy.class).getDocument(docRef, "")).andReturn(doc).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).getDocument(docRef)).andReturn(doc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(docRef)).andReturn(doc).anyTimes();
     return doc;
   }
 
   private BaseObject addCellObj(XWikiDocument doc) {
+    return addObj(doc, CellClass.CLASS_REF);
+  }
+
+  private BaseObject addObj(XWikiDocument doc, ClassReference classRef) {
     BaseObject cellObj = new BaseObject();
     cellObj.setDocumentReference(doc.getDocumentReference());
-    cellObj.setXClassReference(CellClass.CLASS_REF.getDocRef(
+    cellObj.setXClassReference(classRef.getDocRef(
         doc.getDocumentReference().getWikiReference()));
     doc.addXObject(cellObj);
     return cellObj;
@@ -462,8 +434,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         .andReturn(typeConfig).atLeastOnce();
   }
 
-  private void assertDefaultAttributes(String cssClasses, String idname, String cellFN,
-      String cssStyles, Capture<List<CellAttribute>> capturedAttrList) {
+  private Map<String, CellAttribute> assertDefaultAttributes(String cssClasses, String idname,
+      String cellFN, String cssStyles, Capture<List<CellAttribute>> capturedAttrList) {
     List<CellAttribute> attrList = capturedAttrList.getValue();
     assertNotNull(attrList);
     assertFalse(attrList.isEmpty());
@@ -482,7 +454,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     assertTrue("styles attribute not found", attrMap.containsKey("style"));
     assertEquals("wrong styles attribute", cssStyles.replaceAll("[\n\r]", ""),
         attrMap.get("style").getValue().get());
-
+    return attrMap;
   }
 
 }

@@ -31,10 +31,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -71,34 +73,32 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
 
   @Before
   public void setUp_DefaultPresentationTypeTest() throws Exception {
+    registerComponentMock(IModelAccessFacade.class);
     context = getContext();
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     currentDoc.setNew(false);
     context.setDoc(currentDoc);
     nav = new Navigation("N1");
-    navFilterMock = createMock(InternalRightsFilter.class);
+    navFilterMock = createMockAndAddToDefault(InternalRightsFilter.class);
     nav.setNavFilter(navFilterMock);
-    mockLayoutCmd = createMock(PageLayoutCommand.class);
+    mockLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
     nav.pageLayoutCmd = mockLayoutCmd;
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    utils = createMock(IWebUtils.class);
+    xwiki = getWikiMock();
+    utils = createMockAndAddToDefault(IWebUtils.class);
     nav.testInjectUtils(utils);
-    tNServiceMock = createMock(ITreeNodeService.class);
+    tNServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
-    wUServiceMock = createMock(IWebUtilsService.class);
+    wUServiceMock = registerComponentMock(IWebUtilsService.class);
     expect(wUServiceMock.getRefLocalSerializer()).andReturn(Utils.getComponent(
-        IWebUtilsService.class).getRefLocalSerializer()).anyTimes();
-    nav.injected_WebUtilsService = wUServiceMock;
-    ptResolverServiceMock = createMock(PageTypeResolverService.class);
+        EntityReferenceSerializer.class, "local")).anyTimes();
+    ptResolverServiceMock = createMockAndAddToDefault(PageTypeResolverService.class);
     nav.injected_PageTypeResolverService = ptResolverServiceMock;
     defPresType = (DefaultPresentationType) Utils.getComponent(IPresentationTypeRole.class);
-    mockRightService = createMock(XWikiRightService.class);
+    mockRightService = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
-    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).anyTimes();
-    expect(xwiki.getDocument(eq("MySpace.MyCurrentDoc"), same(context))).andReturn(
-        currentDoc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(currentDocRef))
+        .andReturn(currentDoc).anyTimes();
   }
 
   @Test
@@ -111,7 +111,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -122,7 +122,8 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
         "/MySpace/MyCurrentDoc");
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMock(MultilingualMenuNameCommand.class);
+    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+        MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     defPresType.menuNameCmd = menuNameCmdMock;
     String menuName = "My Current Doc";
@@ -141,7 +142,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
         "MySpace.MyCurrentDoc"), same(context))).andReturn(true).atLeastOnce();
-    replayAll(pageTypeRef, menuNameCmdMock);
+    replayDefault();
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), false, 1, nav);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
@@ -149,7 +150,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
         + " cel_nav_hasChildren cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyCurrentDoc"
         + " currentPage myUltimativePageType" + " active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
-    verifyAll(pageTypeRef, menuNameCmdMock);
+    verifyDefault();
   }
 
   @Test
@@ -163,7 +164,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -174,7 +175,8 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
         "/MySpace/MyCurrentDoc");
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMock(MultilingualMenuNameCommand.class);
+    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+        MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     defPresType.menuNameCmd = menuNameCmdMock;
     String menuName = "My Current Doc";
@@ -194,7 +196,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
         "MySpace.MyCurrentDoc"), same(context))).andReturn(true).atLeastOnce();
     getConfigurationSource().setProperty("navigation.linkTarget.enabled", "true");
-    replayAll(pageTypeRef, menuNameCmdMock);
+    replayDefault();
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), false, 1, nav);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\" target=\"_blank\""
@@ -202,7 +204,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
         + " cel_nav_hasChildren cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyCurrentDoc"
         + " currentPage myUltimativePageType" + " active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
-    verifyAll(pageTypeRef, menuNameCmdMock);
+    verifyDefault();
   }
 
   @Test
@@ -213,7 +215,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -225,7 +227,8 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(1);
-    MultilingualMenuNameCommand menuNameCmdMock = createMock(MultilingualMenuNameCommand.class);
+    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+        MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     defPresType.menuNameCmd = menuNameCmdMock;
     String menuName = "My Current Doc";
@@ -246,7 +249,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
         "MySpace.MyCurrentDoc"), same(context))).andReturn(true).atLeastOnce();
-    replayAll(pageTypeRef, menuNameCmdMock);
+    replayDefault();
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), false, 1, nav);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\"" + " style=\"background-image:url(abc);\""
@@ -254,7 +257,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
         + " cel_nav_hasChildren cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyCurrentDoc"
         + " currentPage myUltimativePageType" + " active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
-    verifyAll(pageTypeRef, menuNameCmdMock);
+    verifyDefault();
   }
 
   @Test
@@ -265,7 +268,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -276,7 +279,8 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     nav.setHasLink(false);
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMock(MultilingualMenuNameCommand.class);
+    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+        MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     defPresType.menuNameCmd = menuNameCmdMock;
     expect(menuNameCmdMock.getMultilingualMenuName(eq(currentDoc.getFullName()), eq("de"), same(
@@ -294,7 +298,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
         "MySpace.MyCurrentDoc"), same(context))).andReturn(true).atLeastOnce();
-    replayAll(pageTypeRef, menuNameCmdMock);
+    replayDefault();
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), true, 1, nav);
     assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_odd"
@@ -302,7 +306,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
         + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyCurrentDoc currentPage"
         + " myUltimativePageType active\" id=\"N1:MySpace:MySpace."
         + "MyCurrentDoc\">My Current Doc</span>", outStream.toString());
-    verifyAll(pageTypeRef, menuNameCmdMock);
+    verifyDefault();
   }
 
   // *****************************************************************
@@ -311,18 +315,6 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
 
   private DocumentReference getDocRefForDocName(String docName) {
     return new DocumentReference(context.getDatabase(), "MySpace", docName);
-  }
-
-  private void replayAll(Object... mocks) {
-    replay(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock, ptResolverServiceMock,
-        mockLayoutCmd, mockRightService);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object... mocks) {
-    verify(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock, ptResolverServiceMock,
-        mockLayoutCmd, mockRightService);
-    verify(mocks);
   }
 
 }

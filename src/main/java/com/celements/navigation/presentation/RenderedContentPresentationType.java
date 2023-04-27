@@ -14,11 +14,12 @@ import com.xpn.xwiki.XWikiException;
 @Component("renderedContent")
 public class RenderedContentPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RenderedContentPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(RenderedContentPresentationType.class);
 
-  private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
+  private static final String CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 
-  RenderCommand renderCmd;
+  protected RenderCommand renderCmd;
 
   @Override
   public void writeNodeContent(ICellWriter writer, DocumentReference docRef,
@@ -29,17 +30,21 @@ public class RenderedContentPresentationType implements IPresentationTypeRole<IN
   @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
-    LOGGER.debug("writeNodeContent for [" + docRef + "].");
+    LOGGER.debug("writeNodeContent for [{}].", docRef);
     outStream.append("<div ");
     outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
         + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
+    addRenderedContent(outStream, docRef);
+    outStream.append("</div>\n");
+  }
+
+  protected void addRenderedContent(StringBuilder outStream, DocumentReference docRef) {
     try {
       outStream.append(getRenderCommand().renderCelementsDocument(docRef, "view"));
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get document for [" + docRef + "].", exp);
     }
-    outStream.append("</div>\n");
   }
 
   RenderCommand getRenderCommand() {
@@ -51,7 +56,7 @@ public class RenderedContentPresentationType implements IPresentationTypeRole<IN
 
   @Override
   public String getDefaultCssClass() {
-    return _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS;
+    return CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS;
   }
 
   @Override

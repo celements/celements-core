@@ -19,56 +19,71 @@
  */
 package com.celements.cells;
 
+import static com.google.common.base.MoreObjects.*;
+import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Strings.*;
+
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.annotation.concurrent.NotThreadSafe;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
 import com.celements.cells.attribute.CellAttribute;
-import com.celements.cells.attribute.DefaultAttributeBuilder;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 
+@NotThreadSafe
 public class DivWriter implements ICellWriter {
 
   private static final String TAGNAME_DIV = "div";
 
-  private StringBuilder out;
-  private Deque<String> openLevels = new LinkedList<>();
+  private final StringBuilder out;
+
+  /**
+   * Entry: tagName (String), hasContent (Boolean)
+   */
+  private final Deque<Entry<String, Boolean>> openLevels = new LinkedList<>();
 
   public DivWriter() {
+    this(new StringBuilder());
   }
 
   public DivWriter(StringBuilder out) {
-    this.out = out;
+    this.out = checkNotNull(out);
+  }
+
+  private Optional<Entry<String, Boolean>> getCurrentLevel() {
+    return Optional.ofNullable(openLevels.peek());
+  }
+
+  @Override
+  public Stream<String> getOpenLevels() {
+    return openLevels.stream().map(Entry::getKey);
   }
 
   @Override
   public void closeLevel() {
-    String tagName = openLevels.pop();
-    getOut().append("</");
-    getOut().append(tagName);
-    getOut().append(">");
-  }
-
-  @Override
-  @Deprecated
-  public void openLevel(String tagName, String idname, String cssClasses, String cssStyles) {
-    openLevel(tagName, new DefaultAttributeBuilder().addId(idname).addCssClasses(
-        cssClasses).addStyles(cssStyles).build());
+    if (!openLevels.isEmpty()) {
+      out.append("</");
+      out.append(openLevels.pop().getKey());
+      out.append(">");
+    }
   }
 
   @Override
   public void openLevel() {
-    openLevel("");
+    openLevel(TAGNAME_DIV);
   }
 
   @Override
   public void openLevel(List<CellAttribute> attributes) {
-    openLevel(null, attributes);
+    openLevel(TAGNAME_DIV, attributes);
   }
 
   @Override
@@ -78,55 +93,55 @@ public class DivWriter implements ICellWriter {
 
   @Override
   public void openLevel(String tagName, List<CellAttribute> attributes) {
-    tagName = MoreObjects.firstNonNull(Strings.emptyToNull(tagName), TAGNAME_DIV);
-    openLevels.push(tagName);
-    getOut().append("<");
-    getOut().append(tagName);
+    tagName = firstNonNull(emptyToNull(tagName), TAGNAME_DIV);
+    getCurrentLevel().ifPresent(e -> e.setValue(true));
+    openLevels.push(new SimpleEntry<>(tagName, false));
+    out.append("<");
+    out.append(tagName);
     for (CellAttribute cellAttr : attributes) {
       String attrName = cellAttr.getName();
-      getOut().append(" ");
-      getOut().append(attrName);
-      getOut().append("=\"");
-      Optional<String> attrValue = cellAttr.getValue();
-      // TODO CELDEV-343: check for HTML5 type. Only add default Value for XHMTL
-      getOut().append(StringEscapeUtils.escapeHtml(attrValue.or(attrName)));
-      getOut().append("\"");
+      out.append(" ");
+      out.append(attrName);
+      cellAttr.getValue().ifPresent(attrValue -> {
+        out.append("=\"");
+        out.append(StringEscapeUtils.escapeHtml(attrValue));
+        out.append("\"");
+      });
     }
-    getOut().append(">");
-  }
-
-  @Override
-  @Deprecated
-  public void openLevel(String idname, String cssClasses, String cssStyles) {
-    openLevel("", idname, cssClasses, cssStyles);
+    out.append(">");
   }
 
   @Override
   public void clear() {
-    out = null;
+    out.setLength(0);
     openLevels.clear();
   }
 
-  StringBuilder getOut() {
-    if (out == null) {
-      out = new StringBuilder();
-    }
-    return out;
+  @Override
+  public boolean hasLevelContent() {
+    return getCurrentLevel()
+        .map(Entry::getValue)
+        .orElse(out.length() > 0);
   }
 
   @Override
-  public void appendContent(String content) {
-    getOut().append(content);
+  public DivWriter appendContent(String content) {
+    content = nullToEmpty(content).trim();
+    if (!content.isEmpty()) {
+      getCurrentLevel().ifPresent(e -> e.setValue(true));
+      out.append(content);
+    }
+    return this;
   }
 
   @Override
   public String getAsString() {
-    return getOut().toString();
+    return out.toString();
   }
 
   @Override
   public StringBuilder getAsStringBuilder() {
-    return getOut();
+    return out;
   }
 
   @Override

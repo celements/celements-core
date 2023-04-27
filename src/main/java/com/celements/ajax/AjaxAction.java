@@ -42,7 +42,6 @@ public class AjaxAction extends XWikiAction {
     context.put("action", VIEW_ACTION);
     context.put("ajaxAction", true);
     getAjaxScript(context).ifPresent(celAjaxScript -> {
-      LOGGER.error("ajax: found script path '{}'.", celAjaxScript);
       context.put(CEL_AJAX_CONTEXT_PROPERTY, celAjaxScript);
       VelocityContext vcontext = (VelocityContext) context.get("vcontext");
       vcontext.put(CEL_AJAX_CONTEXT_PROPERTY, celAjaxScript);
@@ -59,7 +58,7 @@ public class AjaxAction extends XWikiAction {
   public String render(XWikiContext context) throws XWikiException {
     String page = Utils.getPage(context.getRequest(), AJAX_SCRIPT_ACTION);
     final String celAjaxScript = getAjaxScript(context).orElse(page);
-    LOGGER.error("Ajax: render page '{}', script: '{}'", page, celAjaxScript);
+    LOGGER.info("Ajax: render page '{}', script: '{}'", page, celAjaxScript);
     Utils.parseTemplate(celAjaxScript, !page.equals("direct"), context);
     return null;
   }

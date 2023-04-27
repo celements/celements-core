@@ -63,7 +63,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addDateField(PUBLISH_DATE_FIELD, "Publish Date (dd.MM.yyyy HH:mm)",
         "dd.MM.yyyy HH:mm", 0);
     needsUpdate |= bclass.addDateField(UNPUBLISH_DATE_FIELD, "Unpublish Date (dd.MM.yyyy "
@@ -96,7 +96,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     }
 
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
+    bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addTextField(FIELD_DOC_EXTRACT_LANGUAGE, "Language", 30);
     needsUpdate |= bclass.addTextAreaField(FIELD_DOC_EXTRACT_CONTENT, "Extract", 80, 7);
 

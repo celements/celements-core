@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.presentation;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
 import com.xpn.xwiki.XWiki;
@@ -41,7 +42,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
 
-public class RenderedContentPresentationTypeTest extends AbstractBridgedComponentTestCase {
+public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private INavigation nav;
@@ -58,13 +59,13 @@ public class RenderedContentPresentationTypeTest extends AbstractBridgedComponen
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
-    nav = createMock(INavigation.class);
-    xwiki = createMock(XWiki.class);
+    nav = createMockAndAddToDefault(INavigation.class);
+    xwiki = createMockAndAddToDefault(XWiki.class);
     context.setWiki(xwiki);
     testRenderEngine = new TestRenderEngine();
     expect(xwiki.getRenderingEngine()).andReturn(testRenderEngine).anyTimes();
     vtPresType = new RenderedContentPresentationType();
-    renderCmdMock = createMock(RenderCommand.class);
+    renderCmdMock = createMockAndAddToDefault(RenderCommand.class);
     vtPresType.renderCmd = renderCmdMock;
   }
 
@@ -104,27 +105,17 @@ public class RenderedContentPresentationTypeTest extends AbstractBridgedComponen
     expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
         isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
             + " first cel_nav_isLeaf RichText\"").once();
-    replayAll();
+    replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
         + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
         outStream.toString());
-    verifyAll();
+    verifyDefault();
   }
 
   // *****************************************************************
-  // * H E L P E R - M E T H O D S *
+  // * H E L P E R S *
   // *****************************************************************/
-
-  private void replayAll(Object... mocks) {
-    replay(xwiki, testRenderEngine.getMock(), renderCmdMock, nav);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object... mocks) {
-    verify(xwiki, testRenderEngine.getMock(), renderCmdMock, nav);
-    verify(mocks);
-  }
 
   public class TestRenderEngine implements XWikiRenderingEngine {
 

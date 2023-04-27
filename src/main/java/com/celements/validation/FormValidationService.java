@@ -19,8 +19,13 @@
  */
 package com.celements.validation;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -28,7 +33,12 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
+import com.celements.docform.DocFormRequestKeyParser;
+import com.celements.docform.DocFormRequestParam;
+import com.celements.model.context.ModelContext;
 import com.celements.web.service.IWebUtilsService;
+
+import one.util.streamex.StreamEx;
 
 @Component
 public class FormValidationService implements IFormValidationServiceRole {
@@ -41,56 +51,78 @@ public class FormValidationService implements IFormValidationServiceRole {
   private IWebUtilsService webUtils;
 
   @Requirement
-  private Map<String, IRequestValidationRuleRole> requestValidationRules;
+  private Map<String, IRequestValidationRule> requestValidationRules;
+
+  @Requirement
+  private Map<String, IRequestValidationRuleRole> legacyRequestValidationRules;
 
   @Requirement
   private Map<String, IFieldValidationRuleRole> fieldValidationRules;
 
-  void injectValidationRules(Map<String, IRequestValidationRuleRole> requestValidationRules,
+  @Requirement
+  private ModelContext context;
+
+  void injectValidationRules(
+      Map<String, IRequestValidationRule> requestValidationRules,
+      Map<String, IRequestValidationRuleRole> legacyRequestValidationRules,
       Map<String, IFieldValidationRuleRole> fieldValidationRules) {
     this.requestValidationRules = requestValidationRules;
+    this.legacyRequestValidationRules = legacyRequestValidationRules;
     this.fieldValidationRules = fieldValidationRules;
   }
 
   @Override
   public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
-    LOGGER.trace("validateRequest called");
-    Map<String, String[]> requestMap = webUtils.getRequestParameterMap();
-    LOGGER.debug("validateRequest: requestMap '" + requestMap + "'");
-    Map<String, Map<ValidationType, Set<String>>> validatedMap = validateMap(requestMap);
-    LOGGER.debug("validateRequest: validatedMap '" + validatedMap + "'");
-    return validatedMap;
+    return validateMap(webUtils.getRequestParameterMap());
   }
 
   @Override
   public Map<String, Map<ValidationType, Set<String>>> validateMap(
       Map<String, String[]> requestMap) {
     Map<String, Map<ValidationType, Set<String>>> ret = new HashMap<>();
-    Map<RequestParameter, String[]> convertedRequestMap = convertMapKeys(requestMap);
-    for (IRequestValidationRuleRole validationRule : requestValidationRules.values()) {
-      LOGGER.trace("Calling validateRequest() for rule '" + validationRule + "'");
-      MAPHANDLER.mergeMultiMaps(validationRule.validateRequest(convertedRequestMap), ret);
+    DocFormRequestKeyParser parser = new DocFormRequestKeyParser(context.getDocRef()
+        .orElseThrow(IllegalStateException::new));
+    for (ValidationResult v : validate(parser.parseParameterMap(requestMap))) {
+      ret.computeIfAbsent(v.getName(), k -> new EnumMap<>(ValidationType.class))
+          .computeIfAbsent(v.getType(), k -> new HashSet<>())
+          .add(v.getMessage());
     }
     return ret;
   }
 
-  Map<RequestParameter, String[]> convertMapKeys(Map<String, String[]> requestMap) {
-    Map<RequestParameter, String[]> convMap = new HashMap<>();
-    for (String key : requestMap.keySet()) {
-      RequestParameter requestparam = RequestParameter.create(key);
-      if (requestparam != null) {
-        convMap.put(requestparam, requestMap.get(key));
-      }
+  @Override
+  public List<ValidationResult> validate(List<DocFormRequestParam> params) {
+    List<ValidationResult> ret = validateLegacy(params);
+    for (IRequestValidationRule validationRule : requestValidationRules.values()) {
+      LOGGER.trace("validate - for rule: {}", validationRule);
+      ret.addAll(validationRule.validate(params));
     }
-    return convMap;
+    LOGGER.debug("validate - params [{}], result [{}]", params, ret);
+    return ret;
+  }
+
+  private List<ValidationResult> validateLegacy(List<DocFormRequestParam> params) {
+    Map<RequestParameter, String[]> paramMap = StreamEx.of(params).mapToEntry(
+        p -> RequestParameter.create(p.getKey().getKeyString()),
+        p -> p.getValues().toArray(new String[0]))
+        .filterKeys(Objects::nonNull)
+        .toImmutableMap();
+    List<ValidationResult> ret = new ArrayList<>();
+    for (IRequestValidationRuleRole validationRule : legacyRequestValidationRules.values()) {
+      LOGGER.trace("validateLegacy - for rule: {}", validationRule);
+      validationRule.validateRequest(paramMap).forEach((name, x) -> x.forEach((type, msgs) -> msgs
+          .forEach(msg -> ret.add(new ValidationResult(type, name, msg)))));
+    }
+    LOGGER.debug("validateLegacy - params [{}], result [{}]", paramMap, ret);
+    return ret;
   }
 
   @Override
   public Map<ValidationType, Set<String>> validateField(String className, String fieldName,
       String value) {
-    Map<ValidationType, Set<String>> ret = new HashMap<>();
+    Map<ValidationType, Set<String>> ret = new EnumMap<>(ValidationType.class);
     for (IFieldValidationRuleRole validationRule : fieldValidationRules.values()) {
-      LOGGER.trace("Calling validateField() for rule '" + validationRule + "'");
+      LOGGER.trace("validateField - for rule: {}", validationRule);
       MAPHANDLER.mergeMaps(validationRule.validateField(className, fieldName, value), ret);
     }
     return ret;

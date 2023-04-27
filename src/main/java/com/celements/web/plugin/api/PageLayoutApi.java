@@ -29,11 +29,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.HtmlDoctype;
-import com.celements.cells.ICellsClassConfig;
+import com.celements.cells.classes.PageLayoutPropertiesClass;
 import com.celements.model.context.ModelContext;
-import com.celements.model.util.References;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.web.Utils;
@@ -42,48 +40,39 @@ public class PageLayoutApi extends Api {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PageLayoutApi.class);
 
-  private PageLayoutCommand pageLayoutCmd;
-  private SpaceReference layoutSpaceRef;
-
-  public PageLayoutApi(SpaceReference layoutSpaceRef, XWikiContext context) {
-    super(context);
-    this.pageLayoutCmd = new PageLayoutCommand();
-    this.layoutSpaceRef = layoutSpaceRef;
-  }
+  private SpaceReference spaceRef;
 
   public PageLayoutApi(SpaceReference layoutSpaceRef) {
-    this(layoutSpaceRef, getContext().getXWikiContext());
+    super(getContext().getXWikiContext());
+    this.spaceRef = layoutSpaceRef;
   }
 
-  public PageLayoutCommand getPageLayoutCommand() {
-    if (hasProgrammingRights()) {
-      return pageLayoutCmd;
-    }
-    return null;
+  public SpaceReference getSpaceRef() {
+    return spaceRef;
   }
 
   public SpaceReference getLayoutSpaceRef() {
-    return References.cloneRef(layoutSpaceRef, SpaceReference.class);
+    return getSpaceRef();
   }
 
   public DocumentReference getLayoutConfigDocRef() {
-    return pageLayoutCmd.standardPropDocRef(layoutSpaceRef);
+    return getLayoutSrv().getLayoutPropDocRef(spaceRef).orElse(null);
   }
 
   public boolean isActive() {
-    return pageLayoutCmd.isActive(layoutSpaceRef);
+    return getLayoutSrv().isActive(spaceRef);
   }
 
   public String getPrettyName() {
-    return pageLayoutCmd.getPrettyName(layoutSpaceRef);
+    return getLayoutSrv().getPrettyName(spaceRef).orElse("Untitled Layout");
   }
 
   public String getVersion() {
-    return pageLayoutCmd.getVersion(layoutSpaceRef);
+    return getLayoutSrv().getVersion(spaceRef);
   }
 
   public String getLayoutType() {
-    return pageLayoutCmd.getLayoutType(layoutSpaceRef);
+    return getLayoutSrv().getLayoutType(spaceRef);
   }
 
   /**
@@ -92,15 +81,15 @@ public class PageLayoutApi extends Api {
    */
   @NotNull
   public HtmlDoctype getHTMLType() {
-    return pageLayoutCmd.getHTMLType(layoutSpaceRef);
+    return getLayoutSrv().getHTMLType(spaceRef);
   }
 
   public boolean isPageLayoutType() {
-    return ICellsClassConfig.PAGE_LAYOUT_VALUE.equals(getLayoutType());
+    return PageLayoutPropertiesClass.PAGE_LAYOUT_VALUE.equals(getLayoutType());
   }
 
   public boolean isEditorLayoutType() {
-    return ICellsClassConfig.EDITOR_LAYOUT_VALUE.equals(getLayoutType());
+    return PageLayoutPropertiesClass.EDITOR_LAYOUT_VALUE.equals(getLayoutType());
   }
 
   /**
@@ -109,16 +98,24 @@ public class PageLayoutApi extends Api {
    */
   public boolean exportLayoutXAR(boolean withDocHistory) {
     try {
-      pageLayoutCmd.exportLayoutXAR(layoutSpaceRef, withDocHistory);
-      return true;
+      return getLayoutSrv().exportLayoutXAR(spaceRef, withDocHistory);
     } catch (XWikiException | IOException exp) {
-      LOGGER.error("Failed to export page layout [{}]", layoutSpaceRef, exp);
+      LOGGER.error("Failed to export page layout [{}]", spaceRef, exp);
     }
     return false;
   }
 
+  @Override
+  public String toString() {
+    return getSpaceRef().toString();
+  }
+
   private static final ModelContext getContext() {
     return Utils.getComponent(ModelContext.class);
+  }
+
+  private static final LayoutServiceRole getLayoutSrv() {
+    return Utils.getComponent(LayoutServiceRole.class);
   }
 
 }

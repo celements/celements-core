@@ -26,7 +26,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("renderedExtract")
 public class RenderedExtractPresentationType implements IPresentationTypeRole<INavigation> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RenderedExtractPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(RenderedExtractPresentationType.class);
 
   private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 
@@ -82,7 +83,7 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
       XWikiDocument contentDoc = getContext().getWiki().getDocument(docRef, getContext());
       vcontext.put("extractDoc", contentDoc.newDocument(getContext()));
       vcontext.put("extractContent", getDocExtract(docRef));
-      return getRenderCommand().renderTemplatePath(templatePath, getContext().getLanguage());
+      return getRenderCommand().renderTemplatePath(templatePath, getContext().getLanguage(), "");
     } catch (XWikiException exp) {
       LOGGER.error("Failed to render template path [" + templatePath + "] for [" + docRef + "].",
           exp);
