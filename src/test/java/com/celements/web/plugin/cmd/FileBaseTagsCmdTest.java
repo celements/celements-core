@@ -94,14 +94,14 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
 
   @Test
   public void testGetTagSpaceRef() {
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     String celFileBaseName = "Content_attachments.FileBaseDoc";
     expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
         celFileBaseName);
     replayDefault();
     SpaceReference tagSpaceRef = fileBaseTagCmd.getTagSpaceRef();
     assertEquals("Content_attachments", tagSpaceRef.getName());
-    assertEquals("myWiki", tagSpaceRef.getParent().getName());
+    assertEquals("mywiki", tagSpaceRef.getParent().getName());
     verifyDefault();
   }
 
@@ -109,7 +109,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
   public void testGetTagSpaceRef_emptyString() throws Exception {
     ConfigurationSource xwikiPropConfigMock = registerComponentMock(ConfigurationSource.class,
         "xwikiproperties");
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     expect(xwikiPropConfigMock.getProperty(eq("model.reference.default.space"), eq(
         "Main"))).andReturn("DefaultSpace").anyTimes();
     expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
@@ -117,27 +117,27 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     replayDefault();
     SpaceReference tagSpaceRef = fileBaseTagCmd.getTagSpaceRef();
     assertEquals("DefaultSpace_attachments", tagSpaceRef.getName());
-    assertEquals("myWiki", tagSpaceRef.getParent().getName());
+    assertEquals("mywiki", tagSpaceRef.getParent().getName());
     verifyDefault();
   }
 
   @Test
   public void testGetTagSpaceRef_onlySpaceName() {
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     String celFileBaseName = "Content_attachments";
     expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
         celFileBaseName);
     replayDefault();
     SpaceReference tagSpaceRef = fileBaseTagCmd.getTagSpaceRef();
     assertEquals("Content_attachments", tagSpaceRef.getName());
-    assertEquals("myWiki", tagSpaceRef.getParent().getName());
+    assertEquals("mywiki", tagSpaceRef.getParent().getName());
     verifyDefault();
   }
 
   @Deprecated
   @Test
   public void testGetTagDocument_docExists_without_MenuItem() throws Exception {
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     String celFileBaseName = "Content_attachments";
     SpaceReference celFileBaseRef = new SpaceReference(celFileBaseName, new WikiReference(
         context.getDatabase()));
@@ -160,7 +160,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
   @Deprecated
   @Test
   public void testGetTagDocument_docExists() throws Exception {
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     String celFileBaseName = "Content_attachments";
     SpaceReference celFileBaseRef = new SpaceReference(celFileBaseName, new WikiReference(
         context.getDatabase()));
@@ -193,7 +193,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
   @Deprecated
   @Test
   public void testGetTagDocument_docExists_addingMenuItem() throws Exception {
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     String celFileBaseName = "Content_attachments";
     SpaceReference celFileBaseRef = new SpaceReference(celFileBaseName, new WikiReference(
         context.getDatabase()));
@@ -235,7 +235,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
 
   @Test
   public void testGetOrCreateTagDocument_docExists_without_MenuItem() throws Exception {
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     String celFileBaseName = "Content_attachments";
     SpaceReference celFileBaseRef = new SpaceReference(celFileBaseName, new WikiReference(
         context.getDatabase()));
@@ -257,7 +257,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
 
   @Test
   public void testGetOrCreateTagDocument_docExists() throws Exception {
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     String celFileBaseName = "Content_attachments";
     SpaceReference celFileBaseRef = new SpaceReference(celFileBaseName, new WikiReference(
         context.getDatabase()));
@@ -289,7 +289,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
 
   @Test
   public void testGetOrCreateTagDocument_docExists_addingMenuItem() throws Exception {
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     String celFileBaseName = "Content_attachments";
     SpaceReference celFileBaseRef = new SpaceReference(celFileBaseName, new WikiReference(
         context.getDatabase()));
@@ -331,7 +331,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
 
   @Test
   public void testGetOrCreateTagDocument_docNotExists_Exception() throws Exception {
-    context.setDatabase("myWiki");
+    context.setDatabase("mywiki");
     String celFileBaseName = "Content_attachments";
     SpaceReference celFileBaseRef = new SpaceReference(celFileBaseName, new WikiReference(
         context.getDatabase()));

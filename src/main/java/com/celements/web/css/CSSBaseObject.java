@@ -136,8 +136,8 @@ public class CSSBaseObject extends CSS {
   public String getCssBasePath() {
     String str = "";
     if (obj != null) {
-      str = obj.getStringValue("cssname");
-      if ((str != null) && !"".equals(str) && !str.contains(":") && !str.startsWith("/")) {
+      str = obj.getStringValue("cssname").trim();
+      if (!str.isEmpty() && !str.contains(":") && !str.startsWith("/")) {
         str = obj.getDocumentReference().getWikiReference().getName() + ":" + str;
       }
     }

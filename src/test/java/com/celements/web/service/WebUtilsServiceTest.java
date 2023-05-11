@@ -750,7 +750,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetWikiRef_attRef() {
-    String wikiName = "myTestWikiName";
+    String wikiName = "mytestwiki";
     AttachmentReference attRef = new AttachmentReference("myFile.jpg", new DocumentReference(
         wikiName, "mySpaceName", "myDocName"));
     replayDefault();
@@ -760,7 +760,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetWikiRef_docRef() {
-    String wikiName = "myTestWikiName";
+    String wikiName = "mytestwiki";
     DocumentReference docRef = new DocumentReference(wikiName, "mySpaceName", "myDocName");
     replayDefault();
     assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(docRef));
@@ -769,7 +769,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetWikiRef_spaceRef() {
-    WikiReference wikiRef = new WikiReference("myTestWikiName");
+    WikiReference wikiRef = new WikiReference("mytestwiki");
     SpaceReference spaceRef = new SpaceReference("mySpaceName", wikiRef);
     replayDefault();
     assertEquals(wikiRef, webUtilsService.getWikiRef(spaceRef));
@@ -778,7 +778,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetWikiRef_wikiRef() {
-    WikiReference wikiRef = new WikiReference("myTestWikiName");
+    WikiReference wikiRef = new WikiReference("mytestwiki");
     replayDefault();
     assertEquals(wikiRef, webUtilsService.getWikiRef(wikiRef));
     verifyDefault();
@@ -786,7 +786,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetWikiRef_entityRef() {
-    EntityReference wikiRef = new EntityReference("myTestWikiName", EntityType.WIKI);
+    EntityReference wikiRef = new EntityReference("mytestwiki", EntityType.WIKI);
     EntityReference ref = new EntityReference("mySpaceName", EntityType.SPACE, wikiRef);
     replayDefault();
     assertEquals(wikiRef, webUtilsService.getWikiRef(ref));
@@ -803,7 +803,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetWikiRef_doc() {
-    String wikiName = "myTestWikiName";
+    String wikiName = "mytestwiki";
     DocumentReference docRef = new DocumentReference(wikiName, "mySpaceName", "myDocName");
     XWikiDocument doc = new XWikiDocument(docRef);
     replayDefault();

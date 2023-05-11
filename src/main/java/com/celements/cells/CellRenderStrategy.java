@@ -20,7 +20,6 @@
 package com.celements.cells;
 
 import static com.celements.common.MoreObjectsCel.*;
-import static com.celements.logging.LogUtils.*;
 import static com.celements.model.util.ReferenceSerializationMode.*;
 import static com.google.common.base.Preconditions.*;
 
@@ -43,6 +42,7 @@ import com.celements.cells.attribute.DefaultAttributeBuilder;
 import com.celements.cells.classes.CellAttributeClass;
 import com.celements.cells.classes.CellClass;
 import com.celements.common.MoreOptional;
+import com.celements.logging.LogUtils;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.Contextualiser;
@@ -124,12 +124,12 @@ public class CellRenderStrategy implements IRenderStrategy {
       LOGGER.trace("getContextualiser: cell [{}]", node.getDocumentReference());
       Optional<String> scopeKey = getRenderScopeKey(node.getDocumentReference());
       scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
-          .map(logF(getExecutionContext()::getProperty)
+          .map(LogUtils.<String, Object>logF(getExecutionContext()::getProperty)
               .debug(LOGGER).msg("getContextualiser"))
           .flatMap(doc -> tryCast(doc, XWikiDocument.class))
           .ifPresent(contextualiser::withDoc);
       scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
-          .map(logF(getExecutionContext()::getProperty)
+          .map(LogUtils.<String, Object>logF(getExecutionContext()::getProperty)
               .debug(LOGGER).msg("getContextualiser"))
           .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
     }
