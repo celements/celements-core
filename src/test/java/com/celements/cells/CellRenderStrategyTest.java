@@ -235,7 +235,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
 
   @Test
   public void test_startRenderCell_auto_id_forEmpty_diffdb() throws Exception {
-    DocumentReference cellRef = new DocumentReference("layoutDb", "Skin", "MasterCell");
+    DocumentReference cellRef = new DocumentReference("layoutdb", "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(cellRef, null, 0);
@@ -246,8 +246,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", "");
     cellObj.setStringValue("css_styles", cssStyles);
-    String idname = "cell:layoutDb..Skin.MasterCell";
-    String cellFN = "layoutDb:Skin.MasterCell";
+    String idname = "cell:layoutdb..Skin.MasterCell";
+    String cellFN = "layoutdb:Skin.MasterCell";
     Capture<List<CellAttribute>> capturedAttrList = newCapture();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
     expectNoCellTypeConfig(cellRef);
@@ -259,7 +259,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
 
   @Test
   public void test_startRenderCell_otherDb() throws Exception {
-    String masterCellDb = "theMasterCellDB";
+    String masterCellDb = "master";
     DocumentReference cellRef = new DocumentReference(masterCellDb, "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
@@ -268,7 +268,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     BaseObject cellObj = addCellObj(doc);
     String cssClasses = "classes two";
     String idname = "myDivId";
-    String cellFN = "theMasterCellDB:Skin.MasterCell";
+    String cellFN = "master:Skin.MasterCell";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);

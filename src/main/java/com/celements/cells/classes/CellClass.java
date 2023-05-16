@@ -34,10 +34,10 @@ import com.google.errorprone.annotations.Immutable;
 @Singleton
 @Immutable
 @Component(CellClass.CLASS_DEF_HINT)
-public class CellClass extends AbstractClassDefinition implements CellsClassDefinition, CelementsClassDefinition {
+public class CellClass extends AbstractClassDefinition
+    implements CellsClassDefinition, CelementsClassDefinition {
 
   public static final String DOC_NAME = "CellClass";
-  public static final String SPACE_NAME = "Celements";
   public static final String CLASS_DEF_HINT = SPACE_NAME + "." + DOC_NAME;
   public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 

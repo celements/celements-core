@@ -85,7 +85,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetSubNodesForParent() throws Exception {
-    String wikiName = "myWiki";
+    String wikiName = "mywiki";
     String spaceName = "mySpace";
     String docName = "myDoc";
     String parentKey = wikiName + ":" + spaceName + ".";
@@ -109,7 +109,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetSubNodesForParent_deprecated() throws Exception {
-    String wikiName = "myWiki";
+    String wikiName = "mywiki";
     String spaceName = "mySpace";
     String docName = "myDoc";
     String parentKey = wikiName + ":" + spaceName + ".";
@@ -131,7 +131,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testFetchNodesForParentKey_mergeCombinedResult() {
-    String wikiName = "myWiki";
+    String wikiName = "mywiki";
     String spaceName = "mySpace";
     String docName = "myDoc";
     String parentKey = wikiName + ":" + spaceName + "." + docName;
@@ -171,7 +171,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     ITreeNodeProvider nodeProviderMock = createMockAndAddToDefault(ITreeNodeProvider.class);
     treeNodeService.nodeProviders.put("testNodeProvider", nodeProviderMock);
 
-    String wikiName = "myWiki";
+    String wikiName = "mywiki";
     String spaceName = "mySpace";
     String docName = "myDoc";
     String parentKey = wikiName + ":" + spaceName + "." + docName;
@@ -215,7 +215,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   // ITreeNodeProvider.class);
   // treeNodeService.nodeProviders.put("testNodeProvider", nodeProviderMock);
   //
-  // String wikiName = "myWiki";
+  // String wikiName = "mywiki";
   // String spaceName = "mySpace";
   // String docName = "myDoc";
   // String parentKey = wikiName + ":" + spaceName + "." + docName;
@@ -256,7 +256,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   //
   @Test
   public void testFetchNodesForParentKey_onlyOldArray() throws Exception {
-    String wikiName = "myWiki";
+    String wikiName = "mywiki";
     String spaceName = "mySpace";
     String docName = "myDoc";
     String parentKey = wikiName + ":" + spaceName + "." + docName;
@@ -279,7 +279,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testFetchNodesForParentKey_onlyNewMappedList() {
-    String wikiName = "myWiki";
+    String wikiName = "mywiki";
     String spaceName = "mySpace";
     String docName = "myDoc";
     String parentKey = wikiName + ":" + spaceName + "." + docName;
@@ -302,7 +302,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testFetchNodesForParentKey_noMenuItems_NPE() {
-    String wikiName = "myWiki";
+    String wikiName = "mywiki";
     String spaceName = "mySpace";
     String docName = "myDoc";
     String parentKey = wikiName + ":" + spaceName + "." + docName;
@@ -626,7 +626,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void getSiblingMenuItem_previous() throws XWikiException {
-    String db = "siblingPrevious";
+    String db = "siblingprevious";
     String space = "Celements2";
     String celDocName = "MenuItem";
     String fullName = db + ":" + space + "." + celDocName;
@@ -692,7 +692,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void getSiblingMenuItem_next() throws XWikiException {
-    String db = "siblingPrevious";
+    String db = "siblingprevious";
     String space = "Celements2";
     String celDocName = "MenuItem";
     String fullName = db + ":" + space + "." + celDocName;
@@ -760,7 +760,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void getSiblingMenuItem_previous_mainMenu() throws XWikiException {
-    String db = "myWiki";
+    String db = "mywiki";
     String space = "mySpace";
     String fullName = db + ":" + space + ".";
 
@@ -818,7 +818,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void getSiblingMenuItem_next_mainMenu() throws XWikiException {
-    String db = "myWiki";
+    String db = "mywiki";
     String space = "mySpace";
     String fullName = db + ":" + space + ".";
 
@@ -876,7 +876,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void getSiblingMenuItem_next_docNotInContextSpace() throws XWikiException {
-    String db = "siblingPrevious";
+    String db = "siblingprevious";
     String space = "Celements2";
     String celDocName = "MenuItem";
     String fullName = db + ":" + space + "." + celDocName;

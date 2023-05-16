@@ -51,8 +51,8 @@ public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testNotMainWiki_main() {
-    context.setDatabase("mainWiki");
-    context.setMainXWiki("mainWiki");
+    context.setDatabase("mainwiki");
+    context.setMainXWiki("mainwiki");
     replayDefault();
     assertFalse(mandatoryXWikiPref.notMainWiki());
     verifyDefault();

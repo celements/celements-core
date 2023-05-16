@@ -128,8 +128,7 @@ public abstract class AbstractJob implements Job {
    * @throws DocumentNotExistsException
    * @throws MalformedURLException
    */
-  XWikiContext createJobContext(XWikiContext xwikiContext) throws DocumentNotExistsException,
-      MalformedURLException {
+  XWikiContext createJobContext(XWikiContext xwikiContext) {
     final XWiki xwiki = xwikiContext.getWiki();
     final String database = xwikiContext.getDatabase();
 
@@ -147,7 +146,7 @@ public abstract class AbstractJob implements Job {
 
     // IMPORTANT: do NOT clone xwikiContext. You would need to ensure that no reference or
     // unwanted value leaks in the new context.
-    // IMPORTANT: following lines base on Utils.prepareContext
+    // IMPORTANT: following lines base on XWikiRequestInitializer.prepareContext
     XWikiContext scontext = new XWikiContext();
     scontext.setEngineContext(xwikiContext.getEngineContext());
     scontext.setRequest(request);
