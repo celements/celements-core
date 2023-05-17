@@ -26,4 +26,6 @@ import com.celements.model.classes.ClassDefinition;
 @ComponentRole
 public interface CelementsClassDefinition extends ClassDefinition {
 
+  String SPACE_NAME = "Celements";
+
 }

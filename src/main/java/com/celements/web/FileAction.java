@@ -21,6 +21,7 @@
 package com.celements.web;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
@@ -76,7 +77,7 @@ public class FileAction extends SkinAction {
    * The encoding to use when reading text resources from the filesystem and when sending
    * css/javascript responses.
    */
-  private static final String ENCODING = "UTF-8";
+  private static final String ENCODING = StandardCharsets.UTF_8.name();
 
   @Override
   public String render(String path, XWikiContext context) throws XWikiException, IOException {
