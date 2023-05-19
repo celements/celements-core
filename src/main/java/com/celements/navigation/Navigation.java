@@ -60,13 +60,11 @@ import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
@@ -110,7 +108,6 @@ public class Navigation implements INavigation {
   public PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
 
   String uniqueName;
-  IWebUtils utils;
 
   private boolean navigationEnabled;
 
@@ -168,7 +165,7 @@ public class Navigation implements INavigation {
     this.nodeSpaceRef = null;
     this.mainUlCssClasses = new LinkedHashSet<>();
     this.cmCssClass = "";
-    utils = WebUtils.getInstance();
+
   }
 
   /**
@@ -818,16 +815,10 @@ public class Navigation implements INavigation {
    * menu_element_name (configName) at the selected place is found. This navigation should
    * be set to disabled and includeNavigation must return an empty string.
    */
+  @Deprecated
   @Override
   public void loadConfigByName(String configName, XWikiContext context) {
-    XWikiDocument doc = context.getDoc();
-    try {
-      BaseObject prefObj = utils.getConfigDocByInheritance(doc, NAVIGATION_CONFIG_CLASS,
-          context).getObject(NAVIGATION_CONFIG_CLASS, "menu_element_name", configName, false);
-      loadConfigFromObject(prefObj);
-    } catch (XWikiException exp) {
-      LOGGER.error("loadConfigByName failed.", exp);
-    }
+    throw new UnsupportedOperationException("Navigation ConfigByName is not supported anymore.");
   }
 
   /**
@@ -939,13 +930,6 @@ public class Navigation implements INavigation {
     } else {
       return cmCssClass;
     }
-  }
-
-  /**
-   * for Tests only !!!
-   **/
-  public void testInjectUtils(IWebUtils utils) {
-    this.utils = utils;
   }
 
   /**

@@ -36,20 +36,19 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.XObjectIterator;
+import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.celements.web.utils.IWebUtils;
 
 public class InheritorFactoryTest extends AbstractComponentTest {
 
   private InheritorFactory factory;
-  private IWebUtils mockWebUtils;
+  private IDocumentParentsListerRole parentsListerMock;
   private PageLayoutCommand mockPageLayoutCmd;
 
   @Before
   public void setUp_InheritorFactoryTest() throws Exception {
     factory = new InheritorFactory();
-    mockWebUtils = createMockAndAddToDefault(IWebUtils.class);
-    factory.inject_TEST_WebUtils(mockWebUtils);
+    parentsListerMock = registerComponentMock(IDocumentParentsListerRole.class);
     mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
     factory.injectPageLayoutCmd(mockPageLayoutCmd);
   }
@@ -79,19 +78,24 @@ public class InheritorFactoryTest extends AbstractComponentTest {
   @Test
   public void testGetNavigationFieldInheritor() {
     String className = "Tools.Banner";
-    String fullName = "mySpace.myDoc";
-    List<String> docList = new ArrayList<>();
-    docList.add(fullName);
-    docList.add("myparent.Doc");
-    docList.add("myparent.Doc2");
-    expect(mockWebUtils.getDocumentParentsList(eq(fullName), eq(true), same(
-        getContext()))).andReturn(docList);
+    String fullName = "xwikidb:mySpace.myDoc";
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
+        "myDoc");
+    List<DocumentReference> docRefList = new ArrayList<>();
+    docRefList.add(docRef);
+    docRefList.add(new DocumentReference(getContext().getDatabase(), "myparent", "Doc"));
+    docRefList.add(new DocumentReference(getContext().getDatabase(), "myparent", "Doc2"));
+    expect(parentsListerMock.getDocumentParentsList(eq(docRef), eq(true))).andReturn(docRefList);
     replayDefault();
     FieldInheritor inheritor = factory.getNavigationFieldInheritor(className, fullName,
         getContext());
     XObjectIterator iterator = inheritor.getIteratorFactory().createIterator();
     assertEquals(className, iterator.getClassName());
-    assertEquals(docList, iterator.getDocListCopy());
+    List<String> docFullNameList = new ArrayList<>();
+    docFullNameList.add(fullName);
+    docFullNameList.add("xwikidb:myparent.Doc");
+    docFullNameList.add("xwikidb:myparent.Doc2");
+    assertEquals(docFullNameList, iterator.getDocListCopy());
     verifyDefault();
   }
 

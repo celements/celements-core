@@ -108,6 +108,10 @@ public interface INavigation extends PresentationNodeData {
   @Deprecated
   public void loadConfigFromObject(BaseObject prefObj);
 
+  /**
+   * @Deprecated since 6.0 no replacement
+   */
+  @Deprecated
   public void loadConfigByName(String configName, XWikiContext context);
 
   public void setCMcssClass(String cmCssClass);
@@ -141,7 +145,7 @@ public interface INavigation extends PresentationNodeData {
   public boolean useImagesForNavigation();
 
   public String getMenuLink(DocumentReference docRef);
-  
+
   @NotNull
   Optional<String> getMenuLinkTarget(@Nullable DocumentReference docRef);
 

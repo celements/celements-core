@@ -52,7 +52,6 @@ import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.IWebUtils;
 import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -63,7 +62,7 @@ import com.xpn.xwiki.web.Utils;
 public class NavigationTest extends AbstractComponentTest {
 
   private Navigation nav;
-  private IWebUtils utils;
+
   private XWikiDocument currentDoc;
   private INavFilter<BaseObject> navFilterMock;
   private ITreeNodeService tNServiceMock;
@@ -83,8 +82,6 @@ public class NavigationTest extends AbstractComponentTest {
     nav = new Navigation("N1");
     navFilterMock = createMockAndAddToDefault(InternalRightsFilter.class);
     nav.setNavFilter(navFilterMock);
-    utils = createMockAndAddToDefault(IWebUtils.class);
-    nav.testInjectUtils(utils);
     tNServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
     wUServiceMock = registerComponentMock(IWebUtilsService.class);
@@ -634,7 +631,6 @@ public class NavigationTest extends AbstractComponentTest {
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))).andReturn(
         emptyMenuItemList);
     nav.setMenuPart("");
-    nav.testInjectUtils(utils);
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().once();
     SpaceReference parentSpaceRef = new SpaceReference(parentSpaceName, new WikiReference(
