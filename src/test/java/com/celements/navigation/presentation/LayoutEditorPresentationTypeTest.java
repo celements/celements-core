@@ -82,8 +82,6 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
     mockLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
     nav.pageLayoutCmd = mockLayoutCmd;
     xwiki = getWikiMock();
-    utils = createMockAndAddToDefault(IWebUtils.class);
-    nav.testInjectUtils(utils);
     tNServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
     wUServiceMock = registerComponentMock(IWebUtilsService.class);
