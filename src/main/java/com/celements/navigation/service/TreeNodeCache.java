@@ -49,11 +49,6 @@ public class TreeNodeCache implements ITreeNodeCache {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.celements.web.utils.IWebUtils#queryCount()
-   */
   @Override
   public int queryCount() {
     return getNotMappedMenuItemsForParentCmd().queryCount();
@@ -72,11 +67,6 @@ public class TreeNodeCache implements ITreeNodeCache {
     return notMappedMenuItemCommand;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public void flushMenuItemCache() {
     getNotMappedMenuItemsForParentCmd().flushMenuItemCache(getContext());
