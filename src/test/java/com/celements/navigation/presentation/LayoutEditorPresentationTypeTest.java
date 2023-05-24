@@ -46,7 +46,6 @@ import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.IWebUtils;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -59,7 +58,6 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
   private Navigation nav;
   private XWiki xwiki;
   private XWikiContext context;
-  private IWebUtils utils;
   private XWikiDocument currentDoc;
   private INavFilter<BaseObject> navFilterMock;
   private ITreeNodeService tNServiceMock;
