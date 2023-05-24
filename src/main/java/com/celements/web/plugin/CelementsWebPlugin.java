@@ -28,7 +28,6 @@ import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.auth.AccountActivationFailedException;
 import com.celements.auth.AuthenticationService;
@@ -51,8 +50,6 @@ import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.service.WebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
 import com.celements.webform.ActionService;
 import com.celements.webform.IActionServiceRole;
 import com.celements.webform.IWebFormServiceRole;
@@ -73,8 +70,6 @@ import com.xpn.xwiki.web.Utils;
 public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebPlugin.class);
-
-  private final static IWebUtils util = WebUtils.getInstance();
 
   final String PARAM_XPAGE = "xpage";
   final String PARAM_CONF = "conf";
@@ -116,8 +111,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     super.virtualInit(context);
   }
 
+  /**
+   * @deprecated since 6.0 no replacement
+   */
+  @Deprecated
   public int queryCount() {
-    return util.queryCount();
+    throw new UnsupportedOperationException(
+        "CelementsWebPlugin queryCount is not supported anymore.");
   }
 
   /**
@@ -129,10 +129,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    *          (default: $doc.space)
    * @param menuPart
    * @return (array of menuitems)
+   * @deprecated since 6.0 no replacement
    */
+  @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(String parent, String menuSpace,
       String menuPart, XWikiContext context) {
-    return util.getSubMenuItemsForParent(parent, menuSpace, menuPart, context);
+    throw new UnsupportedOperationException(
+        "CelementsWebPlugin getSubMenuItemsForParent is not supported anymore.");
   }
 
   public String getVersionMode(XWikiContext context) {
