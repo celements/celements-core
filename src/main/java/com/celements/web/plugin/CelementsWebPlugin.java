@@ -112,7 +112,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 6.0 no replacement
+   * @deprecated since 6.0 instead use TreeNodeCache
    */
   @Deprecated
   public int queryCount() {
@@ -131,6 +131,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    * @return (array of menuitems)
    * @deprecated since 6.0 no replacement
    */
+  // check for velocity Files using this
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(String parent, String menuSpace,
       String menuPart, XWikiContext context) {

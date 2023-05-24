@@ -50,6 +50,7 @@ import org.xwiki.model.reference.SpaceReference;
 import com.celements.configuration.ConfigSourceUtils;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
@@ -759,20 +760,24 @@ public class Navigation implements INavigation {
 
   @Override
   public int getMenuItemPos(String fullName, XWikiContext context) {
-    return WebUtils.getInstance().getMenuItemPos(fullName, menuPart, context);
+    DocumentReference docRef = getModelUtils().resolveRef(fullName, DocumentReference.class);
+    return getTreeNodeService().getMenuItemPos(docRef, menuPart);
   }
 
   @Override
   public int getActiveMenuItemPos(int menuLevel, XWikiContext context) {
-    return WebUtils.getInstance().getActiveMenuItemPos(menuLevel, menuPart, context);
+    return getTreeNodeService().getActiveMenuItemPos(menuLevel, menuPart);
   }
 
+  // only used in NavigationApi. check for velocity files using it
   @Override
   public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(int menuLevel,
       XWikiContext context) {
+    getTreeNodeService().getMenuItemsForHierarchyLevel(menuLevel, menuPart);
     return WebUtils.getInstance().getMenuItemsForHierarchyLevel(menuLevel, menuPart, context);
   }
 
+  // only used in NavigationApi. check for velocity files using it
   @Override
   public String getPrevMenuItemFullName(String fullName, XWikiContext context) {
     BaseObject prevMenuItem = null;
@@ -788,6 +793,7 @@ public class Navigation implements INavigation {
     }
   }
 
+  // only used in NavigationApi. check for velocity files using it
   @Override
   public String getNextMenuItemFullName(String fullName, XWikiContext context) {
     BaseObject nextMenuItem = null;
@@ -1067,6 +1073,10 @@ public class Navigation implements INavigation {
 
   private IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }
