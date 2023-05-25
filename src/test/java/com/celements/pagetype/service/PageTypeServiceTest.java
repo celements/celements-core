@@ -272,7 +272,7 @@ public class PageTypeServiceTest extends AbstractComponentTest {
     PageTypeReference testPageTypeRef = new PageTypeReference("TestPageType", MOCK_PROVIDER,
         Arrays.asList(""));
     expect(providerMock.getPageTypes()).andReturn(Arrays.asList(testPageTypeRef));
-    IPageTypeConfig testPTconfig = createMockAndAddToDefault(XObjectPageTypeConfig.class);
+    IPageTypeConfig testPTconfig = createDefaultMock(XObjectPageTypeConfig.class);
     expect(providerMock.getPageTypeByReference(eq(testPageTypeRef))).andReturn(testPTconfig);
     expect(testPTconfig.isVisible()).andReturn(true);
     replayDefault();

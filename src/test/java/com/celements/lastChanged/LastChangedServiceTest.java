@@ -1,5 +1,6 @@
 package com.celements.lastChanged;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -16,14 +17,14 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
+public class LastChangedServiceTest extends AbstractComponentTest {
 
   private LastChangedService lastChangedServ;
   private XWikiContext context;
@@ -34,14 +35,14 @@ public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
   private SpaceReference spaceRef;
 
   @Before
-  public void setUp_AbstractBridgedComponentTestCase() throws Exception {
+  public void setUp_AbstractComponentTest() throws Exception {
     lastChangedServ = (LastChangedService) Utils.getComponent(ILastChangedRole.class);
     context = getContext();
-    queryManagerMock = createMockAndAddToDefault(QueryManager.class);
+    queryManagerMock = createDefaultMock(QueryManager.class);
     lastChangedServ.queryManager = queryManagerMock;
-    modelAccessMock = createMockAndAddToDefault(IModelAccessFacade.class);
+    modelAccessMock = createDefaultMock(IModelAccessFacade.class);
     lastChangedServ.modelAccess = modelAccessMock;
-    webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
+    webUtilsMock = createDefaultMock(IWebUtilsService.class);
     lastChangedServ.webUtilsService = webUtilsMock;
     mySpaceName = "mySpace";
     spaceRef = new SpaceReference(mySpaceName, new WikiReference(context.getDatabase()));
@@ -50,7 +51,7 @@ public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testInternal_getLastChangeDate_emptyDocumentsList() throws Exception {
-    Query mockQuery = createMockAndAddToDefault(Query.class);
+    Query mockQuery = createDefaultMock(Query.class);
     expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(mockQuery).once();
     expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery).once();
     expect(mockQuery.setLimit(eq(1))).andReturn(mockQuery).once();
@@ -65,7 +66,7 @@ public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testInternal_getLastChangeDate_emptyLangResponse() throws Exception {
-    Query mockQuery = createMockAndAddToDefault(Query.class);
+    Query mockQuery = createDefaultMock(Query.class);
     expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(mockQuery).once();
     expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery).once();
     expect(mockQuery.setLimit(eq(1))).andReturn(mockQuery).once();
@@ -91,7 +92,7 @@ public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
     String mySpaceName = "mySpace";
     SpaceReference spaceRef = new SpaceReference(mySpaceName, new WikiReference(
         context.getDatabase()));
-    Query mockQuery = createMockAndAddToDefault(Query.class);
+    Query mockQuery = createDefaultMock(Query.class);
     expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(mockQuery).once();
     expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery).once();
     expect(mockQuery.setLimit(eq(1))).andReturn(mockQuery).once();

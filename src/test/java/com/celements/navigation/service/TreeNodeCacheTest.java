@@ -82,7 +82,7 @@ public class TreeNodeCacheTest extends AbstractComponentTest {
 
   @Test
   public void testQueryCount() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createMockAndAddToDefault(
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createDefaultMock(
         GetNotMappedMenuItemsForParentCommand.class);
     treeNodeCache.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
     expect(testGetMenuItemCommand.queryCount()).andReturn(15);
@@ -93,7 +93,7 @@ public class TreeNodeCacheTest extends AbstractComponentTest {
 
   @Test
   public void testFlushMenuItemCache() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createMockAndAddToDefault(
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createDefaultMock(
         GetNotMappedMenuItemsForParentCommand.class);
     treeNodeCache.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
     testGetMenuItemCommand.flushMenuItemCache(same(context));

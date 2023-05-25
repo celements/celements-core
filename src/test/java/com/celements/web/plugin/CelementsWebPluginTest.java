@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -33,14 +34,14 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
+public class CelementsWebPluginTest extends AbstractComponentTest {
 
   private CelementsWebPlugin plugin;
   private XWikiContext context;

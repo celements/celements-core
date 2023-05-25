@@ -8,10 +8,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockftpserver.stub.StubFtpServer;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class CelFTPClientTest extends AbstractBridgedComponentTestCase {
+public class CelFTPClientTest extends AbstractComponentTest {
 
   private static final int _TEST_FTP_PORT = 23456;
   private CelFTPClient ftpClient;

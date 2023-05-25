@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.presentation;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -30,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -40,7 +41,7 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class SitemapPresentationTypeTest extends AbstractBridgedComponentTestCase {
+public class SitemapPresentationTypeTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private DocumentReference currentDocRef;

@@ -51,7 +51,7 @@ public class MultilingualMenuNameCommandTest extends AbstractComponentTest {
     currentDoc = new XWikiDocument(docRef);
     context.setDoc(currentDoc);
     menuNameCmd = new MultilingualMenuNameCommand();
-    menuNameCmd.attCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    menuNameCmd.attCmd = createDefaultMock(AttachmentURLCommand.class);
   }
 
   @Test

@@ -92,7 +92,7 @@ public class ContentInheritorTest extends AbstractComponentTest {
     String title_de = "Deutscher Titel";
     XWikiDocument translatedDoc1 = new XWikiDocument(docRef);
     translatedDoc1.setTitle(title_de);
-    XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument testDoc1 = createDefaultMock(XWikiDocument.class);
     expect(testDoc1.isNew()).andReturn(false).anyTimes();
     expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
         translatedDoc1).anyTimes();
@@ -133,7 +133,7 @@ public class ContentInheritorTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Test", "Doc");
     XWikiDocument translatedDoc1 = new XWikiDocument(docRef);
     translatedDoc1.setContent(content_de);
-    XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument testDoc1 = createDefaultMock(XWikiDocument.class);
     expect(testDoc1.isNew()).andReturn(false).anyTimes();
     expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
         translatedDoc1).anyTimes();

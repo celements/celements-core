@@ -56,7 +56,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     context = getContext();
     xwiki = getWikiMock();
     registerComponentMock(IModelAccessFacade.class);
-    mockStore = createMockAndAddToDefault(XWikiStoreInterface.class);
+    mockStore = createDefaultMock(XWikiStoreInterface.class);
     expect(xwiki.getStore()).andReturn(mockStore).anyTimes();
     notMappedItemsCmd = new GetNotMappedMenuItemsForParentCommand();
   }

@@ -67,9 +67,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     registerComponentMocks(IModelAccessFacade.class, IPageTypeResolverRole.class,
         IPageTypeRole.class, LayoutServiceRole.class, VelocityService.class);
-    outWriterMock = createMockAndAddToDefault(ICellWriter.class);
+    outWriterMock = createDefaultMock(ICellWriter.class);
     context = getContext();
-    mockctRendererCmd = createMockAndAddToDefault(RenderCommand.class);
+    mockctRendererCmd = createDefaultMock(RenderCommand.class);
     renderer = new CellRenderStrategy(outWriterMock, mockctRendererCmd);
   }
 
@@ -85,7 +85,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   @Test
   public void test_getCellTypeConfig_withTypeConfig() throws Exception {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
-    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
+    IPageTypeConfig typeConfig = createDefaultMock(IPageTypeConfig.class);
     expectCellTypeConfig(cellRef, typeConfig);
     replayDefault();
     assertSame(typeConfig, renderer.getCellTypeConfig(cellRef).orElse(null));
@@ -397,7 +397,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   private IPageTypeConfig expectCellTypeConfig(DocumentReference cellRef, String configName) {
-    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
+    IPageTypeConfig typeConfig = createDefaultMock(IPageTypeConfig.class);
     expectCellTypeConfig(cellRef, typeConfig);
     expect(typeConfig.defaultTagName())
         .andReturn(com.google.common.base.Optional.fromNullable(configName));

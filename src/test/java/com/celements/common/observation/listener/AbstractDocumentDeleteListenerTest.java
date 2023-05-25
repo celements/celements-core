@@ -50,9 +50,9 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     context = getContext();
     classRef = new DocumentReference("wiki", "Classes", "SomeClass");
     docRef = new DocumentReference("wiki", "Space", "SomeDoc");
-    docMock = createMockAndAddToDefault(XWikiDocument.class);
+    docMock = createDefaultMock(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
-    origDocMock = createMockAndAddToDefault(XWikiDocument.class);
+    origDocMock = createDefaultMock(XWikiDocument.class);
     expect(origDocMock.getDocumentReference()).andReturn(docRef).anyTimes();
     expect(docMock.isFromCache()).andReturn(true).anyTimes();
 
@@ -61,13 +61,13 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     listener.context = Utils.getComponent(ModelContext.class);
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
     listener.injectRemoteObservationManagerContext(
-        remoteObsManContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class));
-    listener.injectObservationManager(obsManagerMock = createMockAndAddToDefault(
+        remoteObsManContextMock = createDefaultMock(RemoteObservationManagerContext.class));
+    listener.injectObservationManager(obsManagerMock = createDefaultMock(
         ObservationManager.class));
     listener.configSrc = Utils.getComponent(ConfigurationSource.class);
 
-    deletingEventMock = createMockAndAddToDefault(Event.class);
-    deletedEventMock = createMockAndAddToDefault(Event.class);
+    deletingEventMock = createDefaultMock(Event.class);
+    deletedEventMock = createDefaultMock(Event.class);
   }
 
   @Test

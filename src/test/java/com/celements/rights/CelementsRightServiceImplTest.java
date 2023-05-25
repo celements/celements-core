@@ -1,5 +1,6 @@
 package com.celements.rights;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -13,7 +14,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.classcollections.DocumentDetailsClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -23,7 +24,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
 import com.xpn.xwiki.web.Utils;
 
-public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestCase {
+public class CelementsRightServiceImplTest extends AbstractComponentTest {
 
   CelementsRightServiceImpl rightService;
   XWiki xwiki;

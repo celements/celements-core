@@ -1,5 +1,6 @@
 package com.celements.filebase;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -8,14 +9,14 @@ import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.filebase.exceptions.FileBaseLoadException;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-public class SingleDocFileBaseServiceTest extends AbstractBridgedComponentTestCase {
+public class SingleDocFileBaseServiceTest extends AbstractComponentTest {
 
   private SingleDocFileBaseService fbService;
 
@@ -39,7 +40,7 @@ public class SingleDocFileBaseServiceTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void test_getFileBaseDoc_configMinus() {
-    fbService.configuration = createMockAndAddToDefault(ConfigurationSource.class);
+    fbService.configuration = createDefaultMock(ConfigurationSource.class);
     expect(fbService.configuration.getProperty(eq(
         IFileBaseServiceRole.FILEBASE_CONFIG_FIELD))).andReturn("-");
     replayDefault();
@@ -58,10 +59,10 @@ public class SingleDocFileBaseServiceTest extends AbstractBridgedComponentTestCa
     String docName = "FBDoc";
     DocumentReference fileBaseDocRef = new DocumentReference(getContext().getDatabase(), spcName,
         docName);
-    fbService.configuration = createMockAndAddToDefault(ConfigurationSource.class);
+    fbService.configuration = createDefaultMock(ConfigurationSource.class);
     expect(fbService.configuration.getProperty(eq(
         IFileBaseServiceRole.FILEBASE_CONFIG_FIELD))).andReturn(spcName + "." + docName);
-    fbService.modelAccess = createMockAndAddToDefault(IModelAccessFacade.class);
+    fbService.modelAccess = createDefaultMock(IModelAccessFacade.class);
     expect(fbService.modelAccess.getOrCreateDocument(eq(fileBaseDocRef))).andThrow(
         new DocumentLoadException(fileBaseDocRef));
     replayDefault();
@@ -81,10 +82,10 @@ public class SingleDocFileBaseServiceTest extends AbstractBridgedComponentTestCa
     DocumentReference fileBaseDocRef = new DocumentReference(getContext().getDatabase(), spcName,
         docName);
     XWikiDocument doc = new XWikiDocument(fileBaseDocRef);
-    fbService.configuration = createMockAndAddToDefault(ConfigurationSource.class);
+    fbService.configuration = createDefaultMock(ConfigurationSource.class);
     expect(fbService.configuration.getProperty(eq(
         IFileBaseServiceRole.FILEBASE_CONFIG_FIELD))).andReturn(spcName + "." + docName);
-    fbService.modelAccess = createMockAndAddToDefault(IModelAccessFacade.class);
+    fbService.modelAccess = createDefaultMock(IModelAccessFacade.class);
     expect(fbService.modelAccess.getOrCreateDocument(eq(fileBaseDocRef))).andReturn(doc);
     replayDefault();
     XWikiDocument resultDoc = fbService.getFileBaseDoc();

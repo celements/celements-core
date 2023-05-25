@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.presentation;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -31,7 +32,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.classcollections.DocumentDetailsClasses;
@@ -47,7 +48,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
 
-public class RenderedExtractPresentationTypeTest extends AbstractBridgedComponentTestCase {
+public class RenderedExtractPresentationTypeTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private INavigation nav;
@@ -64,13 +65,13 @@ public class RenderedExtractPresentationTypeTest extends AbstractBridgedComponen
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
-    nav = createMockAndAddToDefault(INavigation.class);
+    nav = createDefaultMock(INavigation.class);
     xwiki = getWikiMock();
     testRenderEngine = new TestRenderEngine();
     expect(xwiki.getRenderingEngine()).andReturn(testRenderEngine).anyTimes();
     vtPresType = (RenderedExtractPresentationType) Utils.getComponent(IPresentationTypeRole.class,
         "renderedExtract");
-    renderCmdMock = createMockAndAddToDefault(RenderCommand.class);
+    renderCmdMock = createDefaultMock(RenderCommand.class);
     vtPresType.renderCmd = renderCmdMock;
   }
 
@@ -99,7 +100,7 @@ public class RenderedExtractPresentationTypeTest extends AbstractBridgedComponen
 
   @Test
   public void testWriteNodeContent() throws Exception {
-    IWebUtilsService webUtilsServiceMock = createMockAndAddToDefault(IWebUtilsService.class);
+    IWebUtilsService webUtilsServiceMock = createDefaultMock(IWebUtilsService.class);
     vtPresType.webUtilsService = webUtilsServiceMock;
     context.put("vcontext", new VelocityContext());
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
@@ -159,7 +160,7 @@ public class RenderedExtractPresentationTypeTest extends AbstractBridgedComponen
     private XWikiRenderingEngine mockRenderEngine;
 
     public TestRenderEngine() {
-      mockRenderEngine = createMockAndAddToDefault(XWikiRenderingEngine.class);
+      mockRenderEngine = createDefaultMock(XWikiRenderingEngine.class);
     }
 
     public XWikiRenderingEngine getMock() {

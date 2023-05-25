@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -30,11 +31,11 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
-public class ContextMenuCSSClassesCommandTest extends AbstractBridgedComponentTestCase {
+public class ContextMenuCSSClassesCommandTest extends AbstractComponentTest {
 
   private ContextMenuCSSClassesCommand cmCssClassesCmd;
   private XWikiContext context;

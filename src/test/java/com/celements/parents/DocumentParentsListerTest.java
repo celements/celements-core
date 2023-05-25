@@ -1,5 +1,6 @@
 package com.celements.parents;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -16,7 +17,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
@@ -27,7 +28,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase {
+public class DocumentParentsListerTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
@@ -43,8 +44,8 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
     docParentsLister.docParentProviderMap = new HashMap<>();
     docParentsLister.docParentProviderMap.put(XDocParents.DOC_PROVIDER_NAME,
         docParentProviderMapBackup.get(XDocParents.DOC_PROVIDER_NAME));
-    docParentsLister.pageTypeResolver = createMockAndAddToDefault(IPageTypeResolverRole.class);
-    docParentsLister.pageTypeProvider = createMockAndAddToDefault(IPageTypeProviderRole.class);
+    docParentsLister.pageTypeResolver = createDefaultMock(IPageTypeResolverRole.class);
+    docParentsLister.pageTypeProvider = createDefaultMock(IPageTypeProviderRole.class);
   }
 
   @After
@@ -80,7 +81,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetDocumentParentsList_not_include_testProvider_empty() throws Exception {
-    IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
+    IDocParentProviderRole testProviderMock = createDefaultMock(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
@@ -97,7 +98,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetDocumentParentsList_not_include_testProvider_hasParent() throws Exception {
-    IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
+    IDocParentProviderRole testProviderMock = createDefaultMock(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
@@ -153,7 +154,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetDocumentParentsList_includeDoc_testProvider() throws Exception {
-    IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
+    IDocParentProviderRole testProviderMock = createDefaultMock(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
@@ -216,7 +217,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetDocumentParentsList_includeDoc_notexist_testProvider() throws Exception {
-    IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
+    IDocParentProviderRole testProviderMock = createDefaultMock(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
@@ -246,7 +247,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetDocumentParentsList_notParentPageType() throws Exception {
-    IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
+    IDocParentProviderRole testProviderMock = createDefaultMock(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
@@ -270,7 +271,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetDocumentParentsList_includeDoc_testProvider_recursive() throws Exception {
-    IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
+    IDocParentProviderRole testProviderMock = createDefaultMock(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
@@ -301,7 +302,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
         Collections.<String>emptyList());
     expect(docParentsLister.pageTypeResolver.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef).once();
-    IPageTypeConfig confMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    IPageTypeConfig confMock = createDefaultMock(IPageTypeConfig.class);
     expect(docParentsLister.pageTypeProvider.getPageTypeByReference(same(pageTypeRef))).andReturn(
         confMock).once();
     expect(confMock.isUnconnectedParent()).andReturn(isParent).once();

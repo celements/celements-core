@@ -6,10 +6,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.observation.EventListener;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class XObjectPageTypeCacheListenerTest extends AbstractBridgedComponentTestCase {
+public class XObjectPageTypeCacheListenerTest extends AbstractComponentTest {
 
   private static final String _COMPONENT_NAME = "XObjectPageTypeCacheListener";
   private XObjectPageTypeCacheListener eventListener;

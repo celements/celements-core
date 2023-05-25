@@ -60,7 +60,7 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     cmd = new RemoteUserValidator();
     context = getContext();
     userServiceMock = registerComponentMock(UserService.class);
-    xWikiAuthServiceMock = createMockAndAddToDefault(XWikiAuthService.class);
+    xWikiAuthServiceMock = createDefaultMock(XWikiAuthService.class);
     expect(getWikiMock().getAuthService()).andReturn(xWikiAuthServiceMock).anyTimes();
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
     expect(getWikiMock().getXWikiPreference(eq("auth_active_check"), anyObject(
@@ -69,9 +69,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_isValidUserJSON_validationNotAllowed() {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
 
@@ -83,9 +83,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_isValidUserJSON_noUser() throws XWikiException {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.<User>absent());
@@ -101,9 +101,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_isValidUserJSON_notAuthenticated() throws XWikiException {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     User userMock = createUserMock("XWiki.7sh2lya35");
@@ -122,9 +122,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_isValidUserJSON_validUser_wrongGroup() throws XWikiException {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     User userMock = createUserMock("XWiki.7sh2lya35");
@@ -143,9 +143,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_isValidUserJSON_validUser_isInGroup_inactiveUser() throws XWikiException {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     User userMock = createUserMock("XWiki.7sh2lya35");
@@ -165,9 +165,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void testIsValidUserJSON_validUser_isInGroup_noRetGroup() throws XWikiException {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     User userMock = createUserMock("XWiki.7sh2lya35");
@@ -188,11 +188,11 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void testIsValidUserJSON_validUser_isInGroup_retGroup() throws XWikiException {
-    context = createMockAndAddToDefault(XWikiContext.class);
+    context = createDefaultMock(XWikiContext.class);
     expect(context.getUser()).andReturn("xwiki:XWiki.superadmin").anyTimes();
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     expect(context.getRequest()).andReturn(request).anyTimes();
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     expect(context.getWiki()).andReturn(getWikiMock()).anyTimes();
@@ -204,7 +204,7 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     expect(userMock.isActive()).andReturn(true);
     List<String> returnGroups = Arrays.asList("XWiki.TestGroup1", "XWiki.TestGroup2",
         "XWiki.TestGroup3");
-    XWikiUser xUserMock = createMockAndAddToDefault(XWikiUser.class);
+    XWikiUser xUserMock = createDefaultMock(XWikiUser.class);
     expect(userMock.asXWikiUser()).andReturn(xUserMock).anyTimes();
     expectInGroup(xUserMock, "XWiki.MemOfGroup", true);
     expectInGroup(xUserMock, returnGroups.get(0), true);
@@ -294,7 +294,7 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
   public void test_getResultJSON_withReturnGroups() throws Exception {
     User userMock = createUserMock("XWiki.7sh2lya35");
     List<String> returnGroups = Arrays.asList("XWiki.TestGroup1", "XWiki.TestGroup2");
-    XWikiUser xUserMock = createMockAndAddToDefault(XWikiUser.class);
+    XWikiUser xUserMock = createDefaultMock(XWikiUser.class);
     expect(userMock.asXWikiUser()).andReturn(xUserMock).anyTimes();
     expectInGroup(xUserMock, returnGroups.get(0), true);
     expectInGroup(xUserMock, returnGroups.get(1), false);
@@ -308,9 +308,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_validationAllowed_superadmin() {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
 
@@ -324,9 +324,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_validationAllowed_noHostInRequest_null() {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
 
@@ -337,9 +337,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_validationAllowed_noHostInRequest_empty() {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
 
@@ -350,9 +350,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_validationAllowed_noConfigFound_noObj() {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
     XWikiDocument doc = new XWikiDocument();
@@ -365,9 +365,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_validationAllowed_noConfigFound_hasObj() {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
     XWikiDocument doc = new XWikiDocument();
@@ -383,9 +383,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_validationAllowed_secretEmpty() {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
     XWikiDocument doc = new XWikiDocument();
@@ -403,9 +403,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_validationAllowed_secretNoMatch() {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(request.get(eq("secret"))).andReturn("sn34ky").once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
@@ -423,9 +423,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_validationAllowed_allowed() {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    HttpServletRequest httpRequest = createMockAndAddToDefault(HttpServletRequest.class);
+    HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(request.get(eq("secret"))).andReturn("s3cr3tC0d3").once();
     expect(httpRequest.getRemoteHost()).andReturn("test.synventis.com:10080");
@@ -442,7 +442,7 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
   }
 
   private Principal expectAuth(String username, String password) throws XWikiException {
-    Principal principal = createMockAndAddToDefault(Principal.class);
+    Principal principal = createDefaultMock(Principal.class);
     expect(principal.getName()).andReturn(username).anyTimes();
     expect(xWikiAuthServiceMock.authenticate(eq(username), eq(password), same(context))).andReturn(
         principal).once();
@@ -450,7 +450,7 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
   }
 
   private User createUserMock(String username) {
-    User userMock = createMockAndAddToDefault(User.class);
+    User userMock = createDefaultMock(User.class);
     expect(userMock.getDocRef()).andReturn(Utils.getComponent(ModelUtils.class).resolveRef(username,
         DocumentReference.class)).anyTimes();
     return userMock;
@@ -458,7 +458,7 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   private XWikiUser expectInGroup(User userMock, String group, boolean isInGrp)
       throws XWikiException {
-    XWikiUser xUserMock = createMockAndAddToDefault(XWikiUser.class);
+    XWikiUser xUserMock = createDefaultMock(XWikiUser.class);
     expect(userMock.asXWikiUser()).andReturn(xUserMock).anyTimes();
     expectInGroup(xUserMock, group, isInGrp);
     return xUserMock;

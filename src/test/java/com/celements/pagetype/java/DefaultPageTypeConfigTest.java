@@ -56,12 +56,12 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
   public void setUp_DefaultPageTypeConfigTest() throws Exception {
     context = getContext();
     componentManager = Utils.getComponentManager();
-    pageTypeImplMock = createMockAndAddToDefault(IJavaPageTypeRole.class);
+    pageTypeImplMock = createDefaultMock(IJavaPageTypeRole.class);
     testPageType = new DefaultPageTypeConfig(pageTypeImplMock);
     webUtilsService = Utils.getComponent(IWebUtilsService.class);
     componentManager.release(webUtilsService);
     webUtilsManagDesc = componentManager.getComponentDescriptor(IWebUtilsService.class, "default");
-    webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
+    webUtilsMock = createDefaultMock(IWebUtilsService.class);
     componentManager.registerComponent(webUtilsManagDesc, webUtilsMock);
   }
 
@@ -215,7 +215,7 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
   public void test_collectAttributes() {
     DocumentReference cellDocRef = new DocumentReference(context.getDatabase(), "EditorLayout",
         "myField");
-    AttributeBuilder attrBuilder = createMockAndAddToDefault(AttributeBuilder.class);
+    AttributeBuilder attrBuilder = createDefaultMock(AttributeBuilder.class);
     pageTypeImplMock.collectAttributes(same(attrBuilder), eq(cellDocRef));
     expectLastCall().once();
     replayDefault();

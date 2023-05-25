@@ -74,7 +74,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     context = getContext();
     context.setAction("view");
     xwiki = getWikiMock();
-    storeMock = createMockAndAddToDefault(XWikiStoreInterface.class);
+    storeMock = createDefaultMock(XWikiStoreInterface.class);
     expect(xwiki.getStore()).andReturn(storeMock).anyTimes();
     queryManagerMock = registerComponentMock(QueryManager.class);
     modelAccessMock = registerComponentMock(IModelAccessFacade.class);
@@ -190,7 +190,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
 
   private void expectLayoutQuery(WikiReference wiki, List<SpaceReference> layouts)
       throws QueryException {
-    Query queryMock = createMockAndAddToDefault(Query.class);
+    Query queryMock = createDefaultMock(Query.class);
     expect(queryManagerMock.createQuery(eq(HQL_PAGE_LAYOUT), eq(Query.HQL))).andReturn(queryMock);
     expect(queryMock.setWiki(wiki.getName())).andReturn(queryMock);
     expect(queryMock.execute()).andReturn(layouts.stream()
@@ -234,9 +234,9 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
   @Test
   public void test_getPageLayoutForDoc_centralPageLayout() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDocName");
-    InheritorFactory injectedInheritorFactory = createMockAndAddToDefault(InheritorFactory.class);
+    InheritorFactory injectedInheritorFactory = createDefaultMock(InheritorFactory.class);
     String fullName = "mySpace.MyDocName";
-    FieldInheritor inheritor = createMockAndAddToDefault(FieldInheritor.class);
+    FieldInheritor inheritor = createDefaultMock(FieldInheritor.class);
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))).andReturn(
         inheritor);
     String layoutName = "MyPageLayout";
@@ -261,11 +261,11 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_getPageLayoutForDoc_noPageLayout_defined() throws Exception {
-    InheritorFactory injectedInheritorFactory = createMockAndAddToDefault(InheritorFactory.class);
+    InheritorFactory injectedInheritorFactory = createDefaultMock(InheritorFactory.class);
     String myDocFN = "mySpace.MyDocName";
     DocumentReference myDocRef = RefBuilder.create().wiki(context.getDatabase()).space("mySpace")
         .doc("MyDocName").build(DocumentReference.class);
-    FieldInheritor inheritor = createMockAndAddToDefault(FieldInheritor.class);
+    FieldInheritor inheritor = createDefaultMock(FieldInheritor.class);
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(myDocFN), same(context))).andReturn(
         inheritor);
     expect(inheritor.getStringValue(eq("page_layout"), (String) isNull())).andReturn(null);
@@ -286,11 +286,11 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_getPageLayoutForDoc_noPageLayout_defaultAvailable() throws Exception {
-    InheritorFactory injectedInheritorFactory = createMockAndAddToDefault(InheritorFactory.class);
+    InheritorFactory injectedInheritorFactory = createDefaultMock(InheritorFactory.class);
     String fullName = "mySpace.MyDocName";
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyDocName");
-    FieldInheritor inheritor = createMockAndAddToDefault(FieldInheritor.class);
+    FieldInheritor inheritor = createDefaultMock(FieldInheritor.class);
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))).andReturn(
         inheritor);
     expect(inheritor.getStringValue(eq("page_layout"), (String) isNull())).andReturn(null);
@@ -314,12 +314,12 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_getPageLayoutForDoc_noLayoutSpace() throws Exception {
-    InheritorFactory injectedInheritorFactory = createMockAndAddToDefault(InheritorFactory.class);
+    InheritorFactory injectedInheritorFactory = createDefaultMock(InheritorFactory.class);
     String myDocFN = "mySpace.MyDocName";
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyDocName");
     String layoutName = "MyPageLayout";
-    FieldInheritor inheritor = createMockAndAddToDefault(FieldInheritor.class);
+    FieldInheritor inheritor = createDefaultMock(FieldInheritor.class);
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(myDocFN), same(context))).andReturn(
         inheritor);
     expect(inheritor.getStringValue(eq("page_layout"), (String) isNull())).andReturn(layoutName);
@@ -342,12 +342,12 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_getPageLayoutForDoc_noLayoutSpace_central() throws Exception {
-    InheritorFactory injectedInheritorFactory = createMockAndAddToDefault(InheritorFactory.class);
+    InheritorFactory injectedInheritorFactory = createDefaultMock(InheritorFactory.class);
     String myDocFN = "mySpace.MyDocName";
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyDocName");
     String layoutName = "celements2web:MyPageLayout";
-    FieldInheritor inheritor = createMockAndAddToDefault(FieldInheritor.class);
+    FieldInheritor inheritor = createDefaultMock(FieldInheritor.class);
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(myDocFN), same(context))).andReturn(
         inheritor);
     expect(inheritor.getStringValue(eq("page_layout"), (String) isNull())).andReturn(layoutName);
@@ -367,10 +367,10 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_getPageLayoutForDoc_noLayoutSpace_noAccess_someDB() throws Exception {
-    InheritorFactory injectedInheritorFactory = createMockAndAddToDefault(InheritorFactory.class);
+    InheritorFactory injectedInheritorFactory = createDefaultMock(InheritorFactory.class);
     String fullName = "mySpace.MyDocName";
     String layoutName = "someDB:MyPageLayout";
-    FieldInheritor inheritor = createMockAndAddToDefault(FieldInheritor.class);
+    FieldInheritor inheritor = createDefaultMock(FieldInheritor.class);
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))).andReturn(
         inheritor);
     expect(inheritor.getStringValue(eq("page_layout"), (String) isNull())).andReturn(layoutName);
@@ -395,7 +395,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
   @Deprecated
   @Test
   public void test_getPageLayoutForDoc_layoutSpace() throws Exception {
-    InheritorFactory injectedInheritorFactory = createMockAndAddToDefault(InheritorFactory.class);
+    InheritorFactory injectedInheritorFactory = createDefaultMock(InheritorFactory.class);
     DocumentReference myDocRef = RefBuilder.create().wiki(context.getDatabase())
         .space("MyPageLayout").doc("MyDocName").build(DocumentReference.class);
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MyPageLayout",
@@ -427,7 +427,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
   @Deprecated
   @Test
   public void test_getPageLayoutForDoc_layoutSpace_centralLayoutEditor() throws Exception {
-    InheritorFactory injectedInheritorFactory = createMockAndAddToDefault(InheritorFactory.class);
+    InheritorFactory injectedInheritorFactory = createDefaultMock(InheritorFactory.class);
     DocumentReference myDocRef = RefBuilder.create().wiki(context.getDatabase())
         .space("MyPageLayout").doc("MyDocName").build(DocumentReference.class);
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MyPageLayout",
@@ -666,7 +666,7 @@ public class DefaultLayoutServiceTest extends AbstractComponentTest {
     String layoutName = "delLayout";
     SpaceReference layoutSpaceRef = new SpaceReference(layoutName, new WikiReference(
         context.getDatabase()));
-    Query queryMock = createMockAndAddToDefault(Query.class);
+    Query queryMock = createDefaultMock(Query.class);
     expect(queryManagerMock.createQuery(eq("where doc.space = :space"), eq(Query.XWQL))).andReturn(
         queryMock).once();
     expect(queryMock.bindValue(eq("space"), eq(layoutSpaceRef.getName()))).andReturn(

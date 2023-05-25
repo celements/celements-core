@@ -28,7 +28,6 @@ import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.auth.AccountActivationFailedException;
 import com.celements.auth.AuthenticationService;

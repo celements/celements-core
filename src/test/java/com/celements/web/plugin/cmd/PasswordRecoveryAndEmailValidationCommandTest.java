@@ -73,11 +73,11 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     authServiceMock = registerComponentMock(IAuthenticationServiceRole.class);
     webUtilsMock = registerComponentMock(IWebUtilsService.class);
     celSendMailMock = registerComponentMock(IMailObjectRole.class);
-    rightServiceMock = createMockAndAddToDefault(XWikiRightService.class);
+    rightServiceMock = createDefaultMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightServiceMock).anyTimes();
-    rendererMock = createMockAndAddToDefault(XWikiRenderingEngine.class);
+    rendererMock = createDefaultMock(XWikiRenderingEngine.class);
     expect(getWikiMock().getRenderingEngine()).andReturn(rendererMock).anyTimes();
-    requestMock = createMockAndAddToDefault(XWikiRequest.class);
+    requestMock = createDefaultMock(XWikiRequest.class);
     getContext().setRequest(requestMock);
     cmd = new PasswordRecoveryAndEmailValidationCommand();
   }
@@ -156,7 +156,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     String dicMailSubjectKey = PasswordRecoveryAndEmailValidationCommand.CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY;
     ((TestMessageTool) getContext().getMessageTool()).injectMessage(dicMailSubjectKey,
         dictSubjectValue);
-    XWikiMessageTool mockMessageTool = createMockAndAddToDefault(XWikiMessageTool.class);
+    XWikiMessageTool mockMessageTool = createDefaultMock(XWikiMessageTool.class);
     expect(webUtilsMock.getMessageTool(eq("de"))).andReturn(mockMessageTool);
     expect(mockMessageTool.get(eq(dicMailSubjectKey), isA(List.class))).andReturn(
         dicMailSubjectKey);
@@ -170,7 +170,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
   @Test
   public void testGetValidationEmailSubject_defLang_null() throws Exception {
     String dicMailSubjectKey = PasswordRecoveryAndEmailValidationCommand.CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY;
-    XWikiMessageTool mockMessageTool = createMockAndAddToDefault(XWikiMessageTool.class);
+    XWikiMessageTool mockMessageTool = createDefaultMock(XWikiMessageTool.class);
     expect(webUtilsMock.getMessageTool(eq("de"))).andReturn(mockMessageTool);
     expect(mockMessageTool.get(eq(dicMailSubjectKey), isA(List.class))).andReturn(
         dicMailSubjectKey);
@@ -217,7 +217,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
   @Test
   public void test_createNewValidationTokenForUser() throws Exception {
     String token = "asdf";
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(userServiceMock.getUser(userDocRef)).andReturn(user);
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     expect(user.getDocument()).andReturn(userDoc);
@@ -252,7 +252,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
   @Test
   public void test_createNewValidationTokenForUser_QueryException() throws Exception {
     Throwable cause = new QueryException("", null, null);
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(userServiceMock.getUser(userDocRef)).andReturn(user);
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     expect(user.getDocument()).andReturn(userDoc);
@@ -274,7 +274,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
   public void test_createNewValidationTokenForUser_DocumentSaveException() throws Exception {
     Throwable cause = new DocumentSaveException(userDocRef);
     String token = "asdf";
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(userServiceMock.getUser(userDocRef)).andReturn(user);
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     expect(user.getDocument()).andReturn(userDoc);
@@ -317,7 +317,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
         CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(getContext()))).andReturn(
             from);
     expect(modelAccessMock.exists(eq(contentDocRef))).andReturn(true);
-    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument doc = createDefaultMock(XWikiDocument.class);
     expect(modelAccessMock.getDocument(eq(contentDocRef))).andReturn(doc);
     String adminLang = "en";
     expect(doc.getTranslatedDocument(eq(adminLang), same(getContext()))).andReturn(doc).anyTimes();
@@ -379,7 +379,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
         CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(getContext()))).andReturn(
             from);
     expect(modelAccessMock.exists(eq(contentDocRef))).andReturn(true);
-    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument doc = createDefaultMock(XWikiDocument.class);
     expect(modelAccessMock.getDocument(eq(contentDocRef))).andReturn(doc);
     expect(doc.getTranslatedDocument(eq("de"), same(getContext()))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(getContext()))).andReturn(content);
@@ -445,7 +445,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
             from);
     expect(modelAccessMock.exists(eq(contentDocRef))).andReturn(false);
     expect(modelAccessMock.exists(eq(contentCel2WebDocRef))).andReturn(true);
-    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument doc = createDefaultMock(XWikiDocument.class);
     expect(modelAccessMock.getDocument(eq(contentCel2WebDocRef))).andReturn(doc);
     String adminLang = "en";
     expect(doc.getTranslatedDocument(eq(adminLang), same(getContext()))).andReturn(doc).anyTimes();
@@ -507,7 +507,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
             from);
     expect(modelAccessMock.exists(eq(contentDocRef))).andReturn(false);
     expect(modelAccessMock.exists(eq(contentCel2WebDocRef))).andReturn(true);
-    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument doc = createDefaultMock(XWikiDocument.class);
     expect(modelAccessMock.getDocument(eq(contentCel2WebDocRef))).andReturn(doc);
     expect(doc.getTranslatedDocument(eq("de"), same(getContext()))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(getContext()))).andReturn(content);
@@ -627,7 +627,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     getContext().put("vcontext", new VelocityContext());
     expect(modelAccessMock.exists(eq(contentDocRef))).andReturn(false);
     expect(modelAccessMock.exists(eq(contentCel2WebDocRef))).andReturn(true);
-    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument doc = createDefaultMock(XWikiDocument.class);
     expect(modelAccessMock.getDocument(eq(contentCel2WebDocRef))).andReturn(doc);
     String adminLang = "en";
     expect(doc.getTranslatedDocument(eq(adminLang), same(getContext()))).andReturn(doc).anyTimes();
@@ -689,7 +689,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     getContext().put("vcontext", new VelocityContext());
     expect(modelAccessMock.exists(eq(contentDocRef))).andReturn(false);
     expect(modelAccessMock.exists(eq(contentCel2WebDocRef))).andReturn(true);
-    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument doc = createDefaultMock(XWikiDocument.class);
     expect(modelAccessMock.getDocument(eq(contentCel2WebDocRef))).andReturn(doc);
     expect(doc.getTranslatedDocument(eq("de"), same(getContext()))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(getContext()))).andReturn(content);

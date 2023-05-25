@@ -56,13 +56,13 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     ptResolverMock = registerComponentMock(IPageTypeResolverRole.class);
     context = getContext();
     xwiki = getWikiMock();
-    rightServiceMock = createMockAndAddToDefault(XWikiRightService.class);
+    rightServiceMock = createDefaultMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightServiceMock).anyTimes();
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
     prepVeloContextService = (PrepareVelocityContextService) Utils.getComponent(
         IPrepareVelocityContext.class);
-    skinDoc = createMockAndAddToDefault(XWikiDocument.class);
+    skinDoc = createDefaultMock(XWikiDocument.class);
     expect(skinDoc.getFullName()).andReturn("XWiki.Celements2Skin").anyTimes();
     expect(skinDoc.getDocumentReference()).andReturn(new DocumentReference(context.getDatabase(),
         "XWiki", "Celements2Skin")).anyTimes();
@@ -71,7 +71,7 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
         skinDoc).anyTimes();
     expect(xwiki.getDocument(eq(new DocumentReference("celements2web", "XWiki", "Celements2Skin")),
         same(context))).andReturn(skinDoc).anyTimes();
-    ptServiceMock = createMockAndAddToDefault(IPageTypeRole.class);
+    ptServiceMock = createDefaultMock(IPageTypeRole.class);
     prepVeloContextService.pageTypeService = ptServiceMock;
     curDocRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     currentDoc = new XWikiDocument(curDocRef);
@@ -158,7 +158,7 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testFixTdocForInvalidLanguage_wrong_tdoc() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
     expect(docMock.getDefaultLanguage()).andReturn("de").anyTimes();
     expect(docMock.getLanguage()).andReturn("").anyTimes();
@@ -181,7 +181,7 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     context.setLanguage("fr");
     // IMPORTANT: do not touch velocity context if the tdoc is in the correct language.
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
     expect(docMock.getDefaultLanguage()).andReturn("de").anyTimes();
     expect(docMock.getLanguage()).andReturn("").anyTimes();
@@ -205,7 +205,7 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testFixLanguagePreference() throws Exception {
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    XWikiRequest requestMock = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
     context.setRequest(requestMock);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))).andReturn(
@@ -240,7 +240,7 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testFixLanguagePreference_noAcceptLanguageValid() throws Exception {
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    XWikiRequest requestMock = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
     context.setRequest(requestMock);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(getMock(IWebUtilsService.class).getDefaultLanguage()).andReturn("en").atLeastOnce();
@@ -275,7 +275,7 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testFixLanguagePreference_invalidLanguageFromCookie() throws Exception {
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    XWikiRequest requestMock = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
     context.setRequest(requestMock);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))).andReturn(
@@ -310,9 +310,9 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testFixLanguagePreference_addCookieOnlyOnce() throws Exception {
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    XWikiRequest requestMock = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
     context.setRequest(requestMock);
-    XWikiResponse responseMock = createMockAndAddToDefault(XWikiResponse.class);
+    XWikiResponse responseMock = createDefaultMock(XWikiResponse.class);
     context.setResponse(responseMock);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"), eq(
@@ -516,7 +516,7 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetRTEwidth_pageType() throws Exception {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
     expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn(
         "500").anyTimes();
@@ -568,7 +568,7 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetRTEheight_pageType() throws Exception {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
     expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("543").anyTimes();
     XWikiDocument theDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "MySpace",

@@ -63,12 +63,12 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
-    nav = createMockAndAddToDefault(INavigation.class);
+    nav = createDefaultMock(INavigation.class);
     testRenderEngine = new TestRenderEngine();
     expect(xwiki.getRenderingEngine()).andReturn(testRenderEngine).anyTimes();
     vtPresType = (RenderedContentDynLoadPresentationType) Utils
         .getComponent(IPresentationTypeRole.class, "renderedContentDynLoad");
-    renderCmdMock = createMockAndAddToDefault(RenderCommand.class);
+    renderCmdMock = createDefaultMock(RenderCommand.class);
     vtPresType.renderCmd = renderCmdMock;
   }
 

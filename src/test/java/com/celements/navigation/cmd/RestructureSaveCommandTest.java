@@ -39,7 +39,7 @@ public class RestructureSaveCommandTest extends AbstractComponentTest {
   public void setUp_RestructureSaveCommandTest() throws Exception {
     context = getContext();
     restrSaveCmd = new ReorderSaveCommand();
-    mockHandler = createMockAndAddToDefault(ReorderSaveHandler.class);
+    mockHandler = createDefaultMock(ReorderSaveHandler.class);
     restrSaveCmd.injected_Handler(mockHandler);
   }
 

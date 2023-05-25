@@ -1,5 +1,6 @@
 package com.celements.collections.service;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -13,7 +14,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.collections.ICollectionsService;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -22,7 +23,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
-public class CollectionsScriptServiceTest extends AbstractBridgedComponentTestCase {
+public class CollectionsScriptServiceTest extends AbstractComponentTest {
 
   private CollectionsScriptService collScriptService;
 

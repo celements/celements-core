@@ -19,6 +19,7 @@
  */
 package com.celements.web.css;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -28,11 +29,11 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class CSSEngineTest extends AbstractBridgedComponentTestCase {
+public class CSSEngineTest extends AbstractComponentTest {
 
   private CSSEngine cssEngine;
   private XWikiContext context;

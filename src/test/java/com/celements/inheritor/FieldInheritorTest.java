@@ -19,6 +19,7 @@
  */
 package com.celements.inheritor;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.iterator.IIteratorFactory;
 import com.celements.iterator.XObjectIterator;
 import com.xpn.xwiki.XWiki;
@@ -37,7 +38,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
+public class FieldInheritorTest extends AbstractComponentTest {
 
   private FieldInheritor _fieldInheritor;
   private IIteratorFactory<XObjectIterator> _iteratorFactory;
