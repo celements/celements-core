@@ -10,9 +10,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 
-public class WebFormServiceTest extends AbstractBridgedComponentTestCase {
+public class WebFormServiceTest extends AbstractComponentTest {
 
   private WebFormService webFormService;
 

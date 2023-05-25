@@ -1,5 +1,6 @@
 package com.celements.mandatory.listener;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -10,11 +11,11 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.xpn.xwiki.web.Utils;
 
-public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCase {
+public class WikiCreatedEventListenerTest extends AbstractComponentTest {
 
   private WikiCreatedEventListener listener;
 
@@ -25,9 +26,9 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   public void setUp_WikiCreatedEventListenerTest() throws Exception {
     listener = (WikiCreatedEventListener) Utils.getComponent(EventListener.class,
         "celements.mandatory.WikiCreatedEventListener");
-    remoteObsMngContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class);
+    remoteObsMngContextMock = createDefaultMock(RemoteObservationManagerContext.class);
     listener.remoteObservationManagerContext = remoteObsMngContextMock;
-    mandatoryDocCmpMock = createMockAndAddToDefault(IMandatoryDocumentCompositorRole.class);
+    mandatoryDocCmpMock = createDefaultMock(IMandatoryDocumentCompositorRole.class);
     listener.mandatoryDocCmp = mandatoryDocCmpMock;
   }
 

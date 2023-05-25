@@ -21,7 +21,7 @@ package com.celements.sajson;
 
 import static com.celements.sajson.ECommand.*;
 import static com.google.common.base.Preconditions.*;
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

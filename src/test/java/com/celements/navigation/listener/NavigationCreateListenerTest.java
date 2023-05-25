@@ -8,12 +8,12 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.event.NavigationCreatedEvent;
 import com.xpn.xwiki.web.Utils;
 
-public class NavigationCreateListenerTest extends AbstractBridgedComponentTestCase {
+public class NavigationCreateListenerTest extends AbstractComponentTest {
 
   private NavigationCreateListener listener;
 

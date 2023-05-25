@@ -16,7 +16,7 @@ import com.celements.model.classes.fields.StringField;
 public class FormConfigClass extends AbstractClassDefinition implements FormClass {
 
   public static final String CLASS_NAME = "FormConfigClass";
-  public static final String CLASS_DEF_HINT = CLASS_SPACE + "." + CLASS_NAME;
+  public static final String CLASS_DEF_HINT = FormClass.CLASS_SPACE + "." + CLASS_NAME;
   public static final ClassReference CLASS_REF = new ClassReference(CLASS_SPACE, CLASS_NAME);
 
   public static final ClassField<String> FIELD_FORM_LAYOUT = new StringField.Builder(

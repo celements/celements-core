@@ -63,7 +63,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     modelAccessMock = registerComponentMock(IModelAccessFacade.class);
     pageTypeResolverMock = registerComponentMock(IPageTypeResolverRole.class);
     pageLayoutCmdMock = registerComponentMock(LayoutServiceRole.class);
-    attUrlCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    attUrlCmd = createDefaultMock(AttachmentURLCommand.class);
     command = new ExternalJavaScriptFilesCommand();
   }
 

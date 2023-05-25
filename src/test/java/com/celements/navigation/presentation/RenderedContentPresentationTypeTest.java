@@ -59,13 +59,13 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
-    nav = createMockAndAddToDefault(INavigation.class);
-    xwiki = createMockAndAddToDefault(XWiki.class);
+    nav = createDefaultMock(INavigation.class);
+    xwiki = createDefaultMock(XWiki.class);
     context.setWiki(xwiki);
     testRenderEngine = new TestRenderEngine();
     expect(xwiki.getRenderingEngine()).andReturn(testRenderEngine).anyTimes();
     vtPresType = new RenderedContentPresentationType();
-    renderCmdMock = createMockAndAddToDefault(RenderCommand.class);
+    renderCmdMock = createDefaultMock(RenderCommand.class);
     vtPresType.renderCmd = renderCmdMock;
   }
 

@@ -26,11 +26,11 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
-public class DefaultEmptyFieldCheckerTest extends AbstractBridgedComponentTestCase {
+public class DefaultEmptyFieldCheckerTest extends AbstractComponentTest {
 
   private IEmptyFieldChecker _emptyFieldChecker;
 

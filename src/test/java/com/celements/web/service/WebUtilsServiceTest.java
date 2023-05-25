@@ -349,7 +349,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @Test
   public void test_getAdminLanguage_fromUser() throws Exception {
     context.setLanguage("de");
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(user.getAdminLanguage()).andReturn(com.google.common.base.Optional.of("fr"));
 
     replayDefault();
@@ -360,7 +360,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @Test
   public void test_getAdminLanguage_defaultPreferences() throws Exception {
     context.setLanguage("de");
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(user.getAdminLanguage()).andReturn(com.google.common.base.Optional.<String>absent());
     expect(xwiki.getSpacePreference("admin_language", "de", context)).andReturn("es");
 
@@ -373,7 +373,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void test_getAdminLanguage_defaultSystem() throws Exception {
     String systemDefaultAdminLang = "en";
     context.setLanguage("de");
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(user.getAdminLanguage()).andReturn(com.google.common.base.Optional.<String>absent());
     expect(xwiki.getSpacePreference("admin_language", "de", context)).andReturn("");
     expect(xwiki.Param("celements.admin_language")).andReturn("");
@@ -1048,7 +1048,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         .andReturn(Optional.of(localTemplateDoc));
     String localScriptText = "my expected local script";
     localTemplateDoc.setContent(localScriptText);
-    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
         XWikiRenderingEngine.class);
     expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
         "groovy")).anyTimes();
@@ -1076,7 +1076,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         .andReturn(Optional.of(centralTemplateDoc));
     String centralScriptText = "my expected central script";
     centralTemplateDoc.setContent(centralScriptText);
-    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
         XWikiRenderingEngine.class);
     expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
         "groovy")).anyTimes();
@@ -1093,7 +1093,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @Test
   public void testRenderInheritableDocument_disk_langSpecific_no_local_no_central()
       throws Exception {
-    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
         XWikiRenderingEngine.class);
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
@@ -1117,7 +1117,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testRenderInheritableDocument_disk_noLang_no_local_no_central() throws Exception {
-    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
         XWikiRenderingEngine.class);
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
@@ -1142,7 +1142,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testRenderInheritableDocument_disk_defLang_no_local_no_central() throws Exception {
-    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
         XWikiRenderingEngine.class);
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
@@ -1431,7 +1431,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentListSorted_none() {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
 
     expect(docMock.getAttachmentList()).andReturn(Collections.<XWikiAttachment>emptyList()).once();
 
@@ -1444,8 +1444,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentListSorted_single() {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiAttachment att = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
+    XWikiAttachment att = createDefaultMock(XWikiAttachment.class);
 
     expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att)).once();
 
@@ -1459,9 +1459,9 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentListSorted_noComparator() {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
+    XWikiAttachment att1 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att2 = createDefaultMock(XWikiAttachment.class);
 
     expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
 
@@ -1476,9 +1476,9 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentListSorted_name_asc() {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
+    XWikiAttachment att1 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att2 = createDefaultMock(XWikiAttachment.class);
 
     expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
     expect(att1.getFilename()).andReturn("name2").once();
@@ -1496,9 +1496,9 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentListSorted_name_desc() {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
+    XWikiAttachment att1 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att2 = createDefaultMock(XWikiAttachment.class);
 
     expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
     expect(att1.getFilename()).andReturn("name1").once();
@@ -1516,9 +1516,9 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentListSorted_date_asc() {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
+    XWikiAttachment att1 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att2 = createDefaultMock(XWikiAttachment.class);
 
     expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
     expect(att1.getDate()).andReturn(new Date(1)).once();
@@ -1536,9 +1536,9 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentListSorted_date_desc() {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
+    XWikiAttachment att1 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att2 = createDefaultMock(XWikiAttachment.class);
 
     expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
     expect(att1.getDate()).andReturn(new Date(0)).once();
@@ -1556,10 +1556,10 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentListSorted_imageOnly() {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att3 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
+    XWikiAttachment att1 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att2 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att3 = createDefaultMock(XWikiAttachment.class);
 
     expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2, att3)).once();
     expect(att1.isImage(same(context))).andReturn(true).once();
@@ -1577,11 +1577,11 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentListSorted_reduced() {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att3 = createMockAndAddToDefault(XWikiAttachment.class);
-    XWikiAttachment att4 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
+    XWikiAttachment att1 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att2 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att3 = createDefaultMock(XWikiAttachment.class);
+    XWikiAttachment att4 = createDefaultMock(XWikiAttachment.class);
 
     expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2, att3, att4)).once();
 

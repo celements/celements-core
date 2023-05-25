@@ -47,7 +47,7 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     filter = new InternalRightsFilter();
     context = getContext();
     wiki = getWikiMock();
-    rightsService = createMockAndAddToDefault(XWikiRightService.class);
+    rightsService = createDefaultMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService);
   }
 

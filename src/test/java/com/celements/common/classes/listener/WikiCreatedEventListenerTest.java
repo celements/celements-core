@@ -1,5 +1,6 @@
 package com.celements.common.classes.listener;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -11,10 +12,10 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassesCompositorComponent;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCase {
+public class WikiCreatedEventListenerTest extends AbstractComponentTest {
 
   private WikiCreatedEventListener listener;
 
@@ -25,9 +26,9 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   public void setUp_WikiCreatedEventListenerTest() throws Exception {
     listener = (WikiCreatedEventListener) Utils.getComponent(EventListener.class,
         "celements.classes.WikiCreatedEventListener");
-    remoteObsMngContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class);
+    remoteObsMngContextMock = createDefaultMock(RemoteObservationManagerContext.class);
     listener.remoteObservationManagerContext = remoteObsMngContextMock;
-    classesCmpMock = createMockAndAddToDefault(IClassesCompositorComponent.class);
+    classesCmpMock = createDefaultMock(IClassesCompositorComponent.class);
     listener.classesCompositor = classesCmpMock;
   }
 

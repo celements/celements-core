@@ -1,6 +1,5 @@
 package com.celements.navigation.presentation;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import java.util.Set;

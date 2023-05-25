@@ -30,10 +30,10 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class TreeNodeDocumentCreatedListenerTest extends AbstractBridgedComponentTestCase {
+public class TreeNodeDocumentCreatedListenerTest extends AbstractComponentTest {
 
   private static final String _COMPONENT_NAME = "TreeNodeDocumentCreatedListener";
   private TreeNodeDocumentCreatedListener eventListener;

@@ -19,18 +19,19 @@
  */
 package com.celements.mandatory;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
-public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase {
+public class XWikiXWikiPreferencesTest extends AbstractComponentTest {
 
   private XWikiXWikiPreferences mandatoryXWikiPref;
   private XWikiContext context;

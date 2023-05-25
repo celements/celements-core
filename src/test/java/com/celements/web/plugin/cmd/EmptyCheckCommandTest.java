@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -32,7 +33,7 @@ import org.junit.Test;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
@@ -43,7 +44,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 @Deprecated
-public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
+public class EmptyCheckCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
@@ -57,7 +58,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     context = getContext();
     xwiki = getWikiMock();
     emptyChildCheckCmd = new EmptyCheckCommand();
-    treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
+    treeNodeService = createDefaultMock(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(ITreeNodeService.class,
         "default");
     savedTreeNodeServiceDesc = Utils.getComponent(ITreeNodeService.class);
@@ -281,7 +282,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
   // *****************************************************************/
 
   private XWikiDocument createEmptyDoc(DocumentReference emptyDocRef) throws XWikiException {
-    XWikiDocument myXdoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myXdoc = createDefaultMock(XWikiDocument.class);
     XWikiDocument myXTdoc = new XWikiDocument(emptyDocRef);
     myXTdoc.setDefaultLanguage("de");
     myXTdoc.setLanguage("fr");

@@ -11,12 +11,12 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.plugin.cmd.IMailObjectRole;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.web.Utils;
 
-public class CelMailSenderServiceTest extends AbstractBridgedComponentTestCase {
+public class CelMailSenderServiceTest extends AbstractComponentTest {
 
   private CelMailSenderService mailSender;
 
@@ -33,7 +33,7 @@ public class CelMailSenderServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testSendMail() {
-    IMailObjectRole mockMailObject = createMockAndAddToDefault(IMailObjectRole.class);
+    IMailObjectRole mockMailObject = createDefaultMock(IMailObjectRole.class);
     mailSender.internal_injectedMailObject(mockMailObject);
     String from = "testfrom";
     String replyTo = "testreplyTo";
@@ -43,7 +43,7 @@ public class CelMailSenderServiceTest extends AbstractBridgedComponentTestCase {
     String subject = "testsubject";
     String htmlContent = "testHtmlContent";
     String textContent = "testTextContent";
-    Attachment mockAttachment = createMockAndAddToDefault(Attachment.class);
+    Attachment mockAttachment = createDefaultMock(Attachment.class);
     List<Attachment> attachments = Arrays.asList(mockAttachment);
     Map<String, String> others = new HashMap<>();
     mockMailObject.setFrom(eq(from));
@@ -75,7 +75,7 @@ public class CelMailSenderServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testSendMail_latin1() {
-    IMailObjectRole mockMailObject = createMockAndAddToDefault(IMailObjectRole.class);
+    IMailObjectRole mockMailObject = createDefaultMock(IMailObjectRole.class);
     mailSender.internal_injectedMailObject(mockMailObject);
     String from = "testfrom";
     String replyTo = "testreplyTo";
@@ -85,7 +85,7 @@ public class CelMailSenderServiceTest extends AbstractBridgedComponentTestCase {
     String subject = "testsubject";
     String htmlContent = "testHtmlContent";
     String textContent = "testTextContent";
-    Attachment mockAttachment = createMockAndAddToDefault(Attachment.class);
+    Attachment mockAttachment = createDefaultMock(Attachment.class);
     List<Attachment> attachments = Arrays.asList(mockAttachment);
     Map<String, String> others = new HashMap<>();
     mockMailObject.setFrom(eq(from));

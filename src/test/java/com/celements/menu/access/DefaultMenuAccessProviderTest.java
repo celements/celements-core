@@ -1,5 +1,6 @@
 package com.celements.menu.access;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -7,13 +8,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
-public class DefaultMenuAccessProviderTest extends AbstractBridgedComponentTestCase {
+public class DefaultMenuAccessProviderTest extends AbstractComponentTest {
 
   private DefaultMenuAccessProvider defMenuAccessProvider;
   private XWikiContext context;
@@ -24,7 +25,7 @@ public class DefaultMenuAccessProviderTest extends AbstractBridgedComponentTestC
   public void setUp_DefaultMenuAccessProviderTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    rightsMock = createMockAndAddToDefault(XWikiRightService.class);
+    rightsMock = createDefaultMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightsMock).anyTimes();
     defMenuAccessProvider = (DefaultMenuAccessProvider) Utils.getComponent(
         IMenuAccessProviderRole.class, "celements.defaultMenuAccess");

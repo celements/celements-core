@@ -54,7 +54,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
   public void prepare() throws Exception {
     registerComponentMocks(IModelAccessFacade.class);
     tokenAuthImpl = new TokenLDAPAuthServiceImpl();
-    store = createMockAndAddToDefault(XWikiStoreInterface.class);
+    store = createDefaultMock(XWikiStoreInterface.class);
     expect(getWikiMock().getStore()).andReturn(store).anyTimes();
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
   }
@@ -182,7 +182,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     userDoc.setNew(false);
     userDoc.addXObject(userObj);
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     expect(request.getParameter(eq("token"))).andReturn(userToken).atLeastOnce();
     expect(request.getParameter(eq("username"))).andReturn(loginName).atLeastOnce();
     getContext().setRequest(request);
@@ -199,7 +199,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
 
   @Test
   public void test_checkAuthXWikiContext_noTokenAuth_null() throws Exception {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     expect(request.getParameter(eq("token"))).andReturn(null).atLeastOnce();
     expect(request.getParameter(eq("username"))).andReturn(null).atLeastOnce();
     expect(request.getHttpServletRequest()).andReturn(null).anyTimes();
@@ -214,7 +214,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
 
   @Test
   public void test_checkAuthXWikiContext_noTokenAuth_emptyString() throws Exception {
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     expect(request.getParameter(eq("token"))).andReturn("").atLeastOnce();
     expect(request.getParameter(eq("username"))).andReturn("").atLeastOnce();
     expect(request.getHttpServletRequest()).andReturn(null).anyTimes();
@@ -241,7 +241,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractComponentTest {
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     userDoc.setNew(false);
     userDoc.addXObject(userObj);
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    XWikiRequest request = createDefaultMock(XWikiRequest.class);
     expect(request.getParameter(eq("token"))).andReturn(userToken).atLeastOnce();
     expect(request.getParameter(eq("username"))).andReturn(loginName).atLeastOnce();
     getContext().setRequest(request);

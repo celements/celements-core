@@ -201,7 +201,7 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
 
   @Test
   public void test_validateField_invalidKey_notIgnore() throws XWikiException {
-    xClassRegexRule.configSrc = createMockAndAddToDefault(ConfigurationSource.class);
+    xClassRegexRule.configSrc = createDefaultMock(ConfigurationSource.class);
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
 
     expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))).andReturn(doc).once();

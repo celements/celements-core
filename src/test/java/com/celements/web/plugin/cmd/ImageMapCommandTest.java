@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -28,11 +29,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
-public class ImageMapCommandTest extends AbstractBridgedComponentTestCase {
+public class ImageMapCommandTest extends AbstractComponentTest {
 
   private ImageMapCommand imgMapCmd;
   private XWikiContext context;

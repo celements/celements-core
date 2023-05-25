@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -32,7 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -40,7 +41,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
+public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki wiki;
@@ -52,7 +53,7 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
     context = getContext();
     wiki = getWikiMock();
     attUrlCmd = new AttachmentURLCommand();
-    mockURLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
+    mockURLFactory = createDefaultMock(XWikiURLFactory.class);
     context.setURLFactory(mockURLFactory);
   }
 

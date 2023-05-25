@@ -128,7 +128,7 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_hasEditOnAllDocs_notExists_noCreate() throws Exception {
-    getContext().setRequest(createMockAndAddToDefault(XWikiRequest.class));
+    getContext().setRequest(createDefaultMock(XWikiRequest.class));
     DocFormRequestParam param = new DocFormRequestParam(
         createDocFieldKey("key", docRef, "field"), "");
 
@@ -142,7 +142,7 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_hasEditOnAllDocs_notExists() throws Exception {
-    getContext().setRequest(createMockAndAddToDefault(XWikiRequest.class));
+    getContext().setRequest(createDefaultMock(XWikiRequest.class));
     DocFormRequestParam param = new DocFormRequestParam(
         createDocFieldKey("key", docRef, "field"), "");
 

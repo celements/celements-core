@@ -19,6 +19,7 @@
  */
 package com.celements.pagetype.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -31,7 +32,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.PageTypeClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,7 +40,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
+public class GetPageTypesCommandTest extends AbstractComponentTest {
 
   private GetPageTypesCommand gptCmd;
   private XWikiContext context;

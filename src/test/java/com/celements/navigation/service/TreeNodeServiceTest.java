@@ -59,19 +59,19 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   public void setUp_TreeNodeServiceTest() throws Exception {
     context = getContext();
     wiki = getWikiMock();
-    mockStore = createMockAndAddToDefault(XWikiStoreInterface.class);
+    mockStore = createDefaultMock(XWikiStoreInterface.class);
     treeNodeService = (TreeNodeService) Utils.getComponent(ITreeNodeService.class);
     expect(wiki.getStore()).andReturn(mockStore).anyTimes();
-    mockRightService = createMockAndAddToDefault(XWikiRightService.class);
+    mockRightService = createDefaultMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(mockRightService).anyTimes();
-    mockTreeNodeCache = createMockAndAddToDefault(ITreeNodeCache.class);
+    mockTreeNodeCache = createDefaultMock(ITreeNodeCache.class);
     treeNodeService.treeNodeCache = mockTreeNodeCache;
     treeNodeService.execution = Utils.getComponent(Execution.class);
-    mockGetNotMenuItemCommand = createMockAndAddToDefault(
+    mockGetNotMenuItemCommand = createDefaultMock(
         GetNotMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getNotMappedMenuItemsForParentCmd()).andReturn(
         mockGetNotMenuItemCommand).anyTimes();
-    mockGetMenuItemCommand = createMockAndAddToDefault(GetMappedMenuItemsForParentCommand.class);
+    mockGetMenuItemCommand = createDefaultMock(GetMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getMappedMenuItemsForParentCmd()).andReturn(
         mockGetMenuItemCommand).anyTimes();
     backupNodeProviders = treeNodeService.nodeProviders;
@@ -168,7 +168,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testFetchNodesForParentKey_merge_TreeNodeProviders() {
-    ITreeNodeProvider nodeProviderMock = createMockAndAddToDefault(ITreeNodeProvider.class);
+    ITreeNodeProvider nodeProviderMock = createDefaultMock(ITreeNodeProvider.class);
     treeNodeService.nodeProviders.put("testNodeProvider", nodeProviderMock);
 
     String wikiName = "mywiki";
@@ -211,7 +211,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   // FIXME
   // @Test
   // public void testFetchNodesForParentKey_merge_TreeNodeProviders_duplicate_pos() {
-  // ITreeNodeProvider nodeProviderMock = createMockAndAddToDefault(
+  // ITreeNodeProvider nodeProviderMock = createDefaultMock(
   // ITreeNodeProvider.class);
   // treeNodeService.nodeProviders.put("testNodeProvider", nodeProviderMock);
   //
@@ -352,7 +352,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetNavObjectsFromLayout() throws Exception {
-    PageLayoutCommand mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    PageLayoutCommand mockPageLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
         context.getDatabase()));
@@ -402,7 +402,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   @Test
   public void testGetMaxConfiguredNavigationLevel_twoParents() throws Exception {
     InheritorFactory inheritorFact = new InheritorFactory();
-    PageLayoutCommand mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    PageLayoutCommand mockPageLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);
@@ -435,7 +435,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   @Test
   public void testGetMaxConfiguredNavigationLevel_deletedObject_NPE() throws Exception {
     InheritorFactory inheritorFact = new InheritorFactory();
-    PageLayoutCommand mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    PageLayoutCommand mockPageLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);
@@ -466,7 +466,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   @Test
   public void testGetMaxConfiguredNavigationLevel_noObjectFound_NPE() throws Exception {
     InheritorFactory inheritorFact = new InheritorFactory();
-    PageLayoutCommand mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    PageLayoutCommand mockPageLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);
@@ -500,7 +500,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   @Test
   public void testGetMaxConfiguredNavigationLevel_threeParents() throws Exception {
     InheritorFactory inheritorFact = new InheritorFactory();
-    PageLayoutCommand mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    PageLayoutCommand mockPageLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);
@@ -532,7 +532,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   @Test
   public void testGetMaxConfiguredNavigationLevel_LayoutConfig() throws Exception {
     InheritorFactory inheritorFact = new InheritorFactory();
-    PageLayoutCommand mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    PageLayoutCommand mockPageLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);

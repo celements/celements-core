@@ -50,15 +50,15 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(cellDocRef)))
         .andReturn(cellDoc).anyTimes();
     pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
-    webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
+    webUtilsMock = createDefaultMock(IWebUtilsService.class);
     webUtilsServiceDesc = getComponentManager().getComponentDescriptor(IWebUtilsService.class,
         "default");
     savedWebUtilsService = Utils.getComponent(IWebUtilsService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(webUtilsServiceDesc, webUtilsMock);
-    refDefaultSerializerMock = createMockAndAddToDefault(EntityReferenceSerializer.class);
+    refDefaultSerializerMock = createDefaultMock(EntityReferenceSerializer.class);
     expect(webUtilsMock.getRefDefaultSerializer()).andReturn(refDefaultSerializerMock).anyTimes();
-    pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
+    pageLayoutCmdMock = createDefaultMock(PageLayoutCommand.class);
     pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
   }
 
@@ -132,7 +132,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         expDepDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(expDepDocRef))).andReturn(true)
         .atLeastOnce();
-    XWikiDocument leftParentDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument leftParentDoc = createDefaultMock(XWikiDocument.class);
     expect(getMock(IModelAccessFacade.class).getDocument(eq(expDepDocRef)))
         .andReturn(leftParentDoc).atLeastOnce();
     expect(leftParentDoc.getContent()).andReturn("parent Content").atLeastOnce();

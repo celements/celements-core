@@ -24,10 +24,10 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class DefaultEmptyDocumentCheckerTest extends AbstractBridgedComponentTestCase {
+public class DefaultEmptyDocumentCheckerTest extends AbstractComponentTest {
 
   private IEmptyDocumentChecker _emptyDocumentChecker;
 

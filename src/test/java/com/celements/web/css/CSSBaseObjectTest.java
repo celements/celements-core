@@ -63,7 +63,7 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
     xwiki = getWikiMock();
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki", "user");
     context.setUser(Utils.getComponent(ModelUtils.class).serializeRef(userDocRef));
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(getMock(UserService.class).getUser(context.getUser())).andReturn(user).anyTimes();
     expect(user.getDocRef()).andReturn(userDocRef).anyTimes();
   }
@@ -74,7 +74,7 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
     String url = "http://celements2web.testhost/skin/Space/Doc/file.txt";
     bo.setStringValue("cssname", attLink);
     CSSBaseObject cssFile = new CSSBaseObject(bo, context);
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     cssFile.testInjectAttURLcmd(attURLcmd);
     expect(attURLcmd.getAttachmentURL(eq(attLink), same(context))).andReturn(url).once();
     replayDefault();
@@ -86,7 +86,7 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
   public void testGetCSS_emptyObjField() {
     bo.setStringValue("cssname", "");
     CSSBaseObject cssFile = new CSSBaseObject(bo, context);
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     cssFile.testInjectAttURLcmd(attURLcmd);
     expect(attURLcmd.getAttachmentURL(eq(""), same(context))).andReturn("").once();
     replayDefault();
@@ -100,7 +100,7 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
     String url = "/skin/Space/Doc/file.txt";
     bo.setStringValue("cssname", attLink);
     CSSBaseObject cssFile = new CSSBaseObject(bo, context);
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     cssFile.testInjectAttURLcmd(attURLcmd);
     expect(attURLcmd.getAttachmentURL(eq(context.getDatabase() + ":" + attLink), same(
         context))).andReturn(url).once();
@@ -161,7 +161,7 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachment() throws Exception {
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
@@ -175,7 +175,7 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
     attList.add(att);
     doc.setAttachmentList(attList);
     expect(getWikiMock().getDocument(eq(xwikiPrefDocRef), same(getContext()))).andReturn(doc);
-    XWikiRightService rightSerivce = createMockAndAddToDefault(XWikiRightService.class);
+    XWikiRightService rightSerivce = createDefaultMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightSerivce);
     String fullName = getContext().getDatabase() + ":XWiki.XWikiPreferences";
     expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq(fullName), same(
@@ -187,7 +187,7 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachment_Null() throws Exception {
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
@@ -206,7 +206,7 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachment_centralDb() throws Exception {
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
     DocumentReference xwikiPrefDocRef = new DocumentReference("celements2web", "XWiki",
         "XWikiPreferences");
@@ -225,7 +225,7 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
     attList.add(att);
     doc.setAttachmentList(attList);
     expect(getWikiMock().getDocument(eq(xwikiPrefDocRef), same(getContext()))).andReturn(doc);
-    XWikiRightService rightSerivce = createMockAndAddToDefault(XWikiRightService.class);
+    XWikiRightService rightSerivce = createDefaultMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightSerivce);
     String fullName = "celements2web:XWiki.XWikiPreferences";
     expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq(fullName), same(

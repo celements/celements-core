@@ -49,7 +49,7 @@ public class XObjectPageTypeConfigTest extends AbstractComponentTest {
     DocumentReference testPageTypeDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
         "TestPageType");
     xObjPTconfig = new XObjectPageTypeConfig(testPageTypeDocRef);
-    pageTypeMock = createMockAndAddToDefault(PageType.class);
+    pageTypeMock = createDefaultMock(PageType.class);
     xObjPTconfig.pageType = pageTypeMock;
     expect(pageTypeMock.getConfigName(same(context))).andReturn("TestPageType").anyTimes();
   }

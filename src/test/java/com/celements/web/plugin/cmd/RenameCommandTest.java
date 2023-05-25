@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -28,7 +29,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWiki;
@@ -36,7 +37,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class RenameCommandTest extends AbstractBridgedComponentTestCase {
+public class RenameCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
@@ -46,7 +47,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_CelementsWebPluginTest() throws Exception {
     renameCmd = new RenameCommand();
-    mockWebUtils = createMockAndAddToDefault(IWebUtils.class);
+    mockWebUtils = createDefaultMock(IWebUtils.class);
     renameCmd.inject_webUtils(mockWebUtils);
     context = getContext();
     xwiki = getWikiMock();
@@ -68,7 +69,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
   public void testRenameDoc_externalAccessWithFlushMenuCache() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument xDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andReturn(xDoc).once();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
@@ -85,7 +86,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
   public void testRenameDoc_internalAccessWithFlushMenuCache() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument xDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andReturn(xDoc).once();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
@@ -102,7 +103,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
   public void testRenameDoc_internalAccessWithOUTflushMenuCache() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument xDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andReturn(xDoc).once();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
@@ -139,7 +140,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
   public void testRenameDoc_Exception_on_getDocument() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument xDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andThrow(new XWikiException());
@@ -152,7 +153,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
   public void testRenameDoc_Exception_on_rename_withFlushMenuCache() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument xDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andReturn(xDoc).once();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
@@ -168,7 +169,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     String spaceName = "mySpace";
     String newSpaceName = "myNewSpace";
     String firstDocName = "myDoc1";
-    XWikiDocument firstDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument firstDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.exists(eq(spaceName + "." + firstDocName), same(context))).andReturn(
         true).atLeastOnce();
     expect(xwiki.getDocument(eq(spaceName + "." + firstDocName), same(context))).andReturn(
@@ -178,7 +179,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     firstDoc.rename(eq("myNewSpace.myDoc1"), same(context));
     expectLastCall().once();
     String firstDocName2 = "myDoc2";
-    XWikiDocument secondDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument secondDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))).andReturn(
         true).atLeastOnce();
     expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))).andReturn(
@@ -209,7 +210,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(spaceName + "." + firstDocName), same(context))).andThrow(
         new XWikiException());
     String firstDocName2 = "myDoc2";
-    XWikiDocument secondDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument secondDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))).andReturn(
         true).atLeastOnce();
     expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))).andReturn(

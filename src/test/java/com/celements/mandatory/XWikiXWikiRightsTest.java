@@ -19,16 +19,17 @@
  */
 package com.celements.mandatory;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class XWikiXWikiRightsTest extends AbstractBridgedComponentTestCase {
+public class XWikiXWikiRightsTest extends AbstractComponentTest {
 
   private XWikiXWikiRights mandatoryXWikiRights;
 
