@@ -30,11 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
-<<<<<<< HEAD
-=======
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
->>>>>>> origin/dev
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
