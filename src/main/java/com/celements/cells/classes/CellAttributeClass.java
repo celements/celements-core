@@ -38,7 +38,7 @@ public class CellAttributeClass extends AbstractClassDefinition
     implements CellsClassDefinition, CelementsClassDefinition {
 
   public static final String DOC_NAME = "CellAttributeClass";
-  public static final String CLASS_DEF_HINT = SPACE_NAME + "." + DOC_NAME;
+  public static final String CLASS_DEF_HINT = CelementsClassDefinition.SPACE_NAME + "." + DOC_NAME;
   public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 
   public static final ClassField<String> FIELD_NAME = new StringField.Builder(CLASS_REF,

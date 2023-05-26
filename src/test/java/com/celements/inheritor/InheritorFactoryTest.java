@@ -48,9 +48,9 @@ public class InheritorFactoryTest extends AbstractComponentTest {
   @Before
   public void setUp_InheritorFactoryTest() throws Exception {
     factory = new InheritorFactory();
-    mockWebUtils = createMockAndAddToDefault(IWebUtils.class);
+    mockWebUtils = createDefaultMock(IWebUtils.class);
     factory.inject_TEST_WebUtils(mockWebUtils);
-    mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    mockPageLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     factory.injectPageLayoutCmd(mockPageLayoutCmd);
   }
 

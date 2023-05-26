@@ -19,6 +19,7 @@
  */
 package com.celements.inheritor;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,12 +30,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.iterator.IIteratorFactory;
 import com.celements.iterator.XObjectIterator;
 import com.xpn.xwiki.objects.BaseCollection;
 
-public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCase {
+public class AbstractObjectInheritorTest extends AbstractComponentTest {
 
   private TestInheritor _testInheritor;
 

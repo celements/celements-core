@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.listener;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -33,14 +34,14 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.NavigationClasses;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class TreeNodeDocumentUpdatedListenerTest extends AbstractBridgedComponentTestCase {
+public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
 
   private static final String _COMPONENT_NAME = "TreeNodeDocumentUpdatedListener";
   private TreeNodeDocumentUpdatedListener eventListener;

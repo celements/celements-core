@@ -36,12 +36,12 @@ public class FormValidationServiceTest extends AbstractComponentTest {
   public void prepare() throws Exception {
     getContext().setDoc(new XWikiDocument(new DocumentReference(
         getContext().getDatabase(), "space", "doc")));
-    reqRule1 = createMockAndAddToDefault(IRequestValidationRule.class);
-    reqRule2 = createMockAndAddToDefault(IRequestValidationRule.class);
-    legReqRule1 = createMockAndAddToDefault(IRequestValidationRuleRole.class);
-    legReqRule2 = createMockAndAddToDefault(IRequestValidationRuleRole.class);
-    fieldRule1 = createMockAndAddToDefault(IFieldValidationRuleRole.class);
-    fieldRUle2 = createMockAndAddToDefault(IFieldValidationRuleRole.class);
+    reqRule1 = createDefaultMock(IRequestValidationRule.class);
+    reqRule2 = createDefaultMock(IRequestValidationRule.class);
+    legReqRule1 = createDefaultMock(IRequestValidationRuleRole.class);
+    legReqRule2 = createDefaultMock(IRequestValidationRuleRole.class);
+    fieldRule1 = createDefaultMock(IFieldValidationRuleRole.class);
+    fieldRUle2 = createDefaultMock(IFieldValidationRuleRole.class);
     formValidationService = (FormValidationService) Utils.getComponent(
         IFormValidationServiceRole.class);
     formValidationService.injectValidationRules(

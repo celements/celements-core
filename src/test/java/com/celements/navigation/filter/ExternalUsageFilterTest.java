@@ -19,19 +19,20 @@
  */
 package com.celements.navigation.filter;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
-public class ExternalUsageFilterTest extends AbstractBridgedComponentTestCase {
+public class ExternalUsageFilterTest extends AbstractComponentTest {
 
   private ExternalUsageFilter filter;
   private XWikiContext context;

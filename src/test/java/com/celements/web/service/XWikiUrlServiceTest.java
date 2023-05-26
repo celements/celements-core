@@ -29,7 +29,7 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
   @Before
   public void prepareTest() {
     service = Utils.getComponent(UrlService.class);
-    getContext().setURLFactory(urlFactoryMock = createMockAndAddToDefault(XWikiURLFactory.class));
+    getContext().setURLFactory(urlFactoryMock = createDefaultMock(XWikiURLFactory.class));
     docRef = new DocumentReference("wiki", "space", "page");
   }
 

@@ -48,7 +48,7 @@ public class AbstractDocumentCreateListenerTest extends AbstractComponentTest {
     context = getContext();
     classRef = new DocumentReference("wiki", "Classes", "SomeClass");
     docRef = new DocumentReference("wiki", "Space", "SomeDoc");
-    docMock = createMockAndAddToDefault(XWikiDocument.class);
+    docMock = createDefaultMock(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
 
     listener = new TestDocumentCreateListener();
@@ -56,13 +56,13 @@ public class AbstractDocumentCreateListenerTest extends AbstractComponentTest {
     listener.context = Utils.getComponent(ModelContext.class);
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
     listener.injectRemoteObservationManagerContext(
-        remoteObsManContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class));
-    listener.injectObservationManager(obsManagerMock = createMockAndAddToDefault(
+        remoteObsManContextMock = createDefaultMock(RemoteObservationManagerContext.class));
+    listener.injectObservationManager(obsManagerMock = createDefaultMock(
         ObservationManager.class));
     listener.configSrc = Utils.getComponent(ConfigurationSource.class);
 
-    creatingEventMock = createMockAndAddToDefault(Event.class);
-    createdEventMock = createMockAndAddToDefault(Event.class);
+    creatingEventMock = createDefaultMock(Event.class);
+    createdEventMock = createDefaultMock(Event.class);
   }
 
   @Test

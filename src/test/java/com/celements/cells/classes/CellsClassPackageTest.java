@@ -1,6 +1,5 @@
 package com.celements.cells.classes;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import java.util.List;

@@ -1,5 +1,6 @@
 package com.celements.appScript;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -8,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -16,7 +17,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
+public class AppScriptServiceTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
@@ -30,7 +31,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     xwiki = getWikiMock();
     appScriptService = (AppScriptService) Utils.getComponent(IAppScriptService.class);
     preseveEmptyCheck = appScriptService.emptyCheck;
-    emptyCheckMock = createMockAndAddToDefault(IEmptyCheckRole.class);
+    emptyCheckMock = createDefaultMock(IEmptyCheckRole.class);
     appScriptService.emptyCheck = emptyCheckMock;
   }
 

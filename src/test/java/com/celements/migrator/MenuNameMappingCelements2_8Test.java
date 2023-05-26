@@ -19,17 +19,18 @@
  */
 package com.celements.migrator;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
-public class MenuNameMappingCelements2_8Test extends AbstractBridgedComponentTestCase {
+public class MenuNameMappingCelements2_8Test extends AbstractComponentTest {
 
   private MenuNameMappingCelements2_8 migrator;
   private XWikiContext context;

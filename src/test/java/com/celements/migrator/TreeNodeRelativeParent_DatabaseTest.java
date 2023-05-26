@@ -39,9 +39,9 @@ public class TreeNodeRelativeParent_DatabaseTest extends AbstractComponentTest {
 
   @Test
   public void testMigrateXWikiMigrationManagerInterfaceXWikiContext() throws Exception {
-    SubSystemHibernateMigrationManager manager = createMockAndAddToDefault(
+    SubSystemHibernateMigrationManager manager = createDefaultMock(
         SubSystemHibernateMigrationManager.class);
-    Query queryMock = createMockAndAddToDefault(Query.class);
+    Query queryMock = createDefaultMock(Query.class);
     expect(queryManagerMock.createQuery(anyObject(String.class), eq(Query.XWQL))).andReturn(
         queryMock);
     expect(queryMock.bindValue("buggyParent", "xwikidb:%")).andReturn(queryMock);

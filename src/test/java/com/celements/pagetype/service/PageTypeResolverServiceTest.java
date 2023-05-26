@@ -61,7 +61,7 @@ public class PageTypeResolverServiceTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    request = createMockAndAddToDefault(XWikiRequest.class);
+    request = createDefaultMock(XWikiRequest.class);
     getContext().setRequest(request);
     modelStrategyMock = registerComponentMock(IModelAccessFacade.class);
     pageTypeServiceMock = registerComponentMock(IPageTypeRole.class);

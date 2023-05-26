@@ -23,7 +23,7 @@ import static com.celements.logging.LogUtils.*;
 import static com.celements.model.util.References.*;
 import static com.google.common.base.Predicates.*;
 import static com.google.common.collect.ImmutableMap.*;
-import static java.text.MessageFormat.*;
+import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.*;
 import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.*;
 

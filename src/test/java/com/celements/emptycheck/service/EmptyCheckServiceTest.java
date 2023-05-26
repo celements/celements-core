@@ -57,7 +57,7 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
     context = getContext();
     xwiki = getWikiMock();
     emptyCheckService = (EmptyCheckService) Utils.getComponent(IEmptyCheckRole.class);
-    treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
+    treeNodeService = createDefaultMock(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(ITreeNodeService.class,
         "default");
     savedTreeNodeService = Utils.getComponent(ITreeNodeService.class);
@@ -124,11 +124,11 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   @Test
   public void testIsEmptyRTEDocument_two_impl_oneNotEmpty_skipAfterNotEmpty() {
     HashMap<String, IEmptyDocStrategyRole> mockStrategyMap = new HashMap<>();
-    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testOneMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testOne", testOneMock);
-    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testTwoMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testTwo", testTwoMock);
-    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+    IEmptyDocStrategyRole testNotConfiguredMock = createDefaultMock(
         IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
     emptyCheckService.emptyDocStrategies = mockStrategyMap;
@@ -145,11 +145,11 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   @Test
   public void testIsEmptyRTEDocument_two_impl_oneNotEmpty() {
     HashMap<String, IEmptyDocStrategyRole> mockStrategyMap = new HashMap<>();
-    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testOneMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testOne", testOneMock);
-    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testTwoMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testTwo", testTwoMock);
-    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+    IEmptyDocStrategyRole testNotConfiguredMock = createDefaultMock(
         IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
     emptyCheckService.emptyDocStrategies = mockStrategyMap;
@@ -167,11 +167,11 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   @Test
   public void testIsEmptyRTEDocument_two_impl_isEmpty() {
     HashMap<String, IEmptyDocStrategyRole> mockStrategyMap = new HashMap<>();
-    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testOneMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testOne", testOneMock);
-    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testTwoMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testTwo", testTwoMock);
-    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+    IEmptyDocStrategyRole testNotConfiguredMock = createDefaultMock(
         IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
     emptyCheckService.emptyDocStrategies = mockStrategyMap;
@@ -189,11 +189,11 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   @Test
   public void testIsEmptyDocument_two_impl_oneNotEmpty_skipAfterNotEmpty() {
     HashMap<String, IEmptyDocStrategyRole> mockStrategyMap = new HashMap<>();
-    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testOneMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testOne", testOneMock);
-    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testTwoMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testTwo", testTwoMock);
-    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+    IEmptyDocStrategyRole testNotConfiguredMock = createDefaultMock(
         IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
     emptyCheckService.emptyDocStrategies = mockStrategyMap;
@@ -210,11 +210,11 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   @Test
   public void testIsEmptyDocument_two_impl_oneNotEmpty() {
     HashMap<String, IEmptyDocStrategyRole> mockStrategyMap = new HashMap<>();
-    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testOneMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testOne", testOneMock);
-    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testTwoMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testTwo", testTwoMock);
-    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+    IEmptyDocStrategyRole testNotConfiguredMock = createDefaultMock(
         IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
     emptyCheckService.emptyDocStrategies = mockStrategyMap;
@@ -232,11 +232,11 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   @Test
   public void testIsEmptyDocument_two_impl_isEmpty() {
     HashMap<String, IEmptyDocStrategyRole> mockStrategyMap = new HashMap<>();
-    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testOneMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testOne", testOneMock);
-    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(IEmptyDocStrategyRole.class);
+    IEmptyDocStrategyRole testTwoMock = createDefaultMock(IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testTwo", testTwoMock);
-    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+    IEmptyDocStrategyRole testNotConfiguredMock = createDefaultMock(
         IEmptyDocStrategyRole.class);
     mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
     emptyCheckService.emptyDocStrategies = mockStrategyMap;
@@ -386,7 +386,7 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   // *****************************************************************/
 
   private XWikiDocument createEmptyDoc(DocumentReference emptyDocRef) throws XWikiException {
-    XWikiDocument myXdoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myXdoc = createDefaultMock(XWikiDocument.class);
     XWikiDocument myXTdoc = new XWikiDocument(emptyDocRef);
     myXTdoc.setDefaultLanguage("de");
     myXTdoc.setLanguage("fr");

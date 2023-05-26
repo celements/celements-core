@@ -19,18 +19,19 @@
  */
 package com.celements.web.css;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 
-public class CSSTest extends AbstractBridgedComponentTestCase {
+public class CSSTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private CSSMock css;
@@ -39,7 +40,7 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_CSSTest() throws Exception {
     context = getContext();
-    cssMock = createMockAndAddToDefault(CSS.class);
+    cssMock = createDefaultMock(CSS.class);
     css = new CSSMock(context, cssMock);
   }
 
@@ -83,7 +84,7 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetURLFromString() {
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     css.testInjectAttURLcmd(attURLcmd);
     String cssPath = ":celRes/celements2.css";
     String urlPath = "/skin/resources/celRes/celements2.css";

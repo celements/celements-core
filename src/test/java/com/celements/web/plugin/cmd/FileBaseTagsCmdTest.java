@@ -209,7 +209,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
             0))).atLeastOnce();
     XWikiDocument existingTagDoc = new XWikiDocument(tagDocRef);
     existingTagDoc.setNew(false);
-    BaseClass menuItemBaseClass = createMockAndAddToDefault(BaseClass.class);
+    BaseClass menuItemBaseClass = createDefaultMock(BaseClass.class);
     expect(xwiki.getXClass(eq(navClassConfig.getMenuItemClassRef()), same(context))).andReturn(
         menuItemBaseClass).once();
     BaseObject expectedMenuItemObj = new BaseObject();
@@ -305,7 +305,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
             0))).atLeastOnce();
     XWikiDocument existingTagDoc = new XWikiDocument(tagDocRef);
     existingTagDoc.setNew(false);
-    BaseClass menuItemBaseClass = createMockAndAddToDefault(BaseClass.class);
+    BaseClass menuItemBaseClass = createDefaultMock(BaseClass.class);
     expect(xwiki.getXClass(eq(navClassConfig.getMenuItemClassRef()), same(context))).andReturn(
         menuItemBaseClass).once();
     BaseObject expectedMenuItemObj = new BaseObject();
@@ -350,7 +350,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     expect(mockTreeNodeSrv.getSubNodesForParent(eq(celFileBaseRef), isA(
         InternalRightsFilter.class))).andReturn(Arrays.asList(new TreeNode(tagDocRef2, null,
             0))).atLeastOnce();
-    BaseClass menuItemBaseClass = createMockAndAddToDefault(BaseClass.class);
+    BaseClass menuItemBaseClass = createDefaultMock(BaseClass.class);
     expect(xwiki.getXClass(eq(navClassConfig.getMenuItemClassRef()), same(context))).andReturn(
         menuItemBaseClass).once();
     BaseObject expectedMenuItemObj = new BaseObject();

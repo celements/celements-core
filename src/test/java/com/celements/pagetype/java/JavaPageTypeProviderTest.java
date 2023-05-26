@@ -19,7 +19,6 @@
  */
 package com.celements.pagetype.java;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 

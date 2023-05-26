@@ -19,6 +19,7 @@
  */
 package com.celements.cells;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,14 +30,14 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.cells.cmd.PageDependentDocumentReferenceCommand;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class CellsScriptServiceTest extends AbstractBridgedComponentTestCase {
+public class CellsScriptServiceTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;

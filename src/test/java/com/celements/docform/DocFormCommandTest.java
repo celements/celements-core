@@ -328,7 +328,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     xdoc.setNew(true);
     expectDocWithSave(xdoc);
 
-    getContext().setRequest(createMockAndAddToDefault(XWikiRequest.class));
+    getContext().setRequest(createDefaultMock(XWikiRequest.class));
     expect(getContext().getRequest().get(eq("template"))).andReturn("Tmpl.MyTmpl");
     XWikiDocument templateDoc = create(new DocumentReference(wiki.getName(), "Tmpl", "MyTmpl"));
     templateDoc.setNew(false);
@@ -367,7 +367,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
         "content", "Content"));
     expectDoc(xdoc);
     getContext().setLanguage(tdoc.getLanguage());
-    docFormCmd.addTranslationCmd = createMockAndAddToDefault(AddTranslationCommand.class);
+    docFormCmd.addTranslationCmd = createDefaultMock(AddTranslationCommand.class);
     expect(docFormCmd.addTranslationCmd.getTranslatedDoc(same(xdoc), eq(tdoc.getLanguage())))
         .andReturn(tdoc);
     getMock(IModelAccessFacade.class).saveDocument(tdoc, "updateAndSaveDocFormRequest");

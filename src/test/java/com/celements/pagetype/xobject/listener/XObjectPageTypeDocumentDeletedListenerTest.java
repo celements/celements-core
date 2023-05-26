@@ -19,6 +19,7 @@
  */
 package com.celements.pagetype.xobject.listener;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -38,7 +39,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.xobject.event.XObjectPageTypeDeletedEvent;
 import com.xpn.xwiki.XWikiContext;
@@ -46,7 +47,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractBridgedComponentTestCase {
+public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractComponentTest {
 
   private static final String _COMPONENT_NAME = "XObjectPageTypeDocumentDeletedListener";
   private XObjectPageTypeDocumentDeletedListener eventListener;
@@ -64,7 +65,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractBridgedC
     componentManager.release(defaultObservationManager);
     ComponentDescriptor<ObservationManager> obsManagDesc = componentManager.getComponentDescriptor(
         ObservationManager.class, "default");
-    obsManagerMock = createMockAndAddToDefault(ObservationManager.class);
+    obsManagerMock = createDefaultMock(ObservationManager.class);
     componentManager.registerComponent(obsManagDesc, obsManagerMock);
   }
 
@@ -138,7 +139,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractBridgedC
     XWikiDocument sourceDoc = new XWikiDocument(pageTypeDocRef);
     XWikiDocument origDoc = new XWikiDocument(pageTypeDocRef);
     sourceDoc.setOriginalDocument(origDoc);
-    RemoteObservationManagerContext remoteObsManagerCtx = createMockAndAddToDefault(
+    RemoteObservationManagerContext remoteObsManagerCtx = createDefaultMock(
         RemoteObservationManagerContext.class);
     eventListener.remoteObservationManagerContext = remoteObsManagerCtx;
     expect(remoteObsManagerCtx.isRemoteState()).andReturn(true).atLeastOnce();
@@ -152,7 +153,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractBridgedC
     DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
         "pageTypeDocName");
     Event docDelEvent = new DocumentDeletedEvent(pageTypeDocRef);
-    RemoteObservationManagerContext remoteObsManagerCtx = createMockAndAddToDefault(
+    RemoteObservationManagerContext remoteObsManagerCtx = createDefaultMock(
         RemoteObservationManagerContext.class);
     eventListener.remoteObservationManagerContext = remoteObsManagerCtx;
     expect(remoteObsManagerCtx.isRemoteState()).andReturn(false).atLeastOnce();
@@ -169,7 +170,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractBridgedC
     XWikiDocument sourceDoc = new XWikiDocument(pageTypeDocRef);
     XWikiDocument origDoc = new XWikiDocument(pageTypeDocRef);
     sourceDoc.setOriginalDocument(origDoc);
-    RemoteObservationManagerContext remoteObsManagerCtx = createMockAndAddToDefault(
+    RemoteObservationManagerContext remoteObsManagerCtx = createDefaultMock(
         RemoteObservationManagerContext.class);
     eventListener.remoteObservationManagerContext = remoteObsManagerCtx;
     expect(remoteObsManagerCtx.isRemoteState()).andReturn(false).atLeastOnce();
@@ -189,7 +190,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractBridgedC
     BaseObject pageTypePropObj = new BaseObject();
     pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
     origDoc.addXObject(pageTypePropObj);
-    RemoteObservationManagerContext remoteObsManagerCtx = createMockAndAddToDefault(
+    RemoteObservationManagerContext remoteObsManagerCtx = createDefaultMock(
         RemoteObservationManagerContext.class);
     eventListener.remoteObservationManagerContext = remoteObsManagerCtx;
     expect(remoteObsManagerCtx.isRemoteState()).andReturn(false).atLeastOnce();

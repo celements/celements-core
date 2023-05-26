@@ -1,6 +1,5 @@
 package com.celements.common.observation.listener;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -66,8 +65,8 @@ public class LocalEventListenerTest extends AbstractComponentTest {
   @Test
   public void test_onEvent() {
     Event event = AllEvent.ALLEVENT;
-    Object source = createMockAndAddToDefault(Serializable.class);
-    Object data = createMockAndAddToDefault(Serializable.class);
+    Object source = createDefaultMock(Serializable.class);
+    Object data = createDefaultMock(Serializable.class);
     Capture<LocalEventData> localEvDataCapt = newCapture();
 
     getMock(RemoteObservationManager.class).notify(capture(localEvDataCapt));
@@ -85,8 +84,8 @@ public class LocalEventListenerTest extends AbstractComponentTest {
   @Test
   public void test_onEvent_isLocal() {
     Event event = new LocalTestEvent();
-    Object source = createMockAndAddToDefault(Serializable.class);
-    Object data = createMockAndAddToDefault(Serializable.class);
+    Object source = createDefaultMock(Serializable.class);
+    Object data = createDefaultMock(Serializable.class);
 
     replayDefault();
     listener.onEvent(event, source, data);
@@ -96,8 +95,8 @@ public class LocalEventListenerTest extends AbstractComponentTest {
   @Test
   public void test_onEvent_Exception() {
     Event event = AllEvent.ALLEVENT;
-    Object source = createMockAndAddToDefault(Serializable.class);
-    Object data = createMockAndAddToDefault(Serializable.class);
+    Object source = createDefaultMock(Serializable.class);
+    Object data = createDefaultMock(Serializable.class);
     Throwable cause = new RuntimeException();
 
     getMock(RemoteObservationManager.class).notify(isA(LocalEventData.class));
@@ -113,8 +112,8 @@ public class LocalEventListenerTest extends AbstractComponentTest {
   @Test
   public void test_onEvent_NotSerializableException() {
     Event event = AllEvent.ALLEVENT;
-    Object source = createMockAndAddToDefault(Object.class);
-    Object data = createMockAndAddToDefault(Object.class);
+    Object source = createDefaultMock(Object.class);
+    Object data = createDefaultMock(Object.class);
     Throwable exc = new RuntimeException("", new NotSerializableException());
 
     getMock(RemoteObservationManager.class).notify(isA(LocalEventData.class));
@@ -132,9 +131,9 @@ public class LocalEventListenerTest extends AbstractComponentTest {
   public void test_onEvent_NotSerializableException_logging() {
     int runCount = 13;
     Event event = AllEvent.ALLEVENT;
-    Object source = createMockAndAddToDefault(Object.class);
-    Object data = createMockAndAddToDefault(Object.class);
-    Logger loggerMock = listener.injectLogger(createMockAndAddToDefault(Logger.class));
+    Object source = createDefaultMock(Object.class);
+    Object data = createDefaultMock(Object.class);
+    Logger loggerMock = listener.injectLogger(createDefaultMock(Logger.class));
 
     Throwable exc = new RuntimeException("", new NotSerializableException());
     getMock(RemoteObservationManager.class).notify(isA(LocalEventData.class));

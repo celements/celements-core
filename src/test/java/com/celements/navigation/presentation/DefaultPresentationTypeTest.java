@@ -80,22 +80,22 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     currentDoc.setNew(false);
     context.setDoc(currentDoc);
     nav = new Navigation("N1");
-    navFilterMock = createMockAndAddToDefault(InternalRightsFilter.class);
+    navFilterMock = createDefaultMock(InternalRightsFilter.class);
     nav.setNavFilter(navFilterMock);
-    mockLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    mockLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     nav.pageLayoutCmd = mockLayoutCmd;
     xwiki = getWikiMock();
-    utils = createMockAndAddToDefault(IWebUtils.class);
+    utils = createDefaultMock(IWebUtils.class);
     nav.testInjectUtils(utils);
-    tNServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
+    tNServiceMock = createDefaultMock(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
     wUServiceMock = registerComponentMock(IWebUtilsService.class);
     expect(wUServiceMock.getRefLocalSerializer()).andReturn(Utils.getComponent(
         EntityReferenceSerializer.class, "local")).anyTimes();
-    ptResolverServiceMock = createMockAndAddToDefault(PageTypeResolverService.class);
+    ptResolverServiceMock = createDefaultMock(PageTypeResolverService.class);
     nav.injected_PageTypeResolverService = ptResolverServiceMock;
     defPresType = (DefaultPresentationType) Utils.getComponent(IPresentationTypeRole.class);
-    mockRightService = createMockAndAddToDefault(XWikiRightService.class);
+    mockRightService = createDefaultMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(currentDocRef))
         .andReturn(currentDoc).anyTimes();
@@ -111,7 +111,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -122,7 +122,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
         "/MySpace/MyCurrentDoc");
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+    MultilingualMenuNameCommand menuNameCmdMock = createDefaultMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     defPresType.menuNameCmd = menuNameCmdMock;
@@ -164,7 +164,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -175,7 +175,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
         "/MySpace/MyCurrentDoc");
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+    MultilingualMenuNameCommand menuNameCmdMock = createDefaultMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     defPresType.menuNameCmd = menuNameCmdMock;
@@ -215,7 +215,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -227,7 +227,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(1);
-    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+    MultilingualMenuNameCommand menuNameCmdMock = createDefaultMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     defPresType.menuNameCmd = menuNameCmdMock;
@@ -268,7 +268,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -279,7 +279,7 @@ public class DefaultPresentationTypeTest extends AbstractComponentTest {
     nav.setHasLink(false);
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+    MultilingualMenuNameCommand menuNameCmdMock = createDefaultMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     defPresType.menuNameCmd = menuNameCmdMock;

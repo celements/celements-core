@@ -31,13 +31,6 @@
   <version>6.0-SNAPSHOT</version>
   <description>Celements Core</description>
   <dependencies>
-    <!-- Add here all your dependencies -->
-    <dependency>
-      <groupId>com.celements</groupId>
-      <artifactId>celements-shared-tests-deprecated</artifactId>
-      <version>6.0-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-model</artifactId>
@@ -47,7 +40,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-subsystem-migration-manager</artifactId>
-      <version>5.2</version>
+      <version>6.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -81,7 +74,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-scheduler</artifactId>
-      <version>5.0</version>
+      <version>6.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -89,6 +82,6 @@
     <connection>scm:git:git@github.com:celements/celements-core.git</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-core.git</developerConnection>
     <url>https://github.com/celements/celements-core</url>
-    <tag>celements-core-5.12</tag>
+    <tag>HEAD</tag>
   </scm>
 </project>
