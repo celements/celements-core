@@ -1,5 +1,6 @@
 package com.celements.navigation;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -19,7 +20,7 @@ import org.xwiki.query.QueryManager;
 
 import com.celements.common.cache.CacheLoadingException;
 import com.celements.common.cache.IDocumentReferenceCache;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWikiException;
@@ -27,7 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
+public class NavigationCacheTest extends AbstractComponentTest {
 
   private NavigationCache cache;
   private QueryManager queryManagerMock;
@@ -37,9 +38,9 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
   public void setUp_NavigationCacheTest() {
     cache = (NavigationCache) Utils.getComponent(IDocumentReferenceCache.class,
         NavigationCache.NAME);
-    queryManagerMock = createMockAndAddToDefault(QueryManager.class);
+    queryManagerMock = createDefaultMock(QueryManager.class);
     cache.injectQueryManager(queryManagerMock);
-    queryExecServiceMock = createMockAndAddToDefault(IQueryExecutionServiceRole.class);
+    queryExecServiceMock = createDefaultMock(IQueryExecutionServiceRole.class);
     cache.injectQueryExecService(queryExecServiceMock);
   }
 
@@ -210,7 +211,7 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
   }
 
   private void expectXWQL(WikiReference wikiRef, List<DocumentReference> ret) throws Exception {
-    Query queryMock = createMockAndAddToDefault(Query.class);
+    Query queryMock = createDefaultMock(Query.class);
     String xwql = "select distinct doc.fullName from Document doc, doc.object("
         + "Celements2.NavigationConfigClass) as obj";
     expect(queryManagerMock.createQuery(eq(xwql), eq(Query.XWQL))).andReturn(queryMock).once();

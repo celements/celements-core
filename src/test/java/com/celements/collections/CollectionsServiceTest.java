@@ -1,5 +1,6 @@
 package com.celements.collections;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -10,12 +11,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
+public class CollectionsServiceTest extends AbstractComponentTest {
 
   private CollectionsService collectionsService;
 

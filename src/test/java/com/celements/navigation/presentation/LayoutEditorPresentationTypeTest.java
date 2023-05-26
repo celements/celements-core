@@ -75,21 +75,21 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
     nav = new Navigation("N1");
-    navFilterMock = createMockAndAddToDefault(InternalRightsFilter.class);
+    navFilterMock = createDefaultMock(InternalRightsFilter.class);
     nav.setNavFilter(navFilterMock);
-    mockLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    mockLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     nav.pageLayoutCmd = mockLayoutCmd;
     xwiki = getWikiMock();
-    tNServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
+    tNServiceMock = createDefaultMock(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
     wUServiceMock = registerComponentMock(IWebUtilsService.class);
     expect(wUServiceMock.getRefLocalSerializer()).andReturn(Utils.getComponent(
         EntityReferenceSerializer.class, "local")).anyTimes();
-    ptResolverServiceMock = createMockAndAddToDefault(PageTypeResolverService.class);
+    ptResolverServiceMock = createDefaultMock(PageTypeResolverService.class);
     nav.injected_PageTypeResolverService = ptResolverServiceMock;
     layoutEditorPresType = (LayoutEditorPresentationType) Utils.getComponent(
         IPresentationTypeRole.class, "layoutEditor");
-    mockRightService = createMockAndAddToDefault(XWikiRightService.class);
+    mockRightService = createDefaultMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).anyTimes();
     expect(xwiki.getDocument(eq("MySpace.MyCurrentDoc"), same(context))).andReturn(
@@ -104,7 +104,7 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -115,7 +115,7 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
         "/MySpace/MyCurrentDoc");
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+    MultilingualMenuNameCommand menuNameCmdMock = createDefaultMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     layoutEditorPresType.menuNameCmd = menuNameCmdMock;
@@ -154,7 +154,7 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -165,7 +165,7 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
         "/MySpace/MyCurrentDoc");
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+    MultilingualMenuNameCommand menuNameCmdMock = createDefaultMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     layoutEditorPresType.menuNameCmd = menuNameCmdMock;
@@ -209,7 +209,7 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -221,7 +221,7 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(1);
-    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+    MultilingualMenuNameCommand menuNameCmdMock = createDefaultMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     layoutEditorPresType.menuNameCmd = menuNameCmdMock;
@@ -262,7 +262,7 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -273,7 +273,7 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
     nav.setHasLink(false);
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         context))).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMockAndAddToDefault(
+    MultilingualMenuNameCommand menuNameCmdMock = createDefaultMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
     layoutEditorPresType.menuNameCmd = menuNameCmdMock;

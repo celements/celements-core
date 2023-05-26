@@ -57,7 +57,7 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     context = getContext();
     xwiki = getWikiMock();
     nextNonEmptChildCmd = new NextNonEmptyChildrenCommand();
-    treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
+    treeNodeService = createDefaultMock(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(ITreeNodeService.class,
         "default");
     savedTreeNodeServiceDesc = Utils.getComponent(ITreeNodeService.class);
@@ -142,7 +142,7 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
         childrenList).once();
     expect(treeNodeService.getSubNodesForParent(eq(emptyChildDocRef), eq(""))).andReturn(
         Collections.<TreeNode>emptyList()).once();
-    XWikiDocument childEmptyXdoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument childEmptyXdoc = createDefaultMock(XWikiDocument.class);
     expect(childEmptyXdoc.getContent()).andReturn("").once();
     expect(xwiki.getDocument(eq(emptyChildDocRef), same(context))).andReturn(childEmptyXdoc).times(
         2);
@@ -242,7 +242,7 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
   // *****************************************************************/
 
   private XWikiDocument createEmptyDoc(DocumentReference emptyDocRef) throws XWikiException {
-    XWikiDocument myXdoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myXdoc = createDefaultMock(XWikiDocument.class);
     XWikiDocument myXTdoc = new XWikiDocument(emptyDocRef);
     myXTdoc.setDefaultLanguage("de");
     myXTdoc.setLanguage("fr");

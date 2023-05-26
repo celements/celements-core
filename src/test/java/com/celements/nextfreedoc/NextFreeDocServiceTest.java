@@ -42,8 +42,8 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     context = getContext();
     registerComponentMocks(IModelAccessFacade.class, QueryManager.class);
     nextFreeDocService = (NextFreeDocService) Utils.getComponent(INextFreeDocRole.class);
-    queryExecutorMock = createMockAndAddToDefault(QueryExecutor.class);
-    storeMock = createMockAndAddToDefault(XWikiStoreInterface.class);
+    queryExecutorMock = createDefaultMock(QueryExecutor.class);
+    storeMock = createDefaultMock(XWikiStoreInterface.class);
     expect(getWikiMock().getStore()).andReturn(storeMock).anyTimes();
   }
 

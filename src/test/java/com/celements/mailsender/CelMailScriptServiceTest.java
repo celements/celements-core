@@ -6,10 +6,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class CelMailScriptServiceTest extends AbstractBridgedComponentTestCase {
+public class CelMailScriptServiceTest extends AbstractComponentTest {
 
   private CelMailScriptService cmss;
 

@@ -51,7 +51,7 @@ public class CSSStringTest extends AbstractComponentTest {
     context = getContext();
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki", "user");
     context.setUser(Utils.getComponent(ModelUtils.class).serializeRef(userDocRef));
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(getMock(UserService.class).getUser(context.getUser())).andReturn(user).anyTimes();
     expect(user.getDocRef()).andReturn(userDocRef).anyTimes();
   }
@@ -62,7 +62,7 @@ public class CSSStringTest extends AbstractComponentTest {
     String attLink = "Space.Page;test.css";
     CSSString cssFile = new CSSString(attLink, context);
     XWikiContext context = new XWikiContext();
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     cssFile.testInjectAttURLcmd(attURLcmd);
     expect(attURLcmd.getAttachmentURL(eq(attLink), same(context))).andReturn(url).once();
     replayDefault();
@@ -114,7 +114,7 @@ public class CSSStringTest extends AbstractComponentTest {
 
   @Test
   public void test_getAttachment() throws Exception {
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
     String fullName = "XWiki.XWikiPreferences";
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "XWiki",
@@ -130,7 +130,7 @@ public class CSSStringTest extends AbstractComponentTest {
     attList.add(att);
     doc.setAttachmentList(attList);
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(doc);
-    XWikiRightService rightSerivce = createMockAndAddToDefault(XWikiRightService.class);
+    XWikiRightService rightSerivce = createDefaultMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightSerivce);
     expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq(
         getContext().getDatabase() + ":" + fullName), same(getContext()))).andReturn(true);

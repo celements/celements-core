@@ -1,5 +1,6 @@
 package com.celements.emptycheck.internal;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -7,14 +8,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCase {
+public class DefaultEmptyDocStrategyTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
@@ -144,7 +145,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void testIsEmptyRTEDocumentTranslated_empty() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(myDoc).atLeastOnce();
     XWikiDocument myTDoc = new XWikiDocument(docRef);
     myTDoc.setContent("");
@@ -158,7 +159,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void testIsEmptyRTEDocumentTranslated_notEmpty() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(myDoc).atLeastOnce();
     XWikiDocument myTDoc = new XWikiDocument(docRef);
     myTDoc.setContent("asfd");
@@ -195,7 +196,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void testIsEmptyRTEDocument_notEmpty_translations() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myDoc = createDefaultMock(XWikiDocument.class);
     expect(myDoc.getContent()).andReturn("").anyTimes();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(myDoc).atLeastOnce();
     XWikiDocument myTDoc = new XWikiDocument(docRef);
@@ -210,7 +211,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void testIsEmptyRTEDocument_empty_translations() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myDoc = createDefaultMock(XWikiDocument.class);
     expect(myDoc.getContent()).andReturn("").anyTimes();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(myDoc).atLeastOnce();
     XWikiDocument myTDoc = new XWikiDocument(docRef);
@@ -257,7 +258,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void testIsEmptyDocumentTranslated_empty() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(myDoc).atLeastOnce();
     XWikiDocument myTDoc = new XWikiDocument(docRef);
     myTDoc.setContent("");
@@ -271,7 +272,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void testIsEmptyDocumentTranslated_notEmpty() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(myDoc).atLeastOnce();
     XWikiDocument myTDoc = new XWikiDocument(docRef);
     myTDoc.setContent("asfd");
@@ -308,7 +309,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void testIsEmptyDocument_notEmpty_translations() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myDoc = createDefaultMock(XWikiDocument.class);
     expect(myDoc.getContent()).andReturn("").anyTimes();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(myDoc).atLeastOnce();
     XWikiDocument myTDoc = new XWikiDocument(docRef);
@@ -323,7 +324,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void testIsEmptyDocument_empty_translations() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument myDoc = createDefaultMock(XWikiDocument.class);
     expect(myDoc.getContent()).andReturn("").anyTimes();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(myDoc).atLeastOnce();
     XWikiDocument myTDoc = new XWikiDocument(docRef);

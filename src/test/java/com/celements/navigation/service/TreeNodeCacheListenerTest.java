@@ -6,10 +6,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.observation.EventListener;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class TreeNodeCacheListenerTest extends AbstractBridgedComponentTestCase {
+public class TreeNodeCacheListenerTest extends AbstractComponentTest {
 
   private static final String _COMPONENT_NAME = "TreeNodeCacheListener";
   private TreeNodeCacheListener eventListener;

@@ -19,6 +19,7 @@
  */
 package com.celements.pagetype.xobject.listener;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -33,14 +34,14 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class XObjectPageTypeDocumentUpdatedListenerTest extends AbstractBridgedComponentTestCase {
+public class XObjectPageTypeDocumentUpdatedListenerTest extends AbstractComponentTest {
 
   private static final String _COMPONENT_NAME = "XObjectPageTypeDocumentUpdatedListener";
   private XObjectPageTypeDocumentUpdatedListener eventListener;

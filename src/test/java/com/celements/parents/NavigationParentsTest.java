@@ -14,12 +14,12 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.cache.IDocumentReferenceCache;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.NavigationCache;
 import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.web.Utils;
 
-public class NavigationParentsTest extends AbstractBridgedComponentTestCase {
+public class NavigationParentsTest extends AbstractComponentTest {
 
   private NavigationParents navParents;
 
@@ -28,7 +28,7 @@ public class NavigationParentsTest extends AbstractBridgedComponentTestCase {
   public void setUp_NavigationParentsTest() throws Exception {
     navParents = (NavigationParents) Utils.getComponent(IDocParentProviderRole.class,
         NavigationParents.NAME);
-    navParents.navCache = createMockAndAddToDefault(IDocumentReferenceCache.class);
+    navParents.navCache = createDefaultMock(IDocumentReferenceCache.class);
   }
 
   @After

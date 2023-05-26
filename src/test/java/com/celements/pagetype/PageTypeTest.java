@@ -19,6 +19,7 @@
  */
 package com.celements.pagetype;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static junit.framework.Assert.*;
 import static org.easymock.EasyMock.*;
 
@@ -29,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.cmd.PageTypeCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -38,7 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class PageTypeTest extends AbstractBridgedComponentTestCase {
+public class PageTypeTest extends AbstractComponentTest {
 
   private static final String TEST_PAGE_TYPE_DOC = "TestPageType";
   private static final String TEST_PAGE_TYPE_SPACE = "PageTypes";

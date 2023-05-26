@@ -80,19 +80,19 @@ public class NavigationTest extends AbstractComponentTest {
     currentDoc.setNew(false);
     getContext().setDoc(currentDoc);
     nav = new Navigation("N1");
-    navFilterMock = createMockAndAddToDefault(InternalRightsFilter.class);
+    navFilterMock = createDefaultMock(InternalRightsFilter.class);
     nav.setNavFilter(navFilterMock);
-    tNServiceMock = createMockAndAddToDefault(ITreeNodeService.class);
+    tNServiceMock = createDefaultMock(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
     wUServiceMock = registerComponentMock(IWebUtilsService.class);
     expect(wUServiceMock.getRefLocalSerializer()).andReturn(Utils.getComponent(
         EntityReferenceSerializer.class, "local")).anyTimes();
-    ptResolverServiceMock = createMockAndAddToDefault(PageTypeResolverService.class);
+    ptResolverServiceMock = createDefaultMock(PageTypeResolverService.class);
     nav.injected_PageTypeResolverService = ptResolverServiceMock;
-    mockLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    mockLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     nav.pageLayoutCmd = mockLayoutCmd;
     expect(getWikiMock().isMultiLingual(same(getContext()))).andReturn(true).anyTimes();
-    mockRightService = createMockAndAddToDefault(XWikiRightService.class);
+    mockRightService = createDefaultMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(mockRightService).anyTimes();
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
   }
@@ -118,7 +118,7 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testSetRightsFilter() {
-    InternalRightsFilter filterNew = createMockAndAddToDefault(InternalRightsFilter.class);
+    InternalRightsFilter filterNew = createDefaultMock(InternalRightsFilter.class);
     nav.setNavFilter(filterNew);
     assertNotNull(nav.getNavFilter());
     assertSame("expecting injected filter object", filterNew, nav.getNavFilter());
@@ -259,7 +259,7 @@ public class NavigationTest extends AbstractComponentTest {
     ComponentManager componentManager = Utils.getComponentManager();
     ComponentDescriptor<IPageTypeRole> ptServiceDesc = componentManager.getComponentDescriptor(
         IPageTypeRole.class, "default");
-    IPageTypeRole ptServiceMock = createMockAndAddToDefault(IPageTypeRole.class);
+    IPageTypeRole ptServiceMock = createDefaultMock(IPageTypeRole.class);
     componentManager.registerComponent(ptServiceDesc, ptServiceMock);
     BaseObject ptObj = new BaseObject();
     ptObj.setXClassReference(new PageTypeClasses().getPageTypeClassRef(getContext().getDatabase()));
@@ -280,7 +280,7 @@ public class NavigationTest extends AbstractComponentTest {
     String pageType = "myUltimativePageType";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyMenuItemDoc");
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
@@ -317,7 +317,7 @@ public class NavigationTest extends AbstractComponentTest {
     String pageType = "myUltimativePageType";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyMenuItemDoc");
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
@@ -343,7 +343,7 @@ public class NavigationTest extends AbstractComponentTest {
     String pageType = "myUltimativePageType";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyMenuItemDoc");
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
@@ -426,7 +426,7 @@ public class NavigationTest extends AbstractComponentTest {
     String pageType = "myUltimativePageType";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyMenuItemDoc");
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
@@ -451,7 +451,7 @@ public class NavigationTest extends AbstractComponentTest {
     String pageType = "myUltimativePageType";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyMenuItemDoc");
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -475,7 +475,7 @@ public class NavigationTest extends AbstractComponentTest {
     String pageType = "myUltimativePageType";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyMenuItemDoc");
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -501,7 +501,7 @@ public class NavigationTest extends AbstractComponentTest {
     String pageType = "myUltimativePageType";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyMenuItemDoc");
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -527,7 +527,7 @@ public class NavigationTest extends AbstractComponentTest {
     String pageType = "myUltimativePageType";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyMenuItemDoc");
-    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
@@ -980,7 +980,7 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testSetPresentationType_null() throws Exception {
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+    IPresentationTypeRole componentInstance = createDefaultMock(
         IPresentationTypeRole.class);
     nav.setPresentationType(componentInstance);
     replayDefault();
@@ -1015,7 +1015,7 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testGetCMcssClass_default() {
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+    IPresentationTypeRole componentInstance = createDefaultMock(
         IPresentationTypeRole.class);
     nav.setPresentationType(componentInstance);
     expect(componentInstance.getDefaultCssClass()).andReturn("cel_cm_menu").atLeastOnce();
@@ -1026,7 +1026,7 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testGetCMcssClass() {
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+    IPresentationTypeRole componentInstance = createDefaultMock(
         IPresentationTypeRole.class);
     nav.setPresentationType(componentInstance);
     replayDefault();
@@ -1047,7 +1047,7 @@ public class NavigationTest extends AbstractComponentTest {
 
   @Test
   public void testGetPageLayoutName_overwritePresentationType() {
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+    IPresentationTypeRole componentInstance = createDefaultMock(
         IPresentationTypeRole.class);
     nav.setPresentationType(componentInstance);
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",

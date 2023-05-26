@@ -68,7 +68,7 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void test_ConstructorParentSpaceRef_strategy() {
-    PartNameGetter partNameGetterMock = createMockAndAddToDefault(PartNameGetter.class);
+    PartNameGetter partNameGetterMock = createDefaultMock(PartNameGetter.class);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
     TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
         context.getDatabase())), 1, partNameGetterMock);
@@ -82,7 +82,7 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void test_ConstructorParentSpaceRef_strategy_null() {
-    PartNameGetter partNameGetterMock = createMockAndAddToDefault(PartNameGetter.class);
+    PartNameGetter partNameGetterMock = createDefaultMock(PartNameGetter.class);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
     TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
         context.getDatabase())), 1, partNameGetterMock);
@@ -96,7 +96,7 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void test_ConstructorParentSpaceRef_strategy_lazy() {
-    PartNameGetter partNameGetterMock = createMockAndAddToDefault(PartNameGetter.class);
+    PartNameGetter partNameGetterMock = createDefaultMock(PartNameGetter.class);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
     TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
         context.getDatabase())), 1, partNameGetterMock);

@@ -1,5 +1,6 @@
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -10,12 +11,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.css.ICssExtensionRole;
 import com.celements.web.css.CSS;
 import com.celements.web.css.CSSString;
 
-public class CssCommandTest extends AbstractBridgedComponentTestCase {
+public class CssCommandTest extends AbstractComponentTest {
 
   private CssCommand cssCommand;
 

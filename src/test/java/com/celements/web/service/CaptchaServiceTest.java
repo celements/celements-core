@@ -19,6 +19,7 @@
  */
 package com.celements.web.service;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -33,12 +34,12 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 
 import com.celements.captcha.CaptchaService;
 import com.celements.captcha.ICaptchaServiceRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
+public class CaptchaServiceTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private CaptchaService captchaService;
@@ -52,10 +53,10 @@ public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_CelementsWebScriptServiceTest() throws Exception {
     context = getContext();
-    requestMock = createMockAndAddToDefault(XWikiRequest.class);
+    requestMock = createDefaultMock(XWikiRequest.class);
     context.setRequest(requestMock);
     sessionId = "AD87ND789S1L08";
-    sessionMock = createMockAndAddToDefault(HttpSession.class);
+    sessionMock = createDefaultMock(HttpSession.class);
     expect(requestMock.getSession()).andReturn(sessionMock).anyTimes();
     expect(sessionMock.getId()).andReturn(sessionId).anyTimes();
     captchaService = (CaptchaService) Utils.getComponent(ICaptchaServiceRole.class);
@@ -67,7 +68,7 @@ public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
     captchaVerifyerDesc = getComponentManager().getComponentDescriptor(CaptchaVerifier.class,
         "image");
     getComponentManager().release(origImgCaptchaVerifier);
-    imgCaptchaVerifierMock = createMockAndAddToDefault(CaptchaVerifier.class);
+    imgCaptchaVerifierMock = createDefaultMock(CaptchaVerifier.class);
     getComponentManager().registerComponent(captchaVerifyerDesc, imgCaptchaVerifierMock);
     expect(imgCaptchaVerifierMock.getUserId(requestMock)).andReturn(sessionId).anyTimes();
   }

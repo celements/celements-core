@@ -73,7 +73,7 @@ public class RenderCommandTest extends AbstractComponentTest {
     xwiki = getWikiMock();
     velocityContext = (VelocityContext) getExecutionContext().getProperty("velocityContext");
     assertNotNull(velocityContext);
-    cellDockApiMock = createMockAndAddToDefault(Document.class);
+    cellDockApiMock = createDefaultMock(Document.class);
     velocityContext.put("celldoc", cellDockApiMock);
     context.put("vcontext", velocityContext);
     currentDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "Content",
@@ -146,8 +146,8 @@ public class RenderCommandTest extends AbstractComponentTest {
   @Test
   public void testGetRenderTemplatePath_NoViewTemplate_empty() throws Exception {
     String cellDocFN = "xwikidb:MyLayout.Cell12";
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn("").anyTimes();
     expect(ptMock.getName()).andReturn("CelementsCell").anyTimes();
@@ -163,8 +163,8 @@ public class RenderCommandTest extends AbstractComponentTest {
   @Test
   public void testGetRenderTemplatePath_NoViewTemplate_null() throws Exception {
     String cellDocFN = "xwikidb:MyLayout.Cell12";
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(null).anyTimes();
     expect(ptMock.getName()).andReturn("CelementsCell").anyTimes();
@@ -366,8 +366,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
@@ -402,8 +402,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
@@ -437,8 +437,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
@@ -471,8 +471,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
@@ -512,8 +512,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
@@ -548,8 +548,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
@@ -584,8 +584,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
@@ -615,8 +615,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
@@ -643,8 +643,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    IPageTypeConfig ptMock = createDefaultMock(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createDefaultMock(PageTypeReference.class);
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);

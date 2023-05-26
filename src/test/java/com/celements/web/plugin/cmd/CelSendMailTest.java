@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -30,7 +31,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.TestMessageTool;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,7 +40,7 @@ import com.xpn.xwiki.plugin.mailsender.Mail;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
 import com.xpn.xwiki.web.Utils;
 
-public class CelSendMailTest extends AbstractBridgedComponentTestCase {
+public class CelSendMailTest extends AbstractComponentTest {
 
   XWikiContext context;
   CelSendMail sendMail;
@@ -178,7 +179,7 @@ public class CelSendMailTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testSendMail() {
     XWiki xwiki = getWikiMock();
-    MailSenderPluginApi mailPlugin = createMockAndAddToDefault(MailSenderPluginApi.class);
+    MailSenderPluginApi mailPlugin = createDefaultMock(MailSenderPluginApi.class);
     expect(xwiki.getPluginApi(eq("mailsender"), same(context))).andReturn(mailPlugin);
     expect(mailPlugin.sendMail(isA(Mail.class), isA(CelMailConfiguration.class))).andReturn(1);
     sendMail.injectMail(new Mail());

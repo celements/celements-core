@@ -49,7 +49,7 @@ public class InheritorFactoryTest extends AbstractComponentTest {
   public void setUp_InheritorFactoryTest() throws Exception {
     factory = new InheritorFactory();
     parentsListerMock = registerComponentMock(IDocumentParentsListerRole.class);
-    mockPageLayoutCmd = createMockAndAddToDefault(PageLayoutCommand.class);
+    mockPageLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     factory.injectPageLayoutCmd(mockPageLayoutCmd);
   }
 

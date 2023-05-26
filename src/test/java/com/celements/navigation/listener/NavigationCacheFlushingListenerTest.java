@@ -10,7 +10,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 
 import com.celements.common.cache.IDocumentReferenceCache;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.NavigationCache;
 import com.celements.navigation.event.NavigationCreatedEvent;
 import com.celements.navigation.event.NavigationDeletedEvent;
@@ -18,7 +18,7 @@ import com.celements.navigation.event.NavigationUpdatedEvent;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-public class NavigationCacheFlushingListenerTest extends AbstractBridgedComponentTestCase {
+public class NavigationCacheFlushingListenerTest extends AbstractComponentTest {
 
   private NavigationCacheFlushingListener listener;
 
@@ -27,7 +27,7 @@ public class NavigationCacheFlushingListenerTest extends AbstractBridgedComponen
   public void setUp_NavigationCacheFlushingListenerTest() throws Exception {
     listener = (NavigationCacheFlushingListener) Utils.getComponent(EventListener.class,
         NavigationCache.NAME);
-    listener.navCache = createMockAndAddToDefault(IDocumentReferenceCache.class);
+    listener.navCache = createDefaultMock(IDocumentReferenceCache.class);
   }
 
   @After

@@ -69,7 +69,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     xwiki = getWikiMock();
     layoutServiceMock = registerComponentMock(LayoutServiceRole.class);
     modelAccessMock = registerComponentMock(IModelAccessFacade.class);
-    storeMock = createMockAndAddToDefault(XWikiStoreInterface.class);
+    storeMock = createDefaultMock(XWikiStoreInterface.class);
     expect(xwiki.getStore()).andReturn(storeMock).anyTimes();
     plCmd = new PageLayoutCommand();
   }

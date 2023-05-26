@@ -55,7 +55,7 @@ public class XObjectPageTypeCacheTest extends AbstractComponentTest {
     context = getContext();
     xwiki = getWikiMock();
     xObjPageTypeCache = (XObjectPageTypeCache) Utils.getComponent(IXObjectPageTypeCacheRole.class);
-    getPageTypeCmdMock = createMockAndAddToDefault(GetPageTypesCommand.class);
+    getPageTypeCmdMock = createDefaultMock(GetPageTypesCommand.class);
     xObjPageTypeCache.injectedTest_getPageTypeCmd = getPageTypeCmdMock;
     wikiRef = new WikiReference(context.getDatabase());
   }
@@ -73,7 +73,7 @@ public class XObjectPageTypeCacheTest extends AbstractComponentTest {
   public void testInvalidateCacheForWiki() {
     Map<WikiReference, List<PageTypeReference>> pageTypeRefCache = xObjPageTypeCache.getPageTypeRefCache();
     assertNotNull(pageTypeRefCache);
-    PageTypeReference pageTypeRefMack = createMockAndAddToDefault(PageTypeReference.class);
+    PageTypeReference pageTypeRefMack = createDefaultMock(PageTypeReference.class);
     pageTypeRefCache.put(wikiRef, Arrays.asList(pageTypeRefMack));
     assertTrue(pageTypeRefCache.containsKey(wikiRef));
     replayDefault();

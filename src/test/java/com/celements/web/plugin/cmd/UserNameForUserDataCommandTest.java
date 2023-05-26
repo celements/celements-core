@@ -59,7 +59,7 @@ public class UserNameForUserDataCommandTest extends AbstractComponentTest {
   @Test
   public void testGetUsernameForUserData_loginname_exists() throws XWikiException {
     String login = "testLogin";
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(userServiceMock.getUserForLoginField(login, Arrays.asList(
         UserService.DEFAULT_LOGIN_FIELD))).andReturn(Optional.of(user));
     expect(user.asXWikiUser()).andReturn(new XWikiUser("XWiki." + login));
@@ -72,7 +72,7 @@ public class UserNameForUserDataCommandTest extends AbstractComponentTest {
   @Test
   public void testGetUsernameForUserData_multiplePossibleFields() throws XWikiException {
     String login = "testLogin";
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(userServiceMock.getUserForLoginField(login, Arrays.asList("email",
         UserService.DEFAULT_LOGIN_FIELD))).andReturn(Optional.of(user));
     expect(user.asXWikiUser()).andReturn(new XWikiUser("XWiki." + login));

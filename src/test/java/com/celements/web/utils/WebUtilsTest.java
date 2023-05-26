@@ -63,7 +63,7 @@ public class WebUtilsTest extends AbstractComponentTest {
   @Before
   public void prepareTest() throws Exception {
     celUtils = new WebUtils();
-    mockURLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
+    mockURLFactory = createDefaultMock(XWikiURLFactory.class);
     getContext().setURLFactory(mockURLFactory);
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
     expect(registerComponentMock(CoreConfiguration.class).getDefaultDocumentSyntax()).andReturn(

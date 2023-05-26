@@ -61,7 +61,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     service = (CelementsUserService) Utils.getComponent(UserService.class);
     expect(getMock(IWebUtilsService.class).getAdminMessageTool()).andReturn(
         getMessageToolStub()).anyTimes();
-    expect(getWikiMock().getGroupService(getContext())).andReturn(createMockAndAddToDefault(
+    expect(getWikiMock().getGroupService(getContext())).andReturn(createDefaultMock(
         XWikiGroupService.class)).anyTimes();
     getMessageToolStub().injectMessage("core.comment.createdUser", "user created");
     getMessageToolStub().injectMessage("core.comment.addedUserToGroup", "user added to group");
@@ -243,7 +243,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
   private void expectUserQuery(String login, List<String> possibleLoginFields,
       List<DocumentReference> result) throws Exception {
-    Query queryMock = createMockAndAddToDefault(Query.class);
+    Query queryMock = createDefaultMock(Query.class);
     expect(getMock(QueryManager.class).createQuery(service.buildPossibleLoginXwql(
         possibleLoginFields.iterator()), Query.XWQL)).andReturn(queryMock);
     expect(queryMock.bindValue("space", "XWiki")).andReturn(queryMock);
@@ -370,7 +370,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     expectInitialGroups(groups);
     XWikiDocument admGrpDoc = expectGroupAdd(groups.get(0));
     XWikiDocument othGrpDoc = expectGroupAdd(groups.get(1));
-    User user = createMockAndAddToDefault(User.class);
+    User user = createDefaultMock(User.class);
     expect(user.getDocRef()).andReturn(userDocRef).atLeastOnce();
 
     replayDefault();
