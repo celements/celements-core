@@ -94,8 +94,6 @@ com.celements.appScript.AppScriptScriptService
 com.celements.mandatory.XWikiXWikiRights
 com.celements.parents.XDocParents
 com.celements.parents.DocumentParentsLister
-com.celements.scheduler.classes.SchedulerClassConfig
-com.celements.scheduler.classes.SchedulerClasses
 com.celements.navigation.listener.NavigationCreateListener
 com.celements.navigation.listener.NavigationUpdateListener
 com.celements.navigation.listener.NavigationDeleteListener
