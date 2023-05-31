@@ -2,10 +2,10 @@ package com.celements.auth.user;
 
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.springframework.stereotype.Component;
 
 import com.celements.pagetype.category.IPageTypeCategoryRole;
 import com.celements.pagetype.java.AbstractJavaPageType;
@@ -20,8 +20,13 @@ public class UserPageType extends AbstractJavaPageType {
 
   static final String EDIT_TEMPLATE_NAME = "UserEdit";
 
-  @Requirement
-  private IPageTypeCategoryRole pageTypeCategory;
+  private final IPageTypeCategoryRole pageTypeCategory;
+
+  @Inject
+  public UserPageType(
+      IPageTypeCategoryRole pageTypeCategory) {
+    this.pageTypeCategory = pageTypeCategory;
+  }
 
   @Override
   public String getName() {
