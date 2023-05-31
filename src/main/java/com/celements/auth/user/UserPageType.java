@@ -23,8 +23,8 @@ public class UserPageType extends AbstractJavaPageType {
   private final IPageTypeCategoryRole pageTypeCategory;
 
   @Inject
-  public UserPageType(
-      IPageTypeCategoryRole pageTypeCategory) {
+  public UserPageType(IPageTypeCategoryRole pageTypeCategory) {
+    super();
     this.pageTypeCategory = pageTypeCategory;
   }
 
