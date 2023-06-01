@@ -47,6 +47,7 @@ import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
+import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiGroupsClass;
@@ -181,7 +182,8 @@ public class CelementsUserService implements UserService {
     DocumentReference userDocRef = getOrGenerateUserDocRef(userData.remove(USERNAME_FIELD));
     try {
       XWikiDocument userDoc = modelAccess.createDocument(userDocRef);
-      createUserFromData(userDoc, userData);
+      fillInUserData(userDoc, userData);
+      addPageTypeOnUser(userDoc);
       setRightsOnUser(userDoc, Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
           EAccessLevel.DELETE));
       modelAccess.saveDocument(userDoc, getMessage("core.comment.createdUser"));
@@ -217,7 +219,7 @@ public class CelementsUserService implements UserService {
     return userDocRef;
   }
 
-  void createUserFromData(XWikiDocument userDoc, Map<String, String> userData)
+  void fillInUserData(XWikiDocument userDoc, Map<String, String> userData)
       throws DocumentAccessException {
     String userFN = modelUtils.serializeRefLocal(userDoc.getDocumentReference());
     userDoc.setParentReference((EntityReference) usersClass.getDocRef(
@@ -234,6 +236,13 @@ public class CelementsUserService implements UserService {
     } catch (XWikiException xwe) {
       throw new DocumentAccessException(usersClass.getClassReference().getDocRef(), xwe);
     }
+  }
+
+  void addPageTypeOnUser(XWikiDocument userDoc) {
+    XWikiObjectEditor userPageTypeEditor = XWikiObjectEditor.on(userDoc)
+        .filter(PageTypeClass.CLASS_REF);
+    userPageTypeEditor.filter(PageTypeClass.FIELD_PAGE_TYPE, UserPageType.PAGETYPE_NAME);
+    userPageTypeEditor.createFirstIfNotExists();
   }
 
   void setRightsOnUser(XWikiDocument userDoc, List<EAccessLevel> rights) {
