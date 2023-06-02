@@ -83,7 +83,7 @@ public class UserPageTypeMigration extends AbstractCelementsHibernateMigrator {
   }
 
   String getXwql() {
-    return "from doc.object(XWiki.XWikiUsers)";
+    return "from doc.object(XWiki.XWikiUsers) usr";
   }
 
   private void setPageTypeIfAbsent(DocumentReference docRef) throws DocumentAccessException {
