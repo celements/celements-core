@@ -75,4 +75,9 @@ public class UserPageType extends AbstractJavaPageType {
     }
   }
 
+  @Override
+  public boolean useInlineEditorMode() {
+    return true;
+  }
+
 }

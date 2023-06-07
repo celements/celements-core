@@ -99,4 +99,11 @@ public class UserPageTypeTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void test_useInlineEditorMode() {
+    replayDefault();
+    assertTrue(userPageType.useInlineEditorMode());
+    verifyDefault();
+  }
+
 }
