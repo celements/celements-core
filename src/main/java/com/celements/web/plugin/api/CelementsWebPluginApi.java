@@ -733,15 +733,6 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link LegacySkinScriptService #getSkinConfigObj()}
-   */
-  @Deprecated
-  public com.xpn.xwiki.api.Object getSkinConfigObj() {
-    return getLegacySkinScriptService().getSkinConfigObj();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
    *             {@link CelMailScriptService #sendMail(String, String, String, String, String,
    *             String, String, String, List, Map)}
    */

@@ -41,7 +41,6 @@ import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
-import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebService;
@@ -60,7 +59,6 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -315,14 +313,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     XWikiDocument viewTemplate = context.getWiki().getDocument(pageType.getRenderTemplate("view"),
         context);
     return context.getWiki().getRenderingEngine().renderDocument(viewTemplate, doc, context);
-  }
-
-  /**
-   * @deprecated since 2.29.0 use SkinConfigObjCommand instead.
-   */
-  @Deprecated
-  public BaseObject getSkinConfigObj(XWikiContext context) {
-    return new SkinConfigObjCommand().getSkinConfigObj();
   }
 
   @Override
