@@ -30,6 +30,7 @@ import com.celements.model.classes.fields.ClassField;
 import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.XObjectFieldAccessor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiGroupsClass;
@@ -65,6 +66,8 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
         XWikiGroupService.class)).anyTimes();
     getMessageToolStub().injectMessage("core.comment.createdUser", "user created");
     getMessageToolStub().injectMessage("core.comment.addedUserToGroup", "user added to group");
+    expectClassWithNewObj(PageTypeClass.CLASS_REF.getClassDefinition().get(),
+        userDocRef.getWikiReference());
   }
 
   @Test
@@ -329,7 +332,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     expectUserClassFromMap(userData);
 
     replayDefault();
-    service.createUserFromData(userDoc, userData);
+    service.fillInUserData(userDoc, userData);
     verifyDefault();
 
     assertEquals(getUserClass().getDocRef(), userDoc.getParentReference());
@@ -416,6 +419,10 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     assertSame(userDoc, user.getDocument());
     assertEquals(1, XWikiObjectFetcher.on(userDoc).filter(getUserClass()).count());
     assertEquals(2, XWikiObjectFetcher.on(userDoc).filter(getRightsClass()).count());
+    assertEquals(UserPageType.PAGETYPE_NAME, XWikiObjectFetcher.on(userDoc)
+        .filter(PageTypeClass.CLASS_REF)
+        .fetchField(PageTypeClass.FIELD_PAGE_TYPE)
+        .findFirst().orElse(null));
   }
 
   @Test
