@@ -65,7 +65,7 @@ public class CelementsUser implements User {
 
   @Override
   public boolean isGlobal() {
-    return getDocRef().getWikiReference().equals(modelUtils.getMainWikiRef());
+    return modelUtils.isMainWiki(getDocRef().getWikiReference());
   }
 
   @Override
