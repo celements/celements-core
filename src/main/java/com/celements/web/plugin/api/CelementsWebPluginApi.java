@@ -401,7 +401,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public List<Attachment> getRandomImages(String fullName, int num) throws ClassNotFoundException {
-    return WebUtils.getInstance().getRandomImages(fullName, num, context);
+    throw new UnsupportedOperationException(
+        "CelementsWebPluginApi getRandomImages is not supported anymore.");
   }
 
   /**
@@ -2037,4 +2038,5 @@ public class CelementsWebPluginApi extends Api {
   private EmptyCheckScriptService getEmptyCheckScriptService() {
     return (EmptyCheckScriptService) Utils.getComponent(ScriptService.class, "emptycheck");
   }
+
 }
