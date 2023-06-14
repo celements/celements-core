@@ -71,7 +71,6 @@ import com.celements.web.service.LegacySkinScriptService;
 import com.celements.web.service.WebUtilsScriptService;
 import com.celements.web.service.WebUtilsService;
 import com.celements.web.utils.SuggestBaseClass;
-import com.celements.web.utils.WebUtils;
 import com.celements.webform.ActionScriptService;
 import com.celements.webform.WebFormScriptService;
 import com.xpn.xwiki.XWikiContext;
@@ -298,7 +297,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace, String menuPart) {
-    return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, menuPart, context);
+    return getTreeNodeService().getSubNodesForParent(parent, menuSpace, menuPart);
   }
 
   /**
