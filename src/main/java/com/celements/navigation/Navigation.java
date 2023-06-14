@@ -769,12 +769,15 @@ public class Navigation implements INavigation {
     return getTreeNodeService().getActiveMenuItemPos(menuLevel, menuPart);
   }
 
-  // only used in NavigationApi. check for velocity files using it
+  /**
+   * @deprecated since 6.0 instead use TreeNodeService
+   */
+  @Deprecated
   @Override
   public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(int menuLevel,
       XWikiContext context) {
-    getTreeNodeService().getMenuItemsForHierarchyLevel(menuLevel, menuPart);
-    return WebUtils.getInstance().getMenuItemsForHierarchyLevel(menuLevel, menuPart, context);
+    throw new UnsupportedOperationException(
+        "Navigation getMenuItemsForHierarchyLevel is not supported anymore.");
   }
 
   // only used in NavigationApi. check for velocity files using it
