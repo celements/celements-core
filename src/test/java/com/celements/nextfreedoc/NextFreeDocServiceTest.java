@@ -319,4 +319,21 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
         nextFreeDocService.getHighestNumHQL());
   }
 
+  @Test
+  public void test_getNextRandomPageDocRef() {
+
+    // test for thrown exception if lengthOfRandomAlphanumeric <= 3
+
+    // test with prefix=null
+
+    // test if returned DocumentReference does not exist twice
+
+    // test if returned DocumentReference is not null
+
+    // test if returned value is DocumentReference
+
+    // test if prefix is included in DocumentReference
+
+  }
+
 }
