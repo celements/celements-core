@@ -698,7 +698,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public List<String> getDocumentParentsList(String fullName, boolean includeDoc) {
     throw new UnsupportedOperationException(
-        "CelementsWebPluginApi getDocumentParentsList ist not supported anymore.");
+        "CelementsWebPluginApi getDocumentParentsList is not supported anymore.");
   }
 
   /**
