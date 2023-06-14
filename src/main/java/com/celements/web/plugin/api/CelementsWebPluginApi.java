@@ -44,6 +44,7 @@ import com.celements.mailsender.CelMailScriptService;
 import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.navigation.service.TreeNodeCache;
 import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.nextfreedoc.NextFreeDocScriptService;
@@ -279,7 +280,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace) {
-    return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, "", context);
+    return getTreeNodeService().getSubNodesForParent(parent, menuSpace, "");
   }
 
   /**
@@ -1981,6 +1982,10 @@ public class CelementsWebPluginApi extends Api {
 
   private TreeNodeScriptService getTreeNodeScriptService() {
     return (TreeNodeScriptService) Utils.getComponent(ScriptService.class, "treeNode");
+  }
+
+  private ITreeNodeService getTreeNodeService() {
+    return Utils.getComponent(ITreeNodeService.class);
   }
 
   private IWebUtilsService getWebUtilsService() {
