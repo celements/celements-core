@@ -321,7 +321,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getNextRandomPageDocRef_exception() {
+  public void test_getNextRandomPageDocRef_lengthOfRandomAlphaNumeric() {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("mywiki"));
     String prefix = "";
     int lengthOfRandomAlphanumeric = 3;
@@ -389,15 +389,12 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     SpaceReference spaceRef = null;
     String prefix = "";
     int lengthOfRandomAlphanumeric = 10;
-    expect(getMock(IModelAccessFacade.class).exists(anyObject(DocumentReference.class)))
-        .andReturn(false).once();
 
-    replayDefault();
-    DocumentReference docRef = nextFreeDocService.getNextRandomPageDocRef(spaceRef,
-        lengthOfRandomAlphanumeric, prefix);
-    verifyDefault();
+    Exception e = assertThrows(IllegalArgumentException.class, () -> {
+      nextFreeDocService.getNextRandomPageDocRef(spaceRef, lengthOfRandomAlphanumeric, prefix);
+    });
 
-    assertNotNull(docRef);
+    assertEquals("SpaceReference cannot be null.", e.getMessage());
   }
 
   @Test
