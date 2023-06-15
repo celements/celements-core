@@ -47,6 +47,7 @@ import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
+import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
@@ -97,11 +98,14 @@ public class CelementsUserService implements UserService {
 
   private final ModelContext context;
 
+  private final INextFreeDocRole nextFreeDoc;
+
   @Inject
   public CelementsUserService(ClassDefinition usersClass, ClassDefinition groupsClass,
       ClassDefinition rightsClass, QueryManager queryManager,
       IQueryExecutionServiceRole queryExecService, IModelAccessFacade modelAccess,
-      ModelUtils modelUtils, IWebUtilsService webUtils, ModelContext context) {
+      ModelUtils modelUtils, IWebUtilsService webUtils, ModelContext context,
+      INextFreeDocRole nextFreeDoc) {
     super();
     this.usersClass = usersClass;
     this.groupsClass = groupsClass;
@@ -112,6 +116,7 @@ public class CelementsUserService implements UserService {
     this.modelUtils = modelUtils;
     this.webUtils = webUtils;
     this.context = context;
+    this.nextFreeDoc = nextFreeDoc;
   }
 
   @Override
@@ -213,16 +218,16 @@ public class CelementsUserService implements UserService {
     }
   }
 
-  // TODO use instead when available: [CELDEV-692] NextFreeDocService getNextFreeRandomDocRef
   synchronized DocumentReference getOrGenerateUserDocRef(String accountName) {
     accountName = Strings.nullToEmpty(accountName);
+    DocumentReference userDocRef = null;
     if (accountName.isEmpty()) {
-      accountName = RandomStringUtils.randomAlphanumeric(12);
-    }
-    DocumentReference userDocRef = resolveUserDocRef(accountName);
-    while (modelAccess.exists(userDocRef)) {
-      userDocRef = new DocumentReference(RandomStringUtils.randomAlphanumeric(12),
-          getUserSpaceRef());
+      userDocRef = nextFreeDoc.getNextRandomPageDocRef(getUserSpaceRef(), 12, null);
+    } else {
+      userDocRef = resolveUserDocRef(accountName);
+      if (modelAccess.exists(userDocRef)) {
+        userDocRef = nextFreeDoc.getNextRandomPageDocRef(getUserSpaceRef(), 12, null);
+      }
     }
     return userDocRef;
   }
