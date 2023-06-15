@@ -219,13 +219,14 @@ public class CelementsUserService implements UserService {
   synchronized DocumentReference getOrGenerateUserDocRef(String accountName) {
     accountName = Strings.nullToEmpty(accountName);
     DocumentReference userDocRef = null;
-    if (accountName.isEmpty()) {
-      userDocRef = nextFreeDoc.getNextRandomPageDocRef(getUserSpaceRef(), 12, null);
-    } else {
+    if (!accountName.isEmpty()) {
       userDocRef = resolveUserDocRef(accountName);
       if (modelAccess.exists(userDocRef)) {
-        userDocRef = nextFreeDoc.getNextRandomPageDocRef(getUserSpaceRef(), 12, null);
+        userDocRef = null;
       }
+    }
+    if (userDocRef == null) {
+      userDocRef = nextFreeDoc.getNextRandomPageDocRef(getUserSpaceRef(), 12, null);
     }
     return userDocRef;
   }
