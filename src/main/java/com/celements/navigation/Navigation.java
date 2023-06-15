@@ -61,7 +61,6 @@ import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.WebUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
@@ -780,33 +779,33 @@ public class Navigation implements INavigation {
         "Navigation getMenuItemsForHierarchyLevel is not supported anymore.");
   }
 
-  // only used in NavigationApi. check for velocity files using it
   @Override
   public String getPrevMenuItemFullName(String fullName, XWikiContext context) {
-    BaseObject prevMenuItem = null;
+    TreeNode prevTreeNode = null;
     try {
-      prevMenuItem = WebUtils.getInstance().getPrevMenuItem(fullName, context);
+      prevTreeNode = injected_TreeNodeService
+          .getPrevMenuItem(getModelUtils().resolveRef(fullName, DocumentReference.class));
     } catch (XWikiException exp) {
       LOGGER.error("getPrevMenuItemFullName failed.", exp);
     }
-    if (prevMenuItem != null) {
-      return prevMenuItem.getName();
+    if (prevTreeNode != null) {
+      return getModelUtils().serializeRefLocal(prevTreeNode.getDocumentReference());
     } else {
       return "";
     }
   }
 
-  // only used in NavigationApi. check for velocity files using it
   @Override
   public String getNextMenuItemFullName(String fullName, XWikiContext context) {
-    BaseObject nextMenuItem = null;
+    TreeNode nextTreeNode = null;
     try {
-      nextMenuItem = WebUtils.getInstance().getNextMenuItem(fullName, context);
+      nextTreeNode = injected_TreeNodeService
+          .getNextMenuItem(getModelUtils().resolveRef(fullName, DocumentReference.class));
     } catch (XWikiException exp) {
       LOGGER.error("getNextMenuItemFullName failed.", exp);
     }
-    if (nextMenuItem != null) {
-      return nextMenuItem.getName();
+    if (nextTreeNode != null) {
+      return getModelUtils().serializeRefLocal(nextTreeNode.getDocumentReference());
     } else {
       return "";
     }
