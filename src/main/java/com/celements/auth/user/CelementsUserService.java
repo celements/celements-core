@@ -20,14 +20,14 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -79,32 +79,40 @@ public class CelementsUserService implements UserService {
   static final String XWIKI_ALL_GROUP_FN = "XWiki.XWikiAllGroup";
   static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
-  @Requirement(XWikiUsersClass.CLASS_DEF_HINT)
-  private ClassDefinition usersClass;
+  private final ClassDefinition usersClass;
 
-  @Requirement(XWikiGroupsClass.CLASS_DEF_HINT)
-  private ClassDefinition groupsClass;
+  private final ClassDefinition groupsClass;
 
-  @Requirement(XWikiRightsClass.CLASS_DEF_HINT)
-  private ClassDefinition rightsClass;
+  private final ClassDefinition rightsClass;
 
-  @Requirement
-  private QueryManager queryManager;
+  private final QueryManager queryManager;
 
-  @Requirement
-  private IQueryExecutionServiceRole queryExecService;
+  private final IQueryExecutionServiceRole queryExecService;
 
-  @Requirement
-  private IModelAccessFacade modelAccess;
+  private final IModelAccessFacade modelAccess;
 
-  @Requirement
-  private ModelUtils modelUtils;
+  private final ModelUtils modelUtils;
 
-  @Requirement
-  private IWebUtilsService webUtils;
+  private final IWebUtilsService webUtils;
 
-  @Requirement
-  private ModelContext context;
+  private final ModelContext context;
+
+  @Inject
+  public CelementsUserService(ClassDefinition usersClass, ClassDefinition groupsClass,
+      ClassDefinition rightsClass, QueryManager queryManager,
+      IQueryExecutionServiceRole queryExecService, IModelAccessFacade modelAccess,
+      ModelUtils modelUtils, IWebUtilsService webUtils, ModelContext context) {
+    super();
+    this.usersClass = usersClass;
+    this.groupsClass = groupsClass;
+    this.rightsClass = rightsClass;
+    this.queryManager = queryManager;
+    this.queryExecService = queryExecService;
+    this.modelAccess = modelAccess;
+    this.modelUtils = modelUtils;
+    this.webUtils = webUtils;
+    this.context = context;
+  }
 
   @Override
   public SpaceReference getUserSpaceRef() {
