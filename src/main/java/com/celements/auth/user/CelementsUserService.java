@@ -21,6 +21,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -81,30 +82,27 @@ public class CelementsUserService implements UserService {
   static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
   private final ClassDefinition usersClass;
-
   private final ClassDefinition groupsClass;
-
   private final ClassDefinition rightsClass;
-
   private final QueryManager queryManager;
-
   private final IQueryExecutionServiceRole queryExecService;
-
   private final IModelAccessFacade modelAccess;
-
   private final ModelUtils modelUtils;
-
   private final IWebUtilsService webUtils;
-
   private final ModelContext context;
-
   private final INextFreeDocRole nextFreeDoc;
 
   @Inject
-  public CelementsUserService(ClassDefinition usersClass, ClassDefinition groupsClass,
-      ClassDefinition rightsClass, QueryManager queryManager,
-      IQueryExecutionServiceRole queryExecService, IModelAccessFacade modelAccess,
-      ModelUtils modelUtils, IWebUtilsService webUtils, ModelContext context,
+  public CelementsUserService(
+      @Named(XWikiUsersClass.CLASS_DEF_HINT) ClassDefinition usersClass,
+      @Named(XWikiUsersClass.CLASS_DEF_HINT) ClassDefinition groupsClass,
+      @Named(XWikiRightsClass.CLASS_DEF_HINT) ClassDefinition rightsClass,
+      QueryManager queryManager,
+      IQueryExecutionServiceRole queryExecService,
+      IModelAccessFacade modelAccess,
+      ModelUtils modelUtils,
+      IWebUtilsService webUtils,
+      ModelContext context,
       INextFreeDocRole nextFreeDoc) {
     super();
     this.usersClass = usersClass;
