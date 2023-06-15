@@ -404,14 +404,18 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     int lengthOfRandomAlphanumeric = 10;
     Capture<DocumentReference> docRefCapture = newCapture();
     expect(getMock(IModelAccessFacade.class).exists(capture(docRefCapture)))
+        .andReturn(true).once();
+    Capture<DocumentReference> docRef2Capture = newCapture();
+    expect(getMock(IModelAccessFacade.class).exists(capture(docRef2Capture)))
         .andReturn(false).once();
 
     replayDefault();
     DocumentReference docRef = nextFreeDocService.getNextRandomPageDocRef(spaceRef,
         lengthOfRandomAlphanumeric, prefix);
     verifyDefault();
-    // test if returned DocumentReference does not exist twice
 
+    assertNotEquals(docRef, docRefCapture.getValue());
+    assertEquals(docRef, docRef2Capture.getValue());
   }
 
   @Test
