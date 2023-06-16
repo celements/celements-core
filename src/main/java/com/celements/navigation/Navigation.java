@@ -798,8 +798,8 @@ public class Navigation implements INavigation {
   public String getNextMenuItemFullName(String fullName, XWikiContext context) {
     TreeNode nextTreeNode = null;
     try {
-      nextTreeNode = injected_TreeNodeService
-          .getNextMenuItem(getModelUtils().resolveRef(fullName, DocumentReference.class));
+      nextTreeNode = getTreeNodeService().getNextMenuItem(getModelUtils()
+          .resolveRef(fullName, DocumentReference.class));
     } catch (XWikiException exp) {
       LOGGER.error("getNextMenuItemFullName failed.", exp);
     }
