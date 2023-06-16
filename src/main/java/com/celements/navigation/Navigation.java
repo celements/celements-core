@@ -165,7 +165,6 @@ public class Navigation implements INavigation {
     this.nodeSpaceRef = null;
     this.mainUlCssClasses = new LinkedHashSet<>();
     this.cmCssClass = "";
-
   }
 
   /**
