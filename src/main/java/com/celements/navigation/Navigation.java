@@ -165,7 +165,6 @@ public class Navigation implements INavigation {
     this.nodeSpaceRef = null;
     this.mainUlCssClasses = new LinkedHashSet<>();
     this.cmCssClass = "";
-
   }
 
   /**
@@ -783,8 +782,8 @@ public class Navigation implements INavigation {
   public String getPrevMenuItemFullName(String fullName, XWikiContext context) {
     TreeNode prevTreeNode = null;
     try {
-      prevTreeNode = injected_TreeNodeService
-          .getPrevMenuItem(getModelUtils().resolveRef(fullName, DocumentReference.class));
+      prevTreeNode = getTreeNodeService().getPrevMenuItem(getModelUtils()
+          .resolveRef(fullName, DocumentReference.class));
     } catch (XWikiException exp) {
       LOGGER.error("getPrevMenuItemFullName failed.", exp);
     }
@@ -799,8 +798,8 @@ public class Navigation implements INavigation {
   public String getNextMenuItemFullName(String fullName, XWikiContext context) {
     TreeNode nextTreeNode = null;
     try {
-      nextTreeNode = injected_TreeNodeService
-          .getNextMenuItem(getModelUtils().resolveRef(fullName, DocumentReference.class));
+      nextTreeNode = getTreeNodeService().getNextMenuItem(getModelUtils()
+          .resolveRef(fullName, DocumentReference.class));
     } catch (XWikiException exp) {
       LOGGER.error("getNextMenuItemFullName failed.", exp);
     }

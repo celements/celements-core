@@ -87,8 +87,7 @@ public class InheritorFactory {
       XWikiContext context) {
     DocumentReference docRef = getModelUtils().resolveRef(fullName, DocumentReference.class);
     List<DocumentReference> documentParents = getIDocumentParentsListerRole()
-        .getDocumentParentsList(docRef,
-            true);
+        .getDocumentParentsList(docRef, true);
     ClassReference classRef = new ClassReference(className);
     return getFieldInheritor(classRef, documentParents);
   }

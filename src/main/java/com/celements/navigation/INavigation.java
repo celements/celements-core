@@ -109,7 +109,7 @@ public interface INavigation extends PresentationNodeData {
   public void loadConfigFromObject(BaseObject prefObj);
 
   /**
-   * @Deprecated since 6.0 no replacement
+   * @Deprecated since 6.0 instead use XObjectNavigationFactory#createNavigation(DocumentReference)
    */
   @Deprecated
   public void loadConfigByName(String configName, XWikiContext context);
