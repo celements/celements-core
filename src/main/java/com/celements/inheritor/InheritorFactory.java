@@ -83,6 +83,11 @@ public class InheritorFactory {
     return inheritor;
   }
 
+  /**
+   * @deprecated instead use {@link #getFieldInheritor(ClassReference, Iterable)}
+   * @since 6.0
+   */
+  @Deprecated
   public FieldInheritor getNavigationFieldInheritor(String className, String fullName,
       XWikiContext context) {
     DocumentReference docRef = getModelUtils().resolveRef(fullName, DocumentReference.class);
