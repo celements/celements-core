@@ -176,18 +176,16 @@ public class NextFreeDocService implements INextFreeDocRole {
   @Override
   public @NotNull DocumentReference getNextRandomPageDocRef(@NotNull SpaceReference spaceRef,
       int lengthOfRandomAlphanumeric, String prefix) {
-    if (spaceRef == null) {
-      throw new IllegalArgumentException("SpaceReference cannot be null.");
-    }
+    Preconditions.checkNotNull(spaceRef, "SpaceReference cannot be null.");
     Preconditions.checkArgument(lengthOfRandomAlphanumeric > 3,
         "Parameter int lengthOfRandomAlphanumeric has to be > 3");
     prefix = Strings.nullToEmpty(prefix);
-    String newPageName = prefix + RandomStringUtils.randomAlphanumeric(lengthOfRandomAlphanumeric);
-    DocumentReference docRef = new DocumentReference(newPageName, spaceRef);
-    while (modelAccess.exists(docRef)) {
-      newPageName = prefix + RandomStringUtils.randomAlphanumeric(lengthOfRandomAlphanumeric);
+    DocumentReference docRef = null;
+    do {
+      String newPageName = prefix
+          + RandomStringUtils.randomAlphanumeric(lengthOfRandomAlphanumeric);
       docRef = new DocumentReference(newPageName, spaceRef);
-    }
+    } while (modelAccess.exists(docRef));
     return docRef;
   }
 
