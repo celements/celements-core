@@ -782,8 +782,8 @@ public class Navigation implements INavigation {
   public String getPrevMenuItemFullName(String fullName, XWikiContext context) {
     TreeNode prevTreeNode = null;
     try {
-      prevTreeNode = injected_TreeNodeService
-          .getPrevMenuItem(getModelUtils().resolveRef(fullName, DocumentReference.class));
+      prevTreeNode = getTreeNodeService().getPrevMenuItem(getModelUtils()
+          .resolveRef(fullName, DocumentReference.class));
     } catch (XWikiException exp) {
       LOGGER.error("getPrevMenuItemFullName failed.", exp);
     }
