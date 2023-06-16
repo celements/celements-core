@@ -95,7 +95,7 @@ public class CelementsUserService implements UserService {
   @Inject
   public CelementsUserService(
       @Named(XWikiUsersClass.CLASS_DEF_HINT) ClassDefinition usersClass,
-      @Named(XWikiUsersClass.CLASS_DEF_HINT) ClassDefinition groupsClass,
+      @Named(XWikiGroupsClass.CLASS_DEF_HINT) ClassDefinition groupsClass,
       @Named(XWikiRightsClass.CLASS_DEF_HINT) ClassDefinition rightsClass,
       QueryManager queryManager,
       IQueryExecutionServiceRole queryExecService,
