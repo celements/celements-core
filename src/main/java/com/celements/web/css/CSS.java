@@ -27,8 +27,6 @@ import org.xwiki.context.Execution;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
@@ -55,9 +53,6 @@ public abstract class CSS extends Api {
   public CSS(XWikiContext context) {
     super(context);
   }
-
-  @Deprecated
-  protected IWebUtils utils;
 
   protected AttachmentURLCommand attURLcmd;
 
@@ -102,25 +97,6 @@ public abstract class CSS extends Api {
 
   protected String getURLFromString(String str, XWikiContext context) {
     return getAttachmentURLcmd().getAttachmentURL(str, context);
-  }
-
-  /**
-   * for Tests only !!!
-   **/
-  @Deprecated
-  void testInjectUtils(IWebUtils utils) {
-    this.utils = utils;
-  }
-
-  /**
-   * @deprecated instead use WebUtilsService directly
-   */
-  @Deprecated
-  protected IWebUtils getWebUtils() {
-    if (utils == null) {
-      utils = WebUtils.getInstance();
-    }
-    return utils;
   }
 
   /**

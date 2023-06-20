@@ -36,9 +36,8 @@ import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.XObjectIterator;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
+import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
@@ -47,7 +46,6 @@ import com.xpn.xwiki.web.Utils;
 
 public class InheritorFactory {
 
-  private IWebUtils _injectedWebUtils;
   private PageLayoutCommand injectedPageLayoutCmd;
 
   public FieldInheritor getFieldInheritor(ClassReference classRef,
@@ -85,10 +83,18 @@ public class InheritorFactory {
     return inheritor;
   }
 
+  /**
+   * @deprecated instead use {@link #getFieldInheritor(ClassReference, Iterable)}
+   * @since 6.0
+   */
+  @Deprecated
   public FieldInheritor getNavigationFieldInheritor(String className, String fullName,
       XWikiContext context) {
-    return getFieldInheritor(className, getWebUtils().getDocumentParentsList(fullName, true,
-        context), context);
+    DocumentReference docRef = getModelUtils().resolveRef(fullName, DocumentReference.class);
+    List<DocumentReference> documentParents = getIDocumentParentsListerRole()
+        .getDocumentParentsList(docRef, true);
+    ClassReference classRef = new ClassReference(className);
+    return getFieldInheritor(classRef, documentParents);
   }
 
   public FieldInheritor getConfigDocFieldInheritor(String className, String fullName,
@@ -118,22 +124,6 @@ public class InheritorFactory {
     return new PageLayoutCommand();
   }
 
-  IWebUtils getWebUtils() {
-    if (_injectedWebUtils != null) {
-      return _injectedWebUtils;
-    }
-    return WebUtils.getInstance();
-  }
-
-  /**
-   * FOR TESTS ONLY!!!
-   *
-   * @param injectedWebUtils
-   */
-  void inject_TEST_WebUtils(IWebUtils injectedWebUtils) {
-    _injectedWebUtils = injectedWebUtils;
-  }
-
   public FieldInheritor getPageLayoutInheritor(String fullName, XWikiContext context) {
     return getFieldInheritor("Celements2.PageType", Arrays.asList(fullName,
         getSpacePreferencesFullName(fullName), "XWiki.XWikiPreferences"), context);
@@ -157,7 +147,8 @@ public class InheritorFactory {
     checkArgument(isAbsoluteRef(reference));
     Iterable<DocumentReference> docRefs = FluentIterable.of(extractRef(reference,
         DocumentReference.class).orNull(), getSpacePrefDocRef(reference), getXWikiPrefDocRef(
-            reference)).filter(Predicates.notNull());
+            reference))
+        .filter(Predicates.notNull());
     return getFieldInheritor(classRef, docRefs);
   }
 
@@ -184,6 +175,10 @@ public class InheritorFactory {
 
   private ModelUtils getModelUtils() {
     return Utils.getComponent(ModelUtils.class);
+  }
+
+  private IDocumentParentsListerRole getIDocumentParentsListerRole() {
+    return Utils.getComponent(IDocumentParentsListerRole.class);
   }
 
 }

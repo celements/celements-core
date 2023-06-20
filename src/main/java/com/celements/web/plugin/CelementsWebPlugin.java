@@ -41,7 +41,6 @@ import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
-import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebService;
@@ -50,8 +49,6 @@ import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.service.WebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
 import com.celements.webform.ActionService;
 import com.celements.webform.IActionServiceRole;
 import com.celements.webform.IWebFormServiceRole;
@@ -62,7 +59,6 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -72,8 +68,6 @@ import com.xpn.xwiki.web.Utils;
 public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebPlugin.class);
-
-  private final static IWebUtils util = WebUtils.getInstance();
 
   final String PARAM_XPAGE = "xpage";
   final String PARAM_CONF = "conf";
@@ -115,8 +109,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     super.virtualInit(context);
   }
 
+  /**
+   * @deprecated since 6.0 instead use TreeNodeCache
+   */
+  @Deprecated
   public int queryCount() {
-    return util.queryCount();
+    throw new UnsupportedOperationException(
+        "CelementsWebPlugin queryCount is not supported anymore.");
   }
 
   /**
@@ -128,10 +127,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    *          (default: $doc.space)
    * @param menuPart
    * @return (array of menuitems)
+   * @deprecated since 6.0 no replacement
    */
+  @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(String parent, String menuSpace,
       String menuPart, XWikiContext context) {
-    return util.getSubMenuItemsForParent(parent, menuSpace, menuPart, context);
+    throw new UnsupportedOperationException(
+        "CelementsWebPlugin getSubMenuItemsForParent is not supported anymore.");
   }
 
   public String getVersionMode(XWikiContext context) {
@@ -310,14 +312,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     XWikiDocument viewTemplate = context.getWiki().getDocument(pageType.getRenderTemplate("view"),
         context);
     return context.getWiki().getRenderingEngine().renderDocument(viewTemplate, doc, context);
-  }
-
-  /**
-   * @deprecated since 2.29.0 use SkinConfigObjCommand instead.
-   */
-  @Deprecated
-  public BaseObject getSkinConfigObj(XWikiContext context) {
-    return new SkinConfigObjCommand().getSkinConfigObj();
   }
 
   @Override

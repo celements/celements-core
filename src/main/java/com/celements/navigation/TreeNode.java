@@ -76,8 +76,8 @@ public final class TreeNode {
   private TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
       @Nullable Integer position, @Nullable String partName, @Nullable PartNameGetter strategy) {
     Preconditions.checkNotNull(docRef, "Document reference for TreeNode may not be null.");
-    this.docRef = getModelUtils().cloneRef(docRef, DocumentReference.class);
-    this.parentRef = (parentRef != null) ? getModelUtils().cloneRef(parentRef) : null;
+    this.docRef = docRef;
+    this.parentRef = parentRef;
     this.position = MoreObjects.firstNonNull(position, new Integer(0));
     this.partName = (strategy == null) ? Strings.nullToEmpty(partName) : partName;
     this.partNameStrategy = strategy;
