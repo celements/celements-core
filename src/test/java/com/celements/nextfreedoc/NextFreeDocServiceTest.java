@@ -382,6 +382,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
 
     assertNotNull(docRef);
     assertEquals(14, docRef.getName().length());
+    assertTrue(docRef.getName().startsWith(prefix));
   }
 
   @Test
