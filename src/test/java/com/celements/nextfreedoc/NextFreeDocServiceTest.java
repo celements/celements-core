@@ -391,7 +391,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     String prefix = "";
     int lengthOfRandomAlphanumeric = 10;
 
-    Exception e = assertThrows(IllegalArgumentException.class, () -> {
+    Exception e = assertThrows(NullPointerException.class, () -> {
       nextFreeDocService.getNextRandomPageDocRef(spaceRef, lengthOfRandomAlphanumeric, prefix);
     });
 
