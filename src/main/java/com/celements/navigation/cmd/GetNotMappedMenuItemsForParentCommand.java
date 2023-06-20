@@ -219,20 +219,10 @@ public class GetNotMappedMenuItemsForParentCommand {
     return parentKey;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.celements.web.utils.IWebUtils#queryCount()
-   */
   public int queryCount() {
     return queryCount;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
-   */
   synchronized public void flushMenuItemCache(XWikiContext context) {
     /*
      * flushMenuItemCache must be synchronized to prevent following situation: 1) Thread A

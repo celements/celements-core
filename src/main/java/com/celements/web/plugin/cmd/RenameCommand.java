@@ -25,8 +25,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -34,7 +32,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class RenameCommand {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RenameCommand.class);
-  private IWebUtils injectedWebUtils;
 
   /**
    * @param spaceName
@@ -55,30 +52,11 @@ public class RenameCommand {
               + newDocName + "].");
         }
       }
-      if (!renamedPages.isEmpty()) {
-        getWebUtils().flushMenuItemCache(context);
-      }
     } catch (XWikiException exp) {
       LOGGER.error("renameSpace: Failed to rename Space [" + spaceName + "] to [" + newSpaceName
           + "].", exp);
     }
     return renamedPages;
-  }
-
-  IWebUtils getWebUtils() {
-    if (injectedWebUtils != null) {
-      return injectedWebUtils;
-    }
-    return WebUtils.getInstance();
-  }
-
-  /**
-   * FOR TEST ONLY!!!!
-   *
-   * @param mockWebUtils
-   */
-  void inject_webUtils(IWebUtils mockWebUtils) {
-    injectedWebUtils = mockWebUtils;
   }
 
   public boolean renameDoc(String fullname, String newDocName, XWikiContext context) {
@@ -92,9 +70,6 @@ public class RenameCommand {
       try {
         XWikiDocument thePage = context.getWiki().getDocument(fullname, context);
         thePage.rename(newDocName, context);
-        if (!flushMenuCacheExternal) {
-          getWebUtils().flushMenuItemCache(context);
-        }
         return true;
       } catch (XWikiException exp) {
         LOGGER.error("renameDoc: Failed to rename Document [" + fullname + "] to [" + newDocName

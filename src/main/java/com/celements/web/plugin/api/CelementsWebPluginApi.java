@@ -44,6 +44,7 @@ import com.celements.mailsender.CelMailScriptService;
 import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.navigation.service.TreeNodeCache;
 import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.nextfreedoc.NextFreeDocScriptService;
@@ -70,7 +71,6 @@ import com.celements.web.service.LegacySkinScriptService;
 import com.celements.web.service.WebUtilsScriptService;
 import com.celements.web.service.WebUtilsService;
 import com.celements.web.utils.SuggestBaseClass;
-import com.celements.web.utils.WebUtils;
 import com.celements.webform.ActionScriptService;
 import com.celements.webform.WebFormScriptService;
 import com.xpn.xwiki.XWikiContext;
@@ -279,7 +279,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace) {
-    return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, "", context);
+    return getTreeNodeService().getSubNodesForParent(parent, menuSpace, "");
   }
 
   /**
@@ -297,7 +297,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace, String menuPart) {
-    return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, menuPart, context);
+    return getTreeNodeService().getSubNodesForParent(parent, menuSpace, menuPart);
   }
 
   /**
@@ -401,7 +401,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public List<Attachment> getRandomImages(String fullName, int num) throws ClassNotFoundException {
-    return WebUtils.getInstance().getRandomImages(fullName, num, context);
+    throw new UnsupportedOperationException(
+        "CelementsWebPluginApi getRandomImages is not supported anymore.");
   }
 
   /**
@@ -696,7 +697,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public List<String> getDocumentParentsList(String fullName, boolean includeDoc) {
-    return WebUtils.getInstance().getDocumentParentsList(fullName, includeDoc, context);
+    throw new UnsupportedOperationException(
+        "CelementsWebPluginApi getDocumentParentsList is not supported anymore.");
   }
 
   /**
@@ -729,15 +731,6 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public IPageType getPageType(String fullName) throws XWikiException {
     return new PageTypeApi(fullName, context);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link LegacySkinScriptService #getSkinConfigObj()}
-   */
-  @Deprecated
-  public com.xpn.xwiki.api.Object getSkinConfigObj() {
-    return getLegacySkinScriptService().getSkinConfigObj();
   }
 
   /**
@@ -1990,6 +1983,10 @@ public class CelementsWebPluginApi extends Api {
     return (TreeNodeScriptService) Utils.getComponent(ScriptService.class, "treeNode");
   }
 
+  private ITreeNodeService getTreeNodeService() {
+    return Utils.getComponent(ITreeNodeService.class);
+  }
+
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
@@ -2045,4 +2042,5 @@ public class CelementsWebPluginApi extends Api {
   private EmptyCheckScriptService getEmptyCheckScriptService() {
     return (EmptyCheckScriptService) Utils.getComponent(ScriptService.class, "emptycheck");
   }
+
 }

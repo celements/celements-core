@@ -110,6 +110,10 @@ public class NavigationApi extends Api {
     return navigation.getActiveMenuItemPos(menuLevel, context);
   }
 
+  /**
+   * @deprecated since 6.0 instead use TreeNodeService
+   */
+  @Deprecated
   public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(int menuLevel) {
     return navigation.getMenuItemsForHierarchyLevel(menuLevel, context);
   }

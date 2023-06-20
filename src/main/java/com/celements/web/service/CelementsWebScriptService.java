@@ -81,7 +81,6 @@ import com.celements.web.plugin.cmd.ParseObjStoreCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
-import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -91,7 +90,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
@@ -694,35 +692,6 @@ public class CelementsWebScriptService implements ScriptService {
   @Deprecated
   public Map<String, String> getDocMetaTags(String language, String defaultLanguage) {
     return new DocMetaTagsCmd().getDocMetaTags(language, defaultLanguage, getContext());
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link LegacySkinScriptService #getSkinConfigObj()}
-   */
-  @Deprecated
-  public com.xpn.xwiki.api.Object getSkinConfigObj() {
-    return ((LegacySkinScriptService) legacySkinScriptService).getSkinConfigObj();
-  }
-
-  public com.xpn.xwiki.api.Object getSkinConfigObj(String fallbackClassName) {
-    BaseObject skinConfigObj = new SkinConfigObjCommand().getSkinConfigObj(fallbackClassName);
-    if (skinConfigObj != null) {
-      return skinConfigObj.newObjectApi(skinConfigObj, getContext());
-    } else {
-      return null;
-    }
-  }
-
-  public com.xpn.xwiki.api.Object getSkinConfigFieldInheritor(String fallbackClassName,
-      String key) {
-    BaseCollection skinConfigBaseColl = new SkinConfigObjCommand().getSkinConfigFieldInheritor(
-        fallbackClassName).getObject(key);
-    if ((skinConfigBaseColl != null) && (skinConfigBaseColl instanceof BaseObject)) {
-      BaseObject skinConfigObj = (BaseObject) skinConfigBaseColl;
-      return skinConfigObj.newObjectApi(skinConfigObj, getContext());
-    } else {
-      return null;
-    }
   }
 
   public boolean addFileToFileBaseTag(DocumentReference fileDocRef, String fileName,
