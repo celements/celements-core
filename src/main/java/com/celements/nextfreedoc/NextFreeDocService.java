@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.springframework.stereotype.Service;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -21,12 +23,14 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.util.References;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Singleton
-@Component
+@Service
 public class NextFreeDocService implements INextFreeDocRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(NextFreeDocService.class);
@@ -34,14 +38,20 @@ public class NextFreeDocService implements INextFreeDocRole {
   // TODO refactor to org.xwiki.cache.CacheManager
   private final Map<DocumentReference, Long> numCache = new HashMap<>();
 
-  @Requirement
-  private QueryManager queryManager;
+  private final QueryManager queryManager;
 
-  @Requirement
-  IModelAccessFacade modelAccess;
+  private final IModelAccessFacade modelAccess;
 
-  @Requirement
-  private Execution execution;
+  private final Execution execution;
+
+  @Inject
+  public NextFreeDocService(QueryManager queryManager, IModelAccessFacade modelAccess,
+      Execution execution) {
+    super();
+    this.queryManager = queryManager;
+    this.modelAccess = modelAccess;
+    this.execution = execution;
+  }
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -161,6 +171,22 @@ public class NextFreeDocService implements INextFreeDocRole {
   public void injectNum(SpaceReference spaceRef, String title, long num) {
     DocumentReference baseDocRef = new DocumentReference(title, spaceRef);
     numCache.put(baseDocRef, num);
+  }
+
+  @Override
+  public @NotNull DocumentReference getNextRandomPageDocRef(@NotNull SpaceReference spaceRef,
+      int lengthOfRandomAlphanumeric, String prefix) {
+    Preconditions.checkNotNull(spaceRef, "SpaceReference cannot be null.");
+    Preconditions.checkArgument(lengthOfRandomAlphanumeric > 3,
+        "Parameter int lengthOfRandomAlphanumeric has to be > 3");
+    prefix = Strings.nullToEmpty(prefix);
+    DocumentReference docRef = null;
+    do {
+      String newPageName = prefix
+          + RandomStringUtils.randomAlphanumeric(lengthOfRandomAlphanumeric);
+      docRef = new DocumentReference(newPageName, spaceRef);
+    } while (modelAccess.exists(docRef));
+    return docRef;
   }
 
 }

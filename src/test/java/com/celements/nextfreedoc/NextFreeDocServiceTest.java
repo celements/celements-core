@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -317,6 +318,126 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     assertEquals("SELECT doc.name FROM XWikiDocument doc WHERE doc.space=:space "
         + "AND doc.name LIKE :name ORDER BY LENGTH(doc.name) DESC, doc.name DESC",
         nextFreeDocService.getHighestNumHQL());
+  }
+
+  @Test
+  public void test_getNextRandomPageDocRef_lengthOfRandomAlphaNumeric() {
+    SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("mywiki"));
+    String prefix = "";
+    int lengthOfRandomAlphanumeric = 3;
+
+    Exception e = assertThrows(IllegalArgumentException.class, () -> {
+      nextFreeDocService.getNextRandomPageDocRef(spaceRef, lengthOfRandomAlphanumeric, prefix);
+    });
+
+    assertEquals("Parameter int lengthOfRandomAlphanumeric has to be > 3", e.getMessage());
+  }
+
+  @Test
+  public void test_getNextRandomPageDocRef_prefixNull() {
+    SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("mywiki"));
+    String prefix = null;
+    int lengthOfRandomAlphanumeric = 10;
+    expect(getMock(IModelAccessFacade.class).exists(anyObject(DocumentReference.class)))
+        .andReturn(false).once();
+
+    replayDefault();
+    DocumentReference docRef = nextFreeDocService.getNextRandomPageDocRef(spaceRef,
+        lengthOfRandomAlphanumeric, prefix);
+    verifyDefault();
+
+    assertNotNull(docRef);
+    assertEquals(10, docRef.getName().length());
+  }
+
+  @Test
+  public void test_getNextRandomPageDocRef_prefixEmpty() {
+    SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("mywiki"));
+    String prefix = "";
+    int lengthOfRandomAlphanumeric = 10;
+    expect(getMock(IModelAccessFacade.class).exists(anyObject(DocumentReference.class)))
+        .andReturn(false).once();
+
+    replayDefault();
+    DocumentReference docRef = nextFreeDocService.getNextRandomPageDocRef(spaceRef,
+        lengthOfRandomAlphanumeric, prefix);
+    verifyDefault();
+
+    assertNotNull(docRef);
+    assertEquals(10, docRef.getName().length());
+  }
+
+  @Test
+  public void test_getNextRandomPageDocRef_prefixNotEmpty() {
+    SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("mywiki"));
+    String prefix = "asdf";
+    int lengthOfRandomAlphanumeric = 10;
+    expect(getMock(IModelAccessFacade.class).exists(anyObject(DocumentReference.class)))
+        .andReturn(false).once();
+
+    replayDefault();
+    DocumentReference docRef = nextFreeDocService.getNextRandomPageDocRef(spaceRef,
+        lengthOfRandomAlphanumeric, prefix);
+    verifyDefault();
+
+    assertNotNull(docRef);
+    assertEquals(14, docRef.getName().length());
+    assertTrue(docRef.getName().startsWith(prefix));
+  }
+
+  @Test
+  public void test_getNextRandomPageDocRef_spaceRefNull() {
+    SpaceReference spaceRef = null;
+    String prefix = "";
+    int lengthOfRandomAlphanumeric = 10;
+
+    Exception e = assertThrows(NullPointerException.class, () -> {
+      nextFreeDocService.getNextRandomPageDocRef(spaceRef, lengthOfRandomAlphanumeric, prefix);
+    });
+
+    assertEquals("SpaceReference cannot be null.", e.getMessage());
+  }
+
+  @Test
+  public void test_getNextRandomPageDocRef_DocumentReferenceExistsAlready() {
+    SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("mywiki"));
+    String prefix = "";
+    int lengthOfRandomAlphanumeric = 10;
+    Capture<DocumentReference> docRefCapture = newCapture();
+    expect(getMock(IModelAccessFacade.class).exists(capture(docRefCapture)))
+        .andReturn(true).once();
+    Capture<DocumentReference> docRef2Capture = newCapture();
+    expect(getMock(IModelAccessFacade.class).exists(capture(docRef2Capture)))
+        .andReturn(false).once();
+
+    replayDefault();
+    DocumentReference docRef = nextFreeDocService.getNextRandomPageDocRef(spaceRef,
+        lengthOfRandomAlphanumeric, prefix);
+    verifyDefault();
+
+    assertNotEquals(docRef, docRefCapture.getValue());
+    assertEquals(docRef, docRef2Capture.getValue());
+  }
+
+  @Test
+  public void test_getNextRandomPageDocRef() {
+    SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("mywiki"));
+    String prefix = "";
+    int lengthOfRandomAlphanumeric = 10;
+    Capture<DocumentReference> docRefCapture = newCapture();
+    expect(getMock(IModelAccessFacade.class).exists(capture(docRefCapture)))
+        .andReturn(false).once();
+
+    replayDefault();
+    DocumentReference docRef = nextFreeDocService.getNextRandomPageDocRef(spaceRef,
+        lengthOfRandomAlphanumeric, prefix);
+    verifyDefault();
+
+    assertNotNull(docRef);
+    assertEquals(spaceRef, docRef.getLastSpaceReference());
+    assertEquals(10, docRef.getName().length());
+    assertTrue(docRef.getName().matches("[a-zA-Z0-9]+"));
+    assertEquals(docRef, docRefCapture.getValue());
   }
 
 }

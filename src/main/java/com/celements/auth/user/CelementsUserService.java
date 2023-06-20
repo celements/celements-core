@@ -20,14 +20,15 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -47,6 +48,7 @@ import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
+import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.rights.access.EAccessLevel;
@@ -79,32 +81,41 @@ public class CelementsUserService implements UserService {
   static final String XWIKI_ALL_GROUP_FN = "XWiki.XWikiAllGroup";
   static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
-  @Requirement(XWikiUsersClass.CLASS_DEF_HINT)
-  private ClassDefinition usersClass;
+  private final ClassDefinition usersClass;
+  private final ClassDefinition groupsClass;
+  private final ClassDefinition rightsClass;
+  private final QueryManager queryManager;
+  private final IQueryExecutionServiceRole queryExecService;
+  private final IModelAccessFacade modelAccess;
+  private final ModelUtils modelUtils;
+  private final IWebUtilsService webUtils;
+  private final ModelContext context;
+  private final INextFreeDocRole nextFreeDoc;
 
-  @Requirement(XWikiGroupsClass.CLASS_DEF_HINT)
-  private ClassDefinition groupsClass;
-
-  @Requirement(XWikiRightsClass.CLASS_DEF_HINT)
-  private ClassDefinition rightsClass;
-
-  @Requirement
-  private QueryManager queryManager;
-
-  @Requirement
-  private IQueryExecutionServiceRole queryExecService;
-
-  @Requirement
-  private IModelAccessFacade modelAccess;
-
-  @Requirement
-  private ModelUtils modelUtils;
-
-  @Requirement
-  private IWebUtilsService webUtils;
-
-  @Requirement
-  private ModelContext context;
+  @Inject
+  public CelementsUserService(
+      @Named(XWikiUsersClass.CLASS_DEF_HINT) ClassDefinition usersClass,
+      @Named(XWikiGroupsClass.CLASS_DEF_HINT) ClassDefinition groupsClass,
+      @Named(XWikiRightsClass.CLASS_DEF_HINT) ClassDefinition rightsClass,
+      QueryManager queryManager,
+      IQueryExecutionServiceRole queryExecService,
+      IModelAccessFacade modelAccess,
+      ModelUtils modelUtils,
+      IWebUtilsService webUtils,
+      ModelContext context,
+      INextFreeDocRole nextFreeDoc) {
+    super();
+    this.usersClass = usersClass;
+    this.groupsClass = groupsClass;
+    this.rightsClass = rightsClass;
+    this.queryManager = queryManager;
+    this.queryExecService = queryExecService;
+    this.modelAccess = modelAccess;
+    this.modelUtils = modelUtils;
+    this.webUtils = webUtils;
+    this.context = context;
+    this.nextFreeDoc = nextFreeDoc;
+  }
 
   @Override
   public SpaceReference getUserSpaceRef() {
@@ -205,16 +216,17 @@ public class CelementsUserService implements UserService {
     }
   }
 
-  // TODO use instead when available: [CELDEV-692] NextFreeDocService getNextFreeRandomDocRef
   synchronized DocumentReference getOrGenerateUserDocRef(String accountName) {
     accountName = Strings.nullToEmpty(accountName);
-    if (accountName.isEmpty()) {
-      accountName = RandomStringUtils.randomAlphanumeric(12);
+    DocumentReference userDocRef = null;
+    if (!accountName.isEmpty()) {
+      userDocRef = resolveUserDocRef(accountName);
+      if (modelAccess.exists(userDocRef)) {
+        userDocRef = null;
+      }
     }
-    DocumentReference userDocRef = resolveUserDocRef(accountName);
-    while (modelAccess.exists(userDocRef)) {
-      userDocRef = new DocumentReference(RandomStringUtils.randomAlphanumeric(12),
-          getUserSpaceRef());
+    if (userDocRef == null) {
+      userDocRef = nextFreeDoc.getNextRandomPageDocRef(getUserSpaceRef(), 12, null);
     }
     return userDocRef;
   }

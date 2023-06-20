@@ -1,7 +1,10 @@
 package com.celements.nextfreedoc;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
@@ -10,14 +13,21 @@ import com.celements.model.context.ModelContext;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.google.common.base.Strings;
 
-@Component("nextfreedoc")
+@Service
 public class NextFreeDocScriptService implements ScriptService {
 
-  @Requirement
-  private INextFreeDocRole nextFreeDocService;
+  private static final Logger LOGGER = LoggerFactory.getLogger(NextFreeDocScriptService.class);
 
-  @Requirement
-  private ModelContext context;
+  private final INextFreeDocRole nextFreeDocService;
+
+  private final ModelContext context;
+
+  @Inject
+  public NextFreeDocScriptService(INextFreeDocRole nextFreeDocService, ModelContext context) {
+    super();
+    this.nextFreeDocService = nextFreeDocService;
+    this.context = context;
+  }
 
   public DocumentReference getNextTitledPageDocRef(SpaceReference spaceRef, String title) {
     if ((spaceRef != null) && !Strings.isNullOrEmpty(title)) {
@@ -57,6 +67,19 @@ public class NextFreeDocScriptService implements ScriptService {
       return new NextFreeDocNameCommand().getNextUntitledPageName(space, context.getXWikiContext());
     }
     return "";
+  }
+
+  public DocumentReference getNextRandomPageDocRef(SpaceReference spaceRef,
+      int lengthOfRandomAlphanumeric, String prefix) {
+    if (spaceRef != null) {
+      try {
+        return nextFreeDocService.getNextRandomPageDocRef(spaceRef, lengthOfRandomAlphanumeric,
+            prefix);
+      } catch (Exception e) {
+        LOGGER.error("getNextRandomPageDocRef failed for {}", e);
+      }
+    }
+    return null;
   }
 
 }
