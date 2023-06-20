@@ -436,6 +436,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     assertNotNull(docRef);
     assertEquals(spaceRef, docRef.getLastSpaceReference());
     assertEquals(10, docRef.getName().length());
+    assertTrue(docRef.getName().matches("[a-zA-Z0-9]+"));
     assertEquals(docRef, docRefCapture.getValue());
   }
 
