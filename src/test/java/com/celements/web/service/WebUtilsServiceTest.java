@@ -510,7 +510,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @Test
   public void testResolveEntityReference_default_withRef() {
     WikiReference wikiRef = new WikiReference("db");
-    WikiReference otherWikiRef = new WikiReference("otherDB");
+    WikiReference otherWikiRef = new WikiReference("otherdb");
     SpaceReference ref = new SpaceReference("mySpace", wikiRef);
     EntityReference ret = webUtilsService.resolveEntityReference(
         webUtilsService.getRefDefaultSerializer().serialize(ref), EntityType.SPACE, otherWikiRef);
@@ -538,7 +538,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @Test
   public void testResolveEntityReference_local_withRef() {
     WikiReference wikiRef = new WikiReference("db");
-    WikiReference otherWikiRef = new WikiReference("otherDB");
+    WikiReference otherWikiRef = new WikiReference("otherdb");
     SpaceReference ref = new SpaceReference("mySpace", wikiRef);
     EntityReference ret = webUtilsService.resolveEntityReference(
         webUtilsService.getRefLocalSerializer().serialize(ref), EntityType.SPACE, otherWikiRef);
