@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.xwiki.component.descriptor.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
@@ -13,8 +14,12 @@ import com.celements.model.context.ModelContext;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.google.common.base.Strings;
 
-@Service
+@Service(NextFreeDocScriptService.BEAN_NAME)
 public class NextFreeDocScriptService implements ScriptService {
+
+  public static final String NAME = "nextfreedoc";
+  public static final String BEAN_NAME = "org.xwiki.script.service.ScriptService"
+      + ComponentRole.BEAN_NAME_SEPARATOR + NAME;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(NextFreeDocScriptService.class);
 
