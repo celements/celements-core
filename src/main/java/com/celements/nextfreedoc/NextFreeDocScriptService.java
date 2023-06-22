@@ -13,8 +13,10 @@ import com.celements.model.context.ModelContext;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.google.common.base.Strings;
 
-@Service
+@Service(NextFreeDocScriptService.NAME)
 public class NextFreeDocScriptService implements ScriptService {
+
+  public static final String NAME = "nextfreedoc";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(NextFreeDocScriptService.class);
 
