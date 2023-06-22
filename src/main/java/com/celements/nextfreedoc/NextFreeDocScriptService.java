@@ -69,6 +69,7 @@ public class NextFreeDocScriptService implements ScriptService {
     return "";
   }
 
+  // TODO switch to Integer and check for null and add default=12
   public DocumentReference getNextRandomPageDocRef(SpaceReference spaceRef,
       int lengthOfRandomAlphanumeric, String prefix) {
     if (spaceRef != null) {
