@@ -18,7 +18,7 @@ public class NextFreeDocScriptServiceTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    nextFreeDoc = (NextFreeDocScriptService) Utils.getComponent(ScriptService.class);
+    nextFreeDoc = (NextFreeDocScriptService) Utils.getComponent(ScriptService.class, "nextfreedoc");
   }
 
   @Test
