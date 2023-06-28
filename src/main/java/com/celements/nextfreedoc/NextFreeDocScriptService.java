@@ -71,7 +71,6 @@ public class NextFreeDocScriptService implements ScriptService {
     return "";
   }
 
-  // TODO switch to Integer and check for null and add default=12
   public DocumentReference getNextRandomPageDocRef(SpaceReference spaceRef,
       Integer lengthOfRandomAlphanumeric, String prefix) {
     if (lengthOfRandomAlphanumeric == null) {
@@ -80,8 +79,7 @@ public class NextFreeDocScriptService implements ScriptService {
     if (spaceRef != null) {
       try {
         return nextFreeDocService.getNextRandomPageDocRef(spaceRef,
-            lengthOfRandomAlphanumeric.intValue(),
-            prefix);
+            lengthOfRandomAlphanumeric.intValue(), prefix);
       } catch (Exception e) {
         LOGGER.error("getNextRandomPageDocRef failed for {}", e);
       }
