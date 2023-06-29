@@ -72,11 +72,14 @@ public class NextFreeDocScriptService implements ScriptService {
   }
 
   public DocumentReference getNextRandomPageDocRef(SpaceReference spaceRef,
-      int lengthOfRandomAlphanumeric, String prefix) {
+      Integer lengthOfRandomAlphanumeric, String prefix) {
+    if (lengthOfRandomAlphanumeric == null) {
+      lengthOfRandomAlphanumeric = 12;
+    }
     if (spaceRef != null) {
       try {
-        return nextFreeDocService.getNextRandomPageDocRef(spaceRef, lengthOfRandomAlphanumeric,
-            prefix);
+        return nextFreeDocService.getNextRandomPageDocRef(spaceRef,
+            lengthOfRandomAlphanumeric.intValue(), prefix);
       } catch (Exception e) {
         LOGGER.error("getNextRandomPageDocRef failed for {}", e);
       }
