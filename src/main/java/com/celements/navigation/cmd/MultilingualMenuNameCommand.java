@@ -19,6 +19,12 @@
  */
 package com.celements.navigation.cmd;
 
+import static java.util.function.Predicate.*;
+
+import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
@@ -101,9 +107,13 @@ public class MultilingualMenuNameCommand {
       menuName = menuNameObj.getStringValue("menu_name").trim();
     }
     if (!allowEmptyMenuNames && menuName.isEmpty()) {
-      menuName = getModelAccess().getDocumentOpt(docRef, language)
-          .or(() -> getModelAccess().getDocumentOpt(docRef))
+      menuName = Stream.<Supplier<Optional<XWikiDocument>>>of(
+          () -> getModelAccess().getDocumentOpt(docRef, language),
+          () -> getModelAccess().getDocumentOpt(docRef))
+          .map(Supplier::get).flatMap(Optional::stream)
           .map(XWikiDocument::getTitle)
+          .filter(not(String::isBlank))
+          .findFirst()
           .orElseGet(() -> getFallbackMenuName(docRef));
     }
     LOGGER.info("getMenuNameFromBaseObject: for '{}' returning '{}'", docRef, menuName);
