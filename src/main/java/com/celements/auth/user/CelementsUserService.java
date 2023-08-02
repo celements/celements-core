@@ -271,13 +271,16 @@ public class CelementsUserService implements UserService {
     admGrpObjEditor.createFirst();
   }
 
-  void addUserToDefaultGroups(User user) throws DocumentSaveException {
-    getSplitXWikiPreference("initialGroups", "xwiki.users.initialGroups", "")
+  @Override
+  public boolean addUserToDefaultGroups(User user) throws DocumentSaveException {
+    checkNotNull(user);
+    return getSplitXWikiPreference("initialGroups", "xwiki.users.initialGroups", "")
         .append(XWIKI_ALL_GROUP_FN)
         .filter(Objects::nonNull)
         .distinct()
         .map(ClassReference::new)
-        .forEach(rethrowConsumer(groupRef -> addUserToGroup(user, groupRef)));
+        .map(rethrowFunction(groupRef -> addUserToGroup(user, groupRef)))
+        .reduce(false, (x, y) -> x || y);
   }
 
   @Override
