@@ -551,7 +551,7 @@ public class Navigation implements INavigation {
   }
 
   private void closeMenuItemOut(StringBuilder outStream) {
-    outStream.append("<!-- IE6 --></li>");
+    outStream.append("</li>");
   }
 
   void openMenuItemOut(StringBuilder outStream, DocumentReference docRef, boolean isFirstItem,

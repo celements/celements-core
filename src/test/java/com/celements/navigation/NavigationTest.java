@@ -1105,7 +1105,7 @@ public class NavigationTest extends AbstractComponentTest {
         "<ul class=\"cel_nav_empty\">" + "<li class=\"first last cel_nav_odd cel_nav_item1"
             + " cel_nav_hasChildren\">" + "<span id=\"N1:MySpace::\" "
             + " class=\"cel_cm_navigation_menuitem first last cel_nav_odd cel_nav_item1"
-            + " cel_nav_hasChildren\">" + "No Navitems found.</span><!-- IE6 --></li></ul>",
+            + " cel_nav_hasChildren\">" + "No Navitems found.</span></li></ul>",
         nav.includeNavigation());
     verifyDefault();
   }
@@ -1148,8 +1148,14 @@ public class NavigationTest extends AbstractComponentTest {
     expect(getWikiMock().getURL(eq(homeDocRef), eq("view"), same(getContext()))).andReturn("/Home");
     expect(getWikiMock().getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(
         getContext()))).andReturn(0);
-    expect(getWikiMock().getDocument(eq("MySpace.Home"), same(getContext()))).andReturn(
-        new XWikiDocument(homeDocRef)).atLeastOnce();
+    XWikiDocument homeDoc = new XWikiDocument(homeDocRef);
+    homeDoc.setTitle("HomeTitle");
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(homeDocRef))
+        .andReturn(homeDoc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getDocumentOpt(homeDocRef))
+        .andReturn(java.util.Optional.of(homeDoc)).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getDocumentOpt(homeDocRef, "de"))
+        .andReturn(java.util.Optional.empty()).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq("MySpace.Home"),
         same(getContext()))).andReturn(true).atLeastOnce();
     String dictMenuNameKey = "menuname_MySpace.Home";
@@ -1162,7 +1168,7 @@ public class NavigationTest extends AbstractComponentTest {
         + " RichText\"><a href=\"/Home\" class=\"cel_cm_navigation_menuitem first last"
         + " cel_nav_odd cel_nav_item1 cel_nav_isLeaf"
         + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_Home RichText\""
-        + " id=\"N1:MySpace:MySpace.Home\">Home</a><!-- IE6 --></li></ul>",
+        + " id=\"N1:MySpace:MySpace.Home\">HomeTitle</a></li></ul>",
         nav.includeNavigation());
     verifyDefault();
   }

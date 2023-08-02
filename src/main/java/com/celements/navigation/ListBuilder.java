@@ -126,7 +126,7 @@ public class ListBuilder implements INavigationBuilder {
 
   @Override
   public void closeMenuItemOut() {
-    outStream.append("<!-- IE6 --></li>");
+    outStream.append("</li>");
     isFirstItem = false;
   }
 
