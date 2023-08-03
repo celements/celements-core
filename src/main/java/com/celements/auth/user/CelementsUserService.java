@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -222,12 +221,6 @@ public class CelementsUserService implements UserService {
 
   void fillInUserData(XWikiDocument userDoc, Map<String, String> userData)
       throws DocumentAccessException {
-    String userFN = modelUtils.serializeRefLocal(userDoc.getDocumentReference());
-    userDoc.setParentReference((EntityReference) usersClass.getDocRef(
-        userDoc.getDocumentReference().getWikiReference()));
-    userDoc.setCreator(userFN);
-    userDoc.setAuthor(userFN);
-    userDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
     userData.putIfAbsent(XWikiUsersClass.FIELD_ACTIVE.getName(), "0");
     userData.putIfAbsent(XWikiUsersClass.FIELD_PASSWORD.getName(),
         RandomStringUtils.randomAlphanumeric(24));

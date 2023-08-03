@@ -20,6 +20,7 @@ import com.celements.model.field.XObjectFieldAccessor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
+import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -62,8 +63,26 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListenerTest
     assertTrue(getValue(rightsObs.get(1), XWikiRightsClass.FIELD_ALLOW));
   }
 
+  @Test
+  public void test_setDefaultValuesOnNewUser() throws Exception {
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+
+    replayDefault();
+    listener.setDefaultValuesOnNewUser(userDoc);
+    verifyDefault();
+
+    assertEquals(getUserClass().getDocRef(), userDoc.getParentReference());
+    assertEquals("XWiki.msladek", userDoc.getCreator());
+    assertEquals("XWiki.msladek", userDoc.getAuthor());
+    assertEquals("#includeForm(\"XWiki.XWikiUserSheet\")", userDoc.getContent());
+  }
+
   private static ClassDefinition getRightsClass() {
     return Utils.getComponent(ClassDefinition.class, XWikiRightsClass.CLASS_DEF_HINT);
+  }
+
+  private static ClassDefinition getUserClass() {
+    return Utils.getComponent(ClassDefinition.class, XWikiUsersClass.CLASS_DEF_HINT);
   }
 
   private static BaseClass expectClassWithNewObj(ClassDefinition classDef, WikiReference wikiRef)

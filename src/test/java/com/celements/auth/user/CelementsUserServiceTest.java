@@ -325,7 +325,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_createUserFromData() throws Exception {
+  public void test_fillInUserData() throws Exception {
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     Map<String, String> userData = new HashMap<>();
     expectUserClassFromMap(userData);
@@ -334,10 +334,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     service.fillInUserData(userDoc, userData);
     verifyDefault();
 
-    assertEquals(getUserClass().getDocRef(), userDoc.getParentReference());
-    assertEquals("XWiki.msladek", userDoc.getCreator());
-    assertEquals("XWiki.msladek", userDoc.getAuthor());
-    assertEquals("#includeForm(\"XWiki.XWikiUserSheet\")", userDoc.getContent());
     assertEquals(1, XWikiObjectFetcher.on(userDoc).filter(getUserClass()).count());
     assertEquals("0", userData.get(XWikiUsersClass.FIELD_ACTIVE.getName()));
     assertEquals(24, userData.get(XWikiUsersClass.FIELD_PASSWORD.getName()).length());

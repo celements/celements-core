@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.Event;
 
 import com.celements.auth.user.UserInstantiationException;
@@ -23,6 +24,7 @@ import com.celements.model.util.ModelUtils;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
+import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
 
@@ -35,16 +37,19 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
 
   private final UserService userService;
   private final ClassDefinition rightsClass;
+  private final ClassDefinition usersClass;
   private final ModelUtils modelUtils;
 
   @Inject
   public CheckCorrectnessOfNewUserAndAddDefaultValuesListener(
       UserService userService,
       @Named(XWikiRightsClass.CLASS_DEF_HINT) ClassDefinition rightsClass,
+      @Named(XWikiUsersClass.CLASS_DEF_HINT) ClassDefinition usersClass,
       ModelUtils modelUtils) {
     super();
     this.userService = userService;
     this.rightsClass = rightsClass;
+    this.usersClass = usersClass;
     this.modelUtils = modelUtils;
 
   }
@@ -68,6 +73,7 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
       addPageTypeOnUser(source);
       setRightsOnUser(source, Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
           EAccessLevel.DELETE));
+      setDefaultValuesOnNewUser(source);
     }
 
   }
@@ -101,6 +107,15 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
     admGrpObjEditor.createFirstIfNotExists();
+  }
+
+  void setDefaultValuesOnNewUser(XWikiDocument userDoc) {
+    String userFN = modelUtils.serializeRefLocal(userDoc.getDocumentReference());
+    userDoc.setParentReference((EntityReference) usersClass.getDocRef(
+        userDoc.getDocumentReference().getWikiReference()));
+    userDoc.setCreator(userFN);
+    userDoc.setAuthor(userFN);
+    userDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
   }
 
   private XWikiUser asXWikiUser(DocumentReference userDocRef) {
