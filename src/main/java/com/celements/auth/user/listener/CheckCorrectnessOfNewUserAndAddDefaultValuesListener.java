@@ -95,12 +95,12 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
         userDoc.getDocumentReference())));
     userRightObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
     userRightObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
-    userRightObjEditor.createFirst();
+    userRightObjEditor.createFirstIfNotExists();
     XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(userDoc).filter(rightsClass);
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, Arrays.asList(XWIKI_ADMIN_GROUP_FN));
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
-    admGrpObjEditor.createFirst();
+    admGrpObjEditor.createFirstIfNotExists();
   }
 
   private XWikiUser asXWikiUser(DocumentReference userDocRef) {
