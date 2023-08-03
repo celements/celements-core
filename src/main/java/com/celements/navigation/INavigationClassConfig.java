@@ -15,16 +15,22 @@ public interface INavigationClassConfig {
   public static final String MENU_NAME_IMAGE_FIELD = "image";
   public static final String MENU_NAME_TOOLTIP_FIELD = "tooltip";
   public static final String MENU_NAME_LANG_FIELD = "lang";
+  public static final ClassReference MENU_NAME_CLASS_REF = new ClassReference(
+      MENU_NAME_CLASS_SPACE, MENU_NAME_CLASS_DOC);
 
   public static final String MAPPED_MENU_ITEM_CLASS_SPACE = "Classes";
   public static final String MAPPED_MENU_ITEM_CLASS_DOC = "MenuItemClass";
   public static final String MAPPED_MENU_ITEM_CLASS = MAPPED_MENU_ITEM_CLASS_SPACE + "."
       + MAPPED_MENU_ITEM_CLASS_DOC;
+  public static final ClassReference MAPPED_MENU_ITEM_CLASS_REF = new ClassReference(
+      MAPPED_MENU_ITEM_CLASS_SPACE, MAPPED_MENU_ITEM_CLASS_DOC);
 
   public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
   public static final String NAVIGATION_CONFIG_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
   public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE + "."
       + NAVIGATION_CONFIG_CLASS_DOC;
+  public static final ClassReference NAVIGATION_CONFIG_CLASS_REF = new ClassReference(
+      NAVIGATION_CONFIG_CLASS_SPACE, NAVIGATION_CONFIG_CLASS_DOC);
 
   public static final String MENU_ELEMENT_NAME_FIELD = "menu_element_name";
   public static final String FROM_HIERARCHY_LEVEL_FIELD = "from_hierarchy_level";
