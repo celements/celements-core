@@ -75,6 +75,9 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListenerTest
     assertEquals("XWiki.msladek", userDoc.getCreator());
     assertEquals("XWiki.msladek", userDoc.getAuthor());
     assertEquals("#includeForm(\"XWiki.XWikiUserSheet\")", userDoc.getContent());
+    assertEquals(1, XWikiObjectFetcher.on(userDoc).filter(getUserClass()).count());
+    assertEquals(24, XWikiObjectFetcher.on(userDoc).filter(getUserClass())
+        .filterPresent(XWikiUsersClass.FIELD_PASSWORD).toString().length());
   }
 
   private static ClassDefinition getRightsClass() {

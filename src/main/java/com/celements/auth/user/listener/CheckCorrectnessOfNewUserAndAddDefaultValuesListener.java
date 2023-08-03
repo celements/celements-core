@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.stereotype.Component;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
@@ -116,6 +117,10 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
     userDoc.setCreator(userFN);
     userDoc.setAuthor(userFN);
     userDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
+    XWikiObjectEditor userClassObjEditor = XWikiObjectEditor.on(userDoc).filter(usersClass);
+    userClassObjEditor.filter(XWikiUsersClass.FIELD_PASSWORD,
+        RandomStringUtils.randomAlphanumeric(24));
+    userClassObjEditor.createFirstIfNotExists();
   }
 
   private XWikiUser asXWikiUser(DocumentReference userDocRef) {
