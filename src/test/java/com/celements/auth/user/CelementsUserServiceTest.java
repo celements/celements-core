@@ -32,7 +32,6 @@ import com.celements.model.field.XObjectFieldAccessor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.query.IQueryExecutionServiceRole;
-import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiGroupsClass;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
@@ -342,29 +341,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     assertEquals(1, XWikiObjectFetcher.on(userDoc).filter(getUserClass()).count());
     assertEquals("0", userData.get(XWikiUsersClass.FIELD_ACTIVE.getName()));
     assertEquals(24, userData.get(XWikiUsersClass.FIELD_PASSWORD.getName()).length());
-  }
-
-  @Test
-  public void test_setRightsOnUser() throws Exception {
-    List<EAccessLevel> levels = Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
-        EAccessLevel.DELETE);
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    expectClassWithNewObj(getRightsClass(), userDocRef.getWikiReference());
-
-    replayDefault();
-    service.setRightsOnUser(userDoc, levels);
-    verifyDefault();
-
-    List<BaseObject> rightsObs = XWikiObjectFetcher.on(userDoc).filter(getRightsClass()).list();
-    assertEquals(2, rightsObs.size());
-    assertEquals("XWiki.msladek", getValue(rightsObs.get(0), XWikiRightsClass.FIELD_USERS).get(
-        0).getUser());
-    assertEquals(levels, getValue(rightsObs.get(0), XWikiRightsClass.FIELD_LEVELS));
-    assertTrue(getValue(rightsObs.get(0), XWikiRightsClass.FIELD_ALLOW));
-    assertEquals(XWIKI_ADMIN_GROUP_FN, getValue(rightsObs.get(1),
-        XWikiRightsClass.FIELD_GROUPS).get(0));
-    assertEquals(levels, getValue(rightsObs.get(1), XWikiRightsClass.FIELD_LEVELS));
-    assertTrue(getValue(rightsObs.get(1), XWikiRightsClass.FIELD_ALLOW));
   }
 
   @Test

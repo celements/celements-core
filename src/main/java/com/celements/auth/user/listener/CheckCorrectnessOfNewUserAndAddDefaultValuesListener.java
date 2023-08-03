@@ -82,14 +82,14 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
     }
   }
 
-  private void addPageTypeOnUser(XWikiDocument userDoc) {
+  void addPageTypeOnUser(XWikiDocument userDoc) {
     XWikiObjectEditor userPageTypeEditor = XWikiObjectEditor.on(userDoc)
         .filter(PageTypeClass.CLASS_REF);
     userPageTypeEditor.filter(PageTypeClass.FIELD_PAGE_TYPE, UserPageType.PAGETYPE_NAME);
     userPageTypeEditor.createFirstIfNotExists();
   }
 
-  private void setRightsOnUser(XWikiDocument userDoc, List<EAccessLevel> rights) {
+  void setRightsOnUser(XWikiDocument userDoc, List<EAccessLevel> rights) {
     XWikiObjectEditor userRightObjEditor = XWikiObjectEditor.on(userDoc).filter(rightsClass);
     userRightObjEditor.filter(XWikiRightsClass.FIELD_USERS, Arrays.asList(asXWikiUser(
         userDoc.getDocumentReference())));
