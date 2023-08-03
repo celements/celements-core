@@ -42,8 +42,8 @@ public class AddDefaultGroupsToNewUserListener
 
   @Override
   protected void onEventInternal(@NotNull Event event, XWikiDocument source, Object data) {
-    LOGGER.trace("onEvent in addDefaultGroupsToNewUser for source [{}] and context [{}].", source,
-        context);
+    LOGGER.trace("onEvent in addDefaultGroupsToNewUser for source [{}] and data [{}].", source,
+        data);
     try {
       User user = celUserService.getUser(source.getDocRef());
       celUserService.addUserToDefaultGroups(user);
