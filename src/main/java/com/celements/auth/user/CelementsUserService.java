@@ -8,7 +8,6 @@ import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Predicates.*;
 import static com.google.common.collect.ImmutableSet.*;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -49,11 +48,8 @@ import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
 import com.celements.nextfreedoc.INextFreeDocRole;
-import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.query.IQueryExecutionServiceRole;
-import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiGroupsClass;
-import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.SendValidationFailedException;
@@ -65,7 +61,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
 import one.util.streamex.EntryStream;
@@ -83,7 +78,6 @@ public class CelementsUserService implements UserService {
 
   private final ClassDefinition usersClass;
   private final ClassDefinition groupsClass;
-  private final ClassDefinition rightsClass;
   private final QueryManager queryManager;
   private final IQueryExecutionServiceRole queryExecService;
   private final IModelAccessFacade modelAccess;
@@ -96,7 +90,6 @@ public class CelementsUserService implements UserService {
   public CelementsUserService(
       @Named(XWikiUsersClass.CLASS_DEF_HINT) ClassDefinition usersClass,
       @Named(XWikiGroupsClass.CLASS_DEF_HINT) ClassDefinition groupsClass,
-      @Named(XWikiRightsClass.CLASS_DEF_HINT) ClassDefinition rightsClass,
       QueryManager queryManager,
       IQueryExecutionServiceRole queryExecService,
       IModelAccessFacade modelAccess,
@@ -107,7 +100,6 @@ public class CelementsUserService implements UserService {
     super();
     this.usersClass = usersClass;
     this.groupsClass = groupsClass;
-    this.rightsClass = rightsClass;
     this.queryManager = queryManager;
     this.queryExecService = queryExecService;
     this.modelAccess = modelAccess;
@@ -194,9 +186,6 @@ public class CelementsUserService implements UserService {
     try {
       XWikiDocument userDoc = modelAccess.createDocument(userDocRef);
       fillInUserData(userDoc, userData);
-      addPageTypeOnUser(userDoc);
-      setRightsOnUser(userDoc, Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
-          EAccessLevel.DELETE));
       modelAccess.saveDocument(userDoc, getMessage("core.comment.createdUser"));
     } catch (DocumentAccessException dae) {
       throw new UserCreateException(dae);
@@ -248,27 +237,6 @@ public class CelementsUserService implements UserService {
     } catch (XWikiException xwe) {
       throw new DocumentAccessException(usersClass.getClassReference().getDocRef(), xwe);
     }
-  }
-
-  void addPageTypeOnUser(XWikiDocument userDoc) {
-    XWikiObjectEditor userPageTypeEditor = XWikiObjectEditor.on(userDoc)
-        .filter(PageTypeClass.CLASS_REF);
-    userPageTypeEditor.filter(PageTypeClass.FIELD_PAGE_TYPE, UserPageType.PAGETYPE_NAME);
-    userPageTypeEditor.createFirstIfNotExists();
-  }
-
-  void setRightsOnUser(XWikiDocument userDoc, List<EAccessLevel> rights) {
-    XWikiObjectEditor userRightObjEditor = XWikiObjectEditor.on(userDoc).filter(rightsClass);
-    userRightObjEditor.filter(XWikiRightsClass.FIELD_USERS, Arrays.asList(asXWikiUser(
-        userDoc.getDocumentReference())));
-    userRightObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
-    userRightObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
-    userRightObjEditor.createFirst();
-    XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(userDoc).filter(rightsClass);
-    admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, Arrays.asList(XWIKI_ADMIN_GROUP_FN));
-    admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
-    admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
-    admGrpObjEditor.createFirst();
   }
 
   void addUserToDefaultGroups(User user) throws DocumentSaveException {
@@ -418,10 +386,6 @@ public class CelementsUserService implements UserService {
   @Deprecated
   private XWiki getXWiki() {
     return context.getXWikiContext().getWiki();
-  }
-
-  private XWikiUser asXWikiUser(DocumentReference userDocRef) {
-    return new XWikiUser(modelUtils.serializeRefLocal(userDocRef));
   }
 
 }
