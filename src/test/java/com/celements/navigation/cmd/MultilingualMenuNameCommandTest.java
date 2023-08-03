@@ -19,7 +19,6 @@
  */
 package com.celements.navigation.cmd;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -28,6 +27,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.reference.RefBuilder;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWiki;
@@ -44,14 +44,16 @@ public class MultilingualMenuNameCommandTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    xwiki = getWikiMock();
-    context = getContext();
+    registerComponentMock(IModelAccessFacade.class);
+    xwiki = getMock(XWiki.class);
+    context = getXContext();
     DocumentReference docRef = new RefBuilder().wiki(context.getDatabase()).space("MySpace")
         .doc("MyCurrentDoc").build(DocumentReference.class);
     currentDoc = new XWikiDocument(docRef);
     context.setDoc(currentDoc);
-    menuNameCmd = new MultilingualMenuNameCommand();
-    menuNameCmd.attCmd = createDefaultMock(AttachmentURLCommand.class);
+    menuNameCmd = new MultilingualMenuNameCommand(createDefaultMock(AttachmentURLCommand.class));
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(currentDoc.getDocRef()))
+        .andReturn(currentDoc).anyTimes();
   }
 
   @Test
@@ -68,8 +70,6 @@ public class MultilingualMenuNameCommandTest extends AbstractComponentTest {
 
   @Test
   public void testAddNavImageStyle_null() throws Exception {
-    expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
-        currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     replayDefault();
     assertEquals("", menuNameCmd.addNavImageStyle(currentDoc.getFullName(), "de", context));
@@ -84,10 +84,9 @@ public class MultilingualMenuNameCommandTest extends AbstractComponentTest {
     menuNameObj.setStringValue("lang", "de");
     menuNameObj.setStringValue("image", "");
     currentDoc.setObject(MultilingualMenuNameCommand.CELEMENTS_MENU_NAME, 0, menuNameObj);
-    expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
-        currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
-    expect(menuNameCmd.attCmd.getAttachmentURL(eq(""), same(context))).andReturn(null);
+    expect(getMock(AttachmentURLCommand.class).getAttachmentURL(eq(""), same(context)))
+        .andReturn(null);
     replayDefault();
     assertEquals("", menuNameCmd.addNavImageStyle(currentDoc.getFullName(), "de", context));
     verifyDefault();
@@ -102,11 +101,9 @@ public class MultilingualMenuNameCommandTest extends AbstractComponentTest {
     menuNameObj.setStringValue("lang", "de");
     menuNameObj.setStringValue("image", "Content.Home;navImage.jpg");
     currentDoc.setObject(MultilingualMenuNameCommand.CELEMENTS_MENU_NAME, 0, menuNameObj);
-    expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
-        currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
-    expect(menuNameCmd.attCmd.getAttachmentURL(eq("Content.Home;navImage.jpg"), same(context)))
-        .andReturn(attachmentURL);
+    expect(getMock(AttachmentURLCommand.class).getAttachmentURL(eq("Content.Home;navImage.jpg"),
+        same(context))).andReturn(attachmentURL);
     replayDefault();
     assertEquals("style=\"background-image:url(" + attachmentURL + ")\"",
         menuNameCmd.addNavImageStyle(currentDoc.getFullName(), "de", context));
@@ -122,8 +119,6 @@ public class MultilingualMenuNameCommandTest extends AbstractComponentTest {
     menuNameObj.setStringValue("tooltip", toolTip);
     menuNameObj.setStringValue("lang", "de");
     currentDoc.setObject(MultilingualMenuNameCommand.CELEMENTS_MENU_NAME, 0, menuNameObj);
-    expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
-        currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     replayDefault();
     assertEquals("title=\"Tool tip for test\"", menuNameCmd.addToolTip(currentDoc.getFullName(),
@@ -133,8 +128,6 @@ public class MultilingualMenuNameCommandTest extends AbstractComponentTest {
 
   @Test
   public void testAddToolTip_NPE() throws Exception {
-    expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
-        currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     replayDefault();
     assertEquals("", menuNameCmd.addToolTip(currentDoc.getFullName(), "de", context));
