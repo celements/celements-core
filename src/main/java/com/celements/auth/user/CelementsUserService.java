@@ -59,7 +59,6 @@ import com.celements.web.plugin.cmd.SendValidationFailedException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -157,7 +156,7 @@ public class CelementsUserService implements UserService {
             .filter(new UserClassFieldFilter())
             .collect(toImmutableSet());
     if (fields.isEmpty()) {
-      fields = ImmutableSet.of(DEFAULT_LOGIN_FIELD);
+      fields = Set.of(DEFAULT_LOGIN_FIELD);
     }
     return fields;
   }
@@ -318,7 +317,7 @@ public class CelementsUserService implements UserService {
         .filter(new UserClassFieldFilter())
         .collect(toImmutableSet());
     if (possibleLoginFields.isEmpty()) {
-      possibleLoginFields = ImmutableSet.of(DEFAULT_LOGIN_FIELD);
+      possibleLoginFields = Set.of(DEFAULT_LOGIN_FIELD);
     }
     User user = null;
     if (possibleLoginFields.contains(DEFAULT_LOGIN_FIELD)) {
