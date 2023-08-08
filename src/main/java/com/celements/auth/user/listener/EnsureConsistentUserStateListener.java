@@ -43,7 +43,6 @@ public class EnsureConsistentUserStateListener
     super();
     this.userService = userService;
     this.modelUtils = modelUtils;
-
   }
 
   @Override
@@ -65,7 +64,6 @@ public class EnsureConsistentUserStateListener
     setRightsOnUser(source, Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
         EAccessLevel.DELETE));
     setDefaultValuesOnNewUser(source);
-
   }
 
   void addPageTypeOnUser(XWikiDocument userDoc) {
