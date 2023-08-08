@@ -390,11 +390,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
     assertSame(userDoc, user.getDocument());
     assertEquals(1, XWikiObjectFetcher.on(userDoc).filter(getUserClass()).count());
-    assertEquals(2, XWikiObjectFetcher.on(userDoc).filter(getRightsClass()).count());
-    assertEquals(UserPageType.PAGETYPE_NAME, XWikiObjectFetcher.on(userDoc)
-        .filter(PageTypeClass.CLASS_REF)
-        .fetchField(PageTypeClass.FIELD_PAGE_TYPE)
-        .findFirst().orElse(null));
   }
 
   @Test

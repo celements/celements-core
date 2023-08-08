@@ -12,12 +12,15 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.auth.user.UserPageType;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.XObjectFieldAccessor;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
@@ -51,7 +54,9 @@ public class EnsureConsistentUserStateListenerTest
     listener.setRightsOnUser(userDoc, levels);
     verifyDefault();
 
-    List<BaseObject> rightsObs = XWikiObjectFetcher.on(userDoc).filter(getRightsClass()).list();
+    List<BaseObject> rightsObs = XWikiObjectFetcher.on(userDoc)
+        .filter(XWikiRightsClass.CLASS_REF)
+        .list();
     assertEquals(2, rightsObs.size());
     assertEquals("XWiki.msladek", getValue(rightsObs.get(0), XWikiRightsClass.FIELD_USERS).get(
         0).getUser());
@@ -67,6 +72,7 @@ public class EnsureConsistentUserStateListenerTest
   public void test_setDefaultValuesOnNewUser() throws Exception {
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     // sicherstellen, dass ein UserObjekt vorhanden ist
+    XWikiObjectEditor.on(userDoc).filter(getUserClass()).createFirst();
 
     replayDefault();
     listener.setDefaultValuesOnNewUser(userDoc);
@@ -82,12 +88,32 @@ public class EnsureConsistentUserStateListenerTest
         .length());
   }
 
+  @Test
+  public void test_addPageTypeOnUser() throws XWikiException {
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    expectClassWithNewObj(getPageTypeClass(), userDoc.getWikiRef());
+
+    replayDefault();
+    listener.addPageTypeOnUser(userDoc);
+    verifyDefault();
+
+    assertEquals(UserPageType.PAGETYPE_NAME, XWikiObjectFetcher.on(userDoc)
+        .filter(PageTypeClass.CLASS_REF)
+        .fetchField(PageTypeClass.FIELD_PAGE_TYPE)
+        .findFirst()
+        .orElse(null));
+  }
+
   private static ClassDefinition getRightsClass() {
     return Utils.getComponent(ClassDefinition.class, XWikiRightsClass.CLASS_DEF_HINT);
   }
 
   private static ClassDefinition getUserClass() {
     return Utils.getComponent(ClassDefinition.class, XWikiUsersClass.CLASS_DEF_HINT);
+  }
+
+  private static ClassDefinition getPageTypeClass() {
+    return Utils.getComponent(ClassDefinition.class, PageTypeClass.CLASS_DEF_HINT);
   }
 
   private static BaseClass expectClassWithNewObj(ClassDefinition classDef, WikiReference wikiRef)
