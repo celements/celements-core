@@ -41,7 +41,6 @@ import org.xwiki.query.QueryManager;
 import com.celements.marshalling.ReferenceMarshaller;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentAccessException;
-import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.context.ModelContext;
@@ -204,16 +203,7 @@ public class CelementsUserService implements UserService {
     try {
       return getUser(userDocRef);
     } catch (UserInstantiationException exc) {
-      deleteDanglingUser(userDocRef);
-      throw new UserCreateException(exc);
-    }
-  }
-
-  private void deleteDanglingUser(DocumentReference userDocRef) {
-    try {
-      modelAccess.deleteDocument(userDocRef, false);
-    } catch (DocumentDeleteException delExc) {
-      LOGGER.debug("createNewUser - failed, unable to delete [{}]", userDocRef);
+      throw new IllegalStateException("should not happen", exc);
     }
   }
 
