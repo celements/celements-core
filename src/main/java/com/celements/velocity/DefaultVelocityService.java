@@ -88,6 +88,9 @@ public class DefaultVelocityService implements VelocityService {
       VelocityContextModifier contextModifier) throws XWikiVelocityException {
     checkNotNull(templateDoc);
     text = nullToEmpty(text).trim();
+    if (text.isEmpty()) {
+      return text;
+    }
     VelocityContext vContext = (VelocityContext) velocityManager.getVelocityContext().clone();
     if (contextModifier != null) {
       vContext = contextModifier.apply(vContext);

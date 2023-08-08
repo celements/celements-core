@@ -19,21 +19,22 @@
  */
 package com.celements.web.plugin.cmd;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.web.service.UrlService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,23 +51,31 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   @Before
   public void setUp_AttachmentURLCommandTest() throws Exception {
-    context = getContext();
-    wiki = getWikiMock();
+    registerComponentMocks(IAttachmentServiceRole.class, UrlService.class);
+    context = getXContext();
+    wiki = getMock(XWiki.class);
     attUrlCmd = new AttachmentURLCommand();
     mockURLFactory = createDefaultMock(XWikiURLFactory.class);
     context.setURLFactory(mockURLFactory);
+    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
+        "celements.attachmenturl.defaultaction"), eq("file"), same(context)))
+            .andReturn("file").anyTimes();
   }
 
   @Test
   public void testGetAttachmentURL_fullURL() {
+    replayDefault();
     assertEquals("http://www.bla.com/bla.txt", attUrlCmd.getAttachmentURL(
         "http://www.bla.com/bla.txt", context));
+    verifyDefault();
   }
 
   @Test
   public void testGetAttachmentURL_partURL() {
+    replayDefault();
     assertEquals("/xwiki/bin/download/A/B/bla.txt", attUrlCmd.getAttachmentURL(
         "/xwiki/bin/download/A/B/bla.txt", context));
+    verifyDefault();
   }
 
   @Test
@@ -78,11 +87,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     XWikiDocument doc = new XWikiDocument(myDocRef);
     context.setDoc(doc);
     URL viewURL = new URL("http://localhost/mySpace/myDoc");
-    expect(mockURLFactory.createURL(eq(mySpaceName), eq(myDocName), eq("view"), (String) isNull(),
-        (String) isNull(), eq(context.getDatabase()), same(context))).andReturn(viewURL);
-    expect(mockURLFactory.getURL(eq(viewURL), same(context))).andReturn(viewURL.getPath());
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
+    expect(getMock(UrlService.class).getURL(myDocRef, "view")).andReturn(viewURL.getPath());
     replayDefault();
     assertEquals("/mySpace/myDoc?xpage=bla&bli=blu", attUrlCmd.getAttachmentURL(
         "?xpage=bla&bli=blu", context));
@@ -90,62 +95,46 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURL_fullInternalLink() throws XWikiException, MalformedURLException {
+  public void testGetAttachmentURL_fullInternalLink() throws Exception {
+    var attRef = new AttachmentReference("bla.txt",
+        new DocumentReference("celements2web", "A", "B"));
     String resultURL = "http://celements2web.localhost/file/A/B/bla.txt";
-    XWikiDocument abdoc = new XWikiDocument();
-    abdoc.setFullName("A.B");
-    abdoc.setDatabase("celements2web");
-    List<XWikiAttachment> attachList = new ArrayList<>();
+    expect(getMock(UrlService.class).getURL(attRef, "file")).andReturn(resultURL);
     XWikiAttachment blaAtt = new XWikiAttachment();
     blaAtt.setFilename("bla.txt");
-    blaAtt.setDoc(abdoc);
-    attachList.add(blaAtt);
-    abdoc.setAttachmentList(attachList);
-    URL tstURL = new URL(resultURL);
-    expect(mockURLFactory.createAttachmentURL(eq("bla.txt"), eq("A"), eq("B"), eq("file"),
-        (String) eq(null), eq("celements2web"), same(context))).andReturn(tstURL);
-    expect(mockURLFactory.getURL(eq(tstURL), same(context))).andReturn(resultURL);
-    expect(wiki.getDocument(eq("celements2web:A.B"), same(context))).andReturn(abdoc).anyTimes();
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
+    expect(getMock(IAttachmentServiceRole.class)
+        .getAttachmentNameEqual(anyObject(AttachmentReference.class)))
+            .andReturn(blaAtt);
     replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL("celements2web:A.B;bla.txt", context);
-    assertTrue(attachmentURL, attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
     verifyDefault();
+    assertTrue(attachmentURL, attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
   }
 
   @Test
-  public void testGetAttachmentURL_partInternalLink() throws XWikiException, MalformedURLException {
+  public void testGetAttachmentURL_partInternalLink() throws Exception {
+    var attRef = new AttachmentReference("bla.txt",
+        new DocumentReference(context.getDatabase(), "A", "B"));
     String resultURL = "http://mydomain.ch/file/A/B/bla.txt";
-    URL tstURL = new URL(resultURL);
-    expect(mockURLFactory.createAttachmentURL(eq("bla.txt"), eq("A"), eq("B"), eq("file"),
-        (String) eq(null), eq(context.getDatabase()), same(context))).andReturn(tstURL);
-    expect(mockURLFactory.getURL(eq(tstURL), same(context))).andReturn(resultURL);
-    XWikiDocument abdoc = new XWikiDocument();
-    abdoc.setFullName("A.B");
-    List<XWikiAttachment> attachList = new ArrayList<>();
+    expect(getMock(UrlService.class).getURL(attRef, "file")).andReturn(resultURL);
     XWikiAttachment blaAtt = new XWikiAttachment();
-    blaAtt.setFilename("bla.txt");
-    blaAtt.setDoc(abdoc);
-    attachList.add(blaAtt);
-    abdoc.setAttachmentList(attachList);
-    expect(wiki.getDocument(eq("A.B"), same(context))).andReturn(abdoc).anyTimes();
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
+    blaAtt.setFilename(attRef.getName());
+    expect(getMock(IAttachmentServiceRole.class)
+        .getAttachmentNameEqual(anyObject(AttachmentReference.class)))
+            .andReturn(blaAtt);
     replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL("A.B;bla.txt", context);
-    assertTrue(attachmentURL, attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
     verifyDefault();
+    assertTrue(attachmentURL, attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
   }
 
   @Test
-  public void testGetAttachmentURL_partInternalLink_notExists() throws XWikiException,
-      MalformedURLException {
-    XWikiDocument abdoc = new XWikiDocument();
-    abdoc.setFullName("A.B");
-    expect(wiki.getDocument(eq("A.B"), same(context))).andReturn(abdoc).anyTimes();
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
+  public void testGetAttachmentURL_partInternalLink_notExists() throws Exception {
+    var attRef = new AttachmentReference("bla.txt",
+        new DocumentReference(context.getDatabase(), "A", "B"));
+    expect(getMock(IAttachmentServiceRole.class)
+        .getAttachmentNameEqual(anyObject(AttachmentReference.class)))
+            .andThrow(new AttachmentNotExistsException(attRef));
     replayDefault();
     assertNull(attUrlCmd.getAttachmentURL("A.B;bla.txt", context));
     verifyDefault();
@@ -157,11 +146,9 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
         new Date());
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("download");
     replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL("  :celJS/bla.js", context);
-    String expectedURL = "/appname/download/resources/celJS/bla.js";
+    String expectedURL = "/appname/file/resources/celJS/bla.js";
     assertTrue(attachmentURL, attachmentURL.matches(expectedURL + "\\?version=\\d{14}"));
     verifyDefault();
   }
@@ -198,7 +185,9 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentURL_Rubish() {
+    replayDefault();
     assertEquals("http://A.B;bla.txt", attUrlCmd.getAttachmentURL("http://A.B;bla.txt", context));
+    verifyDefault();
   }
 
   @Test
@@ -216,8 +205,6 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetAttachmentURLPrefix() throws Exception {
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file");
     expect(mockURLFactory.createResourceURL(eq(""), eq(true), same(context))).andReturn(new URL(
         "http://test.fabian.dev:10080/skin/resources/"));
     replayDefault();
