@@ -6,7 +6,6 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.stereotype.Component;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.observation.event.Event;
 
 import com.celements.auth.user.User;
@@ -15,6 +14,9 @@ import com.celements.auth.user.UserService;
 import com.celements.common.observation.listener.AbstractLocalEventListener;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.observation.save.SaveEventOperation;
+import com.celements.observation.save.object.ObjectEvent;
+import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
@@ -38,13 +40,13 @@ public class AddDefaultGroupsToNewUserListener
 
   @Override
   public List<Event> getEvents() {
-    return List.of(new DocumentCreatedEvent());
+    return List.of(new ObjectEvent(SaveEventOperation.CREATED, XWikiUsersClass.CLASS_REF));
   }
 
   @Override
   protected void onEventInternal(@NotNull Event event, XWikiDocument source, Object data) {
-    LOGGER.trace("onEvent in addDefaultGroupsToNewUser for source [{}] and data [{}].", source,
-        data);
+    LOGGER.trace("onObjectEvent in addDefaultGroupsToNewUser for source [{}] and data [{}].",
+        source, data);
     try {
       User user = userService.getUser(source.getDocRef());
       userService.addUserToDefaultGroups(user);
@@ -60,7 +62,7 @@ public class AddDefaultGroupsToNewUserListener
     try {
       modelAccess.deleteDocument(source.getDocRef(), false);
     } catch (DocumentDeleteException delExc) {
-      LOGGER.debug("unable to delete dangling user [{}]", source.getDocRef());
+      LOGGER.error("unable to delete dangling user [{}]", source.getDocRef());
     }
   }
 }
