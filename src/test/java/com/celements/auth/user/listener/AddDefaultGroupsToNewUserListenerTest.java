@@ -1,7 +1,6 @@
 package com.celements.auth.user.listener;
 
 import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,12 +46,9 @@ public class AddDefaultGroupsToNewUserListenerTest extends AbstractComponentTest
         .andThrow(uie);
 
     replayDefault();
-    UserInstantiationException thrown = assertThrows(UserInstantiationException.class, () -> {
-      usrListener.onEventInternal(new DocumentCreatedEvent(), anyDoc, new Object());
-    });
+    usrListener.onEventInternal(new DocumentCreatedEvent(), anyDoc, new Object());
     verifyDefault();
 
-    assertEquals("anyDoc is no UserDoc", thrown.getMessage());
   }
 
 }

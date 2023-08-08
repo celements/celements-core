@@ -9,10 +9,11 @@ import org.springframework.stereotype.Component;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.observation.event.Event;
 
-import com.celements.auth.user.CelementsUserService;
 import com.celements.auth.user.User;
 import com.celements.auth.user.UserInstantiationException;
+import com.celements.auth.user.UserService;
 import com.celements.common.observation.listener.AbstractLocalEventListener;
+import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -22,12 +23,12 @@ public class AddDefaultGroupsToNewUserListener
 
   private static final String NAME = "addDefaultGroupsToNewUser";
 
-  private final CelementsUserService celUserService;
+  private final UserService userService;
 
   @Inject
-  public AddDefaultGroupsToNewUserListener(CelementsUserService celUserService) {
+  public AddDefaultGroupsToNewUserListener(UserService userService) {
     super();
-    this.celUserService = celUserService;
+    this.userService = userService;
   }
 
   @Override
@@ -45,12 +46,21 @@ public class AddDefaultGroupsToNewUserListener
     LOGGER.trace("onEvent in addDefaultGroupsToNewUser for source [{}] and data [{}].", source,
         data);
     try {
-      User user = celUserService.getUser(source.getDocRef());
-      celUserService.addUserToDefaultGroups(user);
+      User user = userService.getUser(source.getDocRef());
+      userService.addUserToDefaultGroups(user);
     } catch (DocumentSaveException dse) {
       LOGGER.error("source {} couldn't be added to defaultGroups", source, dse);
+      deleteDanglingUser(source);
     } catch (UserInstantiationException uie) {
       LOGGER.debug("source {} is no user document", source, uie);
+    }
+  }
+
+  private void deleteDanglingUser(XWikiDocument source) {
+    try {
+      modelAccess.deleteDocument(source.getDocRef(), false);
+    } catch (DocumentDeleteException delExc) {
+      LOGGER.debug("unable to delete dangling user [{}]", source.getDocRef());
     }
   }
 }
