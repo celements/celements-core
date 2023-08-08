@@ -202,17 +202,18 @@ public class CelementsUserService implements UserService {
       throw new UserCreateException(dae);
     }
     try {
-      User user = getUser(userDocRef);
-      addUserToDefaultGroups(user);
-      return user;
-    } catch (DocumentSaveException | UserInstantiationException exc) {
-      try {
-        // cleanup dangling users
-        modelAccess.deleteDocument(userDocRef, false);
-      } catch (DocumentDeleteException delExc) {
-        LOGGER.debug("createNewUser - failed, unable to delete [{}]", userDocRef);
-      }
+      return getUser(userDocRef);
+    } catch (UserInstantiationException exc) {
+      deleteDanglingUser(userDocRef);
       throw new UserCreateException(exc);
+    }
+  }
+
+  private void deleteDanglingUser(DocumentReference userDocRef) {
+    try {
+      modelAccess.deleteDocument(userDocRef, false);
+    } catch (DocumentDeleteException delExc) {
+      LOGGER.debug("createNewUser - failed, unable to delete [{}]", userDocRef);
     }
   }
 
