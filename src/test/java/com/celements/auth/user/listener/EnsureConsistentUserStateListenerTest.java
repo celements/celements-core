@@ -27,17 +27,17 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 
-public class CheckCorrectnessOfNewUserAndAddDefaultValuesListenerTest
+public class EnsureConsistentUserStateListenerTest
     extends AbstractComponentTest {
 
-  private CheckCorrectnessOfNewUserAndAddDefaultValuesListener listener;
+  private EnsureConsistentUserStateListener listener;
   private final DocumentReference userDocRef = new DocumentReference("xwikidb", "XWiki", "msladek");
 
   private static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
   @Before
   public void prepareTest() {
-    listener = getBeanFactory().getBean(CheckCorrectnessOfNewUserAndAddDefaultValuesListener.class);
+    listener = getBeanFactory().getBean(EnsureConsistentUserStateListener.class);
   }
 
   @Test
@@ -66,6 +66,7 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListenerTest
   @Test
   public void test_setDefaultValuesOnNewUser() throws Exception {
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    // sicherstellen, dass ein UserObjekt vorhanden ist
 
     replayDefault();
     listener.setDefaultValuesOnNewUser(userDoc);
@@ -74,10 +75,11 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListenerTest
     assertEquals(getUserClass().getDocRef(), userDoc.getParentReference());
     assertEquals("XWiki.msladek", userDoc.getCreator());
     assertEquals("XWiki.msladek", userDoc.getAuthor());
-    assertEquals("#includeForm(\"XWiki.XWikiUserSheet\")", userDoc.getContent());
-    assertEquals(1, XWikiObjectFetcher.on(userDoc).filter(getUserClass()).count());
-    assertEquals(24, XWikiObjectFetcher.on(userDoc).filter(getUserClass())
-        .filterPresent(XWikiUsersClass.FIELD_PASSWORD).toString().length());
+    assertEquals(24, XWikiObjectFetcher.on(userDoc)
+        .fetchField(XWikiUsersClass.FIELD_PASSWORD)
+        .findFirst()
+        .get()
+        .length());
   }
 
   private static ClassDefinition getRightsClass() {

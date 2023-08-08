@@ -4,24 +4,21 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.stereotype.Component;
-import org.xwiki.bridge.event.DocumentCreatingEvent;
-import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.Event;
 
-import com.celements.auth.user.UserInstantiationException;
 import com.celements.auth.user.UserPageType;
 import com.celements.auth.user.UserService;
 import com.celements.common.observation.listener.AbstractLocalEventListener;
-import com.celements.model.classes.ClassDefinition;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.ModelUtils;
+import com.celements.observation.save.SaveEventOperation;
+import com.celements.observation.save.object.ObjectEvent;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
@@ -30,27 +27,21 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 @Component
-public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
+public class EnsureConsistentUserStateListener
     extends AbstractLocalEventListener<XWikiDocument, Object> {
 
-  private static final String NAME = "checkCorrectnessOfNewUserAndAddDefaultValues";
+  private static final String NAME = "ensureConsistentUserState";
   private static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
   private final UserService userService;
-  private final ClassDefinition rightsClass;
-  private final ClassDefinition usersClass;
   private final ModelUtils modelUtils;
 
   @Inject
-  public CheckCorrectnessOfNewUserAndAddDefaultValuesListener(
+  public EnsureConsistentUserStateListener(
       UserService userService,
-      @Named(XWikiRightsClass.CLASS_DEF_HINT) ClassDefinition rightsClass,
-      @Named(XWikiUsersClass.CLASS_DEF_HINT) ClassDefinition usersClass,
       ModelUtils modelUtils) {
     super();
     this.userService = userService;
-    this.rightsClass = rightsClass;
-    this.usersClass = usersClass;
     this.modelUtils = modelUtils;
 
   }
@@ -62,31 +53,19 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
 
   @Override
   public List<Event> getEvents() {
-    return List.of(new DocumentCreatingEvent(), new DocumentUpdatingEvent());
+    return List.of(new ObjectEvent(SaveEventOperation.CREATING, XWikiUsersClass.CLASS_REF));
   }
 
   @Override
   protected void onEventInternal(@NotNull Event event, @NotNull XWikiDocument source, Object data) {
     LOGGER.trace(
-        "onEvent in checkCorrectnessOfNewUserAndAddDefaultValues for source {} and data {}", source,
+        "onObjectEvent in ensureConsistentUserState for source {} and data {}", source,
         data);
-    if (isUser(source)) {
-      addPageTypeOnUser(source);
-      setRightsOnUser(source, Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
-          EAccessLevel.DELETE));
-      setDefaultValuesOnNewUser(source);
-    }
+    addPageTypeOnUser(source);
+    setRightsOnUser(source, Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
+        EAccessLevel.DELETE));
+    setDefaultValuesOnNewUser(source);
 
-  }
-
-  private boolean isUser(XWikiDocument source) {
-    try {
-      userService.getUser(source.getDocRef());
-      return true;
-    } catch (UserInstantiationException uie) {
-      LOGGER.debug("source {} is no user document", source, uie);
-      return false;
-    }
   }
 
   void addPageTypeOnUser(XWikiDocument userDoc) {
@@ -97,13 +76,15 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
   }
 
   void setRightsOnUser(XWikiDocument userDoc, List<EAccessLevel> rights) {
-    XWikiObjectEditor userRightObjEditor = XWikiObjectEditor.on(userDoc).filter(rightsClass);
+    XWikiObjectEditor userRightObjEditor = XWikiObjectEditor.on(userDoc)
+        .filter(XWikiRightsClass.CLASS_REF);
     userRightObjEditor.filter(XWikiRightsClass.FIELD_USERS, Arrays.asList(asXWikiUser(
         userDoc.getDocumentReference())));
     userRightObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
     userRightObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
     userRightObjEditor.createFirstIfNotExists();
-    XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(userDoc).filter(rightsClass);
+    XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(userDoc)
+        .filter(XWikiRightsClass.CLASS_REF);
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, Arrays.asList(XWIKI_ADMIN_GROUP_FN));
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
     admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
@@ -112,15 +93,15 @@ public class CheckCorrectnessOfNewUserAndAddDefaultValuesListener
 
   void setDefaultValuesOnNewUser(XWikiDocument userDoc) {
     String userFN = modelUtils.serializeRefLocal(userDoc.getDocumentReference());
-    userDoc.setParentReference((EntityReference) usersClass.getDocRef(
+    userDoc.setParentReference((EntityReference) XWikiUsersClass.CLASS_REF.getDocRef(
         userDoc.getDocumentReference().getWikiReference()));
     userDoc.setCreator(userFN);
     userDoc.setAuthor(userFN);
-    userDoc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
-    XWikiObjectEditor userClassObjEditor = XWikiObjectEditor.on(userDoc).filter(usersClass);
-    userClassObjEditor.filter(XWikiUsersClass.FIELD_PASSWORD,
-        RandomStringUtils.randomAlphanumeric(24));
-    userClassObjEditor.createFirstIfNotExists();
+    XWikiObjectEditor.on(userDoc)
+        .filter(XWikiUsersClass.CLASS_REF)
+        .filterAbsent(XWikiUsersClass.FIELD_PASSWORD)
+        .editField(XWikiUsersClass.FIELD_PASSWORD)
+        .first(RandomStringUtils.randomAlphanumeric(24));
   }
 
   private XWikiUser asXWikiUser(DocumentReference userDocRef) {
