@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponents;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -212,32 +213,18 @@ public class ExternalJavaScriptFilesCommand {
   @NotEmpty
   String getLazyLoadTag(@NotNull ExtJsFileParameter extJsFileParams,
       @Nullable AttachmentURLCommand attUrlCmdMock) {
-    return "<cel-lazy-load-js src=\"" + generateUrl(extJsFileParams, attUrlCmdMock)
+    return "<cel-lazy-load-js src=\"" + generateUrl(extJsFileParams, attUrlCmdMock).orElse("")
         + "\" loadMode=\"" + extJsFileParams.getLoadMode() + "\"></cel-lazy-load-js>";
   }
 
-  @NotEmpty
-  private String generateUrl(@NotNull ExtJsFileParameter extJsFileParams,
+  @NotNull
+  private Optional<String> generateUrl(@NotNull ExtJsFileParameter extJsFileParams,
       @Nullable AttachmentURLCommand attUrlCmdMock) {
-    String attUrl;
-    final AttachmentURLCommand attUrlCmd = getAttUrlCmd(attUrlCmdMock);
-    final Optional<String> action = extJsFileParams.getAction();
-    if (action.isPresent()) {
-      attUrl = attUrlCmd.getAttachmentURL(extJsFileParams.getJsFile(), action.get(),
-          getModelContext().getXWikiContext());
-    } else {
-      attUrl = attUrlCmd.getAttachmentURL(extJsFileParams.getJsFile(),
-          getModelContext().getXWikiContext());
-    }
-    final Optional<String> params = extJsFileParams.getQueryString();
-    if (params.isPresent()) {
-      if (attUrl.indexOf("?") > -1) {
-        attUrl += "&" + params.get();
-      } else {
-        attUrl += "?" + params.get();
-      }
-    }
-    return attUrl;
+    return getAttUrlCmd(attUrlCmdMock).getAttachmentURL(
+        extJsFileParams.getJsFile(),
+        extJsFileParams.getAction().orElse(null),
+        extJsFileParams.getQueryString().orElse(null))
+        .map(UriComponents::toUriString);
   }
 
   @NotNull
@@ -254,7 +241,8 @@ public class ExternalJavaScriptFilesCommand {
           || attUrlCmd.isOnDiskLink(extJsFileParams.getJsFile())) {
         extJSAttUrlSet.add(extJsFileParams.getJsFile());
       }
-      return generateScriptTagOnce(extJsFileParams, generateUrl(extJsFileParams, attUrlCmd));
+      return generateScriptTagOnce(extJsFileParams,
+          generateUrl(extJsFileParams, attUrlCmd).orElse(null));
     } else {
       LOGGER.debug("addExtJSfileOnce: skip already added {}", extJsFileParams.getJsFile());
     }
@@ -263,7 +251,7 @@ public class ExternalJavaScriptFilesCommand {
 
   @NotNull
   private String generateScriptTagOnce(@NotNull ExtJsFileParameter extJsFileParams,
-      @NotEmpty String jsFileUrl) {
+      @Nullable String jsFileUrl) {
     LOGGER.info("generateScriptTagOnce: extJsFileParams [{}] jsFileUrl [{}]", extJsFileParams,
         jsFileUrl);
     String jsIncludes2 = "";

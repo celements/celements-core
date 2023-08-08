@@ -19,22 +19,36 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.MoreOptional.*;
+import static com.celements.execution.XWikiExecutionProp.*;
+
 import java.net.MalformedURLException;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.util.ModelUtils;
 import com.celements.web.service.LastStartupTimeStampRole;
+import com.celements.web.service.UrlService;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
+@Component
 public class AttachmentURLCommand {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentURLCommand.class);
@@ -59,32 +73,48 @@ public class AttachmentURLCommand {
   }
 
   public String getAttachmentURL(String link, String action, XWikiContext context) {
+    return getAttachmentURL(link, action, "")
+        .map(UriComponents::toUriString)
+        .orElse(null);
+  }
+
+  public Optional<UriComponents> getAttachmentURL(String link, String action, String queryString) {
     String url = link;
+    Supplier<String> versionProvider = null;
+    action = asNonBlank(action).orElseGet(this::getDefaultAction);
     if (isAttachmentLink(link)) {
-      String attName = getAttachmentName(link);
       try {
-        XWikiDocument doc = context.getWiki().getDocument(getPageFullName(link), context);
-        XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(doc, attName);
-        url = doc.getAttachmentURL(attName, action, context);
-        url += "?version=" + getLastStartupTimeStamp().getLastChangedTimeStamp(att.getDate());
-      } catch (XWikiException exp) {
-        LOGGER.error("Error getting attachment URL for doc " + getPageFullName(link) + " and file "
-            + attName, exp);
-        url = link;
-      } catch (AttachmentNotExistsException anee) {
+        var attRef = asAttachmentRef(link);
+        XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(attRef);
+        WikiReference attWiki = attRef.getDocumentReference().getWikiReference();
+        url = getEContext().get(WIKI).map(attWiki::equals).orElse(true)
+            ? getUrlService().getURL(attRef, action)
+            : getUrlService().getExternalURL(attRef, action);
+        versionProvider = () -> getLastStartupTimeStamp().getLastChangedTimeStamp(att.getDate());
+      } catch (DocumentNotExistsException | AttachmentNotExistsException anee) {
         LOGGER.info("Attachment not found for link [{}] and action [{}]", link, action, anee);
-        return null;
+        return Optional.empty();
       }
     } else if (isOnDiskLink(link)) {
       String path = link.trim().substring(1);
-      url = context.getWiki().getSkinFile(path, true, context).replace("/skin/", "/" + action
-          + "/");
-      url += "?version=" + getLastStartupTimeStamp().getFileModificationDate(path);
+      url = getContext().getWiki().getSkinFile(path, true, getContext())
+          .replace("/skin/", "/" + action + "/");
+      versionProvider = () -> getLastStartupTimeStamp().getFileModificationDate(path);
     }
     if (url.startsWith("?")) {
-      url = context.getDoc().getURL("view", context) + url;
+      url = getUrlService().getURL(getContext().getDoc().getDocRef(), "view") + url;
     }
-    return url;
+    try {
+      UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+      builder = builder.query(queryString);
+      if ((versionProvider != null) && !builder.build().getQueryParams().containsKey("version")) {
+        builder = builder.queryParam("version", versionProvider.get());
+      }
+      return Optional.of(builder.build());
+    } catch (IllegalArgumentException iae) {
+      LOGGER.error("Failed building URI for link [{}] and action [{}]", link, action, iae);
+      return Optional.empty();
+    }
   }
 
   private LastStartupTimeStampRole getLastStartupTimeStamp() {
@@ -97,6 +127,12 @@ public class AttachmentURLCommand {
 
   public String getPageFullName(String link) {
     return link.split(";")[0];
+  }
+
+  public AttachmentReference asAttachmentRef(String link) {
+    var split = link.split(";");
+    DocumentReference docRef = getModelUtils().resolveRef(split[0], DocumentReference.class);
+    return new AttachmentReference(split[1], docRef);
   }
 
   public boolean isAttachmentLink(String link) {
@@ -131,12 +167,20 @@ public class AttachmentURLCommand {
     return Utils.getComponent(IAttachmentServiceRole.class);
   }
 
-  private XWikiContext getContext() {
-    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
+  private UrlService getUrlService() {
+    return Utils.getComponent(UrlService.class);
   }
 
-  private Execution getExecution() {
-    return Utils.getComponent(Execution.class);
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
+  }
+
+  private XWikiContext getContext() {
+    return getEContext().get(XWIKI_CONTEXT).orElseThrow();
+  }
+
+  private ExecutionContext getEContext() {
+    return Utils.getComponent(Execution.class).getContext();
   }
 
 }
