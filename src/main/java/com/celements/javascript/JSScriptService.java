@@ -82,12 +82,10 @@ public class JSScriptService implements ScriptService {
   }
 
   public ExtJsFileParameter.Builder createDefaultExtJSParam() {
-    var builder = createExtJSParam().setAction("file");
-    if (xwiki.get().orElseThrow().getXWikiPreferenceAsInt(
-        "cel_activate_jsdefer", 0, getContext()) == 1) {
-      builder = builder.setLoadMode(JsLoadMode.DEFER);
-    }
-    return builder;
+    return createExtJSParam()
+        .setAction("file")
+        .setLoadMode((xwiki.get().orElseThrow().getXWikiPreferenceAsInt("cel_activate_jsdefer", 0,
+            getContext()) == 1) ? JsLoadMode.DEFER : null);
   }
 
   public String includeExtJsFile(@Nullable ExtJsFileParameter.Builder extJsFileParams) {
