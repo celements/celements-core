@@ -11,6 +11,7 @@ import com.celements.auth.user.User;
 import com.celements.auth.user.UserInstantiationException;
 import com.celements.auth.user.UserService;
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public class AddDefaultGroupsToNewUserListenerTest extends AbstractComponentTest {
@@ -47,6 +48,22 @@ public class AddDefaultGroupsToNewUserListenerTest extends AbstractComponentTest
 
     replayDefault();
     usrListener.onEventInternal(new DocumentCreatedEvent(), anyDoc, new Object());
+    verifyDefault();
+
+  }
+
+  @Test
+  public void testOnEventInternal_groupDocCannotBeSaved() throws Exception {
+    XWikiDocument userDoc = new XWikiDocument(
+        new DocumentReference("xwikidb", "XWiki", "cpichler"));
+    User user = createDefaultMock(User.class);
+    Exception dse = new DocumentSaveException(
+        new DocumentReference("xwikidb", "XWiki", "XWikiAllGroup"));
+    expect(getMock(UserService.class).getUser(userDoc.getDocRef())).andReturn(user);
+    expect(getMock(UserService.class).addUserToDefaultGroups(user)).andThrow(dse);
+
+    replayDefault();
+    usrListener.onEventInternal(new DocumentCreatedEvent(), userDoc, new Object());
     verifyDefault();
 
   }
