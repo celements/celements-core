@@ -54,7 +54,7 @@ public class AddDefaultGroupsToNewUserListener
       LOGGER.error("source {} couldn't be added to defaultGroups", source, dse);
       deleteDanglingUser(source);
     } catch (UserInstantiationException uie) {
-      LOGGER.debug("source {} is no user document", source, uie);
+      LOGGER.warn("source {} is no user document", source, uie);
     }
   }
 
