@@ -13,7 +13,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.Event;
 
 import com.celements.auth.user.UserPageType;
-import com.celements.auth.user.UserService;
 import com.celements.common.observation.listener.AbstractLocalEventListener;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.ModelUtils;
@@ -33,15 +32,11 @@ public class EnsureConsistentUserStateListener
   private static final String NAME = "ensureConsistentUserState";
   private static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
-  private final UserService userService;
   private final ModelUtils modelUtils;
 
   @Inject
-  public EnsureConsistentUserStateListener(
-      UserService userService,
-      ModelUtils modelUtils) {
+  public EnsureConsistentUserStateListener(ModelUtils modelUtils) {
     super();
-    this.userService = userService;
     this.modelUtils = modelUtils;
   }
 
