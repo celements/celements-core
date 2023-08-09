@@ -25,7 +25,7 @@ public class AddDefaultGroupsToNewUserListenerTest extends AbstractComponentTest
   }
 
   @Test
-  public void testOnEventInternal() throws Exception {
+  public void test_onEventInternal() throws Exception {
     XWikiDocument userDoc = new XWikiDocument(
         new DocumentReference("xwikidb", "XWiki", "cpichler"));
     User user = createDefaultMock(User.class);
@@ -39,7 +39,7 @@ public class AddDefaultGroupsToNewUserListenerTest extends AbstractComponentTest
   }
 
   @Test
-  public void testOnEventInternal_sourceIsNotUserDoc() throws Exception {
+  public void test_onEventInternal_sourceIsNotUserDoc() throws Exception {
     XWikiDocument anyDoc = new XWikiDocument(
         new DocumentReference("xwikidb", "anySpace", "testDocument"));
     Exception uie = new UserInstantiationException("anyDoc is no UserDoc");
@@ -53,7 +53,7 @@ public class AddDefaultGroupsToNewUserListenerTest extends AbstractComponentTest
   }
 
   @Test
-  public void testOnEventInternal_groupDocCannotBeSaved() throws Exception {
+  public void test_onEventInternal_groupDocCannotBeSaved() throws Exception {
     XWikiDocument userDoc = new XWikiDocument(
         new DocumentReference("xwikidb", "XWiki", "cpichler"));
     User user = createDefaultMock(User.class);
