@@ -41,7 +41,6 @@ import org.xwiki.query.QueryManager;
 import com.celements.marshalling.ReferenceMarshaller;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentAccessException;
-import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.context.ModelContext;
@@ -60,7 +59,6 @@ import com.celements.web.plugin.cmd.SendValidationFailedException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -158,7 +156,7 @@ public class CelementsUserService implements UserService {
             .filter(new UserClassFieldFilter())
             .collect(toImmutableSet());
     if (fields.isEmpty()) {
-      fields = ImmutableSet.of(DEFAULT_LOGIN_FIELD);
+      fields = Set.of(DEFAULT_LOGIN_FIELD);
     }
     return fields;
   }
@@ -202,17 +200,9 @@ public class CelementsUserService implements UserService {
       throw new UserCreateException(dae);
     }
     try {
-      User user = getUser(userDocRef);
-      addUserToDefaultGroups(user);
-      return user;
-    } catch (DocumentSaveException | UserInstantiationException exc) {
-      try {
-        // cleanup dangling users
-        modelAccess.deleteDocument(userDocRef, false);
-      } catch (DocumentDeleteException delExc) {
-        LOGGER.debug("createNewUser - failed, unable to delete [{}]", userDocRef);
-      }
-      throw new UserCreateException(exc);
+      return getUser(userDocRef);
+    } catch (UserInstantiationException exc) {
+      throw new IllegalStateException("should not happen", exc);
     }
   }
 
@@ -271,13 +261,16 @@ public class CelementsUserService implements UserService {
     admGrpObjEditor.createFirst();
   }
 
-  void addUserToDefaultGroups(User user) throws DocumentSaveException {
-    getSplitXWikiPreference("initialGroups", "xwiki.users.initialGroups", "")
+  @Override
+  public boolean addUserToDefaultGroups(User user) throws DocumentSaveException {
+    checkNotNull(user);
+    return getSplitXWikiPreference("initialGroups", "xwiki.users.initialGroups", "")
         .append(XWIKI_ALL_GROUP_FN)
         .filter(Objects::nonNull)
         .distinct()
         .map(ClassReference::new)
-        .forEach(rethrowConsumer(groupRef -> addUserToGroup(user, groupRef)));
+        .map(rethrowFunction(groupRef -> addUserToGroup(user, groupRef)))
+        .reduce(false, (x, y) -> x || y);
   }
 
   @Override
@@ -324,7 +317,7 @@ public class CelementsUserService implements UserService {
         .filter(new UserClassFieldFilter())
         .collect(toImmutableSet());
     if (possibleLoginFields.isEmpty()) {
-      possibleLoginFields = ImmutableSet.of(DEFAULT_LOGIN_FIELD);
+      possibleLoginFields = Set.of(DEFAULT_LOGIN_FIELD);
     }
     User user = null;
     if (possibleLoginFields.contains(DEFAULT_LOGIN_FIELD)) {
