@@ -64,7 +64,6 @@ public class AddDefaultGroupsToNewUserListenerTest extends AbstractComponentTest
     expect(getMock(UserService.class).getUser(userDoc.getDocRef())).andReturn(user);
     expect(getMock(UserService.class).addUserToDefaultGroups(user)).andThrow(dse);
     getMock(IModelAccessFacade.class).deleteDocument(userDoc.getDocRef(), false);
-    expectLastCall().andVoid();
 
     replayDefault();
     usrListener.onEventInternal(new DocumentCreatedEvent(), userDoc, new Object());
