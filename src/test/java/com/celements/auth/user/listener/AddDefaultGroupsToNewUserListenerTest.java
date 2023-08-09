@@ -11,6 +11,7 @@ import com.celements.auth.user.User;
 import com.celements.auth.user.UserInstantiationException;
 import com.celements.auth.user.UserService;
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -21,6 +22,7 @@ public class AddDefaultGroupsToNewUserListenerTest extends AbstractComponentTest
   @Before
   public void prepareTest() throws Exception {
     registerComponentMock(UserService.class);
+    registerComponentMock(IModelAccessFacade.class);
     usrListener = getBeanFactory().getBean(AddDefaultGroupsToNewUserListener.class);
   }
 
@@ -61,6 +63,8 @@ public class AddDefaultGroupsToNewUserListenerTest extends AbstractComponentTest
         new DocumentReference("xwikidb", "XWiki", "XWikiAllGroup"));
     expect(getMock(UserService.class).getUser(userDoc.getDocRef())).andReturn(user);
     expect(getMock(UserService.class).addUserToDefaultGroups(user)).andThrow(dse);
+    getMock(IModelAccessFacade.class).deleteDocument(userDoc.getDocRef(), false);
+    expectLastCall().andVoid();
 
     replayDefault();
     usrListener.onEventInternal(new DocumentCreatedEvent(), userDoc, new Object());
