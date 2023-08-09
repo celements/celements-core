@@ -379,9 +379,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     expectUserClassFromMap(userData);
     expectClassWithNewObj(getRightsClass(), userDocRef.getWikiReference());
     getMock(IModelAccessFacade.class).saveDocument(same(userDoc), anyObject(String.class));
-    expectInitialGroups(Collections.<String>emptyList());
-    expectGroupAdd(XWIKI_ALL_GROUP_FN);
-
     expect(getMock(IModelAccessFacade.class).getDocument(userDocRef)).andReturn(userDoc);
 
     replayDefault();

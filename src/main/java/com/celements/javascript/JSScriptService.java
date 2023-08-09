@@ -1,12 +1,13 @@
 package com.celements.javascript;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.init.XWikiProvider;
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
@@ -16,8 +17,11 @@ public class JSScriptService implements ScriptService {
 
   public static final String JAVA_SCRIPT_FILES_COMMAND_KEY = "com.celements.web.ExternalJavaScriptFilesCommand";
 
-  @Requirement
+  @Inject
   private Execution execution;
+
+  @Inject
+  private XWikiProvider xwiki;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -75,6 +79,17 @@ public class JSScriptService implements ScriptService {
    */
   public ExtJsFileParameter.Builder createExtJSParam() {
     return new ExtJsFileParameter.Builder();
+  }
+
+  public ExtJsFileParameter.Builder createDefaultExtJSParam() {
+    return createExtJSParam()
+        .setAction("file")
+        .setLoadMode(isJSDeferActive() ? JsLoadMode.DEFER : null);
+  }
+
+  private boolean isJSDeferActive() {
+    return 1 == xwiki.get().orElseThrow().getXWikiPreferenceAsInt(
+        "cel_activate_jsdefer", 0, getContext());
   }
 
   public String includeExtJsFile(@Nullable ExtJsFileParameter.Builder extJsFileParams) {
