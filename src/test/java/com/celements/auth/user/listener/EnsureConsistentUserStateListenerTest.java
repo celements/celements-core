@@ -18,7 +18,6 @@ import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.XObjectFieldAccessor;
-import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.rights.access.EAccessLevel;
@@ -39,7 +38,8 @@ public class EnsureConsistentUserStateListenerTest
   private static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
   @Before
-  public void prepareTest() {
+  public void prepareTest() throws Exception {
+    expectClass(getUserClass(), userDocRef.getWikiReference());
     listener = getBeanFactory().getBean(EnsureConsistentUserStateListener.class);
   }
 
@@ -71,8 +71,11 @@ public class EnsureConsistentUserStateListenerTest
   @Test
   public void test_setDefaultValuesOnNewUser() throws Exception {
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    // sicherstellen, dass ein UserObjekt vorhanden ist
-    XWikiObjectEditor.on(userDoc).filter(getUserClass()).createFirst();
+    BaseObject userObj = new BaseObject();
+    userObj.setDocumentReference(userDoc.getDocumentReference());
+    userObj.setXClassReference(XWikiUsersClass.CLASS_REF.getDocRef(
+        userDoc.getDocumentReference().getWikiReference()));
+    userDoc.addXObject(userObj);
 
     replayDefault();
     listener.setDefaultValuesOnNewUser(userDoc);
@@ -127,6 +130,15 @@ public class EnsureConsistentUserStateListenerTest
 
   private static <T> T getValue(BaseObject obj, ClassField<T> field) {
     return getFieldAccessor().get(obj, field).get();
+  }
+
+  private static BaseClass expectClass(ClassDefinition classDef, WikiReference wikiRef)
+      throws XWikiException {
+    BaseClass bClass = createBaseClassMock(classDef.getDocRef(wikiRef));
+    for (ClassField<?> field : classDef.getFields()) {
+      expect(bClass.get(field.getName())).andReturn(field.getXField()).anyTimes();
+    }
+    return bClass;
   }
 
   @SuppressWarnings("unchecked")
