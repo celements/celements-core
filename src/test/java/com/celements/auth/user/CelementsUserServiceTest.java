@@ -39,6 +39,7 @@ import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -61,7 +62,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     service = (CelementsUserService) Utils.getComponent(UserService.class);
     expect(getMock(IWebUtilsService.class).getAdminMessageTool()).andReturn(
         getMessageToolStub()).anyTimes();
-    expect(getWikiMock().getGroupService(getContext())).andReturn(createDefaultMock(
+    expect(getMock(XWiki.class).getGroupService(getXContext())).andReturn(createDefaultMock(
         XWikiGroupService.class)).anyTimes();
     getMessageToolStub().injectMessage("core.comment.createdUser", "user created");
     getMessageToolStub().injectMessage("core.comment.addedUserToGroup", "user added to group");
@@ -139,8 +140,8 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   private void expectPossibleLoginFields(String fields) {
-    expect(getWikiMock().getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"), eq(
-        UserService.DEFAULT_LOGIN_FIELD), same(getContext()))).andReturn(fields).once();
+    expect(getMock(XWiki.class).getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"),
+        eq(UserService.DEFAULT_LOGIN_FIELD), same(getXContext()))).andReturn(fields).once();
   }
 
   @Test
@@ -410,13 +411,14 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   private void expectInitialGroups(List<String> groups) {
-    expect(getWikiMock().getXWikiPreference(eq("initialGroups"), eq("xwiki.users.initialGroups"),
-        eq(""), same(getContext()))).andReturn(Joiner.on(',').join(groups));
+    expect(getMock(XWiki.class).getXWikiPreference(eq("initialGroups"),
+        eq("xwiki.users.initialGroups"), eq(""),
+        same(getXContext()))).andReturn(Joiner.on(',').join(groups));
   }
 
   private BaseClass expectUserClassFromMap(Map<String, String> userData) throws XWikiException {
     BaseClass userXClass = expectClassWithNewObj(getUserClass(), userDocRef.getWikiReference());
-    expect(getWikiMock().getUserClass(getContext())).andReturn(userXClass);
+    expect(getMock(XWiki.class).getUserClass(getXContext())).andReturn(userXClass);
     expect(userXClass.fromMap(same(userData), anyObject(BaseObject.class))).andReturn(
         new BaseObject());
     return userXClass;

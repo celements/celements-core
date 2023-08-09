@@ -36,6 +36,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
+import com.celements.init.XWikiProvider;
 import com.celements.marshalling.ReferenceMarshaller;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentAccessException;
@@ -54,7 +55,6 @@ import com.celements.web.plugin.cmd.SendValidationFailedException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -74,7 +74,6 @@ public class CelementsUserService implements UserService {
   static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
   private final ClassDefinition usersClass;
-  private final ClassDefinition groupsClass;
   private final QueryManager queryManager;
   private final IQueryExecutionServiceRole queryExecService;
   private final IModelAccessFacade modelAccess;
@@ -82,21 +81,21 @@ public class CelementsUserService implements UserService {
   private final IWebUtilsService webUtils;
   private final ModelContext context;
   private final INextFreeDocRole nextFreeDoc;
+  private final XWikiProvider xwiki;
 
   @Inject
   public CelementsUserService(
       @Named(XWikiUsersClass.CLASS_DEF_HINT) ClassDefinition usersClass,
-      @Named(XWikiGroupsClass.CLASS_DEF_HINT) ClassDefinition groupsClass,
       QueryManager queryManager,
       IQueryExecutionServiceRole queryExecService,
       IModelAccessFacade modelAccess,
       ModelUtils modelUtils,
       IWebUtilsService webUtils,
       ModelContext context,
-      INextFreeDocRole nextFreeDoc) {
+      INextFreeDocRole nextFreeDoc,
+      XWikiProvider xwiki) {
     super();
     this.usersClass = usersClass;
-    this.groupsClass = groupsClass;
     this.queryManager = queryManager;
     this.queryExecService = queryExecService;
     this.modelAccess = modelAccess;
@@ -104,6 +103,7 @@ public class CelementsUserService implements UserService {
     this.webUtils = webUtils;
     this.context = context;
     this.nextFreeDoc = nextFreeDoc;
+    this.xwiki = xwiki;
   }
 
   @Override
@@ -216,7 +216,10 @@ public class CelementsUserService implements UserService {
         RandomStringUtils.randomAlphanumeric(24));
     try {
       BaseObject userObject = XWikiObjectEditor.on(userDoc).filter(usersClass).createFirst();
-      getXWiki().getUserClass(context.getXWikiContext()).fromMap(userData, userObject);
+      xwiki.get()
+          .orElseThrow()
+          .getUserClass(context.getXWikiContext())
+          .fromMap(userData, userObject);
     } catch (XWikiException xwe) {
       throw new DocumentAccessException(usersClass.getClassReference().getDocRef(), xwe);
     }
@@ -360,18 +363,15 @@ public class CelementsUserService implements UserService {
 
   private StreamEx<String> getSplitXWikiPreference(String prefName, String cfgParam,
       String defaultValue) {
-    String prefValue = Strings.nullToEmpty(getXWiki().getXWikiPreference(prefName, cfgParam,
-        defaultValue, context.getXWikiContext())).trim();
+    String prefValue = Strings.nullToEmpty(xwiki.get()
+        .orElseThrow()
+        .getXWikiPreference(prefName, cfgParam, defaultValue, context.getXWikiContext()))
+        .trim();
     return StreamEx.of(Splitter.on(",").omitEmptyStrings().splitToStream(prefValue));
   }
 
   private String getMessage(String key) {
     return webUtils.getAdminMessageTool().get(key);
-  }
-
-  @Deprecated
-  private XWiki getXWiki() {
-    return context.getXWikiContext().getWiki();
   }
 
 }
