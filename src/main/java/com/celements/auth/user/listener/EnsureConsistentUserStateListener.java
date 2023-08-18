@@ -52,9 +52,8 @@ public class EnsureConsistentUserStateListener
 
   @Override
   protected void onEventInternal(@NotNull Event event, @NotNull XWikiDocument source, Object data) {
-    LOGGER.trace(
-        "onObjectEvent in ensureConsistentUserState for source {} and data {}", source,
-        data);
+    LOGGER.trace("onObjectEvent in ensureConsistentUserState for source {} and data {}",
+        source, data);
     addPageTypeOnUser(source);
     setRightsOnUser(source, Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
         EAccessLevel.DELETE));
