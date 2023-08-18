@@ -23,9 +23,12 @@ public class GroupScriptService implements ScriptService {
   }
 
   public List<DocumentReference> getAllLocalGroups() {
-    // woher bekomme ich das lokale Wiki?
+    // woher bekomme ich das lokale Wiki? aus dem Context ModelContext.getWikiRef()
     WikiReference wiki = null;
+
     return groupService.getAllGroups(wiki);
   }
+
+  // Für getGroupPrettyName Fallback 2: Document Name holen
 
 }
