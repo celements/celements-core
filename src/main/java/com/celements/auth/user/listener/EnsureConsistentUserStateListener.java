@@ -25,7 +25,7 @@ import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
 
-@Component
+@Component(EnsureConsistentUserStateListener.NAME)
 public class EnsureConsistentUserStateListener
     extends AbstractLocalEventListener<XWikiDocument, Object> {
 
