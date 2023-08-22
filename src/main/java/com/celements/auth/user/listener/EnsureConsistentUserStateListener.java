@@ -29,7 +29,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 public class EnsureConsistentUserStateListener
     extends AbstractLocalEventListener<XWikiDocument, Object> {
 
-  private static final String NAME = "ensureConsistentUserState";
+  public static final String NAME = "ensureConsistentUserState";
   private static final String XWIKI_ADMIN_GROUP_FN = "XWiki.XWikiAdminGroup";
 
   private final ModelUtils modelUtils;
