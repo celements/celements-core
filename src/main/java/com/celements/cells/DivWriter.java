@@ -19,7 +19,7 @@
  */
 package com.celements.cells;
 
-import static com.google.common.base.MoreObjects.*;
+import static com.celements.common.MoreOptional.*;
 import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Strings.*;
 
@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -42,6 +43,8 @@ import com.celements.cells.attribute.CellAttribute;
 public class DivWriter implements ICellWriter {
 
   private static final String TAGNAME_DIV = "div";
+  private static final Set<String> VOID_ELEMENTS = Set.of("area", "base", "br", "col", "embed",
+      "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr");
 
   private final StringBuilder out;
 
@@ -70,9 +73,10 @@ public class DivWriter implements ICellWriter {
   @Override
   public void closeLevel() {
     if (!openLevels.isEmpty()) {
-      out.append("</");
-      out.append(openLevels.pop().getKey());
-      out.append(">");
+      String tagName = openLevels.pop().getKey();
+      if (!VOID_ELEMENTS.contains(tagName)) {
+        out.append("</").append(tagName).append(">");
+      }
     }
   }
 
@@ -93,7 +97,7 @@ public class DivWriter implements ICellWriter {
 
   @Override
   public void openLevel(String tagName, List<CellAttribute> attributes) {
-    tagName = firstNonNull(emptyToNull(tagName), TAGNAME_DIV);
+    tagName = asNonBlank(tagName).orElse(TAGNAME_DIV);
     getCurrentLevel().ifPresent(e -> e.setValue(true));
     openLevels.push(new SimpleEntry<>(tagName, false));
     out.append("<");
@@ -127,7 +131,8 @@ public class DivWriter implements ICellWriter {
   @Override
   public DivWriter appendContent(String content) {
     content = nullToEmpty(content).trim();
-    if (!content.isEmpty()) {
+    if (!content.isEmpty() && !getOpenLevels().findFirst()
+        .map(VOID_ELEMENTS::contains).orElse(false)) {
       getCurrentLevel().ifPresent(e -> e.setValue(true));
       out.append(content);
     }

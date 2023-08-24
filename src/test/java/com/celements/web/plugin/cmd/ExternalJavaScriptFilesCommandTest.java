@@ -241,7 +241,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
   public void testGetExtStringForJsFile_jsm() {
     String url = "http://www.xyz.com/file/resources/celJS/myPath/jsfile.mjs";
     String urlEsc = "http://www.xyz.com/file/resources/celJS/myPath/jsfile.mjs";
-    String scriptStart = "<script defer type=\"module\" src=\"";
+    String scriptStart = "<script type=\"module\" src=\"";
     String scriptEnd = "\"></script>";
     JsFileEntry jsFile = new JsFileEntry().addFilepath(url);
     assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
