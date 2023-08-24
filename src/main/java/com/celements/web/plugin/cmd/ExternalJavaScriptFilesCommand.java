@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.javascript.JsLoadMode.*;
 import static com.google.common.base.Preconditions.*;
 
 import java.util.Collections;
@@ -50,7 +51,6 @@ import com.celements.convert.bean.XObjectBeanConverter;
 import com.celements.javascript.ExtJsFileParameter;
 import com.celements.javascript.JavaScriptExternalFilesClass;
 import com.celements.javascript.JsFileEntry;
-import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
@@ -292,7 +292,7 @@ public class ExternalJavaScriptFilesCommand {
 
   String getExtStringForJsFile(JsFileEntry jsFile) {
     var loadMode = Optional.ofNullable(jsFile.getLoadMode())
-        .filter(mode -> !jsFile.isModule() && (mode != JsLoadMode.SYNC));
+        .filter(mode -> (mode == ASYNC) || ((mode == DEFER) && !jsFile.isModule()));
     return "<script "
         + loadMode.map(mode -> mode.toString().toLowerCase() + " ").orElse("")
         + "type=\"" + (jsFile.isModule() ? "module" : "text/javascript")
