@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.Contextualiser;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
@@ -32,15 +34,17 @@ public class GroupService {
   private final IWebUtilsService webUtils;
   private final ModelUtils modelUtils;
   private final ModelContext context;
+  private final IModelAccessFacade modelAccess;
 
   @Inject
   public GroupService(XWikiGroupService xwikiGroupService, IWebUtilsService webUtils,
-      ModelUtils modelUtils, ModelContext context) {
+      ModelUtils modelUtils, ModelContext context, IModelAccessFacade modelAccess) {
     super();
     this.xwikiGroupService = xwikiGroupService;
     this.webUtils = webUtils;
     this.modelUtils = modelUtils;
     this.context = context;
+    this.modelAccess = modelAccess;
   }
 
   /**
@@ -81,19 +85,21 @@ public class GroupService {
    */
   public @NotNull Optional<String> getGroupPrettyName(@NotNull DocumentReference groupDocRef) {
     checkNotNull(groupDocRef);
-    // prettyName aus Dictionary holen
     String dictKey = "cel_groupname_" + groupDocRef.getName();
-    Optional<String> groupPrettyName = Optional.of(webUtils.getAdminMessageTool().get(dictKey))
-        .filter(value -> !value.equals(dictKey));
-    // .or(() -> getDocumentTitle());
-    // Fallback 1: Document Title holen
-
-    return groupPrettyName;
+    return Optional.of(webUtils.getAdminMessageTool().get(dictKey))
+        .filter(value -> !value.equals(dictKey))
+        .or(() -> getDocumentTitle(groupDocRef));
   }
 
-  private Object getDocumentTitle() {
-    // TODO Auto-generated method stub
-    return null;
+  private Optional<String> getDocumentTitle(DocumentReference groupDocRef) {
+    Optional<String> docTitle = Optional.empty();
+    try {
+      docTitle = Optional
+          .ofNullable(modelAccess.getDocument(groupDocRef).getTitle());
+    } catch (DocumentNotExistsException dnee) {
+      LOGGER.warn("could not get Document for {}", groupDocRef, dnee);
+    }
+    return docTitle;
   }
 
 }
