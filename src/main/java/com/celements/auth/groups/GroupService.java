@@ -50,7 +50,6 @@ public class GroupService {
    */
   public @NotNull List<DocumentReference> getAllGroups(@NotNull WikiReference wiki) {
     checkNotNull(wiki);
-
     List<DocumentReference> groupDocRefList = new ArrayList<>();
     List<String> groupNames = getAllGroupNames(wiki);
     for (String groupName : groupNames) {

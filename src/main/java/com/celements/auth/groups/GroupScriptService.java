@@ -9,23 +9,25 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.model.context.ModelContext;
+
 @Component(GroupScriptService.NAME)
 public class GroupScriptService implements ScriptService {
 
   public static final String NAME = "group";
 
   private final GroupService groupService;
+  private final ModelContext context;
 
   @Inject
-  public GroupScriptService(GroupService groupService) {
+  public GroupScriptService(GroupService groupService, ModelContext context) {
     super();
     this.groupService = groupService;
+    this.context = context;
   }
 
   public List<DocumentReference> getAllLocalGroups() {
-    // woher bekomme ich das lokale Wiki? aus dem Context ModelContext.getWikiRef()
-    WikiReference wiki = null;
-
+    WikiReference wiki = context.getWikiRef();
     return groupService.getAllGroups(wiki);
   }
 
