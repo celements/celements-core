@@ -1,6 +1,7 @@
 package com.celements.auth.groups;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -31,6 +32,13 @@ public class GroupScriptService implements ScriptService {
     return groupService.getAllGroups(wiki);
   }
 
-  // Für getGroupPrettyName Fallback 2: Document Name holen
+  public String getGroupPrettyName(DocumentReference groupDocRef) {
+    Optional<String> groupPrettyName = groupService.getGroupPrettyName(groupDocRef);
+    if (groupPrettyName.isPresent()) {
+      return groupPrettyName.get();
+    } else {
+      return groupDocRef.getName();
+    }
+  }
 
 }
