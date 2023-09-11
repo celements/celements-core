@@ -23,8 +23,10 @@ import static com.celements.common.MoreObjectsCel.*;
 import static com.celements.model.util.ReferenceSerializationMode.*;
 import static com.google.common.base.Preconditions.*;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.concurrent.Immutable;
@@ -32,7 +34,6 @@ import javax.annotation.concurrent.Immutable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -76,6 +77,7 @@ public class CellRenderStrategy implements IRenderStrategy {
       + "cell";
   public static final String EXEC_CTX_KEY_GLOBAL_OBJ_NB = EXEC_CTX_KEY_GLOBAL
       + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
+  public static final String EXEC_CTX_KEY_REPETITIVE = EXEC_CTX_KEY + ".repetitive";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CellRenderStrategy.class);
 
@@ -124,12 +126,12 @@ public class CellRenderStrategy implements IRenderStrategy {
       LOGGER.trace("getContextualiser: cell [{}]", node.getDocumentReference());
       Optional<String> scopeKey = getRenderScopeKey(node.getDocumentReference());
       scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
-          .map(LogUtils.<String, Object>logF(getExecutionContext()::getProperty)
+          .map(LogUtils.<String, Object>logF(execution.getContext()::getProperty)
               .debug(LOGGER).msg("getContextualiser"))
           .flatMap(doc -> tryCast(doc, XWikiDocument.class))
           .ifPresent(contextualiser::withDoc);
       scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
-          .map(LogUtils.<String, Object>logF(getExecutionContext()::getProperty)
+          .map(LogUtils.<String, Object>logF(execution.getContext()::getProperty)
               .debug(LOGGER).msg("getContextualiser"))
           .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
     }
@@ -165,7 +167,7 @@ public class CellRenderStrategy implements IRenderStrategy {
     try {
       XWikiDocument cellDoc = modelAccess.getDocument(cellDocRef);
       XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(cellDoc).filter(CellClass.CLASS_REF);
-      attrBuilder.addId(collectId(cellDocRef, fetcher));
+      collectId(cellDocRef, fetcher).ifPresent(attrBuilder::addId);
       attrBuilder.addAttribute("data-cell-ref", modelUtils.serializeRef(cellDocRef, COMPACT));
       fetcher.fetchField(CellClass.FIELD_CSS_CLASSES).stream().findFirst()
           .ifPresent(attrBuilder::addCssClasses);
@@ -190,15 +192,28 @@ public class CellRenderStrategy implements IRenderStrategy {
     return tagName;
   }
 
-  private String collectId(DocumentReference cellDocRef, XWikiObjectFetcher fetcher) {
+  private Optional<String> collectId(DocumentReference cellDocRef, XWikiObjectFetcher fetcher) {
+    if (execution.getContext().getProperty(EXEC_CTX_KEY_REPETITIVE, false)) {
+      LOGGER.trace("collectId - skip repetitive cell [{}]", cellDocRef);
+      return Optional.empty();
+    }
     String id = fetcher.fetchField(CellClass.FIELD_ID_NAME).stream().findFirst()
-        .orElseGet(() -> "cell:" + modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", ".."));
-    return id + Stream.of(EXEC_CTX_KEY_OBJ_NB, EXEC_CTX_KEY_GLOBAL_OBJ_NB)
-        .map(execution.getContext()::getProperty)
-        .map(val -> Ints.tryParse(Objects.toString(val)))
-        .filter(Objects::nonNull)
-        .map(nb -> "_" + nb)
-        .findFirst().orElse("");
+        .orElseGet(() -> "cell:" + modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", ".."))
+        + Stream.of(EXEC_CTX_KEY_OBJ_NB, EXEC_CTX_KEY_GLOBAL_OBJ_NB)
+            .map(execution.getContext()::getProperty)
+            .map(val -> Ints.tryParse(Objects.toString(val)))
+            .filter(Objects::nonNull)
+            .map(nb -> "_" + nb)
+            .findFirst().orElse("");
+    Set<String> ids = execution.getContext().computeIfAbsent(EXEC_CTX_KEY + ".ids", HashSet::new);
+    if (ids.contains(id)) {
+      LOGGER.warn("collectId - cell id [{}] generated multiple times for [{}]", id, cellDocRef);
+      return Optional.empty();
+    } else {
+      LOGGER.debug("collectId - cell id [{}] generated for [{}]", id, cellDocRef);
+      ids.add(id);
+      return Optional.of(id);
+    }
   }
 
   private void collectEventDataAttr(DocumentReference cellDocRef, AttributeBuilder attributes,
@@ -276,10 +291,6 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   LayoutServiceRole getLayoutService() {
     return Utils.getComponent(LayoutServiceRole.class);
-  }
-
-  private ExecutionContext getExecutionContext() {
-    return Utils.getComponent(Execution.class).getContext();
   }
 
 }

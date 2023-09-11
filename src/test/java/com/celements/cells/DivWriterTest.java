@@ -63,6 +63,15 @@ public class DivWriterTest {
   }
 
   @Test
+  public void test_closeLevel_voidTag() {
+    String tagName = "input";
+    divWriter.openLevel(tagName);
+    divWriter.appendContent("content");
+    divWriter.closeLevel();
+    assertEquals("<input>", divWriter.getAsString());
+  }
+
+  @Test
   public void test_openLevel() {
     String idname = "newId";
     String cssClasses = "classes";

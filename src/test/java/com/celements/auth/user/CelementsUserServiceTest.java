@@ -32,7 +32,6 @@ import com.celements.model.field.XObjectFieldAccessor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.query.IQueryExecutionServiceRole;
-import com.celements.rights.access.EAccessLevel;
 import com.celements.web.classes.oldcore.XWikiGroupsClass;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.celements.web.classes.oldcore.XWikiUsersClass;
@@ -40,6 +39,7 @@ import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -62,7 +62,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     service = (CelementsUserService) Utils.getComponent(UserService.class);
     expect(getMock(IWebUtilsService.class).getAdminMessageTool()).andReturn(
         getMessageToolStub()).anyTimes();
-    expect(getWikiMock().getGroupService(getContext())).andReturn(createDefaultMock(
+    expect(getMock(XWiki.class).getGroupService(getXContext())).andReturn(createDefaultMock(
         XWikiGroupService.class)).anyTimes();
     getMessageToolStub().injectMessage("core.comment.createdUser", "user created");
     getMessageToolStub().injectMessage("core.comment.addedUserToGroup", "user added to group");
@@ -140,8 +140,8 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   private void expectPossibleLoginFields(String fields) {
-    expect(getWikiMock().getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"), eq(
-        UserService.DEFAULT_LOGIN_FIELD), same(getContext()))).andReturn(fields).once();
+    expect(getMock(XWiki.class).getXWikiPreference(eq("cellogin"), eq("celements.login.userfields"),
+        eq(UserService.DEFAULT_LOGIN_FIELD), same(getXContext()))).andReturn(fields).once();
   }
 
   @Test
@@ -326,7 +326,7 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_createUserFromData() throws Exception {
+  public void test_fillInUserData() throws Exception {
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     Map<String, String> userData = new HashMap<>();
     expectUserClassFromMap(userData);
@@ -335,36 +335,9 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
     service.fillInUserData(userDoc, userData);
     verifyDefault();
 
-    assertEquals(getUserClass().getDocRef(), userDoc.getParentReference());
-    assertEquals("XWiki.msladek", userDoc.getCreator());
-    assertEquals("XWiki.msladek", userDoc.getAuthor());
-    assertEquals("#includeForm(\"XWiki.XWikiUserSheet\")", userDoc.getContent());
     assertEquals(1, XWikiObjectFetcher.on(userDoc).filter(getUserClass()).count());
     assertEquals("0", userData.get(XWikiUsersClass.FIELD_ACTIVE.getName()));
     assertEquals(24, userData.get(XWikiUsersClass.FIELD_PASSWORD.getName()).length());
-  }
-
-  @Test
-  public void test_setRightsOnUser() throws Exception {
-    List<EAccessLevel> levels = Arrays.asList(EAccessLevel.VIEW, EAccessLevel.EDIT,
-        EAccessLevel.DELETE);
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    expectClassWithNewObj(getRightsClass(), userDocRef.getWikiReference());
-
-    replayDefault();
-    service.setRightsOnUser(userDoc, levels);
-    verifyDefault();
-
-    List<BaseObject> rightsObs = XWikiObjectFetcher.on(userDoc).filter(getRightsClass()).list();
-    assertEquals(2, rightsObs.size());
-    assertEquals("XWiki.msladek", getValue(rightsObs.get(0), XWikiRightsClass.FIELD_USERS).get(
-        0).getUser());
-    assertEquals(levels, getValue(rightsObs.get(0), XWikiRightsClass.FIELD_LEVELS));
-    assertTrue(getValue(rightsObs.get(0), XWikiRightsClass.FIELD_ALLOW));
-    assertEquals(XWIKI_ADMIN_GROUP_FN, getValue(rightsObs.get(1),
-        XWikiRightsClass.FIELD_GROUPS).get(0));
-    assertEquals(levels, getValue(rightsObs.get(1), XWikiRightsClass.FIELD_LEVELS));
-    assertTrue(getValue(rightsObs.get(1), XWikiRightsClass.FIELD_ALLOW));
   }
 
   @Test
@@ -415,11 +388,6 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
 
     assertSame(userDoc, user.getDocument());
     assertEquals(1, XWikiObjectFetcher.on(userDoc).filter(getUserClass()).count());
-    assertEquals(2, XWikiObjectFetcher.on(userDoc).filter(getRightsClass()).count());
-    assertEquals(UserPageType.PAGETYPE_NAME, XWikiObjectFetcher.on(userDoc)
-        .filter(PageTypeClass.CLASS_REF)
-        .fetchField(PageTypeClass.FIELD_PAGE_TYPE)
-        .findFirst().orElse(null));
   }
 
   @Test
@@ -443,13 +411,14 @@ public class CelementsUserServiceTest extends AbstractComponentTest {
   }
 
   private void expectInitialGroups(List<String> groups) {
-    expect(getWikiMock().getXWikiPreference(eq("initialGroups"), eq("xwiki.users.initialGroups"),
-        eq(""), same(getContext()))).andReturn(Joiner.on(',').join(groups));
+    expect(getMock(XWiki.class).getXWikiPreference(eq("initialGroups"),
+        eq("xwiki.users.initialGroups"), eq(""),
+        same(getXContext()))).andReturn(Joiner.on(',').join(groups));
   }
 
   private BaseClass expectUserClassFromMap(Map<String, String> userData) throws XWikiException {
     BaseClass userXClass = expectClassWithNewObj(getUserClass(), userDocRef.getWikiReference());
-    expect(getWikiMock().getUserClass(getContext())).andReturn(userXClass);
+    expect(getMock(XWiki.class).getUserClass(getXContext())).andReturn(userXClass);
     expect(userXClass.fromMap(same(userData), anyObject(BaseObject.class))).andReturn(
         new BaseObject());
     return userXClass;

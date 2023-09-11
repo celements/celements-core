@@ -19,6 +19,7 @@
  */
 package com.celements.cells;
 
+import static com.celements.cells.CellRenderStrategy.*;
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -32,6 +33,7 @@ import java.util.Optional;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -258,6 +260,23 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_startRenderCell_id_repetitiveCell() throws Exception {
+    getBeanFactory().getBean(Execution.class).getContext()
+        .setProperty(EXEC_CTX_KEY_REPETITIVE, true);
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    TreeNode node = new TreeNode(cellRef, null, 0);
+    expectNewDoc(cellRef);
+    String cellFN = "Skin.MasterCell";
+    Capture<List<CellAttribute>> capturedAttrList = newCapture();
+    outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
+    expectNoCellTypeConfig(cellRef);
+    replayDefault();
+    renderer.startRenderCell(node, false, true);
+    assertDefaultAttributes("", "", cellFN, "", capturedAttrList);
+    verifyDefault();
+  }
+
+  @Test
   public void test_startRenderCell_otherDb() throws Exception {
     String masterCellDb = "master";
     DocumentReference cellRef = new DocumentReference(masterCellDb, "Skin", "MasterCell");
@@ -443,17 +462,21 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     for (CellAttribute attr : attrList) {
       attrMap.put(attr.getName(), attr);
     }
-    assertTrue("id attribute not found", attrMap.containsKey("id"));
-    assertEquals("wrong id attribute", idname, attrMap.get("id").getValue().get());
+    assertEquals(!idname.isEmpty(), attrMap.containsKey("id"));
+    if (attrMap.containsKey("id")) {
+      assertEquals("wrong id attribute", idname, attrMap.get("id").getValue().orElse(""));
+    }
     assertTrue("cell-ref attribute not found", attrMap.containsKey("data-cell-ref"));
     assertEquals("wrong cell-ref attribute", cellFN,
         attrMap.get("data-cell-ref").getValue().get());
     assertTrue("cssClass attribute not found", attrMap.containsKey("class"));
     assertEquals("wrong cssClass attribute", ("cel_cell " + cssClasses).trim(),
         attrMap.get("class").getValue().get());
-    assertTrue("styles attribute not found", attrMap.containsKey("style"));
-    assertEquals("wrong styles attribute", cssStyles.replaceAll("[\n\r]", ""),
-        attrMap.get("style").getValue().get());
+    assertEquals(!cssStyles.isEmpty(), attrMap.containsKey("style"));
+    if (attrMap.containsKey("style")) {
+      assertEquals("wrong styles attribute", cssStyles.replaceAll("[\n\r]", ""),
+          attrMap.get("style").getValue().orElse(""));
+    }
     return attrMap;
   }
 

@@ -1,5 +1,6 @@
 package com.celements.javascript;
 
+import static com.celements.javascript.JsLoadMode.*;
 import static com.google.common.base.Preconditions.*;
 
 import java.util.Objects;
@@ -72,7 +73,7 @@ public final class JsFileEntry extends ObjectBean {
 
   @NotNull
   public JsLoadMode getLoadMode() {
-    if (isModule()) {
+    if (isModule() && (loadMode == SYNC)) {
       return JsLoadMode.DEFER;
     }
     return loadMode;
