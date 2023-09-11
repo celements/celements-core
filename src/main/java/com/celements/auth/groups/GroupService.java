@@ -17,9 +17,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.context.Contextualiser;
+import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 
@@ -31,14 +31,16 @@ public class GroupService {
   private final XWikiGroupService xwikiGroupService;
   private final IWebUtilsService webUtils;
   private final ModelUtils modelUtils;
+  private final ModelContext context;
 
   @Inject
   public GroupService(XWikiGroupService xwikiGroupService, IWebUtilsService webUtils,
-      ModelUtils modelUtils) {
+      ModelUtils modelUtils, ModelContext context) {
     super();
     this.xwikiGroupService = xwikiGroupService;
     this.webUtils = webUtils;
     this.modelUtils = modelUtils;
+    this.context = context;
   }
 
   /**
@@ -48,23 +50,28 @@ public class GroupService {
    */
   public @NotNull List<DocumentReference> getAllGroups(@NotNull WikiReference wiki) {
     checkNotNull(wiki);
-    // ModelContext.getXWikiContext()
-    XWikiContext context = null;
+
     List<DocumentReference> groupDocRefList = new ArrayList<>();
-    try {
-      List<String> groupNames = (List<String>) new Contextualiser()
-          .withWiki(wiki)
-          .execute(rethrow(() -> xwikiGroupService
-              .getAllMatchedGroups(null, false, 0, 0, null, context)));
-      for (String groupName : groupNames) {
-        DocumentReference groupDocRef = modelUtils.resolveRef(groupName, DocumentReference.class);
-        groupDocRefList.add(groupDocRef);
-      }
-    } catch (XWikiException xwe) {
-      LOGGER.error("failed to get all groups for [{}]", wiki, xwe);
-      return groupDocRefList;
+    List<String> groupNames = getAllGroupNames(wiki);
+    for (String groupName : groupNames) {
+      DocumentReference groupDocRef = modelUtils.resolveRef(groupName, DocumentReference.class);
+      groupDocRefList.add(groupDocRef);
     }
     return groupDocRefList;
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<String> getAllGroupNames(WikiReference wiki) {
+    List<String> groupNames = new ArrayList<>();
+    try {
+      groupNames = (List<String>) new Contextualiser()
+          .withWiki(wiki)
+          .execute(rethrow(() -> xwikiGroupService
+              .getAllMatchedGroups(null, false, 0, 0, null, context.getXWikiContext())));
+    } catch (XWikiException xwe) {
+      LOGGER.error("failed to get all groups for [{}]", wiki, xwe);
+    }
+    return groupNames;
   }
 
   /**
