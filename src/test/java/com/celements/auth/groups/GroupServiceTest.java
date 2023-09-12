@@ -18,7 +18,6 @@ import com.celements.model.util.ModelUtils;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.web.Utils;
 
 public class GroupServiceTest extends AbstractComponentTest {
 
@@ -28,7 +27,7 @@ public class GroupServiceTest extends AbstractComponentTest {
   public void prepare_Test() throws Exception {
     registerComponentMocks(IWebUtilsService.class, IModelAccessFacade.class, ModelUtils.class,
         ModelContext.class);
-    service = Utils.getComponent(GroupService.class);
+    service = getBeanFactory().getBean(GroupService.class);
     expect(getMock(XWiki.class).getGroupService(getXContext())).andReturn(createDefaultMock(
         XWikiGroupService.class)).anyTimes();
 

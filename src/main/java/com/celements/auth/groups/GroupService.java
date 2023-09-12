@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.init.XWikiProvider;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.Contextualiser;
@@ -23,24 +24,23 @@ import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.api.XWikiGroupService;
 
 @Component
 public class GroupService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
 
-  private final XWikiGroupService xwikiGroupService;
+  private final XWikiProvider xwiki;
   private final IWebUtilsService webUtils;
   private final ModelUtils modelUtils;
   private final ModelContext context;
   private final IModelAccessFacade modelAccess;
 
   @Inject
-  public GroupService(XWikiGroupService xwikiGroupService, IWebUtilsService webUtils,
+  public GroupService(XWikiProvider xwiki, IWebUtilsService webUtils,
       ModelUtils modelUtils, ModelContext context, IModelAccessFacade modelAccess) {
     super();
-    this.xwikiGroupService = xwikiGroupService;
+    this.xwiki = xwiki;
     this.webUtils = webUtils;
     this.modelUtils = modelUtils;
     this.context = context;
@@ -69,7 +69,9 @@ public class GroupService {
     try {
       groupNames = (List<String>) new Contextualiser()
           .withWiki(wiki)
-          .execute(rethrow(() -> xwikiGroupService
+          .execute(rethrow(() -> xwiki.get()
+              .orElseThrow()
+              .getGroupService(context.getXWikiContext())
               .getAllMatchedGroups(null, false, 0, 0, null, context.getXWikiContext())));
     } catch (XWikiException xwe) {
       LOGGER.error("failed to get all groups for [{}]", wiki, xwe);
