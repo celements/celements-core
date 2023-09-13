@@ -34,10 +34,13 @@ public class GroupScriptService implements ScriptService {
 
   public String getGroupPrettyName(DocumentReference groupDocRef) {
     Optional<String> groupPrettyName = groupService.getGroupPrettyName(groupDocRef);
-    if (groupPrettyName.isPresent()) {
-      return groupPrettyName.get();
-    } else {
+    if (groupPrettyName.isEmpty()) {
+      groupPrettyName = Optional.of("");
+    }
+    if (groupPrettyName.get().equals("")) {
       return groupDocRef.getName();
+    } else {
+      return groupPrettyName.get();
     }
   }
 
