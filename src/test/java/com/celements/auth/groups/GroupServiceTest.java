@@ -4,7 +4,6 @@ import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +17,6 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
-import com.celements.model.util.ModelUtils;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -28,48 +26,52 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 public class GroupServiceTest extends AbstractComponentTest {
 
   private GroupService service;
+  private WikiReference wiki = new WikiReference("xwikidb");
 
   @Before
   public void prepare_Test() throws Exception {
-    registerComponentMocks(IWebUtilsService.class, IModelAccessFacade.class, ModelUtils.class,
-        ModelContext.class);
+    registerComponentMocks(IWebUtilsService.class, IModelAccessFacade.class, ModelContext.class);
     expect(getMock(XWiki.class).getGroupService(getXContext())).andReturn(createDefaultMock(
         XWikiGroupService.class)).anyTimes();
     expect(getMock(IWebUtilsService.class).getAdminMessageTool())
         .andReturn(getMessageToolStub()).anyTimes();
+    expect(getMock(ModelContext.class).getXWikiContext()).andReturn(getXContext()).anyTimes();
+    expect(getMock(ModelContext.class).getWikiRef()).andReturn(wiki).anyTimes();
     service = getBeanFactory().getBean(GroupService.class);
 
   }
 
   @Test
-  public void test_getAllGroups() {
-    WikiReference wiki = new WikiReference("xwikidb");
-    expect(getMock(ModelContext.class).getXWikiContext()).andReturn(getXContext()).anyTimes();
-    List<?> groupNames = Arrays.asList("group1", "group2", "group3");
-
+  public void test_getAllGroups() throws Exception {
+    List<String> groupNames = Arrays.asList("XWiki.group1", "XWiki.group2", "XWiki.group3");
     expect(getMock(XWikiGroupService.class).getAllMatchedGroups(null, false, 0, 0, null,
-        getXContext())).andReturn(groupNames);
-    List<DocumentReference> groupDocRefList = new ArrayList<>();
+        getXContext())).andReturn(castListType(groupNames));
 
     replayDefault();
-    service.getAllGroups(wiki);
+    List<DocumentReference> groupDocRefList = service.getAllGroups(wiki);
     verifyDefault();
 
+    assertEquals(3, groupDocRefList.size());
+    assertEquals("group1", groupDocRefList.get(0).getName());
+
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> List<T> castListType(List<?> list) {
+    return (List<T>) list;
   }
 
   @Test
   public void test_getAllGroups_wikiRefNull() {
-    WikiReference wiki = null;
+    WikiReference wiki2 = null;
     assertThrows(NullPointerException.class, () -> {
-      service.getAllGroups(wiki);
+      service.getAllGroups(wiki2);
     });
 
   }
 
   @Test
   public void test_getAllGroups_XWikiException() throws Exception {
-    WikiReference wiki = new WikiReference("xwikidb");
-    expect(getMock(ModelContext.class).getXWikiContext()).andReturn(getXContext()).anyTimes();
     expect(getMock(XWikiGroupService.class).getAllMatchedGroups(null, false, 0, 0, null,
         getXContext())).andThrow(new XWikiException());
 
