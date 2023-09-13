@@ -55,7 +55,7 @@ public class GroupService {
   public @NotNull List<DocumentReference> getAllGroups(@NotNull WikiReference wiki) {
     checkNotNull(wiki);
     List<DocumentReference> groupDocRefList = new ArrayList<>();
-    List<String> groupNames = getAllGroupNames(wiki);
+    List<String> groupNames = getAllGroupFullNames(wiki);
     for (String groupName : groupNames) {
       DocumentReference groupDocRef = modelUtils.resolveRef(groupName, DocumentReference.class);
       groupDocRefList.add(groupDocRef);
@@ -64,10 +64,10 @@ public class GroupService {
   }
 
   @SuppressWarnings("unchecked")
-  private List<String> getAllGroupNames(WikiReference wiki) {
-    List<String> groupNames = new ArrayList<>();
+  private List<String> getAllGroupFullNames(WikiReference wiki) {
+    List<String> groupFullNames = new ArrayList<>();
     try {
-      groupNames = (List<String>) new Contextualiser()
+      groupFullNames = (List<String>) new Contextualiser()
           .withWiki(wiki)
           .execute(rethrow(() -> xwiki.get()
               .orElseThrow()
@@ -76,7 +76,7 @@ public class GroupService {
     } catch (XWikiException xwe) {
       LOGGER.error("failed to get all groups for [{}]", wiki, xwe);
     }
-    return groupNames;
+    return groupFullNames;
   }
 
   /**
