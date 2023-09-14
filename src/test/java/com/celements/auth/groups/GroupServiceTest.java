@@ -38,7 +38,6 @@ public class GroupServiceTest extends AbstractComponentTest {
     expect(getMock(ModelContext.class).getXWikiContext()).andReturn(getXContext()).anyTimes();
     expect(getMock(ModelContext.class).getWikiRef()).andReturn(wiki).anyTimes();
     service = getBeanFactory().getBean(GroupService.class);
-
   }
 
   @Test
@@ -53,7 +52,6 @@ public class GroupServiceTest extends AbstractComponentTest {
 
     assertEquals(3, groupDocRefList.size());
     assertEquals("group1", groupDocRefList.get(0).getName());
-
   }
 
   @SuppressWarnings("unchecked")
@@ -67,7 +65,6 @@ public class GroupServiceTest extends AbstractComponentTest {
     assertThrows(NullPointerException.class, () -> {
       service.getAllGroups(wiki2);
     });
-
   }
 
   @Test
@@ -149,7 +146,6 @@ public class GroupServiceTest extends AbstractComponentTest {
     verifyDefault();
 
     assertTrue(groupPrettyName.isEmpty());
-
   }
 
 }
