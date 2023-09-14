@@ -98,7 +98,8 @@ public class GroupService {
   private Optional<String> getDocumentTitle(DocumentReference groupDocRef) {
     Optional<String> docTitle = Optional.empty();
     try {
-      docTitle = Optional.of(modelAccess.getDocument(groupDocRef).getTitle());
+      docTitle = Optional.of(modelAccess.getDocument(groupDocRef).getTitle())
+          .filter(t -> !t.isBlank());
     } catch (DocumentNotExistsException dnee) {
       LOGGER.warn("could not get Document for {}", groupDocRef, dnee);
     }
