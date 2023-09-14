@@ -50,12 +50,13 @@ public class GroupService {
   /**
    * Gets the document references for all local groups of a database/wiki and returns them in a list
    *
+   * @param wikiRef
    * @return a list of group document references
    */
-  public @NotNull List<DocumentReference> getAllGroups(@NotNull WikiReference wiki) {
-    checkNotNull(wiki);
+  public @NotNull List<DocumentReference> getAllGroups(@NotNull WikiReference wikiRef) {
+    checkNotNull(wikiRef);
     List<DocumentReference> groupDocRefList = new ArrayList<>();
-    List<String> groupNames = getAllGroupFullNames(wiki);
+    List<String> groupNames = getAllGroupFullNames(wikiRef);
     for (String groupName : groupNames) {
       DocumentReference groupDocRef = modelUtils.resolveRef(groupName, DocumentReference.class);
       groupDocRefList.add(groupDocRef);
@@ -64,17 +65,17 @@ public class GroupService {
   }
 
   @SuppressWarnings("unchecked")
-  private List<String> getAllGroupFullNames(WikiReference wiki) {
+  private List<String> getAllGroupFullNames(WikiReference wikiRef) {
     List<String> groupFullNames = new ArrayList<>();
     try {
       groupFullNames = (List<String>) new Contextualiser()
-          .withWiki(wiki)
+          .withWiki(wikiRef)
           .execute(rethrow(() -> xwiki.get()
               .orElseThrow()
               .getGroupService(context.getXWikiContext())
               .getAllMatchedGroups(null, false, 0, 0, null, context.getXWikiContext())));
     } catch (XWikiException xwe) {
-      LOGGER.error("failed to get all groups for [{}]", wiki, xwe);
+      LOGGER.error("failed to get all groups for [{}]", wikiRef, xwe);
     }
     return groupFullNames;
   }
@@ -83,7 +84,8 @@ public class GroupService {
    * Gets the PrettyName of a group out of the dictionary. If it has no entry it uses the document
    * title as fallback. If it has no document title it returns an absent Optional.
    *
-   * @return a String with the pretty name of the group
+   * @param groupDocRef
+   * @return an Optional String
    */
   public @NotNull Optional<String> getGroupPrettyName(@NotNull DocumentReference groupDocRef) {
     checkNotNull(groupDocRef);
