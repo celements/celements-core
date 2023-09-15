@@ -129,8 +129,7 @@ public class GroupServiceTest extends AbstractComponentTest {
     Optional<String> groupPrettyName = service.getGroupPrettyName(groupDocRef);
     verifyDefault();
 
-    assertTrue(groupPrettyName.isPresent());
-    assertEquals("", groupPrettyName.get());
+    assertTrue(groupPrettyName.isEmpty());
   }
 
   @Test

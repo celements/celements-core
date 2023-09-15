@@ -49,17 +49,4 @@ public class GroupScriptServiceTest extends AbstractComponentTest {
     assertEquals(groupDocRef.getName(), groupName);
   }
 
-  @Test
-  public void test_getGroupPrettyName_OptionalWithEmptyString() {
-    Optional<String> retOptionalEmptyString = Optional.of("");
-    expect(getMock(GroupService.class).getGroupPrettyName(groupDocRef))
-        .andReturn(retOptionalEmptyString);
-
-    replayDefault();
-    String groupName = service.getGroupPrettyName(groupDocRef);
-    verifyDefault();
-
-    assertEquals(groupDocRef.getName(), groupName);
-  }
-
 }
