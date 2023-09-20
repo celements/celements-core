@@ -7,11 +7,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.context.ModelContext;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.pagetype.classes.PageTypeClass;
+import com.celements.rights.access.EAccessLevel;
+import com.celements.web.classes.oldcore.XWikiRightsClass;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -22,14 +24,14 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
-    // TODO Auto-generated method stub
-    return null;
+    return List.of("celements.MandatoryGroups");
   }
 
   @Override
   protected boolean checkDocuments(XWikiDocument doc) throws XWikiException {
-    // muss true zurückliefern, wenn es etwas zu speichern gibt
-    boolean isDirty = checkSpaceLayout(doc);
+    boolean isDirty = false;
+    isDirty = checkSpaceLayout(doc);
+    isDirty |= checkRightsObject(doc);
     return isDirty;
   }
 
@@ -45,16 +47,31 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
     return false;
   }
 
-  @Override
-  protected boolean checkDocumentsMain(XWikiDocument doc) throws XWikiException {
-    // TODO Auto-generated method stub
+  boolean checkRightsObject(XWikiDocument webPrefDoc) {
+    if (!XWikiObjectFetcher.on(webPrefDoc).filter(XWikiRightsClass.CLASS_REF)
+        .filter(XWikiRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup")).exists()) {
+      List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT,
+          EAccessLevel.DELETE);
+      XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(webPrefDoc)
+          .filter(XWikiRightsClass.CLASS_REF);
+      admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup"));
+      admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
+      admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
+      admGrpObjEditor.createFirstIfNotExists();
+      return true;
+    }
     return false;
   }
 
   @Override
+  protected boolean checkDocumentsMain(XWikiDocument doc) throws XWikiException {
+    return checkSpaceLayout(doc);
+  }
+
+  @Override
   protected DocumentReference getDocRef() {
-    return new RefBuilder().with(modelContext.getWikiRef()).space("XWiki")
-        .doc(ModelContext.WEB_PREF_DOC_NAME).build(DocumentReference.class);
+    return new RefBuilder().with(modelContext.getWikiRef()).space(XWikiConstant.XWIKI_SPACE)
+        .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class);
   }
 
   @Override
@@ -69,7 +86,6 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
 
   @Override
   protected boolean skip() {
-    // TODO Auto-generated method stub
     return false;
   }
 
