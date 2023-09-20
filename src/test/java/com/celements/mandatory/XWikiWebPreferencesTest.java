@@ -17,6 +17,7 @@ import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.pagetype.classes.PageTypeClass;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -57,6 +58,22 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
     editor.editField(PageTypeClass.PAGE_LAYOUT).first("SimpleLayout");
     assertFalse(mandatoryWebPrefs.checkSpaceLayout(webPrefDoc));
     verifyDefault();
+  }
+
+  @Test
+  public void test_checkRightsObject_changes() {
+    XWikiDocument xwikiWebPrefs = new XWikiDocument(
+        new RefBuilder().wiki("testWiki").space(XWikiConstant.XWIKI_SPACE)
+            .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class));
+
+    replayDefault();
+    mandatoryWebPrefs.checkRightsObject(xwikiWebPrefs);
+    verifyDefault();
+
+  }
+
+  public void test_checkRightsObject_nochanges() {
+
   }
 
   private static ClassDefinition getPageTypeClass() {
