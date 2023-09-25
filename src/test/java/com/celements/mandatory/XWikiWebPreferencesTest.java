@@ -4,6 +4,8 @@ import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -13,13 +15,18 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
+import com.celements.model.field.FieldAccessor;
+import com.celements.model.field.XObjectFieldAccessor;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.pagetype.classes.PageTypeClass;
+import com.celements.rights.access.EAccessLevel;
+import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -39,6 +46,7 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
         .doc(ModelContext.WEB_PREF_DOC_NAME).build(DocumentReference.class);
     XWikiDocument webPrefDoc = new XWikiDocument(docRef);
     expectClassWithNewObj(getPageTypeClass(), docRef.getWikiReference());
+
     replayDefault();
     assertTrue(mandatoryWebPrefs.checkSpaceLayout(webPrefDoc));
     assertTrue(XWikiObjectFetcher.on(webPrefDoc).filter(PageTypeClass.CLASS_REF).filter(
@@ -52,6 +60,7 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
         .doc(ModelContext.WEB_PREF_DOC_NAME).build(DocumentReference.class);
     XWikiDocument webPrefDoc = new XWikiDocument(docRef);
     expectClassWithNewObj(getPageTypeClass(), docRef.getWikiReference());
+
     replayDefault();
     XWikiObjectEditor editor = XWikiObjectEditor.on(webPrefDoc).filter(PageTypeClass.CLASS_REF);
     editor.createFirstIfNotExists();
@@ -61,19 +70,51 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_checkRightsObject_changes() {
-    XWikiDocument xwikiWebPrefs = new XWikiDocument(
-        new RefBuilder().wiki("testWiki").space(XWikiConstant.XWIKI_SPACE)
-            .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class));
+  public void test_checkRightsObject_changes() throws Exception {
+    DocumentReference docRef = new RefBuilder().wiki("testWiki").space(XWikiConstant.XWIKI_SPACE)
+        .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class);
+    XWikiDocument webPrefDoc = new XWikiDocument(docRef);
+    List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT,
+        EAccessLevel.DELETE);
+    expectClassWithNewObj(getRightsClass(), webPrefDoc.getWikiRef());
 
     replayDefault();
-    mandatoryWebPrefs.checkRightsObject(xwikiWebPrefs);
+    assertTrue(mandatoryWebPrefs.checkRightsObject(webPrefDoc));
     verifyDefault();
 
+    List<BaseObject> rightsObj = XWikiObjectFetcher.on(webPrefDoc)
+        .filter(XWikiRightsClass.CLASS_REF)
+        .list();
+    assertEquals(1, rightsObj.size());
+    assertEquals("XWikiAdminGroup", getValue(rightsObj.get(0),
+        XWikiRightsClass.FIELD_GROUPS).get(0));
+    assertEquals(rights, getValue(rightsObj.get(0), XWikiRightsClass.FIELD_LEVELS));
+    assertTrue(getValue(rightsObj.get(0), XWikiRightsClass.FIELD_ALLOW));
   }
 
-  public void test_checkRightsObject_nochanges() {
+  @Test
+  public void test_checkRightsObject_nochanges() throws Exception {
+    DocumentReference docRef = new RefBuilder().wiki("testWiki").space(XWikiConstant.XWIKI_SPACE)
+        .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class);
+    XWikiDocument webPrefDoc = new XWikiDocument(docRef);
+    List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT,
+        EAccessLevel.DELETE);
+    expectClassWithNewObj(getRightsClass(), webPrefDoc.getWikiRef());
 
+    replayDefault();
+    XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(webPrefDoc)
+        .filter(XWikiRightsClass.CLASS_REF);
+    admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup"));
+    admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
+    admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
+    admGrpObjEditor.createFirstIfNotExists();
+    assertFalse(mandatoryWebPrefs.checkRightsObject(webPrefDoc));
+    verifyDefault();
+
+    List<BaseObject> rightsObj = XWikiObjectFetcher.on(webPrefDoc)
+        .filter(XWikiRightsClass.CLASS_REF)
+        .list();
+    assertEquals(1, rightsObj.size());
   }
 
   private static ClassDefinition getPageTypeClass() {
@@ -87,6 +128,19 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
       expect(bClass.get(field.getName())).andReturn(field.getXField()).anyTimes();
     }
     return bClass;
+  }
+
+  private static ClassDefinition getRightsClass() {
+    return Utils.getComponent(ClassDefinition.class, XWikiRightsClass.CLASS_DEF_HINT);
+  }
+
+  private static <T> T getValue(BaseObject obj, ClassField<T> field) {
+    return getFieldAccessor().get(obj, field).get();
+  }
+
+  @SuppressWarnings("unchecked")
+  private static FieldAccessor<BaseObject> getFieldAccessor() {
+    return Utils.getComponent(FieldAccessor.class, XObjectFieldAccessor.NAME);
   }
 
 }
