@@ -12,7 +12,7 @@ import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.rights.access.EAccessLevel;
-import com.celements.web.classes.oldcore.XWikiRightsClass;
+import com.celements.web.classes.oldcore.XWikiGlobalRightsClass;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -31,7 +31,7 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
   protected boolean checkDocuments(XWikiDocument doc) throws XWikiException {
     boolean isDirty = false;
     isDirty = checkSpaceLayout(doc);
-    isDirty |= checkRightsObject(doc);
+    isDirty |= checkGlobalRightsObject(doc);
     return isDirty;
   }
 
@@ -47,16 +47,16 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
     return false;
   }
 
-  boolean checkRightsObject(XWikiDocument webPrefDoc) {
-    if (!XWikiObjectFetcher.on(webPrefDoc).filter(XWikiRightsClass.CLASS_REF)
-        .filter(XWikiRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup")).exists()) {
-      List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT,
-          EAccessLevel.DELETE);
+  boolean checkGlobalRightsObject(XWikiDocument webPrefDoc) {
+    if (!XWikiObjectFetcher.on(webPrefDoc).filter(XWikiGlobalRightsClass.CLASS_REF)
+        .filter(XWikiGlobalRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup")).exists()) {
+      List<EAccessLevel> rights = List.of(EAccessLevel.EDIT, EAccessLevel.COMMENT,
+          EAccessLevel.DELETE, EAccessLevel.UNDELETE, EAccessLevel.REGISTER);
       XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(webPrefDoc)
-          .filter(XWikiRightsClass.CLASS_REF);
-      admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup"));
-      admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
-      admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
+          .filter(XWikiGlobalRightsClass.CLASS_REF);
+      admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup"));
+      admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_LEVELS, rights);
+      admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_ALLOW, true);
       admGrpObjEditor.createFirstIfNotExists();
       return true;
     }

@@ -22,7 +22,7 @@ import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.rights.access.EAccessLevel;
-import com.celements.web.classes.oldcore.XWikiRightsClass;
+import com.celements.web.classes.oldcore.XWikiGlobalRightsClass;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -74,22 +74,22 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
     DocumentReference docRef = new RefBuilder().wiki("testWiki").space(XWikiConstant.XWIKI_SPACE)
         .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class);
     XWikiDocument webPrefDoc = new XWikiDocument(docRef);
-    List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT,
-        EAccessLevel.DELETE);
-    expectClassWithNewObj(getRightsClass(), webPrefDoc.getWikiRef());
+    List<EAccessLevel> rights = List.of(EAccessLevel.EDIT, EAccessLevel.COMMENT,
+        EAccessLevel.DELETE, EAccessLevel.UNDELETE, EAccessLevel.REGISTER);
+    expectClassWithNewObj(getGlobalRightsClass(), webPrefDoc.getWikiRef());
 
     replayDefault();
-    assertTrue(mandatoryWebPrefs.checkRightsObject(webPrefDoc));
+    assertTrue(mandatoryWebPrefs.checkGlobalRightsObject(webPrefDoc));
     verifyDefault();
 
     List<BaseObject> rightsObj = XWikiObjectFetcher.on(webPrefDoc)
-        .filter(XWikiRightsClass.CLASS_REF)
+        .filter(XWikiGlobalRightsClass.CLASS_REF)
         .list();
     assertEquals(1, rightsObj.size());
     assertEquals("XWikiAdminGroup", getValue(rightsObj.get(0),
-        XWikiRightsClass.FIELD_GROUPS).get(0));
-    assertEquals(rights, getValue(rightsObj.get(0), XWikiRightsClass.FIELD_LEVELS));
-    assertTrue(getValue(rightsObj.get(0), XWikiRightsClass.FIELD_ALLOW));
+        XWikiGlobalRightsClass.FIELD_GROUPS).get(0));
+    assertEquals(rights, getValue(rightsObj.get(0), XWikiGlobalRightsClass.FIELD_LEVELS));
+    assertTrue(getValue(rightsObj.get(0), XWikiGlobalRightsClass.FIELD_ALLOW));
   }
 
   @Test
@@ -99,20 +99,20 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
     XWikiDocument webPrefDoc = new XWikiDocument(docRef);
     List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT,
         EAccessLevel.DELETE);
-    expectClassWithNewObj(getRightsClass(), webPrefDoc.getWikiRef());
+    expectClassWithNewObj(getGlobalRightsClass(), webPrefDoc.getWikiRef());
 
     replayDefault();
     XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(webPrefDoc)
-        .filter(XWikiRightsClass.CLASS_REF);
-    admGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup"));
-    admGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, rights);
-    admGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
+        .filter(XWikiGlobalRightsClass.CLASS_REF);
+    admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup"));
+    admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_LEVELS, rights);
+    admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_ALLOW, true);
     admGrpObjEditor.createFirstIfNotExists();
-    assertFalse(mandatoryWebPrefs.checkRightsObject(webPrefDoc));
+    assertFalse(mandatoryWebPrefs.checkGlobalRightsObject(webPrefDoc));
     verifyDefault();
 
     List<BaseObject> rightsObj = XWikiObjectFetcher.on(webPrefDoc)
-        .filter(XWikiRightsClass.CLASS_REF)
+        .filter(XWikiGlobalRightsClass.CLASS_REF)
         .list();
     assertEquals(1, rightsObj.size());
   }
@@ -130,8 +130,8 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
     return bClass;
   }
 
-  private static ClassDefinition getRightsClass() {
-    return Utils.getComponent(ClassDefinition.class, XWikiRightsClass.CLASS_DEF_HINT);
+  private static ClassDefinition getGlobalRightsClass() {
+    return Utils.getComponent(ClassDefinition.class, XWikiGlobalRightsClass.CLASS_DEF_HINT);
   }
 
   private static <T> T getValue(BaseObject obj, ClassField<T> field) {
