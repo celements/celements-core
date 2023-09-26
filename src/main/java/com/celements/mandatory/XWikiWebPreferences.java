@@ -50,8 +50,8 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
   boolean checkGlobalRightsObject(XWikiDocument webPrefDoc) {
     if (!XWikiObjectFetcher.on(webPrefDoc).filter(XWikiGlobalRightsClass.CLASS_REF)
         .filter(XWikiGlobalRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup")).exists()) {
-      List<EAccessLevel> rights = List.of(EAccessLevel.EDIT, EAccessLevel.COMMENT,
-          EAccessLevel.DELETE, EAccessLevel.UNDELETE, EAccessLevel.REGISTER);
+      List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT,
+          EAccessLevel.COMMENT, EAccessLevel.DELETE, EAccessLevel.UNDELETE, EAccessLevel.REGISTER);
       XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(webPrefDoc)
           .filter(XWikiGlobalRightsClass.CLASS_REF);
       admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup"));

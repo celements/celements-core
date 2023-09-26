@@ -70,11 +70,11 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_checkRightsObject_changes() throws Exception {
+  public void test_checkGlobalRightsObject_changes() throws Exception {
     DocumentReference docRef = new RefBuilder().wiki("testWiki").space(XWikiConstant.XWIKI_SPACE)
         .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class);
     XWikiDocument webPrefDoc = new XWikiDocument(docRef);
-    List<EAccessLevel> rights = List.of(EAccessLevel.EDIT, EAccessLevel.COMMENT,
+    List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT, EAccessLevel.COMMENT,
         EAccessLevel.DELETE, EAccessLevel.UNDELETE, EAccessLevel.REGISTER);
     expectClassWithNewObj(getGlobalRightsClass(), webPrefDoc.getWikiRef());
 
@@ -93,7 +93,7 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_checkRightsObject_nochanges() throws Exception {
+  public void test_checkGlobalRightsObject_nochanges() throws Exception {
     DocumentReference docRef = new RefBuilder().wiki("testWiki").space(XWikiConstant.XWIKI_SPACE)
         .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class);
     XWikiDocument webPrefDoc = new XWikiDocument(docRef);
