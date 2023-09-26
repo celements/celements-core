@@ -41,7 +41,7 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
       XWikiObjectEditor editor = XWikiObjectEditor.on(webPrefDoc).filter(PageTypeClass.CLASS_REF);
       editor.createFirstIfNotExists();
       editor.editField(PageTypeClass.PAGE_LAYOUT).first("SimpleLayout");
-      LOGGER.debug("Content space: set missing SimpleLayout for database [{}].", getWiki());
+      LOGGER.debug("XWiki space: set missing SimpleLayout for database [{}].", getWiki());
       return true;
     }
     return false;
@@ -58,6 +58,8 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
       admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_LEVELS, rights);
       admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_ALLOW, true);
       admGrpObjEditor.createFirstIfNotExists();
+      LOGGER.debug("XWiki space: set missing GlobalRights for XWikiAdminGroup for database [{}].",
+          getWiki());
       return true;
     }
     return false;
