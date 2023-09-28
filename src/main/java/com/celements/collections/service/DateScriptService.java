@@ -162,8 +162,19 @@ public class DateScriptService implements ScriptService {
     return parse(PATTERN_ISO, ZoneId.of("UTC"), text);
   }
 
-  public ZonedDateTime parseLocalISO(String text, ZoneId zone) {
+  public ZonedDateTime parseLocalISO(String text, String defaultTime, ZoneId zone) {
+    if (!text.contains("T")) {
+      text += "T" + defaultTime;
+    }
     return LocalDateTime.parse(text).atZone(zone);
+  }
+
+  public ZonedDateTime parseLocalISO(String text, String defaultTime) {
+    return parseLocalISO(text, defaultTime, getZone());
+  }
+
+  public ZonedDateTime parseLocalISO(String text, ZoneId zone) {
+    return parseLocalISO(text, "00:00:00", getZone());
   }
 
   public ZonedDateTime parseLocalISO(String text) {
