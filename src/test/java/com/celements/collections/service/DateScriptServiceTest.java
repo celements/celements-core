@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 
 import org.junit.Before;
@@ -70,6 +71,14 @@ public class DateScriptServiceTest extends AbstractComponentTest {
     assertNull(ss.parse(pattern, null));
     assertNull(ss.parse(pattern, " "));
     assertNull(ss.parse(pattern, "asdf"));
+  }
+
+  @Test
+  public void test_parseLocalISO() {
+    String isoDateTime = "2007-08-31T23:59:59";
+    ZonedDateTime dateTime = ss.parseLocalISO(isoDateTime);
+    assertNotNull(dateTime);
+    assertEquals(DateUtil.getDefaultZone(), dateTime.getZone());
   }
 
 }

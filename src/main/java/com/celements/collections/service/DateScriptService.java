@@ -6,6 +6,7 @@ import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -159,6 +160,14 @@ public class DateScriptService implements ScriptService {
 
   public ZonedDateTime parseISO(String text) {
     return parse(PATTERN_ISO, ZoneId.of("UTC"), text);
+  }
+
+  public ZonedDateTime parseLocalISO(String text, ZoneId zone) {
+    return LocalDateTime.parse(text).atZone(zone);
+  }
+
+  public ZonedDateTime parseLocalISO(String text) {
+    return parseLocalISO(text, getZone());
   }
 
   private <T> Optional<T> guard(T obj) {
