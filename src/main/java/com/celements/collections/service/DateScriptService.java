@@ -32,7 +32,7 @@ public class DateScriptService implements ScriptService {
   private static final Logger LOGGER = LoggerFactory.getLogger(DateScriptService.class);
 
   public static final String PATTERN_ISO_UTC = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-  public static final String PATTERN_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSz";
+  public static final String PATTERN_LOCAL_ISO = "yyyy-MM-dd'T'HH:mm:ss";
 
   public ZoneId getZone() {
     return DateUtil.getDefaultZone();
@@ -145,7 +145,7 @@ public class DateScriptService implements ScriptService {
   }
 
   public String formatLocalISO(Temporal temporal) {
-    return format(PATTERN_ISO, DateUtil.atZone(temporal, DateUtil.getDefaultZone()));
+    return format(PATTERN_LOCAL_ISO, DateUtil.atZone(temporal, DateUtil.getDefaultZone()));
   }
 
   public String formatLocalISO(Date date) {

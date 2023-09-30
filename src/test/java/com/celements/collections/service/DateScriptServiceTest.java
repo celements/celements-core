@@ -111,4 +111,14 @@ public class DateScriptServiceTest extends AbstractComponentTest {
     assertNull(dateTime);
   }
 
+  @Test
+  public void test_formatLocalISO_dateTime() {
+    String isoDateTime = "2007-08-31T23:59:59";
+    ZonedDateTime dateTime = ss.parseLocalISO(isoDateTime);
+    replayDefault();
+    String dateTimeStr = ss.formatLocalISO(dateTime);
+    verifyDefault();
+    assertNotNull(dateTimeStr);
+    assertEquals(isoDateTime, dateTimeStr);
+  }
 }
