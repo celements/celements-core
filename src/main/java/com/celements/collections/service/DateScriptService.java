@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.Date;
@@ -163,10 +164,17 @@ public class DateScriptService implements ScriptService {
   }
 
   public ZonedDateTime parseLocalISO(String text, String defaultTime, ZoneId zone) {
-    if (!text.contains("T")) {
-      text += "T" + defaultTime;
+    if (!Strings.isNullOrEmpty(text) && !Strings.isNullOrEmpty(defaultTime)) {
+      if (!text.contains("T")) {
+        text += "T" + defaultTime;
+      }
+      try {
+        return LocalDateTime.parse(text).atZone(zone);
+      } catch (DateTimeParseException parseExcp) {
+        LOGGER.error("Failed to parse {}", text, parseExcp);
+      }
     }
-    return LocalDateTime.parse(text).atZone(zone);
+    return null;
   }
 
   public ZonedDateTime parseLocalISO(String text, String defaultTime) {

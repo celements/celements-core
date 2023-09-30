@@ -76,7 +76,9 @@ public class DateScriptServiceTest extends AbstractComponentTest {
   @Test
   public void test_parseLocalISO_date() {
     String isoDate = "2007-08-31";
+    replayDefault();
     ZonedDateTime dateTime = ss.parseLocalISO(isoDate);
+    verifyDefault();
     assertNotNull(dateTime);
     assertEquals(DateUtil.getDefaultZone(), dateTime.getZone());
   }
@@ -84,9 +86,29 @@ public class DateScriptServiceTest extends AbstractComponentTest {
   @Test
   public void test_parseLocalISO_dateTime() {
     String isoDateTime = "2007-08-31T23:59:59";
+    replayDefault();
     ZonedDateTime dateTime = ss.parseLocalISO(isoDateTime);
+    verifyDefault();
     assertNotNull(dateTime);
     assertEquals(DateUtil.getDefaultZone(), dateTime.getZone());
+  }
+
+  @Test
+  public void test_parseLocalISO_null() {
+    String isoDateTime = null;
+    replayDefault();
+    ZonedDateTime dateTime = ss.parseLocalISO(isoDateTime);
+    verifyDefault();
+    assertNull(dateTime);
+  }
+
+  @Test
+  public void test_parseLocalISO_parseException() {
+    String isoDateTime = "asdfasdlkj";
+    replayDefault();
+    ZonedDateTime dateTime = ss.parseLocalISO(isoDateTime);
+    verifyDefault();
+    assertNull(dateTime);
   }
 
 }
