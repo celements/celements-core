@@ -31,7 +31,8 @@ public class DateScriptService implements ScriptService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DateScriptService.class);
 
-  public static final String PATTERN_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+  public static final String PATTERN_ISO_UTC = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+  public static final String PATTERN_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSz";
 
   public ZoneId getZone() {
     return DateUtil.getDefaultZone();
@@ -136,11 +137,19 @@ public class DateScriptService implements ScriptService {
   }
 
   public String formatISO(Temporal temporal) {
-    return format(PATTERN_ISO, DateUtil.atZone(temporal, ZoneId.of("UTC")));
+    return format(PATTERN_ISO_UTC, DateUtil.atZone(temporal, ZoneId.of("UTC")));
   }
 
   public String formatISO(Date date) {
     return this.formatISO(toInstant(date));
+  }
+
+  public String formatLocalISO(Temporal temporal) {
+    return format(PATTERN_ISO, DateUtil.atZone(temporal, DateUtil.getDefaultZone()));
+  }
+
+  public String formatLocalISO(Date date) {
+    return this.formatLocalISO(toInstant(date));
   }
 
   public ZonedDateTime parse(String pattern, String text) {
@@ -160,7 +169,7 @@ public class DateScriptService implements ScriptService {
   }
 
   public ZonedDateTime parseISO(String text) {
-    return parse(PATTERN_ISO, ZoneId.of("UTC"), text);
+    return parse(PATTERN_ISO_UTC, ZoneId.of("UTC"), text);
   }
 
   public ZonedDateTime parseLocalISO(String text, String defaultTime, ZoneId zone) {
