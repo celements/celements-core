@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 
 import org.junit.Before;
@@ -72,4 +73,52 @@ public class DateScriptServiceTest extends AbstractComponentTest {
     assertNull(ss.parse(pattern, "asdf"));
   }
 
+  @Test
+  public void test_parseLocalISO_date() {
+    String isoDate = "2007-08-31";
+    replayDefault();
+    ZonedDateTime dateTime = ss.parseLocalISO(isoDate);
+    verifyDefault();
+    assertNotNull(dateTime);
+    assertEquals(DateUtil.getDefaultZone(), dateTime.getZone());
+  }
+
+  @Test
+  public void test_parseLocalISO_dateTime() {
+    String isoDateTime = "2007-08-31T23:59:59";
+    replayDefault();
+    ZonedDateTime dateTime = ss.parseLocalISO(isoDateTime);
+    verifyDefault();
+    assertNotNull(dateTime);
+    assertEquals(DateUtil.getDefaultZone(), dateTime.getZone());
+  }
+
+  @Test
+  public void test_parseLocalISO_null() {
+    String isoDateTime = null;
+    replayDefault();
+    ZonedDateTime dateTime = ss.parseLocalISO(isoDateTime);
+    verifyDefault();
+    assertNull(dateTime);
+  }
+
+  @Test
+  public void test_parseLocalISO_parseException() {
+    String isoDateTime = "asdfasdlkj";
+    replayDefault();
+    ZonedDateTime dateTime = ss.parseLocalISO(isoDateTime);
+    verifyDefault();
+    assertNull(dateTime);
+  }
+
+  @Test
+  public void test_formatLocalISO_dateTime() {
+    String isoDateTime = "2007-08-31T23:59:59";
+    ZonedDateTime dateTime = ss.parseLocalISO(isoDateTime);
+    replayDefault();
+    String dateTimeStr = ss.formatLocalISO(dateTime);
+    verifyDefault();
+    assertNotNull(dateTimeStr);
+    assertEquals(isoDateTime, dateTimeStr);
+  }
 }
