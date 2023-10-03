@@ -11,6 +11,7 @@ public final class CelConstant {
   public static final String XWIKI_SPACE = XWikiConstant.XWIKI_SPACE;
   public static final String WEB_PREF_DOC_NAME = XWikiConstant.WEB_PREF_DOC_NAME;
   public static final String XWIKI_PREF_DOC_NAME = XWikiConstant.XWIKI_PREF_DOC_NAME;
+  public static final String SIMPLE_LAYOUT = "SimpleLayout";
 
   private CelConstant() {}
 

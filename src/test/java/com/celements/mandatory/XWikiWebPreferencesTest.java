@@ -74,8 +74,6 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
     DocumentReference docRef = new RefBuilder().wiki("testWiki").space(XWikiConstant.XWIKI_SPACE)
         .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class);
     XWikiDocument webPrefDoc = new XWikiDocument(docRef);
-    List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT, EAccessLevel.COMMENT,
-        EAccessLevel.DELETE, EAccessLevel.UNDELETE, EAccessLevel.REGISTER);
     expectClassWithNewObj(getGlobalRightsClass(), webPrefDoc.getWikiRef());
 
     replayDefault();
@@ -88,7 +86,8 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
     assertEquals(1, rightsObj.size());
     assertEquals("XWikiAdminGroup", getValue(rightsObj.get(0),
         XWikiGlobalRightsClass.FIELD_GROUPS).get(0));
-    assertEquals(rights, getValue(rightsObj.get(0), XWikiGlobalRightsClass.FIELD_LEVELS));
+    assertEquals(XWikiWebPreferences.ACCESS_RIGHTS,
+        getValue(rightsObj.get(0), XWikiGlobalRightsClass.FIELD_LEVELS));
     assertTrue(getValue(rightsObj.get(0), XWikiGlobalRightsClass.FIELD_ALLOW));
   }
 
@@ -97,8 +96,8 @@ public class XWikiWebPreferencesTest extends AbstractComponentTest {
     DocumentReference docRef = new RefBuilder().wiki("testWiki").space(XWikiConstant.XWIKI_SPACE)
         .doc(XWikiConstant.WEB_PREF_DOC_NAME).build(DocumentReference.class);
     XWikiDocument webPrefDoc = new XWikiDocument(docRef);
-    List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT,
-        EAccessLevel.DELETE);
+    List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT, EAccessLevel.COMMENT,
+        EAccessLevel.DELETE, EAccessLevel.UNDELETE, EAccessLevel.REGISTER);
     expectClassWithNewObj(getGlobalRightsClass(), webPrefDoc.getWikiRef());
 
     replayDefault();

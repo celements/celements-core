@@ -12,6 +12,7 @@ import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.pagetype.classes.PageTypeClass;
 import com.celements.rights.access.EAccessLevel;
+import com.celements.web.CelConstant;
 import com.celements.web.classes.oldcore.XWikiGlobalRightsClass;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiException;
@@ -21,6 +22,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class XWikiWebPreferences extends AbstractMandatoryDocument {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(XWikiWebPreferences.class);
+  protected static final List<EAccessLevel> ACCESS_RIGHTS = List.of(EAccessLevel.VIEW,
+      EAccessLevel.EDIT, EAccessLevel.COMMENT, EAccessLevel.DELETE, EAccessLevel.UNDELETE,
+      EAccessLevel.REGISTER);
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
@@ -40,7 +44,7 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
         PageTypeClass.PAGE_LAYOUT, "SimpleLayout").exists()) {
       XWikiObjectEditor editor = XWikiObjectEditor.on(webPrefDoc).filter(PageTypeClass.CLASS_REF);
       editor.createFirstIfNotExists();
-      editor.editField(PageTypeClass.PAGE_LAYOUT).first("SimpleLayout");
+      editor.editField(PageTypeClass.PAGE_LAYOUT).first(CelConstant.SIMPLE_LAYOUT);
       LOGGER.debug("XWiki space: set missing SimpleLayout for database [{}].", getWiki());
       return true;
     }
@@ -50,12 +54,10 @@ public class XWikiWebPreferences extends AbstractMandatoryDocument {
   boolean checkGlobalRightsObject(XWikiDocument webPrefDoc) {
     if (!XWikiObjectFetcher.on(webPrefDoc).filter(XWikiGlobalRightsClass.CLASS_REF)
         .filter(XWikiGlobalRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup")).exists()) {
-      List<EAccessLevel> rights = List.of(EAccessLevel.VIEW, EAccessLevel.EDIT,
-          EAccessLevel.COMMENT, EAccessLevel.DELETE, EAccessLevel.UNDELETE, EAccessLevel.REGISTER);
       XWikiObjectEditor admGrpObjEditor = XWikiObjectEditor.on(webPrefDoc)
           .filter(XWikiGlobalRightsClass.CLASS_REF);
       admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_GROUPS, List.of("XWikiAdminGroup"));
-      admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_LEVELS, rights);
+      admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_LEVELS, ACCESS_RIGHTS);
       admGrpObjEditor.filter(XWikiGlobalRightsClass.FIELD_ALLOW, true);
       admGrpObjEditor.createFirstIfNotExists();
       LOGGER.debug("XWiki space: set missing GlobalRights for XWikiAdminGroup for database [{}].",
