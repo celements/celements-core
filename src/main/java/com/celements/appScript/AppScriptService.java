@@ -285,22 +285,27 @@ public class AppScriptService implements IAppScriptService {
 
   @Override
   public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
-    String overwriteAppDocs = getContext().getWiki().getXWikiPreference(
-        APP_SCRIPT_XWPREF_OVERW_DOCS, APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext());
-    List<DocumentReference> overwAppDocList = new ArrayList<>();
-    if (!"-".equals(overwriteAppDocs)) {
-      for (String overwAppDocFN : overwriteAppDocs.split("[, ]")) {
-        try {
-          DocumentReference overwAppDocRef = modelUtils.resolveRef(overwAppDocFN,
-              DocumentReference.class);
-          overwAppDocList.add(overwAppDocRef);
-        } catch (Exception exp) {
-          LOGGER.warn("Failed to parse appScript overwrite docs config part [{}] of complete"
-              + " config [{}].", overwAppDocFN, overwriteAppDocs);
+    try {
+      String overwriteAppDocs = wikiProvider.await(Duration.ofSeconds(60)).getXWikiPreference(
+          APP_SCRIPT_XWPREF_OVERW_DOCS, APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext());
+      List<DocumentReference> overwAppDocList = new ArrayList<>();
+      if (!"-".equals(overwriteAppDocs)) {
+        for (String overwAppDocFN : overwriteAppDocs.split("[, ]")) {
+          try {
+            DocumentReference overwAppDocRef = modelUtils.resolveRef(overwAppDocFN,
+                DocumentReference.class);
+            overwAppDocList.add(overwAppDocRef);
+          } catch (Exception exp) {
+            LOGGER.warn("Failed to parse appScript overwrite docs config part [{}] of complete"
+                + " config [{}].", overwAppDocFN, overwriteAppDocs);
+          }
         }
       }
+      return overwAppDocList.contains(docRef);
+    } catch (ExecutionException exp) {
+      LOGGER.warn("Failed to get wiki in isAppScriptOverwriteDocRef", exp);
     }
-    return overwAppDocList.contains(docRef);
+    return false;
   }
 
   private boolean isAppScriptActionRequest() {
