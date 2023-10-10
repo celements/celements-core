@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -142,11 +142,16 @@ public class AppScriptService implements IAppScriptService {
 
   @Override
   public DocumentReference getAppRecursiveScriptDocRef(String scriptName) {
-    if (hasLocalAppRecursiveScript(scriptName)) {
-      return getLocalAppRecursiveScriptDocRef(scriptName);
-    } else {
-      return getCentralAppRecursiveScriptDocRef(scriptName);
+    String scriptNameFound = findAppScriptRecursivly(scriptName,
+        sn -> hasLocalAppRecursiveScript(sn)
+            || hasCentralAppRecursiveScript(sn),
+        sn -> sn.lastIndexOf("/") > 0);
+    if (hasLocalAppRecursiveScript(scriptNameFound)) {
+      return getLocalAppRecursiveScriptDocRef(scriptNameFound);
+    } else if (hasCentralAppRecursiveScript(scriptNameFound)) {
+      return getCentralAppRecursiveScriptDocRef(scriptNameFound);
     }
+    return null;
   }
 
   @Override
@@ -194,10 +199,9 @@ public class AppScriptService implements IAppScriptService {
 
   @Override
   public String getAppRecursiveScript(String scriptName) {
-    String scriptNameTest = scriptName;
-    do {
-      scriptNameTest = reduceOneDirectory(scriptNameTest).map(sn -> sn + "++").orElse(null);
-    } while (!Strings.isNullOrEmpty(scriptNameTest) && !isAppScriptAvailable(scriptNameTest));
+    String scriptNameTest = findAppScriptRecursivly(scriptName,
+        sn -> isAppScriptAvailable(sn + "++"),
+        sn -> sn.lastIndexOf("/") > 0) + "++";
     if (!Strings.isNullOrEmpty(scriptNameTest) && isAppScriptAvailable(scriptNameTest)) {
       return scriptNameTest;
     } else {
@@ -205,12 +209,20 @@ public class AppScriptService implements IAppScriptService {
     }
   }
 
-  private Optional<String> reduceOneDirectory(String scriptNameTest) {
-    if (scriptNameTest.lastIndexOf("/") > -1) {
-      return Optional.ofNullable(
-          Strings.emptyToNull(scriptNameTest.substring(0, scriptNameTest.lastIndexOf("/"))));
+  private String findAppScriptRecursivly(String scriptName,
+      Predicate<String> hasFound, Predicate<String> hasMore) {
+    String scriptNameTest = scriptName;
+    do {
+      scriptNameTest = reduceOneDirectory(scriptNameTest);
+    } while (!hasFound.test(scriptNameTest) && hasMore.test(scriptNameTest));
+    return scriptNameTest;
+  }
+
+  private String reduceOneDirectory(String scriptNameTest) {
+    if (!Strings.isNullOrEmpty(scriptNameTest) && (scriptNameTest.lastIndexOf("/") > -1)) {
+      return Strings.emptyToNull(scriptNameTest.substring(0, scriptNameTest.lastIndexOf("/")));
     } else {
-      return Optional.empty();
+      return null;
     }
   }
 

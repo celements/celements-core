@@ -8,12 +8,15 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.reference.RefBuilder;
 import com.celements.web.service.UrlService;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
@@ -648,6 +651,49 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     replayDefault();
     assertNull(appScriptService.getAppRecursiveScript(scriptName));
     verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveScriptDocRef() {
+    String scriptName = "path/to/my/appscript";
+    DocumentReference appScriptDocRef2 = createScriptDocRef("path/to/my");
+    expect(modelAccessMock.exists(eq(appScriptDocRef2))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef2))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef2 = createScriptCentralDocRef("path/to/my");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef2))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef2))).andReturn(true)
+        .atLeastOnce();
+    DocumentReference appScriptDocRef3 = createScriptDocRef("path/to");
+    expect(modelAccessMock.exists(eq(appScriptDocRef3))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef3))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef3 = createScriptCentralDocRef("path/to");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef3))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef3))).andReturn(true)
+        .atLeastOnce();
+    DocumentReference appScriptDocRef = createScriptDocRef("path");
+    expect(modelAccessMock.exists(eq(appScriptDocRef))).andReturn(true).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).atLeastOnce();
+    replayDefault();
+    assertEquals(appScriptDocRef, appScriptService.getAppRecursiveScriptDocRef(scriptName));
+    verifyDefault();
+  }
+
+  private DocumentReference createScriptDocRef(String scriptName) {
+    return RefBuilder
+        .from(new WikiReference(getXContext().getDatabase()))
+        .space(IAppScriptService.APP_RECURSIVE_SCRIPT_SPACE_NAME)
+        .doc(scriptName)
+        .build(DocumentReference.class);
+  }
+
+  private DocumentReference createScriptCentralDocRef(String scriptName) {
+    return RefBuilder
+        .from(XWikiConstant.CENTRAL_WIKI)
+        .space(IAppScriptService.APP_RECURSIVE_SCRIPT_SPACE_NAME)
+        .doc(scriptName)
+        .build(DocumentReference.class);
   }
 
 }
