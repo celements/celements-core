@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.util.Util;
@@ -19,13 +20,13 @@ public class AppScriptScriptService implements ScriptService {
   public String getCurrentPageURL(String queryString) {
     String ret;
     if (isAppScriptRequest()) {
-      LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
+      LOGGER.debug("getCurrentPageURL: AppScript for query '{}'", queryString);
       ret = getAppScriptURL(getScriptNameFromURL(), queryString);
     } else {
-      LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
+      LOGGER.debug("getCurrentPageURL: query '{}'", queryString);
       ret = Util.escapeURL("?" + queryString);
     }
-    LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
+    LOGGER.debug("getCurrentPageURL: ret '{}' for query '{}'", ret, queryString);
     return ret;
   }
 
@@ -51,5 +52,33 @@ public class AppScriptScriptService implements ScriptService {
 
   public void setAppScriptService(IAppScriptService appScriptService) {
     this.appScriptService = appScriptService;
+  }
+
+  public boolean hasDocAppScript(String scriptName) {
+    return appScriptService.hasDocAppScript(scriptName);
+  }
+
+  public boolean hasDocAppRecursiveScript(String scriptName) {
+    return appScriptService.hasDocAppRecursiveScript(scriptName);
+  }
+
+  public DocumentReference getAppScriptDocRef(String scriptName) {
+    return appScriptService.getAppScriptDocRef(scriptName);
+  }
+
+  public DocumentReference getAppRecursiveScriptDocRef(String scriptName) {
+    return appScriptService.getAppRecursiveScriptDocRef(scriptName);
+  }
+
+  public boolean isAppScriptAvailable(String scriptName) {
+    return appScriptService.isAppScriptAvailable(scriptName);
+  }
+
+  public String getAppRecursiveScript(String scriptName) {
+    return appScriptService.getAppRecursiveScript(scriptName);
+  }
+
+  public String getAppScriptTemplatePath(String scriptName) {
+    return appScriptService.getAppScriptTemplatePath(scriptName);
   }
 }
