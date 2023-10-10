@@ -19,8 +19,6 @@ public interface IAppScriptService {
 
   boolean hasDocAppScript(String scriptName);
 
-  boolean hasDocAppRecursiveScript(String scriptName);
-
   boolean hasLocalAppScript(String scriptName);
 
   boolean hasLocalAppRecursiveScript(String scriptName);

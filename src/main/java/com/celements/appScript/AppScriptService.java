@@ -91,15 +91,6 @@ public class AppScriptService implements IAppScriptService {
   }
 
   @Override
-  public boolean hasDocAppRecursiveScript(String scriptName) {
-    boolean hasDocAppScript = hasLocalAppRecursiveScript(scriptName)
-        || hasCentralAppRecursiveScript(scriptName);
-    LOGGER.debug("hasDocAppScript: scriptName [{}] hasDocAppScript [{}]", scriptName,
-        hasDocAppScript);
-    return hasDocAppScript;
-  }
-
-  @Override
   public boolean hasLocalAppScript(String scriptName) {
     return !Strings.isNullOrEmpty(scriptName)
         && docAppScriptExists(getLocalAppScriptDocRef(scriptName));

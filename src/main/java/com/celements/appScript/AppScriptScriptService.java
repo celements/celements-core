@@ -58,10 +58,6 @@ public class AppScriptScriptService implements ScriptService {
     return appScriptService.hasDocAppScript(scriptName);
   }
 
-  public boolean hasDocAppRecursiveScript(String scriptName) {
-    return appScriptService.hasDocAppRecursiveScript(scriptName);
-  }
-
   public DocumentReference getAppScriptDocRef(String scriptName) {
     return appScriptService.getAppScriptDocRef(scriptName);
   }
