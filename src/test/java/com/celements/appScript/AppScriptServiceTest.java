@@ -654,7 +654,7 @@ public class AppScriptServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getAppRecursiveScriptDocRef() {
+  public void test_getAppRecursiveScriptDocRef_found() {
     String scriptName = "path/to/my/appscript";
     DocumentReference appScriptDocRef2 = createScriptDocRef("path/to/my");
     expect(modelAccessMock.exists(eq(appScriptDocRef2))).andReturn(false).atLeastOnce();
@@ -677,6 +677,38 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).atLeastOnce();
     replayDefault();
     assertEquals(appScriptDocRef, appScriptService.getAppRecursiveScriptDocRef(scriptName));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveScriptDocRef_notFound() {
+    String scriptName = "path/to/my/appscript";
+    DocumentReference appScriptDocRef2 = createScriptDocRef("path/to/my");
+    expect(modelAccessMock.exists(eq(appScriptDocRef2))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef2))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef2 = createScriptCentralDocRef("path/to/my");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef2))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef2))).andReturn(true)
+        .atLeastOnce();
+    DocumentReference appScriptDocRef3 = createScriptDocRef("path/to");
+    expect(modelAccessMock.exists(eq(appScriptDocRef3))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef3))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef3 = createScriptCentralDocRef("path/to");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef3))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef3))).andReturn(true)
+        .atLeastOnce();
+    DocumentReference appScriptDocRef = createScriptDocRef("path");
+    expect(modelAccessMock.exists(eq(appScriptDocRef))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef = createScriptCentralDocRef("path");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef))).andReturn(true)
+        .atLeastOnce();
+    replayDefault();
+    assertNull(appScriptService.getAppRecursiveScriptDocRef(scriptName));
     verifyDefault();
   }
 
