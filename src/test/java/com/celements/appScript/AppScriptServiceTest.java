@@ -371,7 +371,7 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     replayDefault(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference(context.getDatabase(),
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript"));
+    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript").get());
     verifyDefault(mockRequest);
   }
 
@@ -404,7 +404,7 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     replayDefault(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript"));
+    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript").get());
     verifyDefault(mockRequest);
   }
 

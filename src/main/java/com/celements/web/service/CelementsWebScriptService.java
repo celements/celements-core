@@ -161,66 +161,132 @@ public class CelementsWebScriptService implements ScriptService {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#hasDocAppScript}
+   */
+  @Deprecated
   public boolean hasDocAppScript(String scriptName) {
     return appScriptService.hasDocAppScript(scriptName);
   }
 
+  /**
+   * @deprecated since 6.2 no replacement. instead use {link AppScriptScriptService#hasDocAppScript}
+   */
+  @Deprecated
   public boolean hasLocalAppScript(String scriptName) {
     return appScriptService.hasLocalAppScript(scriptName);
   }
 
+  /**
+   * @deprecated since 6.2 no replacement. instead use {link AppScriptScriptService#hasDocAppScript}
+   */
+  @Deprecated
   public boolean hasCentralAppScript(String scriptName) {
     return appScriptService.hasCentralAppScript(scriptName);
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#getAppScriptDocRef}
+   */
+  @Deprecated
   public DocumentReference getAppScriptDocRef(String scriptName) {
-    return appScriptService.getAppScriptDocRef(scriptName);
+    return appScriptService.getAppScriptDocRef(scriptName).orElse(null);
   }
 
+  /**
+   * @deprecated since 6.2 no replacement. instead use {link
+   *             AppScriptScriptService#getAppScriptDocRef}
+   */
+  @Deprecated
   public DocumentReference getLocalAppScriptDocRef(String scriptName) {
-    return appScriptService.getLocalAppScriptDocRef(scriptName);
+    return appScriptService.getLocalAppScriptDocRef(scriptName).orElse(null);
   }
 
+  /**
+   * @deprecated since 6.2 no replacement. instead use {link
+   *             AppScriptScriptService#getAppScriptDocRef}
+   */
+  @Deprecated
   public DocumentReference getCentralAppScriptDocRef(String scriptName) {
-    return appScriptService.getCentralAppScriptDocRef(scriptName);
+    return appScriptService.getCentralAppScriptDocRef(scriptName).orElse(null);
   }
 
+  /**
+   * @deprecated since 6.2 no replacement.
+   */
+  @Deprecated
   public String getScriptNameFromDocRef(DocumentReference docRef) {
     return appScriptService.getScriptNameFromDocRef(docRef);
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#getAppScriptTemplatePath}
+   */
+  @Deprecated
   public String getAppScriptTemplatePath(String scriptName) {
     return appScriptService.getAppScriptTemplatePath(scriptName);
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#isAppScriptOverwriteDocRef}
+   */
+  @Deprecated
   public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
     return appScriptService.isAppScriptOverwriteDocRef(docRef);
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#isAppScriptAvailable}
+   */
+  @Deprecated
   public boolean isAppScriptAvailable(String scriptName) {
     return appScriptService.isAppScriptAvailable(scriptName);
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#getAppScriptURL}
+   */
+  @Deprecated
   public String getAppScriptURL(String scriptName) {
     return appScriptService.getAppScriptURL(scriptName);
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#getAppScriptURL}
+   */
+  @Deprecated
   public String getAppScriptURL(String scriptName, String queryString) {
     return appScriptService.getAppScriptURL(scriptName, queryString);
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#isAppScriptCurrentPage}
+   */
+  @Deprecated
   public boolean isAppScriptCurrentPage(String scriptName) {
     return appScriptService.isAppScriptCurrentPage(scriptName);
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#getScriptNameFromURL}
+   */
+  @Deprecated
   public String getScriptNameFromURL() {
     return appScriptService.getScriptNameFromURL();
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#isAppScriptRequest}
+   */
+  @Deprecated
   public boolean isAppScriptRequest() {
     return appScriptService.isAppScriptRequest();
   }
 
+  /**
+   * @deprecated since 6.2 instead use {link AppScriptScriptService#getCurrentPageURL}
+   */
+  @Deprecated
   public String getCurrentPageURL(String queryString) {
     String ret;
     if (isAppScriptRequest()) {

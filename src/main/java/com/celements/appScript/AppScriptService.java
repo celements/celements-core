@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -84,7 +85,7 @@ public class AppScriptService implements IAppScriptService {
   }
 
   @Override
-  public boolean hasDocAppScript(String scriptName) {
+  public boolean hasDocAppScript(@Nullable String scriptName) {
     boolean hasDocAppScript = hasLocalAppScript(scriptName) || hasCentralAppScript(scriptName);
     LOGGER.debug("hasDocAppScript: scriptName [{} hasDocAppScript [{}]", scriptName,
         hasDocAppScript);
@@ -92,30 +93,30 @@ public class AppScriptService implements IAppScriptService {
   }
 
   @Override
-  public boolean hasLocalAppScript(String scriptName) {
+  public boolean hasLocalAppScript(@Nullable String scriptName) {
     return !Strings.isNullOrEmpty(scriptName)
-        && docAppScriptExists(getLocalAppScriptDocRef(scriptName));
+        && docAppScriptExists(getLocalAppScriptDocRef(scriptName).orElse(null));
   }
 
   @Override
-  public boolean hasCentralAppScript(String scriptName) {
+  public boolean hasCentralAppScript(@Nullable String scriptName) {
     return !Strings.isNullOrEmpty(scriptName)
-        && docAppScriptExists(getCentralAppScriptDocRef(scriptName));
+        && docAppScriptExists(getCentralAppScriptDocRef(scriptName).orElse(null));
   }
 
   @Override
-  public boolean hasLocalAppRecursiveScript(String scriptName) {
+  public boolean hasLocalAppRecursiveScript(@Nullable String scriptName) {
     return !Strings.isNullOrEmpty(scriptName)
-        && docAppScriptExists(getLocalAppRecursiveScriptDocRef(scriptName));
+        && docAppScriptExists(getLocalAppRecursiveScriptDocRef(scriptName).orElse(null));
   }
 
   @Override
-  public boolean hasCentralAppRecursiveScript(String scriptName) {
+  public boolean hasCentralAppRecursiveScript(@Nullable String scriptName) {
     return !Strings.isNullOrEmpty(scriptName)
-        && docAppScriptExists(getCentralAppRecursiveScriptDocRef(scriptName));
+        && docAppScriptExists(getCentralAppRecursiveScriptDocRef(scriptName).orElse(null));
   }
 
-  private boolean docAppScriptExists(DocumentReference appScriptDocRef) {
+  private boolean docAppScriptExists(@Nullable DocumentReference appScriptDocRef) {
     boolean existsAppScriptDoc = modelAccess.exists(appScriptDocRef);
     boolean isNotEmptyAppScriptDoc = !emptyCheck.isEmptyRTEDocument(appScriptDocRef);
     LOGGER.debug("docAppScriptExists check [{}]: exists [{}] isNotEmpty [{}]", appScriptDocRef,
@@ -124,7 +125,7 @@ public class AppScriptService implements IAppScriptService {
   }
 
   @Override
-  public DocumentReference getAppScriptDocRef(String scriptName) {
+  public Optional<DocumentReference> getAppScriptDocRef(String scriptName) {
     if (hasLocalAppScript(scriptName)) {
       return getLocalAppScriptDocRef(scriptName);
     } else {
@@ -137,38 +138,38 @@ public class AppScriptService implements IAppScriptService {
     return findAppScriptRecursivly(scriptName,
         sn -> hasLocalAppRecursiveScript(sn)
             || hasCentralAppRecursiveScript(sn),
-        sn -> sn.lastIndexOf("/") > 0).map(scriptNameFound -> {
+        sn -> sn.lastIndexOf("/") > 0).flatMap(scriptNameFound -> {
           if (hasLocalAppRecursiveScript(scriptNameFound)) {
             return getLocalAppRecursiveScriptDocRef(scriptNameFound);
           } else if (hasCentralAppRecursiveScript(scriptNameFound)) {
             return getCentralAppRecursiveScriptDocRef(scriptNameFound);
           }
-          return null;
+          return Optional.empty();
         });
   }
 
   @Override
-  public DocumentReference getLocalAppScriptDocRef(String scriptName) {
+  public Optional<DocumentReference> getLocalAppScriptDocRef(String scriptName) {
     return RefBuilder.from(mContext.getWikiRef()).space(APP_SCRIPT_SPACE_NAME).doc(scriptName)
-        .build(DocumentReference.class);
+        .buildOpt(DocumentReference.class);
   }
 
   @Override
-  public DocumentReference getCentralAppScriptDocRef(String scriptName) {
+  public Optional<DocumentReference> getCentralAppScriptDocRef(String scriptName) {
     return RefBuilder.from(XWikiConstant.CENTRAL_WIKI).space(APP_SCRIPT_SPACE_NAME).doc(scriptName)
-        .build(DocumentReference.class);
+        .buildOpt(DocumentReference.class);
   }
 
   @Override
-  public DocumentReference getLocalAppRecursiveScriptDocRef(String scriptName) {
+  public Optional<DocumentReference> getLocalAppRecursiveScriptDocRef(String scriptName) {
     return RefBuilder.from(mContext.getWikiRef()).space(APP_RECURSIVE_SCRIPT_SPACE_NAME)
-        .doc(scriptName).build(DocumentReference.class);
+        .doc(scriptName).buildOpt(DocumentReference.class);
   }
 
   @Override
-  public DocumentReference getCentralAppRecursiveScriptDocRef(String scriptName) {
+  public Optional<DocumentReference> getCentralAppRecursiveScriptDocRef(String scriptName) {
     return RefBuilder.from(XWikiConstant.CENTRAL_WIKI).space(APP_RECURSIVE_SCRIPT_SPACE_NAME)
-        .doc(scriptName).build(DocumentReference.class);
+        .doc(scriptName).buildOpt(DocumentReference.class);
   }
 
   @Override

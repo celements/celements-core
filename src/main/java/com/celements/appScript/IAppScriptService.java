@@ -2,6 +2,8 @@ package com.celements.appScript;
 
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -19,27 +21,27 @@ public interface IAppScriptService {
 
   String getAppActionName();
 
-  boolean hasDocAppScript(String scriptName);
+  boolean hasDocAppScript(@Nullable String scriptName);
 
-  boolean hasLocalAppScript(String scriptName);
+  boolean hasLocalAppScript(@Nullable String scriptName);
 
-  boolean hasLocalAppRecursiveScript(String scriptName);
+  boolean hasLocalAppRecursiveScript(@Nullable String scriptName);
 
-  boolean hasCentralAppScript(String scriptName);
+  boolean hasCentralAppScript(@Nullable String scriptName);
 
-  boolean hasCentralAppRecursiveScript(String scriptName);
+  boolean hasCentralAppRecursiveScript(@Nullable String scriptName);
 
-  DocumentReference getAppScriptDocRef(String scriptName);
+  Optional<DocumentReference> getAppScriptDocRef(String scriptName);
 
   Optional<DocumentReference> getAppRecursiveScriptDocRef(String scriptName);
 
-  DocumentReference getLocalAppScriptDocRef(String scriptName);
+  Optional<DocumentReference> getLocalAppScriptDocRef(String scriptName);
 
-  DocumentReference getLocalAppRecursiveScriptDocRef(String scriptName);
+  Optional<DocumentReference> getLocalAppRecursiveScriptDocRef(String scriptName);
 
-  DocumentReference getCentralAppScriptDocRef(String scriptName);
+  Optional<DocumentReference> getCentralAppScriptDocRef(String scriptName);
 
-  DocumentReference getCentralAppRecursiveScriptDocRef(String scriptName);
+  Optional<DocumentReference> getCentralAppRecursiveScriptDocRef(String scriptName);
 
   String getAppScriptTemplatePath(String scriptName);
 
