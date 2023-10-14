@@ -1,5 +1,7 @@
 package com.celements.navigation.presentation;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -39,7 +41,8 @@ public class RenderedContentPresentationType implements IPresentationTypeRole<IN
     outStream.append("</div>\n");
   }
 
-  protected void addRenderedContent(StringBuilder outStream, DocumentReference docRef) {
+  protected void addRenderedContent(@NotNull StringBuilder outStream,
+      @NotNull DocumentReference docRef) {
     try {
       outStream.append(getRenderCommand().renderCelementsDocument(docRef, "view"));
     } catch (XWikiException exp) {
