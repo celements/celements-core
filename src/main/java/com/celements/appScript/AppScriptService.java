@@ -1,13 +1,21 @@
 package com.celements.appScript;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -16,7 +24,15 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.emptycheck.service.IEmptyCheckRole;
-import com.celements.web.service.IWebUtilsService;
+import com.celements.init.XWikiProvider;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.context.ModelContext;
+import com.celements.model.reference.RefBuilder;
+import com.celements.model.util.ModelUtils;
+import com.celements.web.service.UrlService;
+import com.google.common.base.Strings;
+import com.xpn.xwiki.XWikiConfigSource;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.Util;
 
@@ -25,17 +41,33 @@ public class AppScriptService implements IAppScriptService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AppScriptService.class);
 
-  @Requirement
-  IEmptyCheckRole emptyCheck;
+  @Inject
+  private IEmptyCheckRole emptyCheck;
 
-  @Requirement
-  IWebUtilsService webUtils;
+  @Inject
+  private Execution execution;
 
-  @Requirement
-  Execution execution;
+  @Inject
+  private EntityReferenceValueProvider defaultEntityReferenceValueProvider;
 
-  @Requirement
-  EntityReferenceValueProvider defaultEntityReferenceValueProvider;
+  @Inject
+  private XWikiProvider wikiProvider;
+
+  @Inject
+  private IModelAccessFacade modelAccess;
+
+  @Inject
+  private ModelUtils modelUtils;
+
+  @Inject
+  private ModelContext mContext;
+
+  @Inject
+  private UrlService urlService;
+
+  @Inject
+  @Named(XWikiConfigSource.NAME)
+  private ConfigurationSource xwikiConfigSource;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -49,37 +81,51 @@ public class AppScriptService implements IAppScriptService {
 
   @Override
   public String getAppActionName() {
-    return getContext().getWiki().Param(APP_SCRIPT_ACTION_NAME_CONF_PROPERTY, APP_SCRIPT_XPAGE);
+    return xwikiConfigSource.getProperty(APP_SCRIPT_ACTION_NAME_CONF_PROPERTY, APP_SCRIPT_XPAGE);
   }
 
   @Override
-  public boolean hasDocAppScript(String scriptName) {
+  public boolean hasDocAppScript(@Nullable String scriptName) {
     boolean hasDocAppScript = hasLocalAppScript(scriptName) || hasCentralAppScript(scriptName);
-    LOGGER.debug("hasDocAppScript: scriptName [" + scriptName + "] hasDocAppScript ["
-        + hasDocAppScript + "]");
+    LOGGER.debug("hasDocAppScript: scriptName [{} hasDocAppScript [{}]", scriptName,
+        hasDocAppScript);
     return hasDocAppScript;
   }
 
   @Override
-  public boolean hasLocalAppScript(String scriptName) {
-    return !"".equals(scriptName) && docAppScriptExists(getLocalAppScriptDocRef(scriptName));
+  public boolean hasLocalAppScript(@Nullable String scriptName) {
+    return !Strings.isNullOrEmpty(scriptName)
+        && docAppScriptExists(getLocalAppScriptDocRef(scriptName).orElse(null));
   }
 
-  private boolean docAppScriptExists(DocumentReference appScriptDocRef) {
-    boolean existsAppScriptDoc = getContext().getWiki().exists(appScriptDocRef, getContext());
+  @Override
+  public boolean hasCentralAppScript(@Nullable String scriptName) {
+    return !Strings.isNullOrEmpty(scriptName)
+        && docAppScriptExists(getCentralAppScriptDocRef(scriptName).orElse(null));
+  }
+
+  @Override
+  public boolean hasLocalAppRecursiveScript(@Nullable String scriptName) {
+    return !Strings.isNullOrEmpty(scriptName)
+        && docAppScriptExists(getLocalAppRecursiveScriptDocRef(scriptName).orElse(null));
+  }
+
+  @Override
+  public boolean hasCentralAppRecursiveScript(@Nullable String scriptName) {
+    return !Strings.isNullOrEmpty(scriptName)
+        && docAppScriptExists(getCentralAppRecursiveScriptDocRef(scriptName).orElse(null));
+  }
+
+  private boolean docAppScriptExists(@Nullable DocumentReference appScriptDocRef) {
+    boolean existsAppScriptDoc = modelAccess.exists(appScriptDocRef);
     boolean isNotEmptyAppScriptDoc = !emptyCheck.isEmptyRTEDocument(appScriptDocRef);
-    LOGGER.debug("docAppScriptExists check [" + appScriptDocRef + "]: exists [" + existsAppScriptDoc
-        + "] isNotEmpty [" + isNotEmptyAppScriptDoc + "]");
+    LOGGER.debug("docAppScriptExists check [{}]: exists [{}] isNotEmpty [{}]", appScriptDocRef,
+        existsAppScriptDoc, isNotEmptyAppScriptDoc);
     return (existsAppScriptDoc && isNotEmptyAppScriptDoc);
   }
 
   @Override
-  public boolean hasCentralAppScript(String scriptName) {
-    return !"".equals(scriptName) && docAppScriptExists(getCentralAppScriptDocRef(scriptName));
-  }
-
-  @Override
-  public DocumentReference getAppScriptDocRef(String scriptName) {
+  public Optional<DocumentReference> getAppScriptDocRef(String scriptName) {
     if (hasLocalAppScript(scriptName)) {
       return getLocalAppScriptDocRef(scriptName);
     } else {
@@ -88,13 +134,42 @@ public class AppScriptService implements IAppScriptService {
   }
 
   @Override
-  public DocumentReference getLocalAppScriptDocRef(String scriptName) {
-    return new DocumentReference(getContext().getDatabase(), APP_SCRIPT_SPACE_NAME, scriptName);
+  public Optional<DocumentReference> getAppRecursiveScriptDocRef(String scriptName) {
+    return findAppScriptRecursivly(scriptName,
+        sn -> hasLocalAppRecursiveScript(sn)
+            || hasCentralAppRecursiveScript(sn),
+        sn -> sn.lastIndexOf("/") > 0).flatMap(scriptNameFound -> {
+          if (hasLocalAppRecursiveScript(scriptNameFound)) {
+            return getLocalAppRecursiveScriptDocRef(scriptNameFound);
+          } else if (hasCentralAppRecursiveScript(scriptNameFound)) {
+            return getCentralAppRecursiveScriptDocRef(scriptNameFound);
+          }
+          return Optional.empty();
+        });
   }
 
   @Override
-  public DocumentReference getCentralAppScriptDocRef(String scriptName) {
-    return new DocumentReference("celements2web", APP_SCRIPT_SPACE_NAME, scriptName);
+  public Optional<DocumentReference> getLocalAppScriptDocRef(String scriptName) {
+    return RefBuilder.from(mContext.getWikiRef()).space(APP_SCRIPT_SPACE_NAME).doc(scriptName)
+        .buildOpt(DocumentReference.class);
+  }
+
+  @Override
+  public Optional<DocumentReference> getCentralAppScriptDocRef(String scriptName) {
+    return RefBuilder.from(XWikiConstant.CENTRAL_WIKI).space(APP_SCRIPT_SPACE_NAME).doc(scriptName)
+        .buildOpt(DocumentReference.class);
+  }
+
+  @Override
+  public Optional<DocumentReference> getLocalAppRecursiveScriptDocRef(String scriptName) {
+    return RefBuilder.from(mContext.getWikiRef()).space(APP_RECURSIVE_SCRIPT_SPACE_NAME)
+        .doc(scriptName).buildOpt(DocumentReference.class);
+  }
+
+  @Override
+  public Optional<DocumentReference> getCentralAppRecursiveScriptDocRef(String scriptName) {
+    return RefBuilder.from(XWikiConstant.CENTRAL_WIKI).space(APP_RECURSIVE_SCRIPT_SPACE_NAME)
+        .doc(scriptName).buildOpt(DocumentReference.class);
   }
 
   @Override
@@ -106,13 +181,42 @@ public class AppScriptService implements IAppScriptService {
   public boolean isAppScriptAvailable(String scriptName) {
     try {
       String path = "/templates/" + getAppScriptTemplatePath(scriptName);
-      LOGGER.debug("isAppScriptAvailable: check on [" + path + "].");
-      getContext().getWiki().getResourceContentAsBytes(path);
-      LOGGER.trace("isAppScriptAvailable: Successful got app script [" + scriptName + "].");
+      LOGGER.debug("isAppScriptAvailable: check on [{}].", path);
+      wikiProvider.await(Duration.ofSeconds(60)).getResourceContentAsBytes(path);
+      LOGGER.trace("isAppScriptAvailable: Successful got app script [{}].", scriptName);
       return true;
-    } catch (IOException exp) {
-      LOGGER.debug("isAppScriptAvailable: Failed to get app script [" + scriptName + "].", exp);
+    } catch (IOException | ExecutionException exp) {
+      LOGGER.debug("isAppScriptAvailable: Failed to get app script [{}].", scriptName, exp);
       return false;
+    }
+  }
+
+  @Override
+  public Optional<String> getAppRecursiveScript(String scriptName) {
+    return findAppScriptRecursivly(scriptName,
+        sn -> isAppScriptAvailable(sn + "++"),
+        sn -> sn.lastIndexOf("/") > 0)
+            .map(sNT -> sNT + "++")
+            .filter(sNT -> !Strings.isNullOrEmpty(sNT) && isAppScriptAvailable(sNT));
+  }
+
+  private Optional<String> findAppScriptRecursivly(String scriptName,
+      Predicate<String> hasFound, Predicate<String> hasMore) {
+    String scriptNameTest = scriptName;
+    do {
+      scriptNameTest = reduceOneDirectory(scriptNameTest);
+    } while (!hasFound.test(scriptNameTest) && hasMore.test(scriptNameTest));
+    if (hasFound.test(scriptNameTest)) {
+      return Optional.of(scriptNameTest);
+    }
+    return Optional.empty();
+  }
+
+  private String reduceOneDirectory(String scriptNameTest) {
+    if (!Strings.isNullOrEmpty(scriptNameTest) && (scriptNameTest.lastIndexOf("/") > -1)) {
+      return Strings.emptyToNull(scriptNameTest.substring(0, scriptNameTest.lastIndexOf("/")));
+    } else {
+      return null;
     }
   }
 
@@ -131,8 +235,9 @@ public class AppScriptService implements IAppScriptService {
     }
     queryString = "xpage=" + IAppScriptService.APP_SCRIPT_XPAGE + "&s=" + scriptName + queryString;
     if (scriptName.split("/").length <= 2) {
-      return getContext().getWiki().getURL(webUtils.resolveDocumentReference(scriptName.replaceAll(
-          "/", ".")), "view", queryString, null, getContext());
+      return urlService.getURL(
+          modelUtils.resolveRef(scriptName.replace("/", "."), DocumentReference.class),
+          "view", queryString);
     } else {
       return Util.escapeURL("/app/" + scriptName + "?" + queryString);
     }
@@ -169,22 +274,25 @@ public class AppScriptService implements IAppScriptService {
   public boolean isAppScriptRequest() {
     // TODO exclude isOverlayRequest
     return isAppScriptXpageRequest() || isAppScriptActionRequest() || isAppScriptSpaceRequest()
-        || isAppScriptOverwriteDocRef(getContext().getDoc().getDocumentReference());
+        || isAppScriptOverwriteDocRef(mContext.getDocRef().orElse(null));
   }
 
   @Override
   public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
-    String overwriteAppDocs = getContext().getWiki().getXWikiPreference(
-        APP_SCRIPT_XWPREF_OVERW_DOCS, APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext());
+    String overwriteAppDocs = wikiProvider.get()
+        .map(wiki -> wiki.getXWikiPreference(APP_SCRIPT_XWPREF_OVERW_DOCS,
+            APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext()))
+        .orElse("-");
     List<DocumentReference> overwAppDocList = new ArrayList<>();
     if (!"-".equals(overwriteAppDocs)) {
       for (String overwAppDocFN : overwriteAppDocs.split("[, ]")) {
         try {
-          DocumentReference overwAppDocRef = webUtils.resolveDocumentReference(overwAppDocFN);
+          DocumentReference overwAppDocRef = modelUtils.resolveRef(overwAppDocFN,
+              DocumentReference.class);
           overwAppDocList.add(overwAppDocRef);
         } catch (Exception exp) {
-          LOGGER.warn("Failed to parse appScript overwrite docs config part [" + overwAppDocFN
-              + "] of complete config [" + overwriteAppDocs + "].");
+          LOGGER.warn("Failed to parse appScript overwrite docs config part [{}] of complete"
+              + " config [{}].", overwAppDocFN, overwriteAppDocs);
         }
       }
     }
@@ -198,7 +306,7 @@ public class AppScriptService implements IAppScriptService {
 
   private boolean isAppScriptSpaceRequest() {
     return "view".equals(getContext().getAction())
-        && getContext().getDoc().getDocumentReference().getSpaceReferences().contains(
+        && mContext.getDocRef().orElseThrow().getSpaceReferences().contains(
             getCurrentSpaceRef());
   }
 
@@ -215,7 +323,7 @@ public class AppScriptService implements IAppScriptService {
     if (isAppScriptActionRequest() || isAppScriptSpaceRequest()) {
       String path = getContext().getRequest().getPathInfo();
       return path.substring(getStartIndex(path)).replaceAll("^/+", "");
-    } else if (isAppScriptOverwriteDocRef(getContext().getDoc().getDocumentReference())) {
+    } else if (isAppScriptOverwriteDocRef(mContext.getDocRef().orElse(null))) {
       String path = getContext().getRequest().getPathInfo().replaceAll("^/+", "");
       if (path.startsWith(getContext().getAction())) {
         path = path.replaceAll("^" + getContext().getAction() + "/+", "");

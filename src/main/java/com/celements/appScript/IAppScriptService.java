@@ -1,49 +1,66 @@
 package com.celements.appScript;
 
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
 @ComponentRole
 public interface IAppScriptService {
 
-  public static final String APP_SCRIPT_ACTION_NAME_CONF_PROPERTY = "celements.appScript.actionName";
-  public static final String APP_SCRIPT_XPAGE = "app";
-  public static final String APP_SCRIPT_XWPREF_OVERW_DOCS = "appScriptOverwriteDocs";
-  public static final String APP_SCRIPT_CONF_OVERW_DOCS = "com.celements.appScript.overwriteDocs";
-  public static final String APP_SCRIPT_SPACE_NAME = "AppScripts";
+  static final String APP_SCRIPT_ACTION_NAME_CONF_PROPERTY = "celements.appScript.actionName";
+  static final String APP_SCRIPT_XPAGE = "app";
+  static final String APP_SCRIPT_XWPREF_OVERW_DOCS = "appScriptOverwriteDocs";
+  static final String APP_SCRIPT_CONF_OVERW_DOCS = "com.celements.appScript.overwriteDocs";
+  static final String APP_SCRIPT_SPACE_NAME = "AppScripts";
+  static final String APP_RECURSIVE_SCRIPT_SPACE_NAME = "AppRecursiveScripts";
 
-  public int getStartIndex(String path);
+  int getStartIndex(String path);
 
-  public String getAppActionName();
+  String getAppActionName();
 
-  public boolean hasDocAppScript(String scriptName);
+  boolean hasDocAppScript(@Nullable String scriptName);
 
-  public boolean hasLocalAppScript(String scriptName);
+  boolean hasLocalAppScript(@Nullable String scriptName);
 
-  public boolean hasCentralAppScript(String scriptName);
+  boolean hasLocalAppRecursiveScript(@Nullable String scriptName);
 
-  public DocumentReference getAppScriptDocRef(String scriptName);
+  boolean hasCentralAppScript(@Nullable String scriptName);
 
-  public DocumentReference getLocalAppScriptDocRef(String scriptName);
+  boolean hasCentralAppRecursiveScript(@Nullable String scriptName);
 
-  public DocumentReference getCentralAppScriptDocRef(String scriptName);
+  Optional<DocumentReference> getAppScriptDocRef(String scriptName);
 
-  public String getAppScriptTemplatePath(String scriptName);
+  Optional<DocumentReference> getAppRecursiveScriptDocRef(String scriptName);
 
-  public boolean isAppScriptAvailable(String scriptName);
+  Optional<DocumentReference> getLocalAppScriptDocRef(String scriptName);
 
-  public String getAppScriptURL(String scriptName);
+  Optional<DocumentReference> getLocalAppRecursiveScriptDocRef(String scriptName);
 
-  public String getAppScriptURL(String scriptName, String queryString);
+  Optional<DocumentReference> getCentralAppScriptDocRef(String scriptName);
 
-  public boolean isAppScriptCurrentPage(String scriptName);
+  Optional<DocumentReference> getCentralAppRecursiveScriptDocRef(String scriptName);
 
-  public String getScriptNameFromDocRef(DocumentReference docRef);
+  String getAppScriptTemplatePath(String scriptName);
 
-  public String getScriptNameFromURL();
+  boolean isAppScriptAvailable(String scriptName);
 
-  public boolean isAppScriptRequest();
+  Optional<String> getAppRecursiveScript(String scriptName);
 
-  public boolean isAppScriptOverwriteDocRef(DocumentReference docRef);
+  String getAppScriptURL(String scriptName);
+
+  String getAppScriptURL(String scriptName, String queryString);
+
+  boolean isAppScriptCurrentPage(String scriptName);
+
+  String getScriptNameFromDocRef(DocumentReference docRef);
+
+  String getScriptNameFromURL();
+
+  boolean isAppScriptRequest();
+
+  boolean isAppScriptOverwriteDocRef(DocumentReference docRef);
 
 }
