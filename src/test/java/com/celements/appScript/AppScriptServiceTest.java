@@ -1,17 +1,22 @@
 package com.celements.appScript;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import org.junit.After;
+import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.emptycheck.service.IEmptyCheckRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.reference.RefBuilder;
+import com.celements.web.service.UrlService;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
@@ -22,30 +27,25 @@ public class AppScriptServiceTest extends AbstractComponentTest {
   private XWikiContext context;
   private XWiki xwiki;
   private AppScriptService appScriptService;
-  private IEmptyCheckRole preseveEmptyCheck;
   private IEmptyCheckRole emptyCheckMock;
+  private UrlService urlServiceMock;
+  private IModelAccessFacade modelAccessMock;
 
   @Before
   public void setUp_AppScriptServiceTest() throws Exception {
-    context = getContext();
-    xwiki = getWikiMock();
+    context = getXContext();
+    xwiki = getMock(XWiki.class);
+    urlServiceMock = registerComponentMock(UrlService.class);
+    modelAccessMock = registerComponentMock(IModelAccessFacade.class);
+    emptyCheckMock = registerComponentMock(IEmptyCheckRole.class);
     appScriptService = (AppScriptService) Utils.getComponent(IAppScriptService.class);
-    preseveEmptyCheck = appScriptService.emptyCheck;
-    emptyCheckMock = createDefaultMock(IEmptyCheckRole.class);
-    appScriptService.emptyCheck = emptyCheckMock;
-  }
-
-  @After
-  public void tearDown_AppScriptServiceTest() {
-    appScriptService.emptyCheck = preseveEmptyCheck;
   }
 
   @Test
-  public void testGetStartIndex_Space_Action() {
+  public void test_getStartIndex_Space_Action() {
     String myAppScriptPath = "/app/myAppScript";
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
-        IAppScriptService.APP_SCRIPT_XPAGE))).andReturn(
-            IAppScriptService.APP_SCRIPT_XPAGE).atLeastOnce();
+    getConfigurationSource().setProperty(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
+        IAppScriptService.APP_SCRIPT_XPAGE);
     replayDefault();
     int startIndex = appScriptService.getStartIndex(myAppScriptPath);
     assertEquals("myAppScript", myAppScriptPath.substring(startIndex));
@@ -53,7 +53,7 @@ public class AppScriptServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testIsAppScriptRequest_appXpage() {
+  public void test_isAppScriptRequest_appXpage() {
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
         "noScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -67,25 +67,25 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Content.login").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testIsAppScriptRequest_appAction() {
+  public void test_isAppScriptRequest_appAction() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
     context.put("appAction", true);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testIsAppScriptRequest_view_appSpace() {
+  public void test_isAppScriptRequest_view_appSpace() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -94,13 +94,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testIsAppScriptRequest_view_overwriteAppDoc_comma() {
+  public void test_isAppScriptRequest_view_overwriteAppDoc_comma() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -112,13 +112,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Content.login,Content.WhatsNew").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testIsAppScriptRequest_view_overwriteAppDoc_space() {
+  public void test_isAppScriptRequest_view_overwriteAppDoc_space() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -130,13 +130,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Content.WhatsNew Content.login").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testIsAppScriptRequest_view_overwriteAppDoc_noConfig() {
+  public void test_isAppScriptRequest_view_overwriteAppDoc_noConfig() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -148,13 +148,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"), eq(
         "com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
             "-").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertFalse(appScriptService.isAppScriptRequest());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testIsAppScriptRequest_view_noAppSpace() {
+  public void test_isAppScriptRequest_view_noAppSpace() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -166,13 +166,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"), eq(
         "com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
             "-").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertFalse(appScriptService.isAppScriptRequest());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetAppScriptNameFromRequestURL_appXpage() {
+  public void test_getAppScriptNameFromRequestURL_appXpage() {
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
         "noScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -186,13 +186,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Content.login").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertEquals("myScript", appScriptService.getAppScriptNameFromRequestURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetAppScriptNameFromRequestURL_appAction() {
+  public void test_getAppScriptNameFromRequestURL_appAction() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -205,15 +205,15 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/" + IAppScriptService.APP_SCRIPT_XPAGE
         + "/pathTo/myScript").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
-        "app"))).andReturn("app").anyTimes();
-    replayAll(mockRequest);
+    getConfigurationSource().setProperty(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
+        IAppScriptService.APP_SCRIPT_XPAGE);
+    replayDefault(mockRequest);
     assertEquals("pathTo/myScript", appScriptService.getAppScriptNameFromRequestURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetAppScriptNameFromRequestURL_appAction2() {
+  public void test_getAppScriptNameFromRequestURL_appAction2() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -226,15 +226,15 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/" + IAppScriptService.APP_SCRIPT_XPAGE
         + "/pathTo/pathTo2/myScript").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
-        "app"))).andReturn("app").anyTimes();
-    replayAll(mockRequest);
+    getConfigurationSource().setProperty(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
+        IAppScriptService.APP_SCRIPT_XPAGE);
+    replayDefault(mockRequest);
     assertEquals("pathTo/pathTo2/myScript", appScriptService.getAppScriptNameFromRequestURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetAppScriptNameFromRequestURL_view_appSpace() {
+  public void test_getAppScriptNameFromRequestURL_view_appSpace() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -246,15 +246,15 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/" + IAppScriptService.APP_SCRIPT_XPAGE
         + "/myScript").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
-        "app"))).andReturn("app").anyTimes();
-    replayAll(mockRequest);
+    getConfigurationSource().setProperty(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
+        IAppScriptService.APP_SCRIPT_XPAGE);
+    replayDefault(mockRequest);
     assertEquals("myScript", appScriptService.getAppScriptNameFromRequestURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetAppScriptNameFromRequestURL_view_noAppSpace() {
+  public void test_getAppScriptNameFromRequestURL_view_noAppSpace() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -264,18 +264,18 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
-        "app"))).andReturn("app").anyTimes();
+    getConfigurationSource().setProperty(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
+        IAppScriptService.APP_SCRIPT_XPAGE);
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Content.login").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertEquals("", appScriptService.getAppScriptNameFromRequestURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetAppScriptNameFromRequestURL_view_overwriteAppDoc() {
+  public void test_getAppScriptNameFromRequestURL_view_overwriteAppDoc() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -286,18 +286,18 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/login").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
-        "app"))).andReturn("app").anyTimes();
+    getConfigurationSource().setProperty(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
+        IAppScriptService.APP_SCRIPT_XPAGE);
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Content.WhatsNew Content.login").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertEquals("login", appScriptService.getAppScriptNameFromRequestURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testHasDocAppScript_appAction() {
+  public void test_hasDocAppScript_appAction() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -308,24 +308,24 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
-        "app"))).andReturn("app").anyTimes();
+    getConfigurationSource().setProperty(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
+        IAppScriptService.APP_SCRIPT_XPAGE);
     DocumentReference appScriptDocRef = new DocumentReference(context.getDatabase(),
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "sub/testScript");
-    expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(false);
+    expect(modelAccessMock.exists(eq(appScriptDocRef))).andReturn(false);
     DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "sub/testScript");
-    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false);
+    expect(modelAccessMock.exists(eq(centralAppScriptDocRef))).andReturn(false);
     expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).anyTimes();
     expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(
         false).anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertFalse(appScriptService.hasDocAppScript("sub/testScript"));
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testHasDocAppScript_appAction_emptyString() {
+  public void test_hasDocAppScript_appAction_emptyString() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -336,14 +336,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertFalse(appScriptService.hasDocAppScript(""));
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetAppScriptDocRef_localOverwritesCentral() throws Exception {
-    appScriptService.emptyCheck = preseveEmptyCheck;
+  public void test_getAppScriptDocRef_localOverwritesCentral() throws Exception {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -356,10 +355,11 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     DocumentReference appScriptDocRef = new DocumentReference(context.getDatabase(),
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(true).anyTimes();
+    expect(modelAccessMock.exists(eq(appScriptDocRef))).andReturn(true).anyTimes();
     DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false).anyTimes();
+    expect(modelAccessMock.exists(eq(centralAppScriptDocRef))).andReturn(false)
+        .anyTimes();
     XWikiDocument appScriptDoc = new XWikiDocument(appScriptDocRef);
     appScriptDoc.setContent("this is no empty script!");
     expect(xwiki.getDocument(eq(appScriptDocRef), same(context))).andReturn(
@@ -367,15 +367,16 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
-    replayAll(mockRequest);
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).anyTimes();
+    replayDefault(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference(context.getDatabase(),
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript"));
-    verifyAll(mockRequest);
+    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript").get());
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetAppScriptDocRef_noLocalButCentral() throws Exception {
+  public void test_getAppScriptDocRef_noLocalButCentral() throws Exception {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -388,10 +389,11 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     DocumentReference appScriptDocRef = new DocumentReference(context.getDatabase(),
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(false).anyTimes();
+    expect(modelAccessMock.exists(eq(appScriptDocRef))).andReturn(false).anyTimes();
     DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(true).anyTimes();
+    expect(modelAccessMock.exists(eq(centralAppScriptDocRef))).andReturn(true)
+        .anyTimes();
     XWikiDocument appScriptDoc = new XWikiDocument(appScriptDocRef);
     appScriptDoc.setContent("this is no empty script!");
     expect(xwiki.getDocument(eq(centralAppScriptDocRef), same(context))).andReturn(
@@ -399,15 +401,15 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).anyTimes();
     expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(
         true).anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript"));
-    verifyAll(mockRequest);
+    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript").get());
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetScriptNameFromURL_emptyPathInfo() {
+  public void test_getScriptNameFromURL_emptyPathInfo() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -421,13 +423,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Main.WebHome").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertEquals("WebHome", appScriptService.getScriptNameFromURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetScriptNameFromURL_explicit_DefaultSpace() {
+  public void test_getScriptNameFromURL_explicit_DefaultSpace() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -440,13 +442,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Main.Test").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Main/Test").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertEquals("Test", appScriptService.getScriptNameFromURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetScriptNameFromURL_explicit_DefaultPage() {
+  public void test_getScriptNameFromURL_explicit_DefaultPage() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -460,13 +462,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Test.WebHome").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Test/WebHome").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertEquals("Test/WebHome", appScriptService.getScriptNameFromURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetScriptNameFromURL_implicit_DefaultPage() {
+  public void test_getScriptNameFromURL_implicit_DefaultPage() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -480,13 +482,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Test.WebHome").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Test/").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertEquals("Test/WebHome", appScriptService.getScriptNameFromURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetScriptNameFromURL_explicit_DefaultSpace_DefaultPage() {
+  public void test_getScriptNameFromURL_explicit_DefaultSpace_DefaultPage() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -500,13 +502,13 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Main.WebHome").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Main/WebHome").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertEquals("WebHome", appScriptService.getScriptNameFromURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetScriptNameFromURL_export_action() {
+  public void test_getScriptNameFromURL_export_action() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("export");
@@ -520,87 +522,210 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "TestSpace.TestScript").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/export/TestSpace/TestScript").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertEquals("TestSpace/TestScript", appScriptService.getScriptNameFromURL());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
-  public void testGetScriptNameFromDocRef_defaultSpace() {
+  public void test_getScriptNameFromDocRef_defaultSpace() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Main", "WebHome");
-    replayAll();
+    replayDefault();
     assertEquals("WebHome", appScriptService.getScriptNameFromDocRef(docRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
-  public void testGetScriptNameFromDocRef_anySpace() {
+  public void test_getScriptNameFromDocRef_anySpace() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "ScriptSpace",
         "TestScript");
-    replayAll();
+    replayDefault();
     assertEquals("ScriptSpace/TestScript", appScriptService.getScriptNameFromDocRef(docRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
-  public void testGetAppScriptURL_queryString_queryStringEmpty() {
+  public void test_getAppScriptURL_queryString_queryStringEmpty() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "someSpace", "someDoc");
     String scriptName = "someSpace/someDoc";
 
-    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc"),
-        (String) isNull(), same(context))).andReturn("theURL").once();
+    expect(urlServiceMock.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc")))
+        .andReturn("theURL").once();
 
-    replayAll();
+    replayDefault();
     assertEquals("theURL", appScriptService.getAppScriptURL(scriptName, null));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
-  public void testGetAppScriptURL() {
+  public void test_getAppScriptURL() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "someSpace", "someDoc");
     String scriptName = "someSpace/someDoc";
     String queryString = "string=a{sd]f&string2=a[sd}f";
 
-    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc&" + queryString),
-        (String) isNull(), same(context))).andReturn("theURL").once();
+    expect(urlServiceMock.getURL(eq(docRef), eq("view"),
+        eq("xpage=app&s=someSpace/someDoc&" + queryString))).andReturn("theURL").once();
 
-    replayAll();
+    replayDefault();
     assertEquals("theURL", appScriptService.getAppScriptURL(scriptName, queryString));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
-  public void testGetAppScriptURL_queryStringWithAmp() {
+  public void test_getAppScriptURL_queryStringWithAmp() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "someSpace", "someDoc");
     String scriptName = "someSpace/someDoc";
     String queryString = "&string=a{sd]f&string2=a[sd}f";
 
-    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc&" + queryString),
-        (String) isNull(), same(context))).andReturn("theURL").once();
+    expect(urlServiceMock.getURL(eq(docRef), eq("view"),
+        eq("xpage=app&s=someSpace/someDoc&" + queryString))).andReturn("theURL").once();
 
-    replayAll();
+    replayDefault();
     assertEquals("theURL", appScriptService.getAppScriptURL(scriptName, queryString));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
-  public void testGetAppScriptURL_longName() {
+  public void test_getAppScriptURL_longName() {
     String scriptName = "path/to/my/appscript";
     String queryString = "string=a{sd]f&string2=a[sd}f";
 
-    replayAll();
+    replayDefault();
     String url = appScriptService.getAppScriptURL(scriptName, queryString);
     assertEquals("/app/" + scriptName + "?xpage=app&s=" + scriptName
         + "&string=a%7Bsd%5Df&string2=a%5Bsd%7Df", url);
-    verifyAll();
+    verifyDefault();
   }
 
-  private void replayAll(Object... mocks) {
-    replayDefault(mocks);
+  @Test
+  public void test_isAppScriptAvailable_exists() throws Exception {
+    String scriptName = "path/to/my/appscript";
+    String scriptNamePath = "/templates/celAppScripts/" + scriptName + ".vm";
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePath))).andReturn(new byte[0])
+        .atLeastOnce();
+    replayDefault();
+    assertTrue(appScriptService.isAppScriptAvailable(scriptName));
+    verifyDefault();
   }
 
-  private void verifyAll(Object... mocks) {
-    verifyDefault(mocks);
+  @Test
+  public void test_isAppScriptAvailable_notExists() throws Exception {
+    String scriptName = "path/to/my/appscript";
+    String scriptNamePath = "/templates/celAppScripts/" + scriptName + ".vm";
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePath))).andThrow(new IOException())
+        .atLeastOnce();
+    replayDefault();
+    assertFalse(appScriptService.isAppScriptAvailable(scriptName));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveScript_exists() throws Exception {
+    String scriptName = "path/to/my/appscript";
+    String scriptNamePathBase = "/templates/celAppScripts/";
+    String expectedScriptName = "path/to++";
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + expectedScriptName + ".vm")))
+        .andReturn(new byte[0])
+        .atLeastOnce();
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path/to/my++.vm")))
+        .andThrow(new IOException())
+        .atLeastOnce();
+    replayDefault();
+    assertEquals(expectedScriptName, appScriptService.getAppRecursiveScript(scriptName).get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveScript_notExists() throws Exception {
+    String scriptName = "path/to/my/appscript";
+    String scriptNamePathBase = "/templates/celAppScripts/";
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path/to/my++.vm")))
+        .andThrow(new IOException())
+        .atLeastOnce();
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path/to++.vm")))
+        .andThrow(new IOException())
+        .atLeastOnce();
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path++.vm")))
+        .andThrow(new IOException())
+        .atLeastOnce();
+    replayDefault();
+    assertFalse(appScriptService.getAppRecursiveScript(scriptName).isPresent());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveScriptDocRef_found() {
+    String scriptName = "path/to/my/appscript";
+    DocumentReference appScriptDocRef2 = createScriptDocRef("path/to/my");
+    expect(modelAccessMock.exists(eq(appScriptDocRef2))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef2))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef2 = createScriptCentralDocRef("path/to/my");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef2))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef2))).andReturn(true)
+        .atLeastOnce();
+    DocumentReference appScriptDocRef3 = createScriptDocRef("path/to");
+    expect(modelAccessMock.exists(eq(appScriptDocRef3))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef3))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef3 = createScriptCentralDocRef("path/to");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef3))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef3))).andReturn(true)
+        .atLeastOnce();
+    DocumentReference appScriptDocRef = createScriptDocRef("path");
+    expect(modelAccessMock.exists(eq(appScriptDocRef))).andReturn(true).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).atLeastOnce();
+    replayDefault();
+    assertEquals(appScriptDocRef, appScriptService.getAppRecursiveScriptDocRef(scriptName).get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveScriptDocRef_notFound() {
+    String scriptName = "path/to/my/appscript";
+    DocumentReference appScriptDocRef2 = createScriptDocRef("path/to/my");
+    expect(modelAccessMock.exists(eq(appScriptDocRef2))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef2))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef2 = createScriptCentralDocRef("path/to/my");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef2))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef2))).andReturn(true)
+        .atLeastOnce();
+    DocumentReference appScriptDocRef3 = createScriptDocRef("path/to");
+    expect(modelAccessMock.exists(eq(appScriptDocRef3))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef3))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef3 = createScriptCentralDocRef("path/to");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef3))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef3))).andReturn(true)
+        .atLeastOnce();
+    DocumentReference appScriptDocRef = createScriptDocRef("path");
+    expect(modelAccessMock.exists(eq(appScriptDocRef))).andReturn(false).atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(true).atLeastOnce();
+    DocumentReference appScriptCentralDocRef = createScriptCentralDocRef("path");
+    expect(modelAccessMock.exists(eq(appScriptCentralDocRef))).andReturn(false)
+        .atLeastOnce();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef))).andReturn(true)
+        .atLeastOnce();
+    replayDefault();
+    assertFalse(appScriptService.getAppRecursiveScriptDocRef(scriptName).isPresent());
+    verifyDefault();
+  }
+
+  private DocumentReference createScriptDocRef(String scriptName) {
+    return RefBuilder
+        .from(new WikiReference(getXContext().getDatabase()))
+        .space(IAppScriptService.APP_RECURSIVE_SCRIPT_SPACE_NAME)
+        .doc(scriptName)
+        .build(DocumentReference.class);
+  }
+
+  private DocumentReference createScriptCentralDocRef(String scriptName) {
+    return RefBuilder
+        .from(XWikiConstant.CENTRAL_WIKI)
+        .space(IAppScriptService.APP_RECURSIVE_SCRIPT_SPACE_NAME)
+        .doc(scriptName)
+        .build(DocumentReference.class);
   }
 
 }

@@ -1,13 +1,12 @@
 package com.celements.web.service;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.AppScriptService;
 import com.celements.appScript.IAppScriptService;
@@ -28,15 +27,12 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
 
   @Before
   public void setUp_CelementsWebScriptServiceTest() throws Exception {
-    context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    mockRightService = createMock(XWikiRightService.class);
+    context = getXContext();
+    xwiki = getMock(XWiki.class);
+    mockRightService = createDefaultMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
-    celWebService = new CelementsWebScriptService();
-    celWebService.webUtilsService = Utils.getComponent(IWebUtilsService.class);
-    celWebService.execution = Utils.getComponent(Execution.class);
-    celWebService.appScriptService = Utils.getComponent(IAppScriptService.class);
+    celWebService = (CelementsWebScriptService) Utils.getComponent(ScriptService.class,
+        "celementsweb");
   }
 
   @Test
@@ -45,9 +41,9 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
         "myDocument");
     expect(mockRightService.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), eq(
         "mySpace.myDocument"), same(context))).andReturn(false).once();
-    replayAll();
+    replayDefault();
     assertFalse("expecting false because of no edit rights", celWebService.deleteMenuItem(docRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -109,9 +105,9 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
             "Content.login").anyTimes();
-    replayAll(mockRequest);
+    replayDefault(mockRequest);
     assertTrue(celWebService.isAppScriptRequest());
-    verifyAll(mockRequest);
+    verifyDefault(mockRequest);
   }
 
   @Test
@@ -126,9 +122,9 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
     expect(appScriptServiceMock.getAppScriptURL(eq(scriptName), eq(queryString))).andReturn(
         "theURL").once();
 
-    replayAll(appScriptServiceMock);
+    replayDefault(appScriptServiceMock);
     assertEquals("theURL", celWebService.getCurrentPageURL(queryString));
-    verifyAll(appScriptServiceMock);
+    verifyDefault(appScriptServiceMock);
   }
 
   @Test
@@ -139,33 +135,23 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
 
     expect(appScriptServiceMock.isAppScriptRequest()).andReturn(false).once();
 
-    replayAll(appScriptServiceMock);
+    replayDefault(appScriptServiceMock);
     assertEquals("?my%5BQuery%7DString", celWebService.getCurrentPageURL(queryString));
-    verifyAll(appScriptServiceMock);
+    verifyDefault(appScriptServiceMock);
   }
 
   @Test
   public void testIsHighDate() {
-    replayAll();
+    replayDefault();
     assertTrue(celWebService.isHighDate(IWebUtilsService.DATE_HIGH));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testIsHighDate_NPE() {
-    replayAll();
+    replayDefault();
     assertFalse(celWebService.isHighDate(null));
-    verifyAll();
-  }
-
-  private void replayAll(Object... mocks) {
-    replay(xwiki, mockRightService);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object... mocks) {
-    verify(xwiki, mockRightService);
-    verify(mocks);
+    verifyDefault();
   }
 
 }
