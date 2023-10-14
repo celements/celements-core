@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
@@ -132,17 +133,18 @@ public class AppScriptService implements IAppScriptService {
   }
 
   @Override
-  public DocumentReference getAppRecursiveScriptDocRef(String scriptName) {
-    String scriptNameFound = findAppScriptRecursivly(scriptName,
+  public Optional<DocumentReference> getAppRecursiveScriptDocRef(String scriptName) {
+    return findAppScriptRecursivly(scriptName,
         sn -> hasLocalAppRecursiveScript(sn)
             || hasCentralAppRecursiveScript(sn),
-        sn -> sn.lastIndexOf("/") > 0);
-    if (hasLocalAppRecursiveScript(scriptNameFound)) {
-      return getLocalAppRecursiveScriptDocRef(scriptNameFound);
-    } else if (hasCentralAppRecursiveScript(scriptNameFound)) {
-      return getCentralAppRecursiveScriptDocRef(scriptNameFound);
-    }
-    return null;
+        sn -> sn.lastIndexOf("/") > 0).map(scriptNameFound -> {
+          if (hasLocalAppRecursiveScript(scriptNameFound)) {
+            return getLocalAppRecursiveScriptDocRef(scriptNameFound);
+          } else if (hasCentralAppRecursiveScript(scriptNameFound)) {
+            return getCentralAppRecursiveScriptDocRef(scriptNameFound);
+          }
+          return null;
+        });
   }
 
   @Override
@@ -189,24 +191,24 @@ public class AppScriptService implements IAppScriptService {
   }
 
   @Override
-  public String getAppRecursiveScript(String scriptName) {
-    String scriptNameTest = findAppScriptRecursivly(scriptName,
+  public Optional<String> getAppRecursiveScript(String scriptName) {
+    return findAppScriptRecursivly(scriptName,
         sn -> isAppScriptAvailable(sn + "++"),
-        sn -> sn.lastIndexOf("/") > 0) + "++";
-    if (!Strings.isNullOrEmpty(scriptNameTest) && isAppScriptAvailable(scriptNameTest)) {
-      return scriptNameTest;
-    } else {
-      return null;
-    }
+        sn -> sn.lastIndexOf("/") > 0)
+            .map(sNT -> sNT + "++")
+            .filter(sNT -> !Strings.isNullOrEmpty(sNT) && isAppScriptAvailable(sNT));
   }
 
-  private String findAppScriptRecursivly(String scriptName,
+  private Optional<String> findAppScriptRecursivly(String scriptName,
       Predicate<String> hasFound, Predicate<String> hasMore) {
     String scriptNameTest = scriptName;
     do {
       scriptNameTest = reduceOneDirectory(scriptNameTest);
     } while (!hasFound.test(scriptNameTest) && hasMore.test(scriptNameTest));
-    return scriptNameTest;
+    if (hasFound.test(scriptNameTest)) {
+      return Optional.of(scriptNameTest);
+    }
+    return Optional.empty();
   }
 
   private String reduceOneDirectory(String scriptNameTest) {
@@ -276,27 +278,24 @@ public class AppScriptService implements IAppScriptService {
 
   @Override
   public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
-    try {
-      String overwriteAppDocs = wikiProvider.await(Duration.ofSeconds(60)).getXWikiPreference(
-          APP_SCRIPT_XWPREF_OVERW_DOCS, APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext());
-      List<DocumentReference> overwAppDocList = new ArrayList<>();
-      if (!"-".equals(overwriteAppDocs)) {
-        for (String overwAppDocFN : overwriteAppDocs.split("[, ]")) {
-          try {
-            DocumentReference overwAppDocRef = modelUtils.resolveRef(overwAppDocFN,
-                DocumentReference.class);
-            overwAppDocList.add(overwAppDocRef);
-          } catch (Exception exp) {
-            LOGGER.warn("Failed to parse appScript overwrite docs config part [{}] of complete"
-                + " config [{}].", overwAppDocFN, overwriteAppDocs);
-          }
+    String overwriteAppDocs = wikiProvider.get()
+        .map(wiki -> wiki.getXWikiPreference(APP_SCRIPT_XWPREF_OVERW_DOCS,
+            APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext()))
+        .orElse("-");
+    List<DocumentReference> overwAppDocList = new ArrayList<>();
+    if (!"-".equals(overwriteAppDocs)) {
+      for (String overwAppDocFN : overwriteAppDocs.split("[, ]")) {
+        try {
+          DocumentReference overwAppDocRef = modelUtils.resolveRef(overwAppDocFN,
+              DocumentReference.class);
+          overwAppDocList.add(overwAppDocRef);
+        } catch (Exception exp) {
+          LOGGER.warn("Failed to parse appScript overwrite docs config part [{}] of complete"
+              + " config [{}].", overwAppDocFN, overwriteAppDocs);
         }
       }
-      return overwAppDocList.contains(docRef);
-    } catch (ExecutionException exp) {
-      LOGGER.warn("Failed to get wiki in isAppScriptOverwriteDocRef", exp);
     }
-    return false;
+    return overwAppDocList.contains(docRef);
   }
 
   private boolean isAppScriptActionRequest() {

@@ -63,7 +63,7 @@ public class AppScriptScriptService implements ScriptService {
   }
 
   public DocumentReference getAppRecursiveScriptDocRef(String scriptName) {
-    return appScriptService.getAppRecursiveScriptDocRef(scriptName);
+    return appScriptService.getAppRecursiveScriptDocRef(scriptName).orElse(null);
   }
 
   public boolean isAppScriptAvailable(String scriptName) {
@@ -71,7 +71,7 @@ public class AppScriptScriptService implements ScriptService {
   }
 
   public String getAppRecursiveScript(String scriptName) {
-    return appScriptService.getAppRecursiveScript(scriptName);
+    return appScriptService.getAppRecursiveScript(scriptName).orElse(null);
   }
 
   public String getAppScriptTemplatePath(String scriptName) {

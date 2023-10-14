@@ -631,7 +631,7 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         .andThrow(new IOException())
         .atLeastOnce();
     replayDefault();
-    assertEquals(expectedScriptName, appScriptService.getAppRecursiveScript(scriptName));
+    assertEquals(expectedScriptName, appScriptService.getAppRecursiveScript(scriptName).get());
     verifyDefault();
   }
 
@@ -649,7 +649,7 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         .andThrow(new IOException())
         .atLeastOnce();
     replayDefault();
-    assertNull(appScriptService.getAppRecursiveScript(scriptName));
+    assertFalse(appScriptService.getAppRecursiveScript(scriptName).isPresent());
     verifyDefault();
   }
 
@@ -676,7 +676,7 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(modelAccessMock.exists(eq(appScriptDocRef))).andReturn(true).atLeastOnce();
     expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).atLeastOnce();
     replayDefault();
-    assertEquals(appScriptDocRef, appScriptService.getAppRecursiveScriptDocRef(scriptName));
+    assertEquals(appScriptDocRef, appScriptService.getAppRecursiveScriptDocRef(scriptName).get());
     verifyDefault();
   }
 
@@ -708,7 +708,7 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptCentralDocRef))).andReturn(true)
         .atLeastOnce();
     replayDefault();
-    assertNull(appScriptService.getAppRecursiveScriptDocRef(scriptName));
+    assertFalse(appScriptService.getAppRecursiveScriptDocRef(scriptName).isPresent());
     verifyDefault();
   }
 

@@ -1,5 +1,7 @@
 package com.celements.appScript;
 
+import java.util.Optional;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -29,7 +31,7 @@ public interface IAppScriptService {
 
   DocumentReference getAppScriptDocRef(String scriptName);
 
-  DocumentReference getAppRecursiveScriptDocRef(String scriptName);
+  Optional<DocumentReference> getAppRecursiveScriptDocRef(String scriptName);
 
   DocumentReference getLocalAppScriptDocRef(String scriptName);
 
@@ -43,7 +45,7 @@ public interface IAppScriptService {
 
   boolean isAppScriptAvailable(String scriptName);
 
-  String getAppRecursiveScript(String scriptName);
+  Optional<String> getAppRecursiveScript(String scriptName);
 
   String getAppScriptURL(String scriptName);
 
