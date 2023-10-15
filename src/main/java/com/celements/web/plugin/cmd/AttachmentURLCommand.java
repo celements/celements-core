@@ -21,7 +21,7 @@ package com.celements.web.plugin.cmd;
 
 import static com.celements.common.MoreOptional.*;
 import static com.celements.execution.XWikiExecutionProp.*;
-import static org.python.google.common.base.Strings.*;
+import static com.google.common.base.Strings.*;
 
 import java.net.MalformedURLException;
 import java.util.Optional;
