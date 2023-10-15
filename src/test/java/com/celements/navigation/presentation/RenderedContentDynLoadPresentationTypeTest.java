@@ -22,8 +22,8 @@ package com.celements.navigation.presentation;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
@@ -44,6 +44,7 @@ import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponentTest {
 
@@ -104,8 +105,7 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
     boolean isFirstItem = true;
     boolean isLastItem = false;
     boolean isLeaf = true;
-    expect(mContext.getURL())
-        .andReturn(Optional.of(new URL("https://www.text.ch/MyPage")));
+    Map<String, String[]> paramMap = Map.of();
     String queryString = "xpage=ajax&ajax_mode=rendering/renderDocumentWithPageType&ajax=1";
     String expectedUrl = "/MySpace/MyCurrentDoc?" + queryString;
     String expectedNodeContent = "<cel-lazy-load src=\"" + expectedUrl
@@ -117,6 +117,9 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
             + " first cel_nav_isLeaf RichText\"").once();
     expect(urlServiceMock.getURL(eq(currentDocRef), eq("view"), eq(queryString)))
         .andReturn(expectedUrl);
+    XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
+    expect(mContext.request()).andReturn(Optional.of(requestMock));
+    expect(requestMock.getParameterMap()).andReturn(paramMap);
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
@@ -135,11 +138,10 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
     boolean isFirstItem = true;
     boolean isLastItem = false;
     boolean isLeaf = true;
-    String additionalSkipParams = "&ajax=0&xpage=sfda&ajax_mode=safd";
     String additionalParams = "startDate=12.10.2023";
-    expect(mContext.getURL())
-        .andReturn(Optional
-            .of(new URL("https://www.text.ch/MyPage?" + additionalParams + additionalSkipParams)));
+    Map<String, String[]> paramMap = Map.of("ajax", new String[] { "0" }, "xpage",
+        new String[] { "sfda" }, "startDate", new String[] { "12.10.2023" },
+        "ajax_mode", new String[] { "safd", "safd2" });
     String queryString = "xpage=ajax&ajax_mode=rendering/renderDocumentWithPageType&ajax=1&"
         + additionalParams;
     String expectedUrl = "/MySpace/MyCurrentDoc?" + queryString;
@@ -152,6 +154,9 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
             + " first cel_nav_isLeaf RichText\"").once();
     expect(urlServiceMock.getURL(eq(currentDocRef), eq("view"), eq(queryString)))
         .andReturn(expectedUrl);
+    XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
+    expect(mContext.request()).andReturn(Optional.of(requestMock));
+    expect(requestMock.getParameterMap()).andReturn(paramMap);
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""

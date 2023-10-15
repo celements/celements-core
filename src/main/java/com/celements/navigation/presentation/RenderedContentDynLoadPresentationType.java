@@ -1,9 +1,10 @@
 package com.celements.navigation.presentation;
 
-import java.net.URL;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
   private final UrlService urlSrv;
   private final ModelContext mContext;
 
-  private final List<String> keyBlackList = List.of("ajax=", "xpage=", "ajax_mode=");
+  private final Set<String> keyBlackList = Set.of("ajax", "xpage", "ajax_mode");
 
   @Inject
   public RenderedContentDynLoadPresentationType(UrlService urlSrv, ModelContext mContext) {
@@ -53,18 +54,16 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
   }
 
   private @NotNull String getPassThroughParams() {
-    return mContext.getURL()
-        .flatMap(this::getParamsFromQuery)
-        .orElse(List.of()).stream()
-        .filter(keyValue -> keyBlackList.stream().noneMatch(keyValue::startsWith))
+    return mContext.request()
+    .map(r -> r.getParameterMap().entrySet())
+    .orElse(Set.of())
+    .stream()
+    .filter(entry1 -> !keyBlackList.contains(entry1.getKey()))
+        .flatMap(entry -> List.of(entry.getValue()).stream()
+            .map(v -> entry.getKey() + "=" + v))
         .collect(() -> new StringJoiner("&", "&", "").setEmptyValue(""), StringJoiner::add,
             StringJoiner::merge)
         .toString();
-  }
-
-  private Optional<List<String>> getParamsFromQuery(URL url) {
-    return Optional.ofNullable(url.getQuery())
-        .map(s -> List.<String>of(s.split("&")));
   }
 
 }
