@@ -21,6 +21,7 @@ package com.celements.web.plugin.cmd;
 
 import static com.celements.common.MoreOptional.*;
 import static com.celements.execution.XWikiExecutionProp.*;
+import static org.python.google.common.base.Strings.*;
 
 import java.net.MalformedURLException;
 import java.util.Optional;
@@ -72,6 +73,10 @@ public class AttachmentURLCommand {
         + "/");
   }
 
+  /**
+   * @deprecated instead use {@link #getAttachmentURL(String, String, String)}
+   */
+  @Deprecated(since = "6.2")
   public String getAttachmentURL(String link, String action, XWikiContext context) {
     return getAttachmentURL(link, action, "")
         .map(UriComponents::toUriString)
@@ -106,7 +111,7 @@ public class AttachmentURLCommand {
     }
     try {
       UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
-      builder = builder.query(queryString);
+      builder = builder.query(nullToEmpty(queryString)); // null clears the query string
       if ((versionProvider != null) && !builder.build().getQueryParams().containsKey("version")) {
         builder = builder.queryParam("version", versionProvider.get());
       }
