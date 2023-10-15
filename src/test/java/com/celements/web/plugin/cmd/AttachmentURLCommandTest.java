@@ -63,7 +63,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURL_fullURL() {
+  public void test_getAttachmentURL_fullURL() {
     replayDefault();
     assertEquals("http://www.bla.com/bla.txt", attUrlCmd.getAttachmentURL(
         "http://www.bla.com/bla.txt", context));
@@ -71,7 +71,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURL_partURL() {
+  public void test_getAttachmentURL_partURL() {
     replayDefault();
     assertEquals("/xwiki/bin/download/A/B/bla.txt", attUrlCmd.getAttachmentURL(
         "/xwiki/bin/download/A/B/bla.txt", context));
@@ -79,7 +79,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURL_dynamicParamURL() throws MalformedURLException {
+  public void test_getAttachmentURL_dynamicParamURL() throws MalformedURLException {
     String mySpaceName = "mySpace";
     String myDocName = "myDoc";
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), mySpaceName,
@@ -95,7 +95,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURL_fullInternalLink() throws Exception {
+  public void test_getAttachmentURL_fullInternalLink() throws Exception {
     var attRef = new AttachmentReference("bla.txt",
         new DocumentReference("celements2web", "A", "B"));
     String resultURL = "http://celements2web.localhost/file/A/B/bla.txt";
@@ -112,7 +112,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURL_partInternalLink() throws Exception {
+  public void test_getAttachmentURL_partInternalLink() throws Exception {
     var attRef = new AttachmentReference("bla.txt",
         new DocumentReference(context.getDatabase(), "A", "B"));
     String resultURL = "http://mydomain.ch/file/A/B/bla.txt";
@@ -129,7 +129,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURL_partInternalLink_notExists() throws Exception {
+  public void test_getAttachmentURL_partInternalLink_notExists() throws Exception {
     var attRef = new AttachmentReference("bla.txt",
         new DocumentReference(context.getDatabase(), "A", "B"));
     expect(getMock(IAttachmentServiceRole.class)
@@ -141,7 +141,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURL_onDiskLink() throws XWikiException, MalformedURLException {
+  public void test_getAttachmentURL_onDiskLink() throws XWikiException, MalformedURLException {
     String resultURL = "/appname/skin/resources/celJS/bla.js";
     expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
@@ -150,6 +150,25 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     String attachmentURL = attUrlCmd.getAttachmentURL("  :celJS/bla.js", context);
     String expectedURL = "/appname/file/resources/celJS/bla.js";
     assertTrue(attachmentURL, attachmentURL.matches(expectedURL + "\\?version=\\d{14}"));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAttachmentURL_query() {
+    String url = "http://www.bla.com/bla.mjs";
+    String query = "version=1234";
+    replayDefault();
+    assertEquals(url + "?" + query, attUrlCmd.getAttachmentURL(url, "file", query)
+        .get().toUriString());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAttachmentURL_query_inLink() {
+    String url = "http://www.bla.com/bla.mjs?version=1234";
+    replayDefault();
+    assertEquals(url, attUrlCmd.getAttachmentURL(url, "file", "").get().toUriString());
+    assertEquals(url, attUrlCmd.getAttachmentURL(url, "file", (String) null).get().toUriString());
     verifyDefault();
   }
 
@@ -184,7 +203,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURL_Rubish() {
+  public void test_getAttachmentURL_Rubish() {
     replayDefault();
     assertEquals("http://A.B;bla.txt", attUrlCmd.getAttachmentURL("http://A.B;bla.txt", context));
     verifyDefault();
@@ -204,7 +223,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetAttachmentURLPrefix() throws Exception {
+  public void test_getAttachmentURLPrefix() throws Exception {
     expect(mockURLFactory.createResourceURL(eq(""), eq(true), same(context))).andReturn(new URL(
         "http://test.fabian.dev:10080/skin/resources/"));
     replayDefault();
