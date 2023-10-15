@@ -19,11 +19,12 @@
  */
 package com.celements.navigation.presentation;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
@@ -31,6 +32,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.context.ModelContext;
 import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.service.UrlService;
@@ -42,6 +44,7 @@ import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponentTest {
 
@@ -54,11 +57,13 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
   private TestRenderEngine testRenderEngine;
   private RenderCommand renderCmdMock;
   private UrlService urlServiceMock;
+  private ModelContext mContext;
 
   @Before
-  public void setUp_RenderedContentDynLoadPresentationTypeTest() throws Exception {
-    xwiki = getWikiMock();
-    context = getContext();
+  public void prepareTest() throws Exception {
+    xwiki = getMock(XWiki.class);
+    mContext = registerComponentMock(ModelContext.class);
+    context = getXContext();
     urlServiceMock = registerComponentMock(UrlService.class);
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
@@ -73,25 +78,25 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
   }
 
   @Test
-  public void testComponentLoaded() {
+  public void test_componentLoaded() {
     assertNotNull(Utils.getComponent(IPresentationTypeRole.class, "renderedContentDynLoad"));
   }
 
   @Test
-  public void testGetRenderCommand_default() {
+  public void test_getRenderCommand_default() {
     vtPresType.renderCmd = null;
     assertNotNull(vtPresType.getRenderCommand());
   }
 
   @Test
-  public void testGetRenderCommand_inject() {
+  public void test_getRenderCommand_inject() {
     RenderCommand testMock = new RenderCommand();
     vtPresType.renderCmd = testMock;
     assertSame(testMock, vtPresType.getRenderCommand());
   }
 
   @Test
-  public void testWriteNodeContent() throws Exception {
+  public void test_writeNodeContent_emptyQuery() throws Exception {
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
         "MyPage");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -100,6 +105,7 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
     boolean isFirstItem = true;
     boolean isLastItem = false;
     boolean isLeaf = true;
+    Map<String, String[]> paramMap = Map.of();
     String queryString = "xpage=ajax&ajax_mode=rendering/renderDocumentWithPageType&ajax=1";
     String expectedUrl = "/MySpace/MyCurrentDoc?" + queryString;
     String expectedNodeContent = "<cel-lazy-load src=\"" + expectedUrl
@@ -111,6 +117,46 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
             + " first cel_nav_isLeaf RichText\"").once();
     expect(urlServiceMock.getURL(eq(currentDocRef), eq("view"), eq(queryString)))
         .andReturn(expectedUrl);
+    XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
+    expect(mContext.request()).andReturn(Optional.of(requestMock));
+    expect(requestMock.getParameterMap()).andReturn(paramMap);
+    replayDefault();
+    vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
+    assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
+        + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
+        outStream.toString());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_writeNodeContent_withQuery() throws Exception {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "MyPage");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    StringBuilder outStream = new StringBuilder();
+    boolean isFirstItem = true;
+    boolean isLastItem = false;
+    boolean isLeaf = true;
+    String additionalParams = "startDate=12.10.2023";
+    Map<String, String[]> paramMap = Map.of("ajax", new String[] { "0" }, "xpage",
+        new String[] { "sfda" }, "startDate", new String[] { "12.10.2023" },
+        "ajax_mode", new String[] { "safd", "safd2" });
+    String queryString = "xpage=ajax&ajax_mode=rendering/renderDocumentWithPageType&ajax=1&"
+        + additionalParams;
+    String expectedUrl = "/MySpace/MyCurrentDoc?" + queryString;
+    String expectedNodeContent = "<cel-lazy-load src=\"" + expectedUrl
+        + "\" size=32 ></cel-lazy-load>\n";
+    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
+        "id=\"N3:Content:Content.MyPage\"").once();
+    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
+        isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
+            + " first cel_nav_isLeaf RichText\"").once();
+    expect(urlServiceMock.getURL(eq(currentDocRef), eq("view"), eq(queryString)))
+        .andReturn(expectedUrl);
+    XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
+    expect(mContext.request()).andReturn(Optional.of(requestMock));
+    expect(requestMock.getParameterMap()).andReturn(paramMap);
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
