@@ -3,6 +3,9 @@ package com.celements.web.service;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
+
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -186,6 +189,17 @@ public class WebUtilsScriptService implements ScriptService {
 
   public String getMajorVersion(Document doc) {
     return webUtilsService.getMajorVersion(doc.getDocument());
+  }
+
+  public Cookie createCookie(String name, String value) {
+    if (!Strings.isNullOrEmpty(name)) {
+      try {
+        return new Cookie(name, value);
+      } catch (IllegalArgumentException iae) {
+        LOGGER.warn("createCookie - illegal name {}", name);
+      }
+    }
+    return null;
   }
 
   private boolean hasProgrammingRights() {
