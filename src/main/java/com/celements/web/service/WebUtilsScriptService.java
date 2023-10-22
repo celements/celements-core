@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.servlet.http.Cookie;
 
-import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -20,6 +19,7 @@ import com.celements.auth.AuthenticationScriptService;
 import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.model.context.ModelContext;
 import com.celements.rights.access.EAccessLevel;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
