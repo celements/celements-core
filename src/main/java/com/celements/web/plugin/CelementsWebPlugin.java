@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.celements.auth.AccountActivationFailedException;
-import com.celements.auth.AuthenticationService;
 import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.mailsender.IMailSenderRole;
 import com.celements.mandatory.CheckMandatoryDocuments;
@@ -48,7 +47,6 @@ import com.celements.web.service.ICelementsWebServiceRole;
 import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.service.WebUtilsService;
-import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.webform.ActionService;
 import com.celements.webform.IActionServiceRole;
 import com.celements.webform.IWebFormServiceRole;
@@ -221,19 +219,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.22.0
-   *             instead use
-   *             NewCelementsTokenForUserCommand.getNewCelementsTokenForUserWithAutentication
-   */
-  @Deprecated
-  public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus,
-      XWikiContext context) throws XWikiException {
-    return new NewCelementsTokenForUserCommand().getNewCelementsTokenForUserWithAuthentication(
-        accountName, guestPlus, context);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link AuthenticationService
+   * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #getPasswordHash(String, String)}
    */
   @Deprecated
@@ -242,7 +228,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link AuthenticationService
+   * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #activateAccount(String)}
    */
   @Deprecated
@@ -379,19 +365,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * getUniqueValidationKey
-   *
-   * @param context
-   * @return
-   * @throws XWikiException
-   * @deprecated since 2.14.0 use NewCelementsTokenForUserCommand instead
-   */
-  @Deprecated
-  public String getUniqueValidationKey(XWikiContext context) throws XWikiException {
-    return new NewCelementsTokenForUserCommand().getUniqueValidationKey(context);
-  }
-
-  /**
    * @param attachToDoc
    * @param fieldName
    * @param userToken
@@ -446,7 +419,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link AuthenticationService
+   * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #checkAuth(String, String, String, String, Boolean)}
    */
   @Deprecated
