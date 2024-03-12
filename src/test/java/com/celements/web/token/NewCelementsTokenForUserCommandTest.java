@@ -19,7 +19,6 @@
  */
 package com.celements.web.token;
 
-import static com.celements.auth.user.UserTestUtils.*;
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -37,11 +36,14 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.classes.ClassDefinition;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.web.classes.oldcore.XWikiUsersClass;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommandTest extends AbstractComponentTest {
 
@@ -169,6 +171,20 @@ public class NewCelementsTokenForUserCommandTest extends AbstractComponentTest {
 
   private XWikiObjectFetcher getTokenObjects(XWikiDocument doc) {
     return XWikiObjectFetcher.on(doc).filter(cmd.getTokenClassRef());
+  }
+
+  private BaseObject addUserObj(XWikiDocument userDoc) {
+    BaseObject userObj = new BaseObject();
+    userObj.setDocumentReference(userDoc.getDocumentReference());
+    userObj.setXClassReference(getUserClass().getClassReference().getDocRef(
+        userDoc.getDocumentReference().getWikiReference()));
+    userObj.setIntValue(XWikiUsersClass.FIELD_SUSPENDED.getName(), 0);
+    userDoc.addXObject(userObj);
+    return userObj;
+  }
+
+  private ClassDefinition getUserClass() {
+    return Utils.getComponent(ClassDefinition.class, XWikiUsersClass.CLASS_DEF_HINT);
   }
 
 }
