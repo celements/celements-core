@@ -502,44 +502,6 @@ public class CelementsWebPluginApi extends Api {
     return getAuthenticationService().getPasswordHash(encoding, str);
   }
 
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #sendNewValidation(String, String,
-   *             DocumentReference)}
-   */
-  @Deprecated
-  public void sendNewValidation(String user, String possibleFields,
-      DocumentReference mailContentDocRef) {
-    getAuthenticationService().sendNewValidation(user, possibleFields, mailContentDocRef);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getNewCelementsTokenForUser()}
-   */
-  @Deprecated
-  public String getNewCelementsTokenForUser() {
-    return getAuthenticationService().getNewCelementsTokenForUser();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getNewCelementsTokenForUser(Boolean)}
-   */
-  @Deprecated
-  public String getNewCelementsTokenForUser(Boolean guestPlus) {
-    return getAuthenticationService().getNewCelementsTokenForUser(guestPlus);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getNewCelementsTokenForUser(Boolean, int)}
-   */
-  @Deprecated
-  public String getNewCelementsTokenForUser(Boolean guestPlus, int minutesValid) {
-    return getAuthenticationService().getNewCelementsTokenForUser(guestPlus, minutesValid);
-  }
-
   // /**
   // * If a template in the template dir on disk is parsed the hasProbrammingRights will
   // * return false, because the sdoc and idoc are NULL. hasCelProgrammingRights in
