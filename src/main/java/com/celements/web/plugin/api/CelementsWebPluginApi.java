@@ -470,15 +470,6 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getUsernameForUserData(String, String)}
-   */
-  @Deprecated
-  public String getUsernameForUserData(String login, String possibleLogins) {
-    return getAuthenticationService().getUsernameForUserData(login, possibleLogins);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
    *             {@link CelementsWebScriptService #getNextObjPageId(SpaceReference,
    *             DocumentReference, String)}
    */
