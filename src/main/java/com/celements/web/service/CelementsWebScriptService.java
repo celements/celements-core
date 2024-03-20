@@ -797,6 +797,10 @@ public class CelementsWebScriptService implements ScriptService {
     return (webUtilsService.isAdvancedAdmin() || showLoginName);
   }
 
+  /**
+   * @deprecated since 6.5 instead use {@link CelementsUserScriptService#getPossibleLoginFields()}
+   */
+  @Deprecated
   public String getPossibleLogins() {
     return new PossibleLoginsCommand().getPossibleLogins();
   }
