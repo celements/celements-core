@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.celements.auth.user.UserService;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 
@@ -15,6 +16,7 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
   @Before
   public void prepareTest() throws Exception {
     registerComponentMock(IModelAccessFacade.class);
+    registerComponentMock(UserService.class);
     service = (CelementsWebService) getComponentManager().lookup(ICelementsWebServiceRole.class);
   }
 
