@@ -398,27 +398,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @param userToken
-   * @param context
-   * @return
-   * @throws XWikiException
-   * @deprecated since 2.14.0 dropped. Set token and username in request for automated
-   *             login.
-   */
-  @Deprecated
-  public XWikiUser checkAuthByToken(String userToken, XWikiContext context) throws XWikiException {
-    String username = getUsernameForToken(userToken, context);
-    if ((username != null) && !username.equals("")) {
-      LOGGER.info("checkAuthByToken: user " + username + " identified by userToken.");
-      context.setUser(username);
-      return context.getXWikiUser();
-    } else {
-      LOGGER.warn("checkAuthByToken: username could not be identified by token");
-    }
-    return null;
-  }
-
-  /**
    * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #checkAuth(String, String, String, String, Boolean)}
    */
