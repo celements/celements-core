@@ -24,7 +24,6 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,21 +113,6 @@ public class CelementsWebPluginTest extends AbstractComponentTest {
     assertTrue(((GetMappedMenuItemsForParentCommand) context.get(
         GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY)).isActive());
 
-  }
-
-  @Test
-  public void testGetSupportedAdminLanguages() {
-    assertNotNull(plugin.getSupportedAdminLanguages());
-    assertEquals(Arrays.asList("de", "fr", "en", "it"),
-        plugin.getSupportedAdminLanguages());
-  }
-
-  @Test
-  public void testSetSupportedAdminLanguages() {
-    List<String> injectedLangList = Arrays.asList("bla", "bli", "blo");
-    plugin.setSupportedAdminLanguages(injectedLangList);
-    assertNotNull(plugin.getSupportedAdminLanguages());
-    assertEquals(injectedLangList, plugin.getSupportedAdminLanguages());
   }
 
   @Test

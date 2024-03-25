@@ -431,24 +431,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   /**
    * @deprecated since 2.59 instead use {@link CelementsWebService
-   *             #getSupportedAdminLanguages()}
-   */
-  @Deprecated
-  public List<String> getSupportedAdminLanguages() {
-    return getCelementsWebService().getSupportedAdminLanguages();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link CelementsWebService
-   *             #setSupportedAdminLanguages(List<String> newSupportedAdminLangList)}
-   */
-  @Deprecated
-  public void setSupportedAdminLanguages(List<String> newSupportedAdminLangList) {
-    getCelementsWebService().setSupportedAdminLanguages(newSupportedAdminLangList);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link CelementsWebService
    *             #writeUTF8Response(String, String)}
    */
   @Deprecated
