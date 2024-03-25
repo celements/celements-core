@@ -20,11 +20,9 @@
 package com.celements.web.plugin;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +57,6 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
@@ -160,62 +157,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public String getUsernameForUserData(String login, String possibleLogins, XWikiContext context)
       throws XWikiException {
     return new UserNameForUserDataCommand().getUsernameForUserData(login, possibleLogins, context);
-  }
-
-  /**
-   * @param userToken
-   * @param context
-   * @return
-   * @throws XWikiException
-   * @deprecated since 2.14.0 use TokenLDAPAuthServiceImpl instead
-   */
-  @Deprecated
-  public String getUsernameForToken(String userToken, XWikiContext context) throws XWikiException {
-
-    String hashedCode = encryptString("hash:SHA-512:", userToken);
-    String userDoc = "";
-
-    if ((userToken != null) && (userToken.trim().length() > 0)) {
-
-      String hql = ", BaseObject as obj, Classes.TokenClass as token where ";
-      hql += "doc.space='XWiki' ";
-      hql += "and obj.name=doc.fullName ";
-      hql += "and token.tokenvalue=? ";
-      hql += "and token.validuntil>=? ";
-      hql += "and obj.id=token.id ";
-
-      List<Object> parameterList = new Vector<>();
-      parameterList.add(hashedCode);
-      parameterList.add(new Date());
-
-      XWikiStoreInterface storage = context.getWiki().getStore();
-      List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
-      LOGGER.info("searching token and found " + users.size() + " with parameters "
-          + Arrays.deepToString(parameterList.toArray()));
-      if ((users == null) || (users.size() == 0)) {
-        String db = context.getDatabase();
-        context.setDatabase("xwiki");
-        users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
-        if ((users != null) && (users.size() == 1)) {
-          users.add("xwiki:" + users.remove(0));
-        }
-        context.setDatabase(db);
-      }
-      int usersFound = 0;
-      for (String tmpUserDoc : users) {
-        if (!tmpUserDoc.trim().equals("")) {
-          usersFound++;
-          userDoc = tmpUserDoc;
-        }
-      }
-      if (usersFound > 1) {
-        LOGGER.warn("Found more than one user for token '" + userToken + "'");
-        return null;
-      }
-    } else {
-      LOGGER.warn("No valid token given");
-    }
-    return userDoc;
   }
 
   /**
