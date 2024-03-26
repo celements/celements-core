@@ -179,17 +179,6 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     this.supportedAdminLangList = supportedAdminLangList;
   }
 
-  @Deprecated
-  @Override
-  public String encodeUrlToUtf8(String urlStr) {
-    try {
-      return encodeUrlForRedirect(urlStr);
-    } catch (MalformedURLException exc) {
-      LOGGER.error("Failed to encode url [{}] to utf-8", urlStr, exc);
-      return urlStr;
-    }
-  }
-
   @Override
   public void sendRedirect(String urlStr) {
     try {

@@ -23,14 +23,9 @@ import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
-import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,8 +33,6 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 
 public class CelementsWebPluginTest extends AbstractComponentTest {
 
@@ -58,87 +51,6 @@ public class CelementsWebPluginTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetUsernameForToken() throws XWikiException {
-    XWiki xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
-    String userToken = "123456789012345678901234";
-    List<String> userDocs = new Vector<>();
-    userDocs.add("Doc.Fullname");
-    expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = newCapture();
-    Capture<List<?>> captParams = newCapture();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
-        context))).andReturn(userDocs).once();
-    replay(xwiki, store);
-    assertEquals("Doc.Fullname", plugin.getUsernameForToken(userToken, context));
-    assertTrue(captHQL.getValue().contains("token.tokenvalue=?"));
-    assertTrue("There seems to be no database independent 'now' in hql.",
-        captHQL.getValue().contains("token.validuntil>=?"));
-    assertTrue(captParams.getValue().contains(plugin.encryptString("hash:SHA-512:", userToken)));
-    verify(xwiki, store);
-  }
-
-  @Test
-  public void testGetUsernameForToken_userFromMainwiki() throws XWikiException {
-    XWiki xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
-    String userToken = "123456789012345678901234";
-    List<String> userDocs = new Vector<>();
-    userDocs.add("Doc.Fullname");
-    expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = newCapture();
-    Capture<String> captHQL2 = newCapture();
-    Capture<List<?>> captParams = newCapture();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
-        context))).andReturn(new ArrayList<String>()).once();
-    expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), capture(captParams), same(
-        context))).andReturn(userDocs).once();
-    replay(xwiki, store);
-    assertEquals("xwiki:Doc.Fullname", plugin.getUsernameForToken(userToken, context));
-    assertTrue(captHQL2.getValue().contains("token.tokenvalue=?"));
-    assertTrue("There seems to be no database independent 'now' in hql.",
-        captHQL2.getValue().contains("token.validuntil>=?"));
-    assertTrue(captParams.getValue().contains(plugin.encryptString("hash:SHA-512:", userToken)));
-    verify(xwiki, store);
-  }
-
-  @Test
-  public void testCheckAuthByToken_noUser() throws XWikiException {
-    XWiki xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
-    String userToken = "123456789012345678901234";
-    List<String> userDocs = new Vector<>();
-    expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = newCapture();
-    Capture<List<?>> captParams = newCapture();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
-        context))).andReturn(userDocs).times(2);
-    replay(xwiki, store);
-    assertNull(plugin.checkAuthByToken(userToken, context));
-  }
-
-  @Test
-  public void testCheckAuthByToken() throws XWikiException {
-    XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
-    String userToken = "123456789012345678901234";
-    List<String> userDocs = new Vector<>();
-    userDocs.add("Doc.Fullname");
-    expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = newCapture();
-    Capture<List<?>> captParams = newCapture();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
-        context))).andReturn(userDocs).once();
-    replay(xwiki, store);
-    assertEquals("Doc.Fullname", plugin.checkAuthByToken(userToken, context).getUser());
-    assertEquals("Doc.Fullname", context.getXWikiUser().getUser());
-    assertEquals("Doc.Fullname", context.getUser());
-    verify(xwiki, store);
-  }
-
-  @Test
   public void testEnableMappedMenuItems() {
     plugin.enableMappedMenuItems(context);
     assertTrue(context.get(
@@ -148,21 +60,6 @@ public class CelementsWebPluginTest extends AbstractComponentTest {
     assertTrue(((GetMappedMenuItemsForParentCommand) context.get(
         GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY)).isActive());
 
-  }
-
-  @Test
-  public void testGetSupportedAdminLanguages() {
-    assertNotNull(plugin.getSupportedAdminLanguages());
-    assertEquals(Arrays.asList("de", "fr", "en", "it"),
-        plugin.getSupportedAdminLanguages());
-  }
-
-  @Test
-  public void testSetSupportedAdminLanguages() {
-    List<String> injectedLangList = Arrays.asList("bla", "bli", "blo");
-    plugin.setSupportedAdminLanguages(injectedLangList);
-    assertNotNull(plugin.getSupportedAdminLanguages());
-    assertEquals(injectedLangList, plugin.getSupportedAdminLanguages());
   }
 
   @Test

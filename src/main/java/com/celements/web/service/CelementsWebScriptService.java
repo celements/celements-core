@@ -797,6 +797,10 @@ public class CelementsWebScriptService implements ScriptService {
     return (webUtilsService.isAdvancedAdmin() || showLoginName);
   }
 
+  /**
+   * @deprecated since 6.5 instead use {@link CelementsUserScriptService#getPossibleLoginFields()}
+   */
+  @Deprecated
   public String getPossibleLogins() {
     return new PossibleLoginsCommand().getPossibleLogins();
   }
@@ -1160,14 +1164,6 @@ public class CelementsWebScriptService implements ScriptService {
       }
     }
     return url;
-  }
-
-  /**
-   * @deprecated since 3.1, only intended for internal usage
-   */
-  @Deprecated
-  public String encodeUrlToUtf8(String urlStr) {
-    return getCelementsWebService().encodeUrlToUtf8(urlStr);
   }
 
   public void sendRedirect(String urlStr) {
