@@ -15,7 +15,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.auth.AuthenticationScriptService;
 import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.model.context.ModelContext;
 import com.celements.rights.access.EAccessLevel;
@@ -29,7 +28,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 @Component("webUtils")
 public class WebUtilsScriptService implements ScriptService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(WebUtilsScriptService.class);
 
   @Requirement
   IWebUtilsService webUtilsService;

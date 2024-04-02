@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.auth.user.UserService;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.token.TokenLDAPAuthServiceImpl;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -37,8 +37,6 @@ import com.xpn.xwiki.web.Utils;
 public class TokenBasedUploadCommand {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TokenBasedUploadCommand.class);
-
-  private TokenLDAPAuthServiceImpl tokenAuthImpl = new TokenLDAPAuthServiceImpl();
 
   IWebUtilsService webUtilsService;
 
@@ -61,10 +59,14 @@ public class TokenBasedUploadCommand {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
+  private UserService getUserService() {
+    return Utils.getComponent(UserService.class);
+  }
+
   @Deprecated
   public int tokenBasedUpload(Document attachToDoc, String fieldName, String userToken,
       XWikiContext context) throws XWikiException {
-    String username = tokenAuthImpl.getUsernameForToken(userToken, context);
+    String username = getUserService().getUsernameForToken(userToken);
     if ((username != null) && !username.equals("")) {
       LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
       context.setUser(username);
@@ -87,7 +89,7 @@ public class TokenBasedUploadCommand {
 
   public int tokenBasedUploadDocRef(DocumentReference attachToDocRef, String fieldNamePrefix,
       String userToken, Boolean createIfNotExists) throws XWikiException {
-    String username = tokenAuthImpl.getUsernameForToken(userToken, getContext());
+    String username = getUserService().getUsernameForToken(userToken);
     if ((username != null) && !username.equals("")) {
       LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
       getContext().setUser(username);

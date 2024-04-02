@@ -20,6 +20,7 @@
 package com.celements.web.plugin.api;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +36,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.AppScriptScriptService;
-import com.celements.auth.AuthenticationScriptService;
+import com.celements.auth.AccountActivationFailedException;
+import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.css.CssScriptService;
 import com.celements.emptycheck.service.EmptyCheckScriptService;
 import com.celements.filebase.FileBaseScriptService;
@@ -468,24 +470,6 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getUsernameForUserData(String)}
-   */
-  @Deprecated
-  public String getUsernameForUserData(String login) {
-    return getAuthenticationScriptService().getUsernameForUserData(login);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getUsernameForUserData(String, String)}
-   */
-  @Deprecated
-  public String getUsernameForUserData(String login, String possibleLogins) {
-    return getAuthenticationScriptService().getUsernameForUserData(login, possibleLogins);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
    *             {@link CelementsWebScriptService #getNextObjPageId(SpaceReference,
    *             DocumentReference, String)}
    */
@@ -506,72 +490,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String encryptString(String encoding, String str) {
-    return getAuthenticationScriptService().getPasswordHash(encoding, str);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getPasswordHash(String)}
-   */
-  @Deprecated
-  public String encryptString(String str) {
-    return getAuthenticationScriptService().getPasswordHash(str);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #sendNewValidation(String, String)}
-   */
-  @Deprecated
-  public boolean sendNewValidation(String user, String possibleFields) {
-    return getAuthenticationScriptService().sendNewValidation(user, possibleFields);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #sendNewValidation(String, String,
-   *             DocumentReference)}
-   */
-  @Deprecated
-  public void sendNewValidation(String user, String possibleFields,
-      DocumentReference mailContentDocRef) {
-    getAuthenticationScriptService().sendNewValidation(user, possibleFields, mailContentDocRef);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getNewValidationTokenForUser()}
-   */
-  @Deprecated
-  public String getNewValidationTokenForUser() {
-    return getAuthenticationScriptService().getNewValidationTokenForUser();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getNewCelementsTokenForUser()}
-   */
-  @Deprecated
-  public String getNewCelementsTokenForUser() {
-    return getAuthenticationScriptService().getNewCelementsTokenForUser();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getNewCelementsTokenForUser(Boolean)}
-   */
-  @Deprecated
-  public String getNewCelementsTokenForUser(Boolean guestPlus) {
-    return getAuthenticationScriptService().getNewCelementsTokenForUser(guestPlus);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getNewCelementsTokenForUser(Boolean, int)}
-   */
-  @Deprecated
-  public String getNewCelementsTokenForUser(Boolean guestPlus, int minutesValid) {
-    return getAuthenticationScriptService().getNewCelementsTokenForUser(guestPlus, minutesValid);
+    return getAuthenticationService().getPasswordHash(encoding, str);
   }
 
   // /**
@@ -682,7 +601,12 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public Map<String, String> activateAccount(String activationCode) {
-    return getAuthenticationScriptService().activateAccount(activationCode);
+    try {
+      return getAuthenticationService().activateAccount(activationCode);
+    } catch (AccountActivationFailedException authExp) {
+      LOGGER.info("Failed to activate account", authExp);
+    }
+    return Collections.emptyMap();
   }
 
   /**
@@ -910,33 +834,6 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getUniqueValidationKey()}
-   */
-  @Deprecated
-  public String getUniqueValidationKey() throws XWikiException {
-    return getAuthenticationScriptService().getUniqueValidationKey();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #recoverPassword()}
-   */
-  @Deprecated
-  public String recoverPassword() throws XWikiException {
-    return getAuthenticationScriptService().recoverPassword();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #recoverPassword(String)}
-   */
-  @Deprecated
-  public String recoverPassword(String account) throws XWikiException {
-    return getAuthenticationScriptService().recoverPassword(account);
-  }
-
-  /**
    * @deprecated since 2.18.0 use instead velocity $datetool.format(format, date)
    */
   @Deprecated
@@ -1085,28 +982,6 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.59 method dropped. Login happens automated, when token and
-   *             username are set in request Check authentication from logincredential and
-   *             password and set according persitent login information If it fails user
-   *             is unlogged
-   * @param userToken
-   *          token for user
-   * @return null if failed, non null XWikiUser if sucess
-   * @throws XWikiException
-   */
-  @Deprecated
-  public XWikiUser checkAuthByToken(String userToken) throws XWikiException {
-    if (hasProgrammingRights()) {
-      LOGGER.debug("checkAuthByToken: executing checkAuthByToken in plugin");
-      return plugin.checkAuthByToken(userToken, context);
-    } else {
-      LOGGER.debug("checkAuthByToken: missing ProgrammingRights for [" + context.get("sdoc")
-          + "]: checkAuthByToken cannot be executed!");
-    }
-    return null;
-  }
-
-  /**
    * @deprecated since 2.59 instead use
    *             {@link AuthenticationScriptService #checkAuth(String, String, String, String)}
    *             Check authentication from logincredential and password and set according
@@ -1123,8 +998,8 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins) throws XWikiException {
-    return getAuthenticationScriptService().checkAuth(logincredential, password, rememberme,
-        possibleLogins);
+    return getAuthenticationService().checkAuth(logincredential, password, rememberme,
+        possibleLogins, null);
   }
 
   /**
@@ -1147,7 +1022,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins, boolean noRedirect) throws XWikiException {
-    return getAuthenticationScriptService().checkAuth(logincredential, password, rememberme,
+    return getAuthenticationService().checkAuth(logincredential, password, rememberme,
         possibleLogins, noRedirect);
   }
 
@@ -1672,17 +1547,6 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #isValidUserJSON(String, String, String, List)}
-   */
-  @Deprecated
-  public String isValidUserJSON(String username, String password, String memberOfGroup,
-      List<String> returnGroupMemberships) {
-    return getAuthenticationScriptService().isValidUserJSON(username, password, memberOfGroup,
-        returnGroupMemberships);
-  }
-
-  /**
    * @deprecated since 2.14.0 use syncustom script service direcly instead
    */
   @Deprecated
@@ -1747,24 +1611,6 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getLogoutRedirectURL()}
-   */
-  @Deprecated
-  public String getLogoutRedirectURL() {
-    return getAuthenticationScriptService().getLogoutRedirectURL();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getLoginRedirectURL()}
-   */
-  @Deprecated
-  public String getLoginRedirectURL() {
-    return getAuthenticationScriptService().getLoginRedirectURL();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
    *             {@link CelementsWebScriptService #isCelementsRights(String)}
    */
   @Deprecated
@@ -1809,8 +1655,15 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public boolean hasAccessLevel(String level, String user, boolean isUser, String docname) {
-    return getAuthenticationScriptService().hasAccessLevel(level, user, isUser,
-        getWebUtilsService().resolveDocumentReference(docname));
+
+    try {
+      return getAuthenticationService().hasAccessLevel(level, user, isUser,
+          getWebUtilsService().resolveDocumentReference(docname));
+    } catch (Exception exp) {
+      LOGGER.warn("hasAccessLevel failed for level[" + level + "] user[" + user + "] " + "docname["
+          + docname + "] isUser[" + isUser + "]", exp);
+      return false;
+    }
   }
 
   /**
@@ -1991,8 +1844,8 @@ public class CelementsWebPluginApi extends Api {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
-  private AuthenticationScriptService getAuthenticationScriptService() {
-    return (AuthenticationScriptService) Utils.getComponent(ScriptService.class, "authentication");
+  private IAuthenticationServiceRole getAuthenticationService() {
+    return Utils.getComponent(IAuthenticationServiceRole.class);
   }
 
   private EditorSupportScriptService getEditorSupportScriptService() {

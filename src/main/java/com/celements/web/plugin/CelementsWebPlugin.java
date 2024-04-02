@@ -20,17 +20,14 @@
 package com.celements.web.plugin;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.celements.auth.AccountActivationFailedException;
-import com.celements.auth.AuthenticationService;
 import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.mailsender.IMailSenderRole;
 import com.celements.mandatory.CheckMandatoryDocuments;
@@ -48,7 +45,6 @@ import com.celements.web.service.ICelementsWebServiceRole;
 import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.service.WebUtilsService;
-import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.webform.ActionService;
 import com.celements.webform.IActionServiceRole;
 import com.celements.webform.IWebFormServiceRole;
@@ -61,7 +57,6 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
@@ -165,75 +160,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @param userToken
-   * @param context
-   * @return
-   * @throws XWikiException
-   * @deprecated since 2.14.0 use TokenLDAPAuthServiceImpl instead
-   */
-  @Deprecated
-  public String getUsernameForToken(String userToken, XWikiContext context) throws XWikiException {
-
-    String hashedCode = encryptString("hash:SHA-512:", userToken);
-    String userDoc = "";
-
-    if ((userToken != null) && (userToken.trim().length() > 0)) {
-
-      String hql = ", BaseObject as obj, Classes.TokenClass as token where ";
-      hql += "doc.space='XWiki' ";
-      hql += "and obj.name=doc.fullName ";
-      hql += "and token.tokenvalue=? ";
-      hql += "and token.validuntil>=? ";
-      hql += "and obj.id=token.id ";
-
-      List<Object> parameterList = new Vector<>();
-      parameterList.add(hashedCode);
-      parameterList.add(new Date());
-
-      XWikiStoreInterface storage = context.getWiki().getStore();
-      List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
-      LOGGER.info("searching token and found " + users.size() + " with parameters "
-          + Arrays.deepToString(parameterList.toArray()));
-      if ((users == null) || (users.size() == 0)) {
-        String db = context.getDatabase();
-        context.setDatabase("xwiki");
-        users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
-        if ((users != null) && (users.size() == 1)) {
-          users.add("xwiki:" + users.remove(0));
-        }
-        context.setDatabase(db);
-      }
-      int usersFound = 0;
-      for (String tmpUserDoc : users) {
-        if (!tmpUserDoc.trim().equals("")) {
-          usersFound++;
-          userDoc = tmpUserDoc;
-        }
-      }
-      if (usersFound > 1) {
-        LOGGER.warn("Found more than one user for token '" + userToken + "'");
-        return null;
-      }
-    } else {
-      LOGGER.warn("No valid token given");
-    }
-    return userDoc;
-  }
-
-  /**
-   * @deprecated since 2.22.0
-   *             instead use
-   *             NewCelementsTokenForUserCommand.getNewCelementsTokenForUserWithAutentication
-   */
-  @Deprecated
-  public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus,
-      XWikiContext context) throws XWikiException {
-    return new NewCelementsTokenForUserCommand().getNewCelementsTokenForUserWithAuthentication(
-        accountName, guestPlus, context);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link AuthenticationService
+   * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #getPasswordHash(String, String)}
    */
   @Deprecated
@@ -242,7 +169,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link AuthenticationService
+   * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #activateAccount(String)}
    */
   @Deprecated
@@ -379,19 +306,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * getUniqueValidationKey
-   *
-   * @param context
-   * @return
-   * @throws XWikiException
-   * @deprecated since 2.14.0 use NewCelementsTokenForUserCommand instead
-   */
-  @Deprecated
-  public String getUniqueValidationKey(XWikiContext context) throws XWikiException {
-    return new NewCelementsTokenForUserCommand().getUniqueValidationKey(context);
-  }
-
-  /**
    * @param attachToDoc
    * @param fieldName
    * @param userToken
@@ -425,28 +339,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @param userToken
-   * @param context
-   * @return
-   * @throws XWikiException
-   * @deprecated since 2.14.0 dropped. Set token and username in request for automated
-   *             login.
-   */
-  @Deprecated
-  public XWikiUser checkAuthByToken(String userToken, XWikiContext context) throws XWikiException {
-    String username = getUsernameForToken(userToken, context);
-    if ((username != null) && !username.equals("")) {
-      LOGGER.info("checkAuthByToken: user " + username + " identified by userToken.");
-      context.setUser(username);
-      return context.getXWikiUser();
-    } else {
-      LOGGER.warn("checkAuthByToken: username could not be identified by token");
-    }
-    return null;
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link AuthenticationService
+   * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #checkAuth(String, String, String, String, Boolean)}
    */
   @Deprecated
@@ -475,24 +368,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public boolean executeAction(Document actionDoc, Map<String, String[]> request,
       XWikiDocument includingDoc, XWikiContext context) {
     return getActionService().executeAction(actionDoc, request, includingDoc, context);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link CelementsWebService
-   *             #getSupportedAdminLanguages()}
-   */
-  @Deprecated
-  public List<String> getSupportedAdminLanguages() {
-    return getCelementsWebService().getSupportedAdminLanguages();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link CelementsWebService
-   *             #setSupportedAdminLanguages(List<String> newSupportedAdminLangList)}
-   */
-  @Deprecated
-  public void setSupportedAdminLanguages(List<String> newSupportedAdminLangList) {
-    getCelementsWebService().setSupportedAdminLanguages(newSupportedAdminLangList);
   }
 
   /**
