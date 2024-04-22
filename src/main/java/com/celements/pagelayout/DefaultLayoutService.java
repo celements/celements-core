@@ -232,8 +232,8 @@ public final class DefaultLayoutService implements LayoutServiceRole {
         .filter(SpaceReference.class::isInstance)
         .map(SpaceReference.class::cast)
         .filter(this::canRenderLayout)
-        .orElse(getPageLayoutForDoc(modelContext.getDocRef()
-            .orElse(null)));
+        .or(() -> modelContext.getDocRef().map(this::getPageLayoutForDoc))
+        .orElse(null);
   }
 
   @Override
