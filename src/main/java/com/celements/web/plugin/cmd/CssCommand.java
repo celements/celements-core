@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Vector;
 
@@ -34,12 +35,12 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.css.ICssExtensionRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.css.CSS;
 import com.celements.web.css.CSSEngine;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -79,7 +80,6 @@ public class CssCommand {
   private List<CSS> collectAllCSS(XWikiContext context) throws XWikiException {
     List<CSS> cssList = new ArrayList<>();
     cssList.addAll(includeApplicationDefaultCSS());
-    cssList.addAll(includeCSSAfterSkin("", context));
     cssList.addAll(includeCSSAfterPreferences("", context));
     cssList.addAll(includeCSSAfterPageType("", context));
     cssList.addAll(includeCSSAfterPageLayout("", context));
@@ -125,7 +125,8 @@ public class CssCommand {
       XWikiDocument doc = context.getDoc();
       skins = doc.getXObjects(getSkinsUserCssClassRef(context.getDatabase()));
       LOGGER.debug("CSS Page: " + doc.getDocumentReference() + " has attached " + ((skins != null)
-          ? skins.size() : "0") + " Skins.UserCSS objects.");
+          ? skins.size()
+          : "0") + " Skins.UserCSS objects.");
     }
     return includeCSS(css, "cel_css_list_page", skins, context);
   }
@@ -178,17 +179,15 @@ public class CssCommand {
     return cssList;
   }
 
+  /**
+   * @param css
+   * @param context
+   * @return
+   * @deprecated dropped because skin support was dropped in 6.0
+   */
+  @Deprecated(since = "6.6", forRemoval = true)
   public List<CSS> includeCSSAfterSkin(String css, XWikiContext context) {
-    VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
-    List<CSS> cssList = Collections.emptyList();
-
-    if (vcontext != null) {
-      List<BaseObject> baseList = new ArrayList<>();
-      baseList.addAll(addUserSkinCss((Document) vcontext.get("skin_doc")));
-      baseList.addAll(addUserSkinCss((Document) vcontext.get("after_skin_cssdoc")));
-      cssList = includeCSS(css, "cel_css_list_skin", baseList, context);
-    }
-    return cssList;
+    return Collections.emptyList();
   }
 
   public List<CSS> includeCSSAfterPageType(String css, XWikiContext context) {
@@ -205,40 +204,31 @@ public class CssCommand {
     if ((pageTypeDoc != null) && (vcontext != null)) {
       List<BaseObject> baseList = new ArrayList<>();
       baseList.addAll(addUserSkinCss(pageTypeDoc));
-      baseList.addAll(addUserSkinCss((Document) vcontext.get("after_pagetype_cssdoc")));
       cssList = includeCSS(css, "cel_css_list_pagetype", baseList, context);
     }
     return cssList;
   }
 
   public List<CSS> includeCSSAfterPageLayout(String css, XWikiContext context) {
-    XWikiDocument pageLayoutDoc = null;
-    pageLayoutDoc = new PageLayoutCommand().getLayoutPropDoc();
+    Optional<DocumentReference> pageLayoutDocRefOpt = getLayoutService()
+        .getLayoutPropDocRefForCurrentDoc();
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
 
-    if ((pageLayoutDoc != null) && (vcontext != null)) {
+    if (pageLayoutDocRefOpt.isPresent() && (vcontext != null)) {
       List<BaseObject> baseList = new ArrayList<>();
-      baseList.addAll(addUserSkinCss(pageLayoutDoc));
-      baseList.addAll(addUserSkinCss((Document) vcontext.get("after_pagelayout_cssdoc")));
+      try {
+        XWikiDocument pageLayoutDoc = getModelAccess().getDocument(pageLayoutDocRefOpt.get());
+        baseList.addAll(addUserSkinCss(pageLayoutDoc));
+      } catch (DocumentNotExistsException dne) {
+        LOGGER.info("includeCSSAfterPageLayout pageLayoutDoc {} does not exist",
+            pageLayoutDocRefOpt.get(), dne);
+      }
       baseList.addAll(addUserSkinCss((DocumentReference) vcontext.get(
           "after_pagelayout_cssdocref")));
       cssList = includeCSS(css, "cel_css_list_pagelayout", baseList, context);
     }
     return cssList;
-  }
-
-  /**
-   * CAUTION!!! needs programming rights!!
-   *
-   * @deprecated 2.81 instead use {@link addUserSkinCss(DocumentReference)}
-   */
-  @Deprecated
-  private List<BaseObject> addUserSkinCss(Document docAPI) {
-    if ((docAPI != null) && (docAPI.getDocument() != null)) {
-      return addUserSkinCss(docAPI.getDocument());
-    }
-    return Collections.emptyList();
   }
 
   private List<BaseObject> addUserSkinCss(DocumentReference docRef) {
@@ -257,7 +247,8 @@ public class CssCommand {
       List<BaseObject> objs = docAPI.getXObjects(getSkinsUserCssClassRef(
           docAPI.getDocumentReference().getWikiReference().getName()));
       LOGGER.debug("CSS Skin: " + docAPI.getDocumentReference() + " has attached " + ((objs != null)
-          ? objs.size() : "0") + " Skins.UserCSS objects.");
+          ? objs.size()
+          : "0") + " Skins.UserCSS objects.");
       if (objs != null) {
         return objs;
       }
@@ -282,6 +273,10 @@ public class CssCommand {
 
   private IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private LayoutServiceRole getLayoutService() {
+    return Utils.getComponent(LayoutServiceRole.class);
   }
 
 }
