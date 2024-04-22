@@ -16,6 +16,7 @@ import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.XObjectFieldAccessor;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.rights.access.EAccessLevel;
@@ -59,9 +60,26 @@ public class AbstractXWikiClassRightsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_checkRightsObject_noChanges() {
-    // TODO implement test
+  public void test_checkRightsObject_noChanges() throws XWikiException {
+    DocumentReference docRef = new RefBuilder().wiki("testwiki").space(XWikiConstant.XWIKI_SPACE)
+        .doc("TestXWikiClass").build(DocumentReference.class);
+    XWikiDocument classDoc = new XWikiDocument(docRef);
+    expectClassWithNewObj(getRightsClass(), classDoc.getWikiRef());
 
+    replayDefault();
+    XWikiObjectEditor allGrpObjEditor = XWikiObjectEditor.on(classDoc)
+        .filter(XWikiRightsClass.CLASS_REF);
+    allGrpObjEditor.filter(XWikiRightsClass.FIELD_GROUPS, List.of("XWikiAllGroup"));
+    allGrpObjEditor.filter(XWikiRightsClass.FIELD_LEVELS, List.of(EAccessLevel.VIEW));
+    allGrpObjEditor.filter(XWikiRightsClass.FIELD_ALLOW, true);
+    allGrpObjEditor.createFirstIfNotExists();
+    assertFalse(xwikiClassRights.checkRightsObject(classDoc));
+    verifyDefault();
+
+    List<BaseObject> rightsObj = XWikiObjectFetcher.on(classDoc)
+        .filter(XWikiRightsClass.CLASS_REF)
+        .list();
+    assertEquals(1, rightsObj.size());
   }
 
   private static <T> T getValue(BaseObject obj, ClassField<T> field) {
