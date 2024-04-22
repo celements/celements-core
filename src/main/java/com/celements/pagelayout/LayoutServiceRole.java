@@ -22,6 +22,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public interface LayoutServiceRole {
 
   String CEL_LAYOUT_EDITOR_PL_NAME = "CelLayoutEditor";
+  static final String OVERWRITE_LAYOUT_REF = "overwriteLayoutRef";
 
   boolean createLayout(@NotNull SpaceReference layoutSpaceRef);
 

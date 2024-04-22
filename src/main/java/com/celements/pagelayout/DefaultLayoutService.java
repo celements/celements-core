@@ -226,7 +226,12 @@ public final class DefaultLayoutService implements LayoutServiceRole {
 
   @Override
   public SpaceReference getPageLayoutForCurrentDoc() {
-    return getPageLayoutForDoc(modelContext.getCurrentDocRef().orNull());
+    VelocityContext vcontext = ((VelocityContext) modelContext.getXWikiContext().get("vcontext"));
+    Object overwriteLayoutObj = vcontext.get(OVERWRITE_LAYOUT_REF);
+    if (overwriteLayoutObj instanceof SpaceReference) {
+      return (SpaceReference) overwriteLayoutObj;
+    }
+    return getPageLayoutForDoc(modelContext.getDocRef().orElse(null));
   }
 
   @Override
