@@ -212,6 +212,8 @@ public class CssCommand {
   public List<CSS> includeCSSAfterPageLayout(String css, XWikiContext context) {
     Optional<DocumentReference> pageLayoutDocRefOpt = getLayoutService()
         .getLayoutPropDocRefForCurrentDoc();
+    LOGGER.debug("includeCSSAfterPageLayout pageLayoutDocRefOpt {}",
+        pageLayoutDocRefOpt.orElse(null));
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
 
@@ -220,6 +222,8 @@ public class CssCommand {
       try {
         XWikiDocument pageLayoutDoc = getModelAccess().getDocument(pageLayoutDocRefOpt.get());
         baseList.addAll(addUserSkinCss(pageLayoutDoc));
+        LOGGER.debug("includeCSSAfterPageLayout baseList.size {}",
+            baseList.size());
       } catch (DocumentNotExistsException dne) {
         LOGGER.info("includeCSSAfterPageLayout pageLayoutDoc {} does not exist",
             pageLayoutDocRefOpt.get(), dne);
