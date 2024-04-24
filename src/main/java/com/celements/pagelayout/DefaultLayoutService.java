@@ -248,11 +248,11 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     SpaceReference currDocPageLayout = getPageLayoutForCurrentDoc();
     if (currDocPageLayout != null) {
       LOGGER.debug("getLayoutPropDoc: found page layout [{}] for page [{}].", currDocPageLayout,
-          modelContext.getCurrentDocRef());
+          modelContext.getDocRef());
       return getLayoutPropDocRef(currDocPageLayout);
     }
     LOGGER.debug("getLayoutPropDoc: found NO page layout for page [{}].",
-        modelContext.getCurrentDocRef());
+        modelContext.getDocRef());
     return Optional.empty();
   }
 
