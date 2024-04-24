@@ -224,14 +224,18 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     return cellRenderer.getAsString();
   }
 
-  @Override
-  public SpaceReference getPageLayoutForCurrentDoc() {
+  private Optional<SpaceReference> overwriteLayoutRef() {
     VelocityContext vcontext = ((VelocityContext) modelContext.getXWikiContext().get("vcontext"));
     return Optional.ofNullable(vcontext)
         .map(vc -> vc.get(OVERWRITE_LAYOUT_REF))
         .filter(SpaceReference.class::isInstance)
         .map(SpaceReference.class::cast)
-        .filter(this::canRenderLayout)
+        .flatMap(this::resolveValidLayoutSpace);
+  }
+
+  @Override
+  public SpaceReference getPageLayoutForCurrentDoc() {
+    return overwriteLayoutRef()
         .or(() -> modelContext.getDocRef().map(this::getPageLayoutForDoc))
         .orElse(null);
   }
