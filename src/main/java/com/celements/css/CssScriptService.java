@@ -66,7 +66,7 @@ public class CssScriptService implements ScriptService {
    * @return
    * @deprecated dropped because skin support was dropped in 6.0
    */
-  @Deprecated(since = "6.6", forRemoval = true)
+  @Deprecated(since = "6.7", forRemoval = true)
   public void includeCSSAfterSkin(String css) {
     getCssCmd().includeCSSAfterSkin(css, getContext());
   }

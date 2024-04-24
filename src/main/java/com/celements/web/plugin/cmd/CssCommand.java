@@ -186,7 +186,7 @@ public class CssCommand {
    * @return
    * @deprecated dropped because skin support was dropped in 6.0
    */
-  @Deprecated(since = "6.6", forRemoval = true)
+  @Deprecated(since = "6.7", forRemoval = true)
   public List<CSS> includeCSSAfterSkin(String css, XWikiContext context) {
     return Collections.emptyList();
   }
