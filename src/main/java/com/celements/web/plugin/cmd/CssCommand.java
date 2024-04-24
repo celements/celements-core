@@ -62,13 +62,13 @@ public class CssCommand {
     List<CSS> cssResultList = new ArrayList<>();
     List<CSS> cssList = collectAllCSS(context);
 
-    LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
+    LOGGER.debug("List of CSS files built. There are {} CSS files to include.", cssList.size());
 
     Set<CSS> includedCSS = new HashSet<>();
     for (CSS css2 : cssList) {
       CSS css = css2;
       if (!includedCSS.contains(css) && (css != null)) {
-        LOGGER.debug("CSS to add to result List: " + css.toString());
+        LOGGER.debug("CSS to add to result List: {}", css.toString());
         cssResultList.add(css);
         includedCSS.add(css);
       }
@@ -88,28 +88,28 @@ public class CssCommand {
   }
 
   public String displayAllCSS(XWikiContext context) throws XWikiException {
-    String CSS = "";
+    StringBuilder cssBuilder = new StringBuilder();
 
     List<CSS> cssList = getAllCSS(context);
     for (CSS css : cssList) {
-      LOGGER.debug("displayAllCSS: displayInclude for [" + css.getCSS() + "].");
-      CSS += css.displayInclude(context);
+      LOGGER.debug("displayAllCSS: displayInclude for [{}].", css.getCSS());
+      cssBuilder.append(css.displayInclude(context));
     }
 
-    return CSS;
+    return cssBuilder.toString();
   }
 
   public List<CSS> getRTEContentCSS(XWikiContext context) throws XWikiException {
     List<CSS> cssResultList = new ArrayList<>();
     List<CSS> cssList = collectAllCSS(context);
 
-    LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
+    LOGGER.debug("List of CSS files built. There are {} CSS files to include.", cssList.size());
 
     Set<CSS> includedCSS = new HashSet<>();
     for (CSS css2 : cssList) {
       CSS css = css2;
       if ((css != null) && !includedCSS.contains(css) && css.isContentCSS()) {
-        LOGGER.debug("RTE content CSS to add to result List: " + css.toString());
+        LOGGER.debug("RTE content CSS to add to result List: {}", css);
         cssResultList.add(css);
         includedCSS.add(css);
       }
@@ -124,9 +124,10 @@ public class CssCommand {
         context.getDoc().getDocumentReference().getLastSpaceReference())) {
       XWikiDocument doc = context.getDoc();
       skins = doc.getXObjects(getSkinsUserCssClassRef(context.getDatabase()));
-      LOGGER.debug("CSS Page: " + doc.getDocumentReference() + " has attached " + ((skins != null)
-          ? skins.size()
-          : "0") + " Skins.UserCSS objects.");
+      LOGGER.debug("CSS Page: {} has attached {} Skins.UserCSS objects.",
+          doc.getDocumentReference(), ((skins != null)
+              ? skins.size()
+              : "0"));
     }
     return includeCSS(css, "cel_css_list_page", skins, context);
   }
@@ -143,11 +144,11 @@ public class CssCommand {
         space = context.getDoc().getSpace();
       }
 
-      LOGGER.debug("WebPreferences space is: '" + space + "'");
-      String baseCSS = context.getWiki().getSpacePreference("stylesheet", space, "", context) + " ";
-      baseCSS = context.getWiki().getSpacePreference("stylesheets", space, "", context) + " ";
+      LOGGER.debug("WebPreferences space is: '{}'", space);
+      String baseCSS = context.getWiki().getSpacePreference("stylesheets", space, "", context)
+          + " ";
 
-      LOGGER.debug("CSS Prefs: has '" + baseCSS + "' as CSS to add.");
+      LOGGER.debug("CSS Prefs: has '{}' as CSS to add.", baseCSS);
 
       List<BaseObject> baseList = new ArrayList<>();
       DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
@@ -212,8 +213,6 @@ public class CssCommand {
   public List<CSS> includeCSSAfterPageLayout(String css, XWikiContext context) {
     Optional<DocumentReference> pageLayoutDocRefOpt = getLayoutService()
         .getLayoutPropDocRefForCurrentDoc();
-    LOGGER.debug("includeCSSAfterPageLayout pageLayoutDocRefOpt {}",
-        pageLayoutDocRefOpt.orElse(null));
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
 
@@ -222,8 +221,6 @@ public class CssCommand {
       try {
         XWikiDocument pageLayoutDoc = getModelAccess().getDocument(pageLayoutDocRefOpt.get());
         baseList.addAll(addUserSkinCss(pageLayoutDoc));
-        LOGGER.debug("includeCSSAfterPageLayout baseList.size {}",
-            baseList.size());
       } catch (DocumentNotExistsException dne) {
         LOGGER.info("includeCSSAfterPageLayout pageLayoutDoc {} does not exist",
             pageLayoutDocRefOpt.get(), dne);
@@ -250,9 +247,10 @@ public class CssCommand {
     if (docAPI != null) {
       List<BaseObject> objs = docAPI.getXObjects(getSkinsUserCssClassRef(
           docAPI.getDocumentReference().getWikiReference().getName()));
-      LOGGER.debug("CSS Skin: " + docAPI.getDocumentReference() + " has attached " + ((objs != null)
-          ? objs.size()
-          : "0") + " Skins.UserCSS objects.");
+      LOGGER.debug("CSS Skin: {} has attached {} Skins.UserCSS objects.",
+          docAPI.getDocumentReference(), ((objs != null)
+              ? objs.size()
+              : "0"));
       if (objs != null) {
         return objs;
       }
