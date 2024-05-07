@@ -16,21 +16,22 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.springframework.stereotype.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.velocity.VelocityManager;
 
 import com.celements.cells.CellRenderStrategy;
 import com.celements.cells.HtmlDoctype;
@@ -85,26 +86,28 @@ public final class DefaultLayoutService implements LayoutServiceRole {
    */
   private static final String PACKAGEPLUGIN_NAME = "package";
 
-  @Requirement
-  private Execution execution;
+  private final ModelContext modelContext;
+  private final ModelUtils modelUtils;
+  private final IModelAccessFacade modelAccess;
+  private final QueryManager queryManager;
+  private final ConfigurationSource cfgSrc;
+  private final VelocityManager velocityManager;
 
-  @Requirement
-  private ModelContext modelContext;
-
-  @Requirement
-  private ModelUtils modelUtils;
-
-  @Requirement
-  private IModelAccessFacade modelAccess;
-
-  @Requirement
-  private QueryManager queryManager;
-
-  @Requirement
-  private ConfigurationSource cfgSrc;
-
-  @Requirement
-  private IWebUtilsService webUtilsSrv;
+  @Inject
+  public DefaultLayoutService(ModelContext modelContext,
+      ModelUtils modelUtils,
+      IModelAccessFacade modelAccess,
+      QueryManager queryManager,
+      ConfigurationSource cfgSrc,
+      IWebUtilsService webUtilsSrv,
+      VelocityManager velocityManager) {
+    this.modelContext = modelContext;
+    this.modelUtils = modelUtils;
+    this.modelAccess = modelAccess;
+    this.queryManager = queryManager;
+    this.cfgSrc = cfgSrc;
+    this.velocityManager = velocityManager;
+  }
 
   @Override
   public Map<SpaceReference, String> getAllPageLayouts() {
@@ -225,8 +228,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   private Optional<SpaceReference> overwriteLayoutRef() {
-    VelocityContext vcontext = ((VelocityContext) modelContext.getXWikiContext().get("vcontext"));
-    return Optional.ofNullable(vcontext)
+    return Optional.ofNullable(velocityManager.getVelocityContext())
         .map(vc -> vc.get(OVERWRITE_LAYOUT_REF))
         .filter(SpaceReference.class::isInstance)
         .map(SpaceReference.class::cast)
@@ -261,13 +263,15 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public Optional<DocumentReference> getLayoutPropDocRef(SpaceReference layoutSpaceRef) {
+  @NotNull
+  public Optional<DocumentReference> getLayoutPropDocRef(@Nullable SpaceReference layoutSpaceRef) {
     return Optional.ofNullable(layoutSpaceRef)
         .map(spaceRef -> RefBuilder.from(spaceRef).doc("WebHome").build(DocumentReference.class));
   }
 
   @Override
-  public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
+  @Nullable
+  public SpaceReference getPageLayoutForDoc(@Nullable DocumentReference documentReference) {
     InheritorFactory inheritorFactory = new InheritorFactory();
     return getPageLayoutForDoc(documentReference, inheritorFactory);
   }
@@ -345,12 +349,13 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public boolean canRenderLayout(SpaceReference layoutSpaceRef) {
+  public boolean canRenderLayout(@Nullable SpaceReference layoutSpaceRef) {
     return resolveValidLayoutSpace(layoutSpaceRef).isPresent();
   }
 
   @Override
-  public Optional<BaseObject> getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
+  @NotNull
+  public Optional<BaseObject> getLayoutPropertyObj(@Nullable SpaceReference layoutSpaceRef) {
     return resolveValidLayoutSpace(layoutSpaceRef)
         .flatMap(this::getLayoutPropDocRef)
         .flatMap(this::getLayoutPropertyBaseObject);
@@ -370,21 +375,23 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public boolean isActive(SpaceReference layoutSpaceRef) {
+  public boolean isActive(@Nullable SpaceReference layoutSpaceRef) {
     return getLayoutPropertyObj(layoutSpaceRef)
         .filter(propObj -> (propObj.getIntValue("isActive", 0) > 0))
         .isPresent();
   }
 
   @Override
-  public Optional<String> getPrettyName(SpaceReference layoutSpaceRef) {
+  @NotNull
+  public Optional<String> getPrettyName(@Nullable SpaceReference layoutSpaceRef) {
     return getLayoutPropertyObj(layoutSpaceRef)
         .map(propObj -> propObj.getStringValue("prettyname"))
         .filter(not(Strings::isNullOrEmpty));
   }
 
   @Override
-  public String getLayoutType(SpaceReference layoutSpaceRef) {
+  @NotEmpty
+  public String getLayoutType(@Nullable SpaceReference layoutSpaceRef) {
     return getLayoutPropertyObj(layoutSpaceRef)
         .map(propObj -> propObj.getStringValue(FIELD_LAYOUT_TYPE.getName()))
         .filter(not(Strings::isNullOrEmpty))
@@ -401,7 +408,8 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public String getVersion(SpaceReference layoutSpaceRef) {
+  @NotNull
+  public String getVersion(@Nullable SpaceReference layoutSpaceRef) {
     return getLayoutPropertyObj(layoutSpaceRef)
         .map(propObj -> propObj.getStringValue("version"))
         .orElse("");
@@ -427,10 +435,10 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   public String renderCelementsDocumentWithLayout(@NotNull DocumentReference docRef,
       @Nullable SpaceReference layoutSpaceRef) {
     checkNotNull(docRef);
-    final XWikiDocument oldContextDoc = modelContext.getCurrentDoc().orNull();
+    final Optional<XWikiDocument> oldContextDoc = modelContext.getDocument();
     LOGGER.debug("renderCelementsDocumentWithLayout for docRef [{}] and layoutSpaceRef [{}]"
         + " overwrite oldContextDoc [{}].", docRef, layoutSpaceRef,
-        oldContextDoc.getDocumentReference());
+        oldContextDoc.map(XWikiDocument::getDocumentReference).orElse(null));
     final XWikiContext xWikiContext = modelContext.getXWikiContext();
     final VelocityContext vcontext = (VelocityContext) xWikiContext.get("vcontext");
     try {
@@ -442,8 +450,10 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       LOGGER.error("Failed to get '{}' document to renderCelementsDocumentWithLayout.", docRef,
           exp);
     } finally {
-      xWikiContext.setDoc(oldContextDoc);
-      vcontext.put("doc", oldContextDoc.newDocument(xWikiContext));
+      oldContextDoc.ifPresent(oldDoc -> {
+        xWikiContext.setDoc(oldDoc);
+        vcontext.put("doc", oldDoc.newDocument(xWikiContext));
+      });
     }
     return "";
   }

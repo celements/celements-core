@@ -138,7 +138,6 @@ com.celements.collections.service.StreamScriptService
 com.celements.collections.service.DateScriptService
 com.celements.docform.DocFormCommand
 com.celements.init.TimeZoneInit
-com.celements.pagelayout.DefaultLayoutService
 com.celements.javascript.JavaScriptExternalFilesClass
 com.celements.cells.classes.CellsClassPackage
 com.celements.cells.classes.PageLayoutPropertiesClass
