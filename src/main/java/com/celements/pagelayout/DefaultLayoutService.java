@@ -230,7 +230,8 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   private Optional<SpaceReference> overwriteLayoutRef() {
     return Optional.ofNullable(velocityManager.getVelocityContext())
         .map(vc -> vc.get(OVERWRITE_LAYOUT_REF))
-        .flatMap(tryCast(SpaceReference.class))
+        .filter(SpaceReference.class::isInstance)
+        .map(SpaceReference.class::cast)
         .flatMap(this::resolveValidLayoutSpace);
   }
 
@@ -242,7 +243,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
-  public boolean existsLayout(SpaceReference layoutSpaceRef) {
+  public boolean existsLayout(@Nullable SpaceReference layoutSpaceRef) {
     return getLayoutPropDocRef(layoutSpaceRef)
         .flatMap(this::getLayoutPropertyBaseObject)
         .isPresent();

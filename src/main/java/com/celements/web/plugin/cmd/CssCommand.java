@@ -19,6 +19,8 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.spring.context.SpringContextProvider.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
