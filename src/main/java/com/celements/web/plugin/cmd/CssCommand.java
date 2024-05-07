@@ -278,7 +278,7 @@ public class CssCommand {
   }
 
   private LayoutServiceRole getLayoutService() {
-    return Utils.getComponent(LayoutServiceRole.class);
+    return getSpringContext().getBean(LayoutServiceRole.class);
   }
 
 }
