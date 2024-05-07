@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -18,10 +17,10 @@ import com.celements.cells.HtmlDoctype;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 
-@ComponentRole
 public interface LayoutServiceRole {
 
   String CEL_LAYOUT_EDITOR_PL_NAME = "CelLayoutEditor";
+  static final String OVERWRITE_LAYOUT_REF = "overwriteLayoutRef";
 
   boolean createLayout(@NotNull SpaceReference layoutSpaceRef);
 
