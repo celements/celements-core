@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
@@ -50,6 +51,8 @@ import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
+import com.celements.navigation.TreeNode;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.web.CelConstant;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Predicates;
@@ -92,6 +95,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   private final QueryManager queryManager;
   private final ConfigurationSource cfgSrc;
   private final VelocityManager velocityManager;
+  private final ITreeNodeService treeNodeService;
 
   @Inject
   public DefaultLayoutService(ModelContext modelContext,
@@ -100,13 +104,14 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       QueryManager queryManager,
       ConfigurationSource cfgSrc,
       IWebUtilsService webUtilsSrv,
-      VelocityManager velocityManager) {
+      VelocityManager velocityManager, ITreeNodeService treeNodeService) {
     this.modelContext = modelContext;
     this.modelUtils = modelUtils;
     this.modelAccess = modelAccess;
     this.queryManager = queryManager;
     this.cfgSrc = cfgSrc;
     this.velocityManager = velocityManager;
+    this.treeNodeService = treeNodeService;
   }
 
   @Override
@@ -195,32 +200,98 @@ public final class DefaultLayoutService implements LayoutServiceRole {
     return false;
   }
 
+  /**
+   * @deprecated instead use {@link #renderLayout()})
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   @Override
   public String renderPageLayout() {
+    return renderLayout();
+  }
+
+  @Override
+  public String renderLayout() {
     return renderPageLayoutLocal(getPageLayoutForCurrentDoc());
   }
 
+  /**
+   * @deprecated instead use {@link #renderLayout(SpaceReference)})
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   @Override
   public String renderPageLayout(@Nullable SpaceReference layoutSpaceRef) {
-    LOGGER.info("renderPageLayout: for layoutRef '{}'", layoutSpaceRef);
-    layoutSpaceRef = resolveValidLayoutSpace(layoutSpaceRef).orElse(null);
-    LOGGER.debug("renderPageLayout: after decideLocalOrCentral layoutRef '{}'", layoutSpaceRef);
-    return renderPageLayoutLocal(layoutSpaceRef);
+    return renderLayout(layoutSpaceRef);
   }
 
   @Override
+  public String renderLayout(@Nullable SpaceReference layoutSpaceRef) {
+    LOGGER.info("renderPageLayout: for layoutRef '{}'", layoutSpaceRef);
+    layoutSpaceRef = resolveValidLayoutSpace(layoutSpaceRef).orElse(null);
+    LOGGER.debug("renderPageLayout: after resolveValidLayoutSpace layoutRef '{}'", layoutSpaceRef);
+    return renderLayoutLocal(layoutSpaceRef);
+  }
+
+  @Override
+  @NotNull
+  public String renderLayoutPartial(@Nullable DocumentReference startNodeRef) {
+    if (startNodeRef == null) {
+      return "";
+    }
+    SpaceReference layoutSpaceRef = startNodeRef.getLastSpaceReference();
+    LOGGER.info("renderLayoutPartial: for layoutRef '{}'", layoutSpaceRef);
+    layoutSpaceRef = resolveValidLayoutSpace(layoutSpaceRef).orElse(null);
+    LOGGER.debug("renderLayoutPartial: after resolveValidLayoutSpace layoutRef '{}'",
+        layoutSpaceRef);
+    DocumentReference localStartNodeRef = RefBuilder.from(layoutSpaceRef)
+        .doc(startNodeRef.getName()).build(DocumentReference.class);
+    if (treeNodeService.isTreeNode(localStartNodeRef)) {
+      TreeNode startNode;
+      try {
+        startNode = treeNodeService.getTreeNodeForDocRef(localStartNodeRef);
+        return renderLayoutPartialLocal(startNode);
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to get TreeNode for {}", localStartNodeRef, exp);
+      }
+    } else {
+      LOGGER.info("cannot render {}, because it must be a TreeNode.", localStartNodeRef);
+    }
+    return "";
+  }
+
+  /**
+   * @deprecated instead use {@link #renderLayout(SpaceReference)})
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
+  @Override
   public String renderPageLayoutLocal(@Nullable SpaceReference layoutSpaceRef) {
+    return renderLayoutLocal(layoutSpaceRef);
+  }
+
+  @Override
+  public String renderLayoutLocal(@Nullable SpaceReference layoutSpaceRef) {
+    return renderLocal(layoutSpaceRef,
+        (RenderingEngine renderEngine) -> renderEngine.renderLayout(layoutSpaceRef));
+  }
+
+  @Override
+  public String renderLayoutPartialLocal(TreeNode startNode) {
+    return renderLocal(startNode.getDocumentReference().getLastSpaceReference(),
+        (RenderingEngine renderEngine) -> renderEngine.renderLayoutPartial(startNode));
+  }
+
+  private String renderLocal(SpaceReference layoutSpaceRef,
+      Consumer<RenderingEngine> renderLocalFunc) {
     if (layoutSpaceRef == null) {
       return "";
     }
     long millisec = System.currentTimeMillis();
     LOGGER.debug("renderPageLayout for layout [{}].", layoutSpaceRef);
     IRenderStrategy cellRenderer = new CellRenderStrategy();
-    getRenderingLayoutStack().push(layoutSpaceRef);
     RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
+    getRenderingLayoutStack().push(layoutSpaceRef);
     new Contextualiser()
         .withVeloContext(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY, layoutSpaceRef)
-        .execute(() -> renderEngine.renderPageLayout(layoutSpaceRef));
+        .execute(() -> renderLocalFunc.accept(renderEngine));
     getRenderingLayoutStack().pop();
     LOGGER.info("renderPageLayout finishing. Time used in millisec: {}",
         (System.currentTimeMillis() - millisec));
