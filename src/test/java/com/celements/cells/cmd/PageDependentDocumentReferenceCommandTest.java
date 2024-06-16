@@ -1,6 +1,5 @@
 package com.celements.cells.cmd;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -43,9 +42,9 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
 
   @Before
   public void prepare() throws Exception {
-    context = getContext();
-    xwiki = getWikiMock();
-    registerComponentMock(IModelAccessFacade.class);
+    context = getXContext();
+    xwiki = getMock(XWiki.class);
+    registerComponentMocks(IModelAccessFacade.class, ITreeNodeService.class);
     document = createDefaultMock(XWikiDocument.class);
     cellDocRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
     cellDoc = new XWikiDocument(cellDocRef);
@@ -55,7 +54,6 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     defaultValueProviderDesc = getComponentManager().getComponentDescriptor(
         EntityReferenceValueProvider.class, "default");
     savedDefaultValueProviderService = Utils.getComponent(EntityReferenceValueProvider.class);
-    getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     defValueProviderMock = createDefaultMock(EntityReferenceValueProvider.class);
     getComponentManager().registerComponent(defaultValueProviderDesc, defValueProviderMock);
   }

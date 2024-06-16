@@ -67,13 +67,35 @@ public class LayoutScriptService implements ScriptService {
     return modelContext.getXWikiContext();
   }
 
+  /**
+   * @deprecated instead use {@link #renderLayout()})
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   public String renderPageLayout() {
     return layoutService.renderPageLayout();
   }
 
+  public String renderLayout() {
+    return layoutService.renderLayout();
+  }
+
+  /**
+   * @deprecated instead use {@link #renderLayout(SpaceReference)})
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   @NotNull
   public String renderPageLayout(@Nullable SpaceReference spaceRef) {
     return layoutService.renderPageLayout(spaceRef);
+  }
+
+  @NotNull
+  public String renderLayout(@Nullable SpaceReference spaceRef) {
+    return layoutService.renderLayout(spaceRef);
+  }
+
+  @NotNull
+  public String renderLayoutPartial(@Nullable DocumentReference startNodeRef) {
+    return layoutService.renderLayoutPartial(startNodeRef);
   }
 
   /**

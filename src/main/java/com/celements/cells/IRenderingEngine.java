@@ -31,12 +31,12 @@ public interface IRenderingEngine {
   void renderCell(@Nullable TreeNode node);
 
   /**
-   * @param spaceName
-   * @deprecated since 2.14.0 use renderPageLayout(SpaceReference) instead.
+   * @deprecated instead use {@link #renderLayout(SpaceReference)})
    */
-  @Deprecated
-  void renderPageLayout(String spaceName);
-
+  @Deprecated(since = "6.7", forRemoval = true)
   void renderPageLayout(@NotNull SpaceReference spaceRef);
 
+  void renderLayout(@NotNull SpaceReference layoutSpaceRef);
+
+  void renderLayoutPartial(@NotNull TreeNode startNode);
 }

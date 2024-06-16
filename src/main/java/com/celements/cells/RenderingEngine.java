@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.*;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.EntityReference;
@@ -40,10 +42,12 @@ public class RenderingEngine implements IRenderingEngine {
 
   private IRenderStrategy renderStrategy;
 
-  ITreeNodeService treeNodeService;
+  private final ITreeNodeService treeNodeService;
   IWebUtilsService webUtilsService;
 
-  public RenderingEngine() {}
+  public RenderingEngine() {
+    treeNodeService = Utils.getComponent(ITreeNodeService.class);
+  }
 
   /*
    * (non-Javadoc)
@@ -52,7 +56,7 @@ public class RenderingEngine implements IRenderingEngine {
    * com.xpn.xwiki.objects.BaseObject)
    */
   @Override
-  public void renderCell(TreeNode node) {
+  public void renderCell(@Nullable TreeNode node) {
     renderStrategy.startRendering();
     // isFirst AND isLast because only this item and its children is
     // rendered (NO SIBLINGS!)
@@ -60,16 +64,13 @@ public class RenderingEngine implements IRenderingEngine {
     renderStrategy.endRendering();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.celements.web.cells.IRenderingEngine#renderSubCells(java.lang.String)
+  /**
+   * @deprecated instead use {@link #renderLayout(SpaceReference)})
    */
   @Override
-  @Deprecated
-  public void renderPageLayout(String spaceName) {
-    SpaceReference spaceRef = getWebUtilsService().resolveSpaceReference(spaceName);
-    renderPageLayout(spaceRef);
+  @Deprecated(since = "6.7", forRemoval = true)
+  public void renderPageLayout(SpaceReference spaceRef) {
+    renderLayout(spaceRef);
   }
 
   /*
@@ -79,11 +80,25 @@ public class RenderingEngine implements IRenderingEngine {
    * org.xwiki.model.reference.SpaceReference)
    */
   @Override
-  public void renderPageLayout(SpaceReference spaceRef) {
+  public void renderLayout(SpaceReference spaceRef) {
     checkNotNull(spaceRef);
     LOGGER.debug("renderPageLayout: start rendering [{}].", spaceRef);
     renderStrategy.startRendering();
     renderSubCells(null, spaceRef);
+    renderStrategy.endRendering();
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see com.celements.web.cells.IRenderingEngine#renderSubCells(
+   * org.xwiki.model.reference.SpaceReference)
+   */
+  @Override
+  public void renderLayoutPartial(TreeNode startNode) {
+    LOGGER.debug("renderPageLayoutPartial: start rendering [{}].", startNode);
+    renderStrategy.startRendering();
+    renderSubCells(startNode, startNode.getDocumentReference().getLastSpaceReference());
     renderStrategy.endRendering();
   }
 
@@ -101,7 +116,7 @@ public class RenderingEngine implements IRenderingEngine {
 
   void renderSubCells(TreeNode parentNode, EntityReference parentRef) {
     if (renderStrategy.isRenderSubCells(parentRef)) {
-      List<TreeNode> children = getTreeNodeService().getSubNodesForParent(parentRef,
+      List<TreeNode> children = treeNodeService.getSubNodesForParent(parentRef,
           renderStrategy.getMenuPart(parentNode));
       LOGGER.debug("internal_renderSubCells: for parent [{}] render [{}] children [{}].",
           parentRef, children.size(), children);
@@ -123,13 +138,6 @@ public class RenderingEngine implements IRenderingEngine {
   public RenderingEngine setRenderStrategy(IRenderStrategy newStrategy) {
     this.renderStrategy = newStrategy;
     return this;
-  }
-
-  ITreeNodeService getTreeNodeService() {
-    if (treeNodeService != null) {
-      return treeNodeService;
-    }
-    return Utils.getComponent(ITreeNodeService.class);
   }
 
   IWebUtilsService getWebUtilsService() {
