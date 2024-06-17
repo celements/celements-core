@@ -96,9 +96,9 @@ public class RenderingEngine implements IRenderingEngine {
    */
   @Override
   public void renderLayoutPartial(TreeNode startNode) {
-    LOGGER.debug("renderPageLayoutPartial: start rendering [{}].", startNode);
+    LOGGER.debug("renderLayoutPartial: start rendering [{}].", startNode);
     renderStrategy.startRendering();
-    renderSubCells(startNode, startNode.getDocumentReference().getLastSpaceReference());
+    renderSubCells(startNode, startNode.getDocumentReference());
     renderStrategy.endRendering();
   }
 
