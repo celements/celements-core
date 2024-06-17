@@ -148,7 +148,7 @@ public class RenderingEngineTest extends AbstractComponentTest {
     renderStrategyMock.startRendering();
     renderStrategyMock.endRendering();
     expect(renderStrategyMock
-        .isRenderSubCells(eq(node.getDocumentReference().getLastSpaceReference()))).andReturn(false)
+        .isRenderSubCells(eq(node.getDocumentReference()))).andReturn(false)
             .once();
     replayDefault();
     renderingEngine.renderLayoutPartial(node);

@@ -285,7 +285,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       return "";
     }
     long millisec = System.currentTimeMillis();
-    LOGGER.debug("renderPageLayout for layout [{}].", layoutSpaceRef);
+    LOGGER.debug("renderLocal for layout [{}].", layoutSpaceRef);
     IRenderStrategy cellRenderer = new CellRenderStrategy();
     RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
     getRenderingLayoutStack().push(layoutSpaceRef);
@@ -293,7 +293,7 @@ public final class DefaultLayoutService implements LayoutServiceRole {
         .withVeloContext(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY, layoutSpaceRef)
         .execute(() -> renderLocalFunc.accept(renderEngine));
     getRenderingLayoutStack().pop();
-    LOGGER.info("renderPageLayout finishing. Time used in millisec: {}",
+    LOGGER.info("renderLocal finishing. Time used in millisec: {}",
         (System.currentTimeMillis() - millisec));
     return cellRenderer.getAsString();
   }
