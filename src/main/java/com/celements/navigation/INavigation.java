@@ -151,10 +151,22 @@ public interface INavigation extends PresentationNodeData {
 
   public String getNavLanguage();
 
+  /**
+   * @deprecated instead use {@link AttributeBuilder#addId(nav.getUniqueId(DocumentReference))}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   public String addUniqueElementId(DocumentReference docRef);
 
+  /**
+   * @deprecated instead use {@link #getCssClassAttribute(DocumentReference, boolean, boolean,
+   *             boolean, boolean, int)}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   public String addCssClasses(DocumentReference docRef, boolean withCM, boolean isFirstItem,
       boolean isLastItem, boolean isLeaf, int numItem);
+
+  public List<String> getCssClassList(DocumentReference docRef, boolean withCM,
+      boolean isFirstItem, boolean isLastItem, boolean isLeaf, int numItem);
 
   public void setPresentationType(String presentationTypeHint);
 

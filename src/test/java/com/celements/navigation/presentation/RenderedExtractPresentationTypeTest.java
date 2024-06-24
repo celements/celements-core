@@ -33,6 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.classcollections.DocumentDetailsClasses;
@@ -58,15 +59,17 @@ public class RenderedExtractPresentationTypeTest extends AbstractComponentTest {
   private RenderedExtractPresentationType vtPresType;
   private TestRenderEngine testRenderEngine;
   private RenderCommand renderCmdMock;
+  private IModelAccessFacade modelAccessMock;
 
   @Before
-  public void setUp_RenderedExtractPresentationTypeTest() throws Exception {
-    context = getContext();
+  public void prepare() throws Exception {
+    context = getXContext();
+    modelAccessMock = registerComponentMock(IModelAccessFacade.class);
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
     nav = createDefaultMock(INavigation.class);
-    xwiki = getWikiMock();
+    xwiki = getMock(XWiki.class);
     testRenderEngine = new TestRenderEngine();
     expect(xwiki.getRenderingEngine()).andReturn(testRenderEngine).anyTimes();
     vtPresType = (RenderedExtractPresentationType) Utils.getComponent(IPresentationTypeRole.class,
@@ -124,7 +127,7 @@ public class RenderedExtractPresentationTypeTest extends AbstractComponentTest {
     expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
         isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
             + " first cel_nav_isLeaf RichText\"").once();
-    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).atLeastOnce();
+    expect(modelAccessMock.getDocument(eq(currentDocRef))).andReturn(currentDoc).atLeastOnce();
     DocumentReference templateDocRef = new DocumentReference(context.getDatabase(), "Templates",
         "RenderedExtract");
     String templateDiskPath = ":celTemplates/RenderedExtract.vm";

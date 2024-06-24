@@ -55,6 +55,9 @@ public interface LayoutServiceRole {
   String renderLayout(@Nullable SpaceReference layoutSpaceRef);
 
   @NotNull
+  String renderLayoutAsJson(@Nullable SpaceReference layoutSpaceRef);
+
+  @NotNull
   String renderLayoutPartial(@Nullable DocumentReference startNodeRef);
 
   /**

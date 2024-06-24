@@ -33,7 +33,6 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.web.Utils;
 
 public class RenderingEngine implements IRenderingEngine {
@@ -43,7 +42,6 @@ public class RenderingEngine implements IRenderingEngine {
   private IRenderStrategy renderStrategy;
 
   private final ITreeNodeService treeNodeService;
-  IWebUtilsService webUtilsService;
 
   public RenderingEngine() {
     treeNodeService = Utils.getComponent(ITreeNodeService.class);
@@ -138,13 +136,6 @@ public class RenderingEngine implements IRenderingEngine {
   public RenderingEngine setRenderStrategy(IRenderStrategy newStrategy) {
     this.renderStrategy = newStrategy;
     return this;
-  }
-
-  IWebUtilsService getWebUtilsService() {
-    if (webUtilsService != null) {
-      return webUtilsService;
-    }
-    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }

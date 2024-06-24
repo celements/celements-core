@@ -7,6 +7,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.ICellWriter;
+import com.celements.navigation.INavigation;
 
 @ComponentRole
 public interface IPresentationTypeRole<T extends PresentationNodeData> {
@@ -14,6 +15,14 @@ public interface IPresentationTypeRole<T extends PresentationNodeData> {
   void writeNodeContent(@NotNull ICellWriter writer, @NotNull DocumentReference docRef,
       @NotNull T nodeData);
 
+  public void writeNodeContent(ICellWriter writer, boolean isFirstItem, boolean isLastItem,
+      DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation);
+
+  /**
+   * @deprecated instead use {@link #writeNodeContent(ICellWriter, boolean, boolean,
+   *             DocumentReference, boolean, int, INavigation)}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   void writeNodeContent(@NotNull StringBuilder writer, boolean isFirstItem, boolean isLastItem,
       @NotNull DocumentReference docRef, boolean isLeaf, int numItem, @NotNull T nodeData);
 

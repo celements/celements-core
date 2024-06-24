@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.cells.div;
+package com.celements.cells;
 
 import static com.celements.cells.AbstractRenderStrategy.*;
 import static org.easymock.EasyMock.*;
@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.easymock.Capture;
 import org.junit.Before;
@@ -37,12 +38,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.cells.CellTypeCategory;
-import com.celements.cells.ICellWriter;
 import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.cells.attribute.CellAttribute;
 import com.celements.cells.classes.CellAttributeClass;
 import com.celements.cells.classes.CellClass;
+import com.celements.cells.div.CellRenderStrategy;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
@@ -58,7 +58,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class CellRenderStrategyTest extends AbstractComponentTest {
+public class AbstractRenderStrategyTest extends AbstractComponentTest {
 
   private CellRenderStrategy renderer;
   private ICellWriter outWriterMock;
@@ -73,6 +73,25 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     context = getXContext();
     mockctRendererCmd = createDefaultMock(RenderCommand.class);
     renderer = new CellRenderStrategy(outWriterMock, mockctRendererCmd);
+  }
+
+  @Test
+  public void test_getCellTypeConfig_noTypeConfig() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    expectNoCellTypeConfig(cellRef);
+    replayDefault();
+    assertFalse(renderer.getCellTypeConfig(cellRef).isPresent());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getCellTypeConfig_withTypeConfig() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    IPageTypeConfig typeConfig = createDefaultMock(IPageTypeConfig.class);
+    expectCellTypeConfig(cellRef, typeConfig);
+    replayDefault();
+    assertSame(typeConfig, renderer.getCellTypeConfig(cellRef).orElse(null));
+    verifyDefault();
   }
 
   @Test
@@ -335,6 +354,60 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     expect(outWriterMock.appendContent(eq(cellContentExpected))).andReturn(outWriterMock);
     replayDefault();
     renderer.renderEmptyChildren(cellNode);
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getTagName_noCellConfig_fallback_CellType() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    expectNewDoc(cellRef);
+    String configName = "TestType";
+    expectCellTypeConfig(cellRef, configName);
+    replayDefault();
+    Optional<String> tagName = renderer.getTagName(cellRef);
+    assertNotNull(tagName);
+    assertTrue(tagName.isPresent());
+    assertEquals(configName, tagName.get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getTagName_emptyTagName_fallback_CellType() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    addCellObj(expectNewDoc(cellRef));
+    String configName = "TestType";
+    expectCellTypeConfig(cellRef, configName);
+    replayDefault();
+    Optional<String> tagName = renderer.getTagName(cellRef);
+    assertNotNull(tagName);
+    assertTrue(tagName.isPresent());
+    assertEquals(configName, tagName.get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getTagName_fromCellConfig() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    BaseObject cellObj = addCellObj(expectNewDoc(cellRef));
+    String expectedTagName = "form";
+    cellObj.setStringValue(CellClass.FIELD_TAG_NAME.getName(), expectedTagName);
+    replayDefault();
+    Optional<String> tagName = renderer.getTagName(cellRef);
+    assertNotNull(tagName);
+    assertTrue(tagName.isPresent());
+    assertEquals(expectedTagName, tagName.get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getTagName_emptyTagName_fallback_CellType_noTagName() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    expectNewDoc(cellRef);
+    expectCellTypeConfig(cellRef, (String) null);
+    replayDefault();
+    Optional<String> tagName = renderer.getTagName(cellRef);
+    assertNotNull(tagName);
+    assertFalse(tagName.isPresent());
     verifyDefault();
   }
 

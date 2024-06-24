@@ -19,36 +19,48 @@
  */
 package com.celements.cells;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.celements.cells.attribute.CellAttribute;
 
-public interface ICellWriter {
+@NotThreadSafe
+public abstract class AbstractWriter implements ICellWriter {
 
-  @NotNull
-  Stream<String> getOpenLevels();
+  /**
+   * Entry: tagName (String), hasContent (Boolean)
+   */
+  protected final Deque<Entry<String, Boolean>> openLevels = new LinkedList<>();
 
-  void closeLevel();
+  protected Optional<Entry<String, Boolean>> getCurrentLevel() {
+    return Optional.ofNullable(openLevels.peek());
+  }
 
-  void clear();
+  protected Optional<Boolean> hasLevelContentOptional() {
+    return getCurrentLevel()
+        .map(Entry::getValue);
+  }
 
-  @NotNull
-  ICellWriter appendContent(@Nullable String content);
+  @Override
+  public void openLevel(@Nullable String tagName) {
+    openLevel(tagName, Collections.<CellAttribute>emptyList());
+  }
 
-  void openLevel(@Nullable String tagName);
+  @Override
+  public final Stream<String> getOpenLevels() {
+    return openLevels.stream().map(Entry::getKey);
+  }
 
-  void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes);
-
-  boolean hasLevelContent();
-
-  @NotNull
-  String getAsString();
-
-  @NotNull
-  StringBuilder getAsStringBuilder();
+  @Override
+  public void clear() {
+    openLevels.clear();
+  }
 
 }

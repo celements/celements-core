@@ -94,6 +94,11 @@ public class LayoutScriptService implements ScriptService {
   }
 
   @NotNull
+  public String renderLayoutAsJson(@Nullable SpaceReference spaceRef) {
+    return layoutService.renderLayoutAsJson(spaceRef);
+  }
+
+  @NotNull
   public String renderLayoutPartial(@Nullable DocumentReference startNodeRef) {
     return layoutService.renderLayoutPartial(startNodeRef);
   }

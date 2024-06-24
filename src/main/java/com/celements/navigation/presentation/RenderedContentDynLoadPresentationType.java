@@ -1,10 +1,8 @@
 package com.celements.navigation.presentation;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -15,12 +13,10 @@ import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.context.ModelContext;
-import com.celements.navigation.INavigation;
 import com.celements.web.service.UrlService;
 
 @Component("renderedContentDynLoad")
-public class RenderedContentDynLoadPresentationType extends RenderedContentPresentationType
-    implements IPresentationTypeRole<INavigation> {
+public class RenderedContentDynLoadPresentationType extends RenderedContentPresentationType {
 
   private static final Logger LOGGER = LoggerFactory
       .getLogger(RenderedContentDynLoadPresentationType.class);
@@ -37,12 +33,13 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
   }
 
   @Override
-  protected void addRenderedContent(@NotNull StringBuilder outStream,
-      @NotNull DocumentReference docRef) {
+  protected String addRenderedContent(@NotNull DocumentReference docRef) {
+    StringBuilder outStream = new StringBuilder();
     outStream.append("<cel-lazy-load src=\"");
     outStream.append(getLoadSrcUrl(docRef));
     outStream.append("\" size=32 >");
     outStream.append("</cel-lazy-load>\n");
+    return outStream.toString();
   }
 
   private @NotNull String getLoadSrcUrl(@NotNull DocumentReference docRef) {
@@ -55,10 +52,10 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
 
   private @NotNull String getPassThroughParams() {
     return mContext.request()
-    .map(r -> r.getParameterMap().entrySet())
-    .orElse(Set.of())
-    .stream()
-    .filter(entry1 -> !keyBlackList.contains(entry1.getKey()))
+        .map(r -> r.getParameterMap().entrySet())
+        .orElse(Set.of())
+        .stream()
+        .filter(entry1 -> !keyBlackList.contains(entry1.getKey()))
         .flatMap(entry -> List.of(entry.getValue()).stream()
             .map(v -> entry.getKey() + "=" + v))
         .collect(() -> new StringJoiner("&", "&", "").setEmptyValue(""), StringJoiner::add,

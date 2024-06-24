@@ -4,11 +4,13 @@ import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
+import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.ICellWriter;
+import com.celements.cells.attribute.AttributeBuilder;
+import com.celements.cells.attribute.DefaultAttributeBuilder;
 import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
 import com.xpn.xwiki.XWikiException;
@@ -26,9 +28,27 @@ public class RenderedContentPresentationType implements IPresentationTypeRole<IN
   @Override
   public void writeNodeContent(ICellWriter writer, DocumentReference docRef,
       INavigation navigation) {
-    writeNodeContent(writer.getAsStringBuilder(), false, false, docRef, true, 0, navigation);
+    writeNodeContent(writer, false, false, docRef, true, 0, navigation);
   }
 
+  @Override
+  public void writeNodeContent(ICellWriter writer, boolean isFirstItem, boolean isLastItem,
+      DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
+    LOGGER.debug("writeNodeContent for [{}].", docRef);
+    AttributeBuilder attributes = new DefaultAttributeBuilder();
+    attributes.addId(nav.getUniqueId(docRef));
+    attributes.addCssClasses(
+        nav.getCssClassList(docRef, isLeaf, isFirstItem, isLastItem, isLeaf, numItem));
+    writer.openLevel("div", attributes.build());
+    writer.appendContent(addRenderedContent(docRef));
+    writer.closeLevel();
+  }
+
+  /**
+   * @deprecated instead use {@link #writeNodeContent(ICellWriter, boolean, boolean,
+   *             DocumentReference, boolean, int, INavigation)}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
@@ -37,17 +57,17 @@ public class RenderedContentPresentationType implements IPresentationTypeRole<IN
     outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
         + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
-    addRenderedContent(outStream, docRef);
+    outStream.append(addRenderedContent(docRef));
     outStream.append("</div>\n");
   }
 
-  protected void addRenderedContent(@NotNull StringBuilder outStream,
-      @NotNull DocumentReference docRef) {
+  protected String addRenderedContent(@NotNull DocumentReference docRef) {
     try {
-      outStream.append(getRenderCommand().renderCelementsDocument(docRef, "view"));
+      return getRenderCommand().renderCelementsDocument(docRef, "view");
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get document for [" + docRef + "].", exp);
+      LOGGER.error("Failed to get document for [{}].", docRef, exp);
     }
+    return "";
   }
 
   RenderCommand getRenderCommand() {

@@ -1,0 +1,75 @@
+package com.celements.cells.json;
+
+import java.util.List;
+
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang.NotImplementedException;
+
+import com.celements.cells.AbstractWriter;
+import com.celements.cells.ICellWriter;
+import com.celements.cells.attribute.CellAttribute;
+import com.celements.sajson.JsonBuilder;
+
+@NotThreadSafe
+public class JsonWriter extends AbstractWriter {
+
+  private final JsonBuilder jsonBuilder;
+
+  public JsonWriter() {
+    this(new JsonBuilder());
+  }
+
+  public JsonWriter(JsonBuilder jsonBuilder) {
+    this.jsonBuilder = jsonBuilder;
+  }
+
+  @Override
+  public void closeLevel() {
+    jsonBuilder.closeDictionary();
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    jsonBuilder.clear();
+  }
+
+  @Override
+  public @NotNull ICellWriter appendContent(@Nullable String content) {
+    jsonBuilder.addPropertyNonEmpty("content", content);
+    return this;
+  }
+
+  @Override
+  public void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes) {
+    jsonBuilder.openDictionary();
+    jsonBuilder.addPropertyNonEmpty("tagName", tagName);
+    jsonBuilder.openProperty("attributes");
+    jsonBuilder.openDictionary();
+    attributes.stream()
+        .filter(attribute -> attribute.getValue().isPresent())
+        .forEach(
+            attribute -> jsonBuilder.addPropertyNonEmpty(attribute.getName(),
+                attribute.getValue()));
+    jsonBuilder.closeDictionary();
+  }
+
+  @Override
+  public boolean hasLevelContent() {
+    return hasLevelContentOptional().orElse(!jsonBuilder.isOnFirstElement());
+  }
+
+  @Override
+  public @NotNull String getAsString() {
+    return jsonBuilder.getJSON();
+  }
+
+  @Override
+  public @NotNull StringBuilder getAsStringBuilder() {
+    throw new NotImplementedException();
+  }
+
+}
