@@ -32,13 +32,15 @@ import java.util.regex.Pattern;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * Simple Api for JSON. The builder helps do generate a valid JSON string based on event handling.
  */
 @NotThreadSafe
 public class JsonBuilder {
 
-  private static final Map<Pattern, String> JSON_REPLACEMENTS = Map.of(
+  private static final Map<Pattern, String> JSON_REPLACEMENTS = ImmutableMap.of(
       Pattern.compile("\\\\"), "\\\\\\\\",
       Pattern.compile("\""), "\\\\\"",
       Pattern.compile("\n"), "\\\\n",
@@ -80,9 +82,7 @@ public class JsonBuilder {
   }
 
   public String getJSON() {
-    if (!isComplete()) {
-      throw new IllegalStateException(format("{0} is still open", commandStack.peek()));
-    }
+    checkState(isComplete(), format("{0} is still open", commandStack.peek()));
     return json.toString();
   }
 
