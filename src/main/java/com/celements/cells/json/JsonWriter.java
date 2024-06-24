@@ -45,6 +45,9 @@ public class JsonWriter extends AbstractWriter {
 
   @Override
   public void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes) {
+    if (!jsonBuilder.isOnFirstElement()) {
+      jsonBuilder.openProperty("cell");
+    }
     jsonBuilder.openDictionary();
     jsonBuilder.addPropertyNonEmpty("tagName", tagName);
     jsonBuilder.openProperty("attributes");
