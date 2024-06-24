@@ -23,6 +23,7 @@ import static com.celements.navigation.INavigationClassConfig.*;
 import static com.google.common.base.Predicates.*;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -61,6 +62,7 @@ import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
@@ -530,10 +532,8 @@ public class Navigation implements INavigation {
   }
 
   private boolean isLeaf(String fullName, XWikiContext context) {
-    List<TreeNode> currentMenuItems = getTreeNodeService().getSubNodesForParent(fullName,
-        getMenuSpace(context), getNavFilter());
-    boolean isLeaf = (currentMenuItems.size() <= 0);
-    return isLeaf;
+    return getTreeNodeService().getSubNodesForParent(fullName,
+        getMenuSpace(context), getNavFilter()).isEmpty();
   }
 
   @Override
@@ -560,6 +560,11 @@ public class Navigation implements INavigation {
         + ">");
   }
 
+  /**
+   * @deprecated instead use {@link #getCssClassAttribute(DocumentReference, boolean, boolean,
+   *             boolean, boolean, int)}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   @Override
   public String addCssClasses(DocumentReference docRef, boolean withCM, boolean isFirstItem,
       boolean isLastItem, boolean isLeaf, int numItem) {
@@ -570,6 +575,10 @@ public class Navigation implements INavigation {
     return "";
   }
 
+  /**
+   * @deprecated instead use {@link AttributeBuilder#addId(nav.getUniqueId(DocumentReference))}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   @Override
   public String addUniqueElementId(DocumentReference docRef) {
     return "id=\"" + getUniqueId(docRef) + "\"";
@@ -606,48 +615,60 @@ public class Navigation implements INavigation {
     return (currentLevel < showInactiveToLevel);
   }
 
+  /**
+   * @deprecated instead use {@link #getCssClassList(DocumentReference, boolean, boolean, boolean,
+   *             boolean, int)}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   String getCssClasses(DocumentReference docRef, boolean withCM, boolean isFirstItem,
       boolean isLastItem, boolean isLeaf, int numItem) {
-    String cssClass = "";
+    return Joiner.on(" ")
+        .join(getCssClassList(docRef, withCM, isFirstItem, isLastItem, isLeaf, numItem));
+  }
+
+  @Override
+  public List<String> getCssClassList(DocumentReference docRef, boolean withCM, boolean isFirstItem,
+      boolean isLastItem, boolean isLeaf, int numItem) {
+    List<String> cssClassList = new ArrayList<>();
     if (withCM) {
-      cssClass += getCMcssClass();
+      cssClassList.add(getCMcssClass());
     }
     if (isFirstItem) {
-      cssClass += " first";
+      cssClassList.add("first");
     }
     if (isLastItem) {
-      cssClass += " last";
+      cssClassList.add("last");
     }
     if ((numItem & 1) == 0) {
-      cssClass += " cel_nav_even";
+      cssClassList.add("cel_nav_even");
     } else {
-      cssClass += " cel_nav_odd";
+      cssClassList.add("cel_nav_odd");
     }
-    cssClass += " cel_nav_item" + numItem;
+    cssClassList.add("cel_nav_item" + numItem);
     if (isLeaf) {
-      cssClass += " cel_nav_isLeaf";
+      cssClassList.add("cel_nav_isLeaf");
     } else {
-      cssClass += " cel_nav_hasChildren";
+      cssClassList.add("cel_nav_hasChildren");
     }
     if (docRef != null) {
-      cssClass += " cel_nav_nodeSpace_" + docRef.getLastSpaceReference().getName();
-      cssClass += " cel_nav_nodeName_" + docRef.getName();
+      cssClassList.add("cel_nav_nodeSpace_" + docRef.getLastSpaceReference().getName());
+      cssClassList.add("cel_nav_nodeName_" + docRef.getName());
       if (docRef.equals(getContext().getDoc().getDocumentReference())) {
-        cssClass += " currentPage";
+        cssClassList.add("currentPage");
       }
-      cssClass += " " + getPageTypeConfigName(docRef);
+      cssClassList.add(getPageTypeConfigName(docRef));
       String pageLayoutName = getPageLayoutName(docRef);
       if (!"".equals(pageLayoutName)) {
-        cssClass += " " + pageLayoutName;
+        cssClassList.add(pageLayoutName);
       }
       if (isActiveMenuItem(docRef)) {
-        cssClass += " active";
+        cssClassList.add("active");
       }
       if (isRestrictedRights(docRef)) {
-        cssClass += " cel_nav_restricted_rights";
+        cssClassList.add("cel_nav_restricted_rights");
       }
     }
-    return cssClass.trim();
+    return cssClassList;
   }
 
   boolean isRestrictedRights(DocumentReference docRef) {

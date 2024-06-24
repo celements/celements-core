@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.navigation.INavigation;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -22,17 +21,6 @@ public class SitemapPresentationType extends DefaultPresentationType {
   @Override
   public String getDefaultCssClass() {
     return _CEL_CM_SM_TREENODE_DEFAULT_CSSCLASS;
-  }
-
-  @Override
-  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
-      DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation) {
-    try {
-      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem, navigation);
-      addLanguageLinks(outStream, docRef);
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to writeNodeContent for docRef [" + docRef + "].", exp);
-    }
   }
 
   void addLanguageLinks(StringBuilder outStream, DocumentReference docRef) {

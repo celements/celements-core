@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.cells;
+package com.celements.cells.div;
 
 import static org.junit.Assert.*;
 
@@ -38,13 +38,6 @@ public class DivWriterTest {
   @Before
   public void prepareTest() throws Exception {
     divWriter = new DivWriter();
-  }
-
-  @Test
-  public void test_closeLevel_noArg() {
-    divWriter.openLevel();
-    divWriter.closeLevel();
-    assertEquals("<div></div>", divWriter.getAsString());
   }
 
   @Test
@@ -76,8 +69,9 @@ public class DivWriterTest {
     String idname = "newId";
     String cssClasses = "classes";
     String cssStyles = "width:100px;\nheight:10px;\n";
-    divWriter.openLevel(new DefaultAttributeBuilder().addId(idname).addCssClasses(
-        cssClasses).addStyles(cssStyles).build());
+    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME,
+        new DefaultAttributeBuilder().addId(idname).addCssClasses(
+            cssClasses).addStyles(cssStyles).build());
     String returnedString = divWriter.getAsString();
     assertTrue("Must start with '<div ' but got '" + returnedString + "'",
         returnedString.startsWith("<div "));
@@ -96,14 +90,16 @@ public class DivWriterTest {
   @Test
   public void test_openLevel_cssClasses() {
     String cssClasses = "classes";
-    divWriter.openLevel(new DefaultAttributeBuilder().addCssClasses(cssClasses).build());
+    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME,
+        new DefaultAttributeBuilder().addCssClasses(cssClasses).build());
     assertEquals("<div class=\"" + cssClasses + "\">", divWriter.getAsString());
   }
 
   @Test
   public void test_openLevel_id() {
     String idname = "newId";
-    divWriter.openLevel(new DefaultAttributeBuilder().addId(idname).build());
+    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME,
+        new DefaultAttributeBuilder().addId(idname).build());
     assertEquals("<div id=\"" + idname + "\">", divWriter.getAsString());
   }
 
@@ -111,8 +107,9 @@ public class DivWriterTest {
   public void test_openLevel_cssStyles_empty() {
     String idname = "newId";
     String cssClasses = "classes";
-    divWriter.openLevel(new DefaultAttributeBuilder().addId(idname).addCssClasses(cssClasses)
-        .build());
+    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME,
+        new DefaultAttributeBuilder().addId(idname).addCssClasses(cssClasses)
+            .build());
     assertTrue("Must start with '<div '", divWriter.getAsString().startsWith("<div "));
     assertTrue("Must end with '>'", divWriter.getAsString().endsWith(">"));
     String cssClassExpected = " class=\"" + cssClasses + "\"";
@@ -161,7 +158,7 @@ public class DivWriterTest {
         "testName2").addValue("testValue2");
     List<CellAttribute> attributes = Arrays.asList((CellAttribute) attrBuilder.build(),
         (CellAttribute) attrBuilder2.build());
-    divWriter.openLevel(attributes);
+    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME, attributes);
     String returnedString = divWriter.getAsString();
     assertTrue("Must start with '<div ' but got '" + returnedString + "'",
         returnedString.startsWith("<div "));
@@ -177,7 +174,7 @@ public class DivWriterTest {
     DefaultCellAttribute.Builder attrBuilder = new DefaultCellAttribute.Builder().attrName(
         "testName").addValue("test. : -äöü\"Value");
     List<CellAttribute> attributes = Arrays.asList((CellAttribute) attrBuilder.build());
-    divWriter.openLevel(attributes);
+    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME, attributes);
     String returnedString = divWriter.getAsString();
     assertTrue("Must start with '<div ' but got '" + returnedString + "'",
         returnedString.startsWith("<div "));
@@ -192,9 +189,9 @@ public class DivWriterTest {
     assertFalse(divWriter.hasLevelContent());
     divWriter.appendContent("lol");
     assertTrue(divWriter.hasLevelContent());
-    divWriter.openLevel();
+    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME);
     assertFalse(divWriter.hasLevelContent());
-    divWriter.openLevel();
+    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME);
     divWriter.closeLevel();
     assertTrue(divWriter.hasLevelContent());
     divWriter.closeLevel();

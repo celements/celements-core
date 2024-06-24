@@ -34,11 +34,12 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.velocity.VelocityManager;
 
-import com.celements.cells.CellRenderStrategy;
 import com.celements.cells.HtmlDoctype;
 import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
 import com.celements.cells.classes.PageLayoutPropertiesClass;
+import com.celements.cells.div.CellRenderStrategy;
+import com.celements.cells.json.JsonRenderStrategy;
 import com.celements.common.MoreOptional;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.model.access.IModelAccessFacade;
@@ -232,6 +233,15 @@ public final class DefaultLayoutService implements LayoutServiceRole {
   }
 
   @Override
+  public String renderLayoutAsJson(@Nullable SpaceReference layoutSpaceRef) {
+    LOGGER.info("renderLayoutAsJson: for layoutRef '{}'", layoutSpaceRef);
+    final SpaceReference spaceRef = resolveValidLayoutSpace(layoutSpaceRef).orElse(null);
+    LOGGER.debug("renderLayoutAsJson: after resolveValidLayoutSpace layoutRef '{}'", spaceRef);
+    return renderLocal(new JsonRenderStrategy(), spaceRef,
+        (RenderingEngine renderEngine) -> renderEngine.renderLayout(spaceRef));
+  }
+
+  @Override
   @NotNull
   public String renderLayoutPartial(@Nullable DocumentReference startNodeRef) {
     if (startNodeRef == null) {
@@ -269,24 +279,24 @@ public final class DefaultLayoutService implements LayoutServiceRole {
 
   @Override
   public String renderLayoutLocal(@Nullable SpaceReference layoutSpaceRef) {
-    return renderLocal(layoutSpaceRef,
+    return renderLocal(new CellRenderStrategy(), layoutSpaceRef,
         (RenderingEngine renderEngine) -> renderEngine.renderLayout(layoutSpaceRef));
   }
 
   @Override
   public String renderLayoutPartialLocal(TreeNode startNode) {
-    return renderLocal(startNode.getDocumentReference().getLastSpaceReference(),
+    return renderLocal(new CellRenderStrategy(),
+        startNode.getDocumentReference().getLastSpaceReference(),
         (RenderingEngine renderEngine) -> renderEngine.renderLayoutPartial(startNode));
   }
 
-  private String renderLocal(SpaceReference layoutSpaceRef,
+  private String renderLocal(IRenderStrategy cellRenderer, SpaceReference layoutSpaceRef,
       Consumer<RenderingEngine> renderLocalFunc) {
     if (layoutSpaceRef == null) {
       return "";
     }
     long millisec = System.currentTimeMillis();
     LOGGER.debug("renderLocal for layout [{}].", layoutSpaceRef);
-    IRenderStrategy cellRenderer = new CellRenderStrategy();
     RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
     getRenderingLayoutStack().push(layoutSpaceRef);
     new Contextualiser()

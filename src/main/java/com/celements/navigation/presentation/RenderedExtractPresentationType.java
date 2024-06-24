@@ -10,9 +10,13 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.ICellWriter;
+import com.celements.cells.attribute.AttributeBuilder;
+import com.celements.cells.attribute.DefaultAttributeBuilder;
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
-import com.celements.model.util.References;
+import com.celements.model.reference.RefBuilder;
 import com.celements.navigation.INavigation;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.rendering.RenderCommand;
@@ -35,6 +39,9 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
 
   @Requirement
   protected ModelContext context;
+
+  @Requirement
+  private IModelAccessFacade modelAccess;
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -60,53 +67,69 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
   }
 
   @Override
+  public void writeNodeContent(ICellWriter writer, boolean isFirstItem, boolean isLastItem,
+      DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
+    LOGGER.debug("writeNodeContent for [{}].", docRef);
+    AttributeBuilder attributes = new DefaultAttributeBuilder();
+    attributes.addId(nav.getUniqueId(docRef));
+    attributes.addCssClasses(
+        nav.getCssClassList(docRef, isLeaf, isFirstItem, isLastItem, isLeaf, numItem));
+    writer.openLevel("div", attributes.build());
+    writer.appendContent(getRenderedExtract(docRef));
+    writer.closeLevel();
+  }
+
+  /**
+   * @deprecated instead use {@link #writeNodeContent(ICellWriter, boolean, boolean,
+   *             DocumentReference, boolean, int, INavigation)}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
+  @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
-    LOGGER.debug("writeNodeContent for [" + docRef + "].");
+    LOGGER.debug("writeNodeContent for [{}].", docRef);
     outStream.append("<div ");
     outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
         + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
-    try {
-      outStream.append(getRenderedExtract(docRef));
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get document for [" + docRef + "].", exp);
-    }
+    outStream.append(getRenderedExtract(docRef));
     outStream.append("</div>\n");
   }
 
-  String getRenderedExtract(DocumentReference docRef) throws XWikiException {
+  String getRenderedExtract(DocumentReference docRef) {
     String templatePath = webUtilsService.getInheritedTemplatedPath(getTemplateRef());
     try {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       vcontext.put("extractDocRef", docRef);
-      XWikiDocument contentDoc = getContext().getWiki().getDocument(docRef, getContext());
+      XWikiDocument contentDoc = modelAccess.getDocument(docRef);
       vcontext.put("extractDoc", contentDoc.newDocument(getContext()));
       vcontext.put("extractContent", getDocExtract(docRef));
       return getRenderCommand().renderTemplatePath(templatePath, getContext().getLanguage(), "");
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to render template path [" + templatePath + "] for [" + docRef + "].",
-          exp);
+      LOGGER.error("Failed to render template path [{}] for [{}].",
+          templatePath, docRef, exp);
+    } catch (DocumentNotExistsException exp) {
+      LOGGER.error("Failed to get document for [{}].", docRef, exp);
     }
     return "";
   }
 
   private DocumentReference getTemplateRef() {
-    SpaceReference templateSpaceRef = References.create(SpaceReference.class,
-        IPageTypeConfig.TEMPLATE_SPACE_NAME, context.getWikiRef());
-    return References.create(DocumentReference.class, "RenderedExtract", templateSpaceRef);
+    return RefBuilder.from(context.getWikiRef()).space(
+        IPageTypeConfig.TEMPLATE_SPACE_NAME).doc("RenderedExtract").build(DocumentReference.class);
   }
 
-  private String getDocExtract(DocumentReference docRef) throws XWikiException {
-    XWikiDocument contentDoc = getContext().getWiki().getDocument(docRef, getContext());
+  private String getDocExtract(DocumentReference docRef) throws DocumentNotExistsException {
+    XWikiDocument contentDoc = modelAccess.getDocument(docRef);
     DocumentReference documentExtractClassRef = getDocDetailsClasses().getDocumentExtractClassRef(
         docRef.getLastSpaceReference().getParent().getName());
     BaseObject extractObj = contentDoc.getXObject(documentExtractClassRef,
         DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE, getContext().getLanguage(), false);
     if (extractObj == null) {
       extractObj = contentDoc.getXObject(documentExtractClassRef,
-          DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE, webUtilsService.getDefaultLanguage(
-              docRef.getLastSpaceReference()), false);
+          DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE, context.getDefaultLanguage(
+              docRef.getLastSpaceReference()),
+          false);
     }
     if (extractObj != null) {
       return extractObj.getStringValue(DocumentDetailsClasses.FIELD_DOC_EXTRACT_CONTENT);

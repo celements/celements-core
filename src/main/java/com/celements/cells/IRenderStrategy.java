@@ -41,7 +41,7 @@ public interface IRenderStrategy {
   @NotNull
   String getMenuPart(@Nullable TreeNode node);
 
-  void startRenderCell(@Nullable TreeNode node, boolean isFirstItem, boolean isLastItem);
+  void startRenderCell(@NotNull TreeNode node, boolean isFirstItem, boolean isLastItem);
 
   void startRenderChildren(@Nullable EntityReference parentRef);
 
@@ -54,6 +54,6 @@ public interface IRenderStrategy {
   @NotNull
   String getAsString();
 
-  void renderEmptyChildren(@Nullable TreeNode node);
+  void renderEmptyChildren(@NotNull TreeNode node);
 
 }

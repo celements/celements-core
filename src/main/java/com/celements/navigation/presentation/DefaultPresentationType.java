@@ -47,6 +47,22 @@ public class DefaultPresentationType implements IPresentationTypeRole<INavigatio
   }
 
   @Override
+  public void writeNodeContent(ICellWriter writer, boolean isFirstItem, boolean isLastItem,
+      DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation) {
+    try {
+      LOGGER.debug("writeNodeContent for [{}].", docRef);
+      appendMenuItemLink(writer, isFirstItem, isLastItem, docRef, isLeaf, numItem, navigation);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to writeNodeContent for docRef [{}].", docRef, exp);
+    }
+  }
+
+  /**
+   * @deprecated instead use {@link #writeNodeContent(ICellWriter, boolean, boolean,
+   *             DocumentReference, boolean, int, INavigation)}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
+  @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation) {
     try {
@@ -57,9 +73,25 @@ public class DefaultPresentationType implements IPresentationTypeRole<INavigatio
     }
   }
 
+  /**
+   * @deprecated instead use {@link #appendMenuItemLink(ICellWriter, boolean, boolean,
+   *             DocumentReference, boolean, int, INavigation)}
+   */
+  @Deprecated(since = "6.7", forRemoval = true)
   protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
       boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav)
       throws XWikiException {
+    outStream.append(getMenuItemHtml(isFirstItem, isLastItem, docRef, isLeaf, numItem, nav));
+  }
+
+  protected void appendMenuItemLink(ICellWriter writer, boolean isFirstItem,
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav)
+      throws XWikiException {
+    writer.appendContent(getMenuItemHtml(isFirstItem, isLastItem, docRef, isLeaf, numItem, nav));
+  }
+
+  private String getMenuItemHtml(boolean isFirstItem, boolean isLastItem, DocumentReference docRef,
+      boolean isLeaf, int numItem, INavigation nav) throws XWikiException {
     String fullName = modelUtils.serializeRef(docRef, LOCAL);
     String tagName = (nav.hasLink() ? "a" : "span");
     String menuItemHTML = "<" + tagName;
@@ -79,7 +111,7 @@ public class DefaultPresentationType implements IPresentationTypeRole<INavigatio
         getContext());
     menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem);
     menuItemHTML += " " + nav.addUniqueElementId(docRef) + ">" + menuName + "</" + tagName + ">";
-    outStream.append(menuItemHTML);
+    return menuItemHTML;
   }
 
   @Override
