@@ -20,6 +20,7 @@ public class JsonWriter extends AbstractWriter {
 
   public JsonWriter() {
     this(new JsonBuilder());
+    jsonBuilder.openDictionary();
   }
 
   public JsonWriter(JsonBuilder jsonBuilder) {
@@ -35,6 +36,7 @@ public class JsonWriter extends AbstractWriter {
   public void clear() {
     super.clear();
     jsonBuilder.clear();
+    jsonBuilder.openDictionary();
   }
 
   @Override
@@ -45,10 +47,7 @@ public class JsonWriter extends AbstractWriter {
 
   @Override
   public void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes) {
-    if (!jsonBuilder.isOnFirstElement()) {
-      jsonBuilder.openProperty("cell");
-    }
-    jsonBuilder.openDictionary();
+    jsonBuilder.openDictionary("cell");
     jsonBuilder.addPropertyNonEmpty("tagName", tagName);
     jsonBuilder.openProperty("attributes");
     jsonBuilder.openDictionary();
@@ -67,6 +66,7 @@ public class JsonWriter extends AbstractWriter {
 
   @Override
   public @NotNull String getAsString() {
+    jsonBuilder.closeDictionary();
     return jsonBuilder.getJSON();
   }
 

@@ -20,7 +20,7 @@ public class JsonWriterTest extends AbstractComponentTest {
   public void test_openLevel() {
     writer.openLevel("div");
     writer.closeLevel();
-    assertEquals("{\"tagName\" : \"div\", \"attributes\" : {}}", writer.getAsString());
+    assertEquals("{\"cell\" : {\"tagName\" : \"div\", \"attributes\" : {}}}", writer.getAsString());
   }
 
   @Test
@@ -29,9 +29,22 @@ public class JsonWriterTest extends AbstractComponentTest {
     writer.openLevel("div");
     writer.closeLevel();
     writer.closeLevel();
-    assertEquals("{\"tagName\" : \"div\", \"attributes\" : {},"
-        + " \"cell\" : {\"tagName\" : \"div\", \"attributes\" : {}}}",
-        writer.getAsString());
+    assertEquals("{"
+        + "\"cell\" : {\"tagName\" : \"div\", \"attributes\" : {},"
+        + " \"cell\" : {\"tagName\" : \"div\", \"attributes\" : {}}}"
+        + "}", writer.getAsString());
+  }
+
+  @Test
+  public void test_openLevel_onTopLevel() {
+    writer.openLevel("div");
+    writer.closeLevel();
+    writer.openLevel("div");
+    writer.closeLevel();
+    assertEquals("{"
+        + "\"cell\" : {\"tagName\" : \"div\", \"attributes\" : {}},"
+        + " \"cell\" : {\"tagName\" : \"div\", \"attributes\" : {}}"
+        + "}", writer.getAsString());
   }
 
 }
