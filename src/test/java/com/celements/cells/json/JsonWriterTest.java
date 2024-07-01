@@ -23,7 +23,7 @@ public class JsonWriterTest {
   public void test_openLevel() {
     writer.openLevel("div");
     writer.closeLevel();
-    assertEquals("{\"node1\" : {\"tagName\" : \"div\", \"attributes\" : {}}}",
+    assertEquals("[{\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : []}]",
         writer.getAsString());
   }
 
@@ -33,10 +33,10 @@ public class JsonWriterTest {
     writer.openLevel("div");
     writer.closeLevel();
     writer.closeLevel();
-    assertEquals("{"
-        + "\"node1\" : {\"tagName\" : \"div\", \"attributes\" : {},"
-        + " \"node2\" : {\"tagName\" : \"div\", \"attributes\" : {}}}"
-        + "}", writer.getAsString());
+    assertEquals("["
+        + "{\"tagName\" : \"div\", \"attributes\" : {},"
+        + " \"subnodes\" : [{\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : []}]}"
+        + "]", writer.getAsString());
   }
 
   @Test
@@ -45,10 +45,10 @@ public class JsonWriterTest {
     writer.closeLevel();
     writer.openLevel("div");
     writer.closeLevel();
-    assertEquals("{"
-        + "\"node1\" : {\"tagName\" : \"div\", \"attributes\" : {}},"
-        + " \"node2\" : {\"tagName\" : \"div\", \"attributes\" : {}}"
-        + "}", writer.getAsString());
+    assertEquals("["
+        + "{\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : []},"
+        + " {\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : []}"
+        + "]", writer.getAsString());
   }
 
   @Test
@@ -58,8 +58,8 @@ public class JsonWriterTest {
     List<CellAttribute> attributes = attrBuilder.build();
     writer.openLevel("div", attributes);
     writer.closeLevel();
-    assertEquals("{\"node1\" : {\"tagName\" : \"div\", \"attributes\" :"
-        + " {\"class\" : \"cel_cell\"}}}", writer.getAsString());
+    assertEquals("[{\"tagName\" : \"div\", \"attributes\" : {\"class\" : \"cel_cell\"},"
+        + " \"subnodes\" : []}]", writer.getAsString());
   }
 
 }
