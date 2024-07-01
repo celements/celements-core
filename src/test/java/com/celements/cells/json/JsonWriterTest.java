@@ -2,12 +2,15 @@ package com.celements.cells.json;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractComponentTest;
+import com.celements.cells.attribute.CellAttribute;
+import com.celements.cells.attribute.DefaultAttributeBuilder;
 
-public class JsonWriterTest extends AbstractComponentTest {
+public class JsonWriterTest {
 
   private JsonWriter writer;
 
@@ -45,6 +48,17 @@ public class JsonWriterTest extends AbstractComponentTest {
         + "\"cell\" : {\"tagName\" : \"div\", \"attributes\" : {}},"
         + " \"cell\" : {\"tagName\" : \"div\", \"attributes\" : {}}"
         + "}", writer.getAsString());
+  }
+
+  @Test
+  public void test_openLevel_attributes() {
+    DefaultAttributeBuilder attrBuilder = new DefaultAttributeBuilder();
+    attrBuilder.addCssClasses("cel_cell");
+    List<CellAttribute> attributes = attrBuilder.build();
+    writer.openLevel("div", attributes);
+    writer.closeLevel();
+    assertEquals("{\"cell\" : {\"tagName\" : \"div\", \"attributes\" :"
+        + " {\"class\" : \"cel_cell\"}}}", writer.getAsString());
   }
 
 }
