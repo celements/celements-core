@@ -6,8 +6,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import com.celements.cells.AbstractWriter;
 import com.celements.cells.ICellWriter;
 import com.celements.cells.attribute.CellAttribute;
@@ -17,6 +15,7 @@ import com.celements.sajson.JsonBuilder;
 public class JsonWriter extends AbstractWriter {
 
   private final JsonBuilder jsonBuilder;
+  private int nodeCounter = 0;
 
   public JsonWriter() {
     this(new JsonBuilder());
@@ -37,6 +36,7 @@ public class JsonWriter extends AbstractWriter {
     super.clear();
     jsonBuilder.clear();
     jsonBuilder.openDictionary();
+    nodeCounter = 0;
   }
 
   @Override
@@ -47,7 +47,7 @@ public class JsonWriter extends AbstractWriter {
 
   @Override
   public void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes) {
-    jsonBuilder.openDictionary("cell");
+    jsonBuilder.openDictionary("node" + ++nodeCounter);
     jsonBuilder.addPropertyNonEmpty("tagName", tagName);
     jsonBuilder.openProperty("attributes");
     jsonBuilder.openDictionary();
@@ -61,8 +61,7 @@ public class JsonWriter extends AbstractWriter {
 
   @Override
   public boolean hasLevelContent() {
-    // TODO solve correctly with a boolean inside JsonWriter
-    return hasLevelContentOptional().orElse(!jsonBuilder.isOnFirstElement());
+    throw new UnsupportedOperationException("hasLevelContent has no meaning in json");
   }
 
   @Override
@@ -73,7 +72,7 @@ public class JsonWriter extends AbstractWriter {
 
   @Override
   public @NotNull StringBuilder getAsStringBuilder() {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException("getAsStringBuilder has no meaning in json");
   }
 
 }
