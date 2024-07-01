@@ -55,12 +55,13 @@ public class JsonWriter extends AbstractWriter {
         .filter(attribute -> attribute.getValue().isPresent())
         .forEach(
             attribute -> jsonBuilder.addPropertyNonEmpty(attribute.getName(),
-                attribute.getValue()));
+                attribute.getValue().get()));
     jsonBuilder.closeDictionary();
   }
 
   @Override
   public boolean hasLevelContent() {
+    // TODO solve correctly with a boolean inside JsonWriter
     return hasLevelContentOptional().orElse(!jsonBuilder.isOnFirstElement());
   }
 
