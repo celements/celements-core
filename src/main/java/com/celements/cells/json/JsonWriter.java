@@ -15,11 +15,10 @@ import com.celements.sajson.JsonBuilder;
 public class JsonWriter extends AbstractWriter {
 
   private final JsonBuilder jsonBuilder;
-  private int nodeCounter = 0;
 
   public JsonWriter() {
     this(new JsonBuilder());
-    jsonBuilder.openDictionary();
+    jsonBuilder.openArray();
   }
 
   public JsonWriter(JsonBuilder jsonBuilder) {
@@ -28,6 +27,7 @@ public class JsonWriter extends AbstractWriter {
 
   @Override
   public void closeLevel() {
+    jsonBuilder.closeArray();
     jsonBuilder.closeDictionary();
   }
 
@@ -35,8 +35,7 @@ public class JsonWriter extends AbstractWriter {
   public void clear() {
     super.clear();
     jsonBuilder.clear();
-    jsonBuilder.openDictionary();
-    nodeCounter = 0;
+    jsonBuilder.openArray();
   }
 
   @Override
@@ -47,16 +46,16 @@ public class JsonWriter extends AbstractWriter {
 
   @Override
   public void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes) {
-    jsonBuilder.openDictionary("node" + ++nodeCounter);
-    jsonBuilder.addPropertyNonEmpty("tagName", tagName);
-    jsonBuilder.openProperty("attributes");
     jsonBuilder.openDictionary();
+    jsonBuilder.addPropertyNonEmpty("tagName", tagName);
+    jsonBuilder.openDictionary("attributes");
     attributes.stream()
         .filter(attribute -> attribute.getValue().isPresent())
         .forEach(
             attribute -> jsonBuilder.addPropertyNonEmpty(attribute.getName(),
                 attribute.getValue().get()));
     jsonBuilder.closeDictionary();
+    jsonBuilder.openArray("subnodes");
   }
 
   @Override
@@ -66,7 +65,7 @@ public class JsonWriter extends AbstractWriter {
 
   @Override
   public @NotNull String getAsString() {
-    jsonBuilder.closeDictionary();
+    jsonBuilder.closeArray();
     return jsonBuilder.getJSON();
   }
 
