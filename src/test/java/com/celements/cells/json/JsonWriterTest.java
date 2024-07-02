@@ -62,4 +62,14 @@ public class JsonWriterTest {
         + " \"subnodes\" : []}]", writer.getAsString());
   }
 
+  @Test
+  public void test_appendContent() {
+    writer.openLevel("div");
+    String content = "dies ist der Test content";
+    writer.appendContent(content);
+    writer.closeLevel();
+    assertEquals("[{\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : [],"
+        + " \"content\" : \"dies ist der Test content\"}]", writer.getAsString());
+  }
+
 }

@@ -15,6 +15,7 @@ import com.celements.sajson.JsonBuilder;
 public class JsonWriter extends AbstractWriter {
 
   private final JsonBuilder jsonBuilder;
+  private final StringBuilder contentBuilder;
 
   public JsonWriter() {
     this(new JsonBuilder());
@@ -23,24 +24,28 @@ public class JsonWriter extends AbstractWriter {
 
   public JsonWriter(JsonBuilder jsonBuilder) {
     this.jsonBuilder = jsonBuilder;
+    this.contentBuilder = new StringBuilder();
   }
 
   @Override
   public void closeLevel() {
     jsonBuilder.closeArray();
+    jsonBuilder.addPropertyNonEmpty("content", contentBuilder.toString());
+    contentBuilder.setLength(0);
     jsonBuilder.closeDictionary();
   }
 
   @Override
   public void clear() {
     super.clear();
+    contentBuilder.setLength(0);
     jsonBuilder.clear();
     jsonBuilder.openArray();
   }
 
   @Override
   public @NotNull ICellWriter appendContent(@Nullable String content) {
-    jsonBuilder.addPropertyNonEmpty("content", content);
+    contentBuilder.append(content);
     return this;
   }
 
