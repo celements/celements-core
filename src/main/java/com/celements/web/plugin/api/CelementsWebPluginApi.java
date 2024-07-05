@@ -204,15 +204,6 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.2 instead use
-   *             {@link TreeNodeScriptService #enableMappedMenuItems()}
-   */
-  @Deprecated
-  public void enableMappedMenuItems() {
-    getTreeNodeScriptService().enableMappedMenuItems();
-  }
-
-  /**
-   * @deprecated since 2.2 instead use
    *             {@link TreeNodeScriptService #getMaxConfiguredNavigationLevel()}
    */
   @Deprecated
@@ -484,15 +475,6 @@ public class CelementsWebPluginApi extends Api {
     return 1;
   }
 
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationScriptService #getPasswordHash(String, String)}
-   */
-  @Deprecated
-  public String encryptString(String encoding, String str) {
-    return getAuthenticationService().getPasswordHash(encoding, str);
-  }
-
   // /**
   // * If a template in the template dir on disk is parsed the hasProbrammingRights will
   // * return false, because the sdoc and idoc are NULL. hasCelProgrammingRights in
@@ -584,15 +566,6 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public String getEmailAdressForCurrentUser() {
     return getScriptService().getEmailAdressForCurrentUser();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link CelementsWebScriptService #getEmailAdressForUser(String)}
-   */
-  @Deprecated
-  public String getEmailAdressForUser(String username) {
-    return getScriptService().getEmailAdressForUser(username);
   }
 
   /**
@@ -939,46 +912,6 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public MenuScriptService getMenuBar() {
     return (MenuScriptService) Utils.getComponent(ScriptService.class, "celMenu");
-  }
-
-  /**
-   * @param attachToDoc
-   * @param fieldName
-   * @param userToken
-   * @return
-   * @deprecated since 2.14.0 because upload failes if xwiki guest does not have view
-   *             rights on document
-   */
-  @Deprecated
-  public int tokenBasedUpload(Document attachToDoc, String fieldName, String userToken) {
-    try {
-      return plugin.tokenBasedUpload(attachToDoc, fieldName, userToken, context);
-    } catch (XWikiException exp) {
-      LOGGER.error("token based attachment upload failed: ", exp);
-    }
-    return 0;
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link FileBaseScriptService #tokenBasedUpload(String, String, String)}
-   */
-  @Deprecated
-  public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken) {
-    return getFileBaseScriptService().tokenBasedUpload(
-        getWebUtilsService().resolveDocumentReference(attachToDocFN), fieldName, userToken);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link FileBaseScriptService #tokenBasedUpload(String, String, String, Boolean)}
-   */
-  @Deprecated
-  public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken,
-      Boolean createIfNotExists) {
-    return getFileBaseScriptService().tokenBasedUpload(
-        getWebUtilsService().resolveDocumentReference(attachToDocFN), fieldName, userToken,
-        createIfNotExists);
   }
 
   /**

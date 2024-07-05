@@ -31,14 +31,10 @@ import com.celements.auth.AccountActivationFailedException;
 import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.mailsender.IMailSenderRole;
 import com.celements.mandatory.CheckMandatoryDocuments;
-import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
-import com.celements.navigation.service.ITreeNodeService;
-import com.celements.pagetype.IPageType;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
-import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebService;
 import com.celements.web.service.ICelementsWebServiceRole;
@@ -161,15 +157,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   /**
    * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
-   *             #getPasswordHash(String, String)}
-   */
-  @Deprecated
-  public String encryptString(String encoding, String str) {
-    return getAuthenticationService().getPasswordHash(encoding, str);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #activateAccount(String)}
    */
   @Deprecated
@@ -181,16 +168,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
           XWikiException.ERROR_XWIKI_UNKNOWN, "activateAccount failed.", authExp);
     }
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link CelementsWebService
-   *             #getEmailAdressForUser(DocumentReference)}
-   */
-  @Deprecated
-  public String getEmailAdressForUser(String username, XWikiContext context) {
-    return getCelementsWebService().getEmailAdressForUser(
-        getWebUtilsService().resolveDocumentReference(username));
   }
 
   // TODO Delegation can be removed as soon as latin1 flag can be removed
@@ -229,18 +206,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return getWebUtilsService().getAttachmentsForDocs(docsFN);
   }
 
-  /**
-   * @deprecated since 2.11.7 instead use renderCelementsDocument
-   *             on celementsweb scriptService
-   */
-  @Deprecated
-  public String renderCelementsPageType(XWikiDocument doc, IPageType pageType, XWikiContext context)
-      throws XWikiException {
-    XWikiDocument viewTemplate = context.getWiki().getDocument(pageType.getRenderTemplate("view"),
-        context);
-    return context.getWiki().getRenderingEngine().renderDocument(viewTemplate, doc, context);
-  }
-
   @Override
   public void beginRendering(XWikiContext context) {
     LOGGER.debug("start beginRendering: language [" + context.getLanguage() + "].");
@@ -271,15 +236,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   /**
    * @deprecated since 2.59 instead use {@link CelementsWebService
-   *             #getUniqueNameValueRequestMap()}
-   */
-  @Deprecated
-  public Map<String, String> getUniqueNameValueRequestMap(XWikiContext context) {
-    return getCelementsWebService().getUniqueNameValueRequestMap();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link CelementsWebService
    *             #createUser(boolean)}
    */
   @Deprecated
@@ -306,39 +262,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @param attachToDoc
-   * @param fieldName
-   * @param userToken
-   * @param context
-   * @return
-   * @throws XWikiException
-   * @deprecated since 2.28.0 use TokenBasedUploadCommand instead
-   */
-  @Deprecated
-  public int tokenBasedUpload(Document attachToDoc, String fieldName, String userToken,
-      XWikiContext context) throws XWikiException {
-    return new TokenBasedUploadCommand().tokenBasedUpload(attachToDoc, fieldName, userToken,
-        context);
-  }
-
-  /**
-   * @param attachToDocFN
-   * @param fieldName
-   * @param userToken
-   * @param createIfNotExists
-   * @param context
-   * @return
-   * @throws XWikiException
-   * @deprecated since 2.28.0 use TokenBasedUploadCommand instead
-   */
-  @Deprecated
-  public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken,
-      Boolean createIfNotExists, XWikiContext context) throws XWikiException {
-    return new TokenBasedUploadCommand().tokenBasedUpload(attachToDocFN, fieldName, userToken,
-        createIfNotExists, context);
-  }
-
-  /**
    * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #checkAuth(String, String, String, String, Boolean)}
    */
@@ -347,17 +270,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       String possibleLogins, Boolean noRedirect, XWikiContext context) throws XWikiException {
     return getAuthenticationService().checkAuth(logincredential, password, rememberme,
         possibleLogins, noRedirect);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link ITreeNodeService
-   *             #enableMappedMenuItems()}
-   */
-  @Deprecated
-  public void enableMappedMenuItems(XWikiContext context) {
-    GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();
-    cmd.setIsActive(true);
-    context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, cmd);
   }
 
   /**
