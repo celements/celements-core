@@ -149,15 +149,6 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.2 instead use
-   *             {@link TreeNodeScriptService #isTreeNode(DocumentReference)}
-   */
-  @Deprecated
-  public boolean isTreeNode(DocumentReference docRef) {
-    return getTreeNodeScriptService().isTreeNode(docRef);
-  }
-
-  /**
-   * @deprecated since 2.2 instead use
    *             {@link TreeNodeScriptService #getSubNodesForParentRef(EntityReference)}
    */
   @Deprecated
