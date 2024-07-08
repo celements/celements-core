@@ -34,7 +34,6 @@ import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
-import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebService;
 import com.celements.web.service.ICelementsWebServiceRole;
@@ -244,24 +243,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.33.0 instead use PossibleLoginsCommand
-   */
-  @Deprecated
-  public String getPossibleLogins(XWikiContext context) {
-    return new PossibleLoginsCommand().getPossibleLogins();
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link CelementsWebService
-   *             #createUser(Map, String, boolean)}
-   */
-  @Deprecated
-  public synchronized int createUser(Map<String, String> userData, String possibleLogins,
-      boolean validate, XWikiContext context) throws XWikiException {
-    return getCelementsWebService().createUser(userData, possibleLogins, validate);
-  }
-
-  /**
    * @deprecated since 2.59 instead use {@link IAuthenticationServiceRole
    *             #checkAuth(String, String, String, String, Boolean)}
    */
@@ -283,16 +264,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link CelementsWebService
-   *             #writeUTF8Response(String, String)}
-   */
-  @Deprecated
-  public boolean writeUTF8Response(String filename, String renderDocFullName,
-      XWikiContext context) {
-    return getCelementsWebService().writeUTF8Response(filename, renderDocFullName);
-  }
-
-  /**
    * @deprecated since 2.59 instead use {@link WebFormService
    *             #isFormFilled(Map, Set)}
    */
@@ -304,14 +275,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   boolean arrayContains(String[] array, String value) {
     Arrays.sort(array);
     return (Arrays.binarySearch(array, value) >= 0);
-  }
-
-  /**
-   * @deprecated since 2.14.0 use IWebUtilsService instead
-   */
-  @Deprecated
-  public String getDefaultLanguage(XWikiContext context) {
-    return getWebUtilsService().getDefaultLanguage();
   }
 
   /**
