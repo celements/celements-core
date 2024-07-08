@@ -246,15 +246,6 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link JSScriptService #getAllExternalJavaScriptFiles()}
-   */
-  @Deprecated
-  public String getAllExternalJavaScriptFiles() throws XWikiException {
-    return getJSScriptService().getAllExternalJavaScriptFiles();
-  }
-
-  /**
    * @deprecated since 2.11.3 instead use
    *             {@link CelementsWebScriptService #addImageMapConfig(String)}
    */
@@ -310,14 +301,6 @@ public class CelementsWebPluginApi extends Api {
   // return (hasProgrammingRights()
   // || ((context.get("sdoc") == null) && (context.get("idoc") == null)));
   // }
-
-  /**
-   * @deprecated since 2.59 instead use {@link CssScriptService #displayAllCSS()}
-   */
-  @Deprecated
-  public String displayAllCSS() throws XWikiException {
-    return getCSSScriptService().displayAllCSS();
-  }
 
   /**
    * @deprecated since 2.59 instead use {@link CssScriptService #getRTEContentCSS()}
