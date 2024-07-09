@@ -39,9 +39,9 @@ import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.classes.PageTypeClass;
+import com.celements.pagetype.java.RichTextPageType;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
-import com.google.common.base.Supplier;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -94,13 +94,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
       pageTypeRef = Optional.absent();
       fallbackReference = context.getWikiRef();
     }
-    return pageTypeRef.or(new Supplier<PageTypeReference>() { // lazy evaluation
-
-      @Override
-      public PageTypeReference get() {
-        return resolveDefaultPageTypeReference(fallbackReference);
-      }
-    });
+    return pageTypeRef.or(() -> resolveDefaultPageTypeReference(fallbackReference));
   }
 
   @Override
@@ -155,7 +149,8 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   PageTypeReference getDefaultPageTypeReference() {
-    return pageTypeService.getPageTypeReference("RichText").get();
+    return pageTypeService.getPageTypeReference(RichTextPageType.NAME).toJavaUtil()
+        .orElseThrow();
   }
 
   @Override
