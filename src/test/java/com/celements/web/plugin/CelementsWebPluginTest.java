@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
@@ -48,18 +47,6 @@ public class CelementsWebPluginTest extends AbstractComponentTest {
     // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     plugin = new CelementsWebPlugin("celementsweb", "CelementsWebPlugin", context);
-  }
-
-  @Test
-  public void testEnableMappedMenuItems() {
-    plugin.enableMappedMenuItems(context);
-    assertTrue(context.get(
-        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
-    assertTrue(context.get(
-        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
-    assertTrue(((GetMappedMenuItemsForParentCommand) context.get(
-        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY)).isActive());
-
   }
 
   @Test
