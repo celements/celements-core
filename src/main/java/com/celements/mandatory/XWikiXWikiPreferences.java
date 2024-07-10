@@ -92,6 +92,10 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   private boolean checkWikiPreferences(XWikiDocument wikiPrefDoc,
       Predicate<BaseObject> additionalChecks) {
+    var defaultLang = xwikiCfg.getProperty("celements.admin_language", "en");
+    if (isNullOrEmpty(wikiPrefDoc.getDefaultLanguage())) {
+      wikiPrefDoc.setDefaultLanguage(defaultLang);
+    }
     BaseObject prefsObj = XWikiObjectEditor.on(wikiPrefDoc)
         .filter(new ClassReference(getDocRef()))
         .createFirstIfNotExists();
@@ -101,7 +105,6 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     dirty |= setIntValue(prefsObj, "renderXWikiRadeoxRenderer", 1);
     dirty |= setStringValue(prefsObj, "pageWidth", "default");
     dirty |= setIntValue(prefsObj, "multilingual", 1);
-    var defaultLang = xwikiCfg.getProperty("celements.admin_language", "en");
     dirty |= setStringValue(prefsObj, "languages", defaultLang);
     dirty |= setStringValue(prefsObj, "default_language", defaultLang);
     dirty |= setStringValue(prefsObj, "admin_language", defaultLang);

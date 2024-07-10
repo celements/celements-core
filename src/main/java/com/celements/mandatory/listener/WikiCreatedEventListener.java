@@ -19,6 +19,8 @@
  */
 package com.celements.mandatory.listener;
 
+import static com.celements.execution.XWikiExecutionProp.*;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,7 +55,7 @@ public class WikiCreatedEventListener implements EventListener {
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+    return execution.getContext().get(XWIKI_CONTEXT).orElseThrow();
   }
 
   @Override
