@@ -19,6 +19,8 @@
  */
 package com.celements.common.classes.listener;
 
+import static com.celements.execution.XWikiExecutionProp.*;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,6 +30,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -48,8 +51,12 @@ public class DocumentUpdatedEventListener implements EventListener {
   @Requirement
   private Execution execution;
 
+  protected ExecutionContext getEContext() {
+    return execution.getContext();
+  }
+
   protected XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    return getEContext().get(XWIKI_CONTEXT).orElseThrow();
   }
 
   @Override
@@ -70,7 +77,7 @@ public class DocumentUpdatedEventListener implements EventListener {
       DocumentReference xwikiPrefDoc = new DocumentReference(
           document.getDocumentReference().getLastSpaceReference().getParent().getName(), "XWiki",
           "XWikiPreferences");
-      if (document.getDocumentReference().equals(xwikiPrefDoc)) {
+      if (document.getDocumentReference().equals(xwikiPrefDoc) && checkCycle()) {
         LOGGER.info("changes on [" + xwikiPrefDoc + "] saved. Checking all Class Collections.");
         classesCompositor.checkClasses();
       } else {
@@ -80,6 +87,15 @@ public class DocumentUpdatedEventListener implements EventListener {
     } else {
       LOGGER.warn("unrecognised event [" + event.getClass() + "] in classes.CompositorComonent.");
     }
+  }
+
+  private boolean checkCycle() {
+    if (Boolean.TRUE.equals(getEContext().getProperty(getName()))) {
+      LOGGER.warn("cycle detected in [" + getName() + "].", new Throwable());
+      return true;
+    }
+    getEContext().setProperty(getName(), true);
+    return false;
   }
 
 }

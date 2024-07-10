@@ -79,6 +79,7 @@ public class GroupCellClassTest extends AbstractComponentTest {
 
     XWikiDocument doc = new XWikiDocument(pageTypeClassRef);
     expect(modelAccessMock.getOrCreateDocument(eq(pageTypeClassRef))).andReturn(doc).once();
+    expect(modelAccessMock.exists(doc.getDocRef())).andReturn(false);
     modelAccessMock.saveDocument(same(doc), anyObject(String.class));
     expectLastCall().once();
     replayDefault();
