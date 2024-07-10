@@ -133,7 +133,7 @@ public class Robots_TXT implements IMandatoryDocumentRole {
     BaseObject pageTypeObj = robotsTxtDoc.getXObject(pageTypeClassRef, false, getContext());
     if (pageTypeObj == null) {
       pageTypeObj = robotsTxtDoc.newXObject(pageTypeClassRef, getContext());
-      pageTypeObj.setStringValue("page_type", _ROBOTS_TXT_PAGE_TYPE);
+      pageTypeObj.setStringValue("page_type", CodePageType.NAME);
       LOGGER.debug("HTML.robots_txt missing page type object fixed for database ["
           + getContext().getDatabase() + "].");
       return true;
