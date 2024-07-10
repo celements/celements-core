@@ -30,10 +30,11 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.pagetype.PageTypeClasses;
-import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -54,6 +55,9 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
 
   @Requirement
   ITreeNodeCache treeNodeCache;
+
+  @Requirement
+  private IModelAccessFacade modelAccess;
 
   @Requirement
   Execution execution;
@@ -107,33 +111,22 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
 
   void checkFileBaseTag1() throws XWikiException {
     DocumentReference fileBaseTag1Ref = getFileBaseTag1Ref(getContext().getDatabase());
-    XWikiDocument fileBaseTag1Doc;
-    if (!getContext().getWiki().exists(fileBaseTag1Ref, getContext())) {
-      LOGGER.debug("FileBaseTag1Document is missing that we create it. ["
-          + getContext().getDatabase() + "]");
-      fileBaseTag1Doc = new CreateDocumentCommand().createDocument(fileBaseTag1Ref,
-          _FILE_BASE_TAG_PAGE_TYPE);
-    } else {
-      fileBaseTag1Doc = getContext().getWiki().getDocument(fileBaseTag1Ref, getContext());
-      LOGGER.trace("FileBaseTag1Document already exists. [" + getContext().getDatabase() + "]");
-    }
-    if (fileBaseTag1Doc != null) {
-      boolean dirty = checkPageType(fileBaseTag1Doc);
-      dirty |= checkMenuItem(fileBaseTag1Doc);
-      dirty |= checkMenuName(fileBaseTag1Doc, "en", ".zip");
-      dirty |= checkMenuName(fileBaseTag1Doc, "de", ".zip");
-      if (dirty) {
+    XWikiDocument fileBaseTag1Doc = modelAccess.getOrCreateDocument(fileBaseTag1Ref);
+    boolean dirty = checkPageType(fileBaseTag1Doc);
+    dirty |= checkMenuItem(fileBaseTag1Doc);
+    dirty |= checkMenuName(fileBaseTag1Doc, "en", ".zip");
+    dirty |= checkMenuName(fileBaseTag1Doc, "de", ".zip");
+    if (dirty) {
+      try {
         LOGGER.info("FileBaseTag1Document updated for [" + getContext().getDatabase() + "].");
-        getContext().getWiki().saveDocument(fileBaseTag1Doc, "autocreate"
-            + " Content_attachments.FileBaseTag1.", getContext());
+        modelAccess.saveDocument(fileBaseTag1Doc, "autocreate Content_attachments.FileBaseTag1.");
         treeNodeCache.flushMenuItemCache();
-      } else {
-        LOGGER.debug("FileBaseTag1Document not saved. Everything uptodate. ["
-            + getContext().getDatabase() + "].");
+      } catch (DocumentSaveException dse) {
+        throw new XWikiException(0, 0, "failed saving", dse);
       }
     } else {
-      LOGGER.trace("skip checkFileBaseTag1 because fileBaseTag1Doc is null! ["
-          + getContext().getDatabase() + "]");
+      LOGGER.debug("FileBaseTag1Document not saved. Everything uptodate. ["
+          + getContext().getDatabase() + "].");
     }
   }
 

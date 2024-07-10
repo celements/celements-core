@@ -30,10 +30,11 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.pagetype.PageTypeClasses;
-import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -54,6 +55,9 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
 
   @Requirement
   ITreeNodeCache treeNodeCache;
+
+  @Requirement
+  private IModelAccessFacade modelAccess;
 
   @Requirement
   Execution execution;
@@ -107,33 +111,22 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
 
   void checkFileBaseTag0() throws XWikiException {
     DocumentReference fileBaseTag0Ref = getFileBaseTag0Ref(getContext().getDatabase());
-    XWikiDocument fileBaseTag0Doc;
-    if (!getContext().getWiki().exists(fileBaseTag0Ref, getContext())) {
-      LOGGER.debug("FileBaseTag0Document is missing that we create it. ["
-          + getContext().getDatabase() + "]");
-      fileBaseTag0Doc = new CreateDocumentCommand().createDocument(fileBaseTag0Ref,
-          _FILE_BASE_TAG_PAGE_TYPE);
-    } else {
-      fileBaseTag0Doc = getContext().getWiki().getDocument(fileBaseTag0Ref, getContext());
-      LOGGER.trace("FileBaseTag0Document already exists. [" + getContext().getDatabase() + "]");
-    }
-    if (fileBaseTag0Doc != null) {
-      boolean dirty = checkPageType(fileBaseTag0Doc);
-      dirty |= checkMenuItem(fileBaseTag0Doc);
-      dirty |= checkMenuName(fileBaseTag0Doc, "en", "Photos");
-      dirty |= checkMenuName(fileBaseTag0Doc, "de", "Fotos");
-      if (dirty) {
+    XWikiDocument fileBaseTag0Doc = modelAccess.getOrCreateDocument(fileBaseTag0Ref);
+    boolean dirty = checkPageType(fileBaseTag0Doc);
+    dirty |= checkMenuItem(fileBaseTag0Doc);
+    dirty |= checkMenuName(fileBaseTag0Doc, "en", "Photos");
+    dirty |= checkMenuName(fileBaseTag0Doc, "de", "Fotos");
+    if (dirty) {
+      try {
         LOGGER.info("FileBaseTag0Document updated for [" + getContext().getDatabase() + "].");
-        getContext().getWiki().saveDocument(fileBaseTag0Doc, "autocreate"
-            + " Content_attachments.FileBaseTag0.", getContext());
+        modelAccess.saveDocument(fileBaseTag0Doc, "autocreate Content_attachments.FileBaseTag0.");
         treeNodeCache.flushMenuItemCache();
-      } else {
-        LOGGER.debug("FileBaseTag0Document not saved. Everything uptodate. ["
-            + getContext().getDatabase() + "].");
+      } catch (DocumentSaveException dse) {
+        throw new XWikiException(0, 0, "failed saving", dse);
       }
     } else {
-      LOGGER.trace("skip checkFileBaseTag0 because fileBaseTag0Doc is null! ["
-          + getContext().getDatabase() + "]");
+      LOGGER.debug("FileBaseTag0Document not saved. Everything uptodate. ["
+          + getContext().getDatabase() + "].");
     }
   }
 

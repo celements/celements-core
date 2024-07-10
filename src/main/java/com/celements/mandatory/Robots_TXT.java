@@ -32,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.pagetype.PageTypeClasses;
 import com.celements.pagetype.java.CodePageType;
 import com.xpn.xwiki.XWikiContext;
@@ -92,20 +93,18 @@ public class Robots_TXT implements IMandatoryDocumentRole {
   void checkRobots_txtDocument() throws XWikiException {
     DocumentReference robotsTxtDocRef = getRobotsTxtDocRef(getContext().getDatabase());
     XWikiDocument robotsTxtDoc = modelAccess.getOrCreateDocument(robotsTxtDocRef);
-    if (robotsTxtDoc != null) {
-      boolean dirty = checkPageType(robotsTxtDoc);
-      dirty |= checkRobots_txt(robotsTxtDoc);
-      if (dirty) {
+    boolean dirty = checkPageType(robotsTxtDoc);
+    dirty |= checkRobots_txt(robotsTxtDoc);
+    if (dirty) {
+      try {
         LOGGER.info("Robots_txtDocument updated for [" + getContext().getDatabase() + "].");
-        getContext().getWiki().saveDocument(robotsTxtDoc, "autocreate" + " HTML.robots_txt.",
-            getContext());
-      } else {
-        LOGGER.debug("Robots_txtDocument not saved. Everything uptodate. ["
-            + getContext().getDatabase() + "].");
+        modelAccess.saveDocument(robotsTxtDoc, "autocreate HTML.robots_txt.");
+      } catch (DocumentSaveException dse) {
+        throw new XWikiException(0, 0, "failed saving", dse);
       }
     } else {
-      LOGGER.trace("skip checkRobots_txt because robotsTxtDoc is null! ["
-          + getContext().getDatabase() + "]");
+      LOGGER.debug("Robots_txtDocument not saved. Everything uptodate. ["
+          + getContext().getDatabase() + "].");
     }
   }
 
