@@ -31,9 +31,9 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.pagetype.PageTypeClasses;
 import com.celements.pagetype.java.CodePageType;
-import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -46,6 +46,9 @@ public class Robots_TXT implements IMandatoryDocumentRole {
 
   @Requirement("celements.celPageTypeClasses")
   IClassCollectionRole pageTypeClasses;
+
+  @Requirement
+  private IModelAccessFacade modelAccess;
 
   @Requirement
   Execution execution;
@@ -88,16 +91,7 @@ public class Robots_TXT implements IMandatoryDocumentRole {
 
   void checkRobots_txtDocument() throws XWikiException {
     DocumentReference robotsTxtDocRef = getRobotsTxtDocRef(getContext().getDatabase());
-    XWikiDocument robotsTxtDoc;
-    if (!getContext().getWiki().exists(robotsTxtDocRef, getContext())) {
-      LOGGER.debug("Robots_txtDocument is missing that we create it. [" + getContext().getDatabase()
-          + "]");
-      robotsTxtDoc = new CreateDocumentCommand().createDocument(robotsTxtDocRef,
-          CodePageType.NAME);
-    } else {
-      robotsTxtDoc = getContext().getWiki().getDocument(robotsTxtDocRef, getContext());
-      LOGGER.trace("Robots_txtDocument already exists. [" + getContext().getDatabase() + "]");
-    }
+    XWikiDocument robotsTxtDoc = modelAccess.getOrCreateDocument(robotsTxtDocRef);
     if (robotsTxtDoc != null) {
       boolean dirty = checkPageType(robotsTxtDoc);
       dirty |= checkRobots_txt(robotsTxtDoc);
