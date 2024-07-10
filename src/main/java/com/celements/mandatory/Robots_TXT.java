@@ -32,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.pagetype.PageTypeClasses;
+import com.celements.pagetype.java.CodePageType;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -40,8 +41,6 @@ import com.xpn.xwiki.objects.BaseObject;
 
 @Component("celements.mandatory.robots_txt")
 public class Robots_TXT implements IMandatoryDocumentRole {
-
-  private static final String _ROBOTS_TXT_PAGE_TYPE = "Code";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Robots_TXT.class);
 
@@ -94,7 +93,7 @@ public class Robots_TXT implements IMandatoryDocumentRole {
       LOGGER.debug("Robots_txtDocument is missing that we create it. [" + getContext().getDatabase()
           + "]");
       robotsTxtDoc = new CreateDocumentCommand().createDocument(robotsTxtDocRef,
-          _ROBOTS_TXT_PAGE_TYPE);
+          CodePageType.NAME);
     } else {
       robotsTxtDoc = getContext().getWiki().getDocument(robotsTxtDocRef, getContext());
       LOGGER.trace("Robots_txtDocument already exists. [" + getContext().getDatabase() + "]");
