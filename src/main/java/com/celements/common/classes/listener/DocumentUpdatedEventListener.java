@@ -39,8 +39,10 @@ import com.celements.common.classes.IClassesCompositorComponent;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-@Component("celements.classes.DocumentUpdatedEventListener")
+@Component(DocumentUpdatedEventListener.NAME)
 public class DocumentUpdatedEventListener implements EventListener {
+
+  public static final String NAME = "celements.classes.DocumentUpdatedEventListener";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
       DocumentUpdatedEventListener.class);
@@ -67,7 +69,7 @@ public class DocumentUpdatedEventListener implements EventListener {
 
   @Override
   public String getName() {
-    return "celements.classes.DocumentUpdatedEventListener";
+    return NAME;
   }
 
   @Override
@@ -77,25 +79,19 @@ public class DocumentUpdatedEventListener implements EventListener {
       DocumentReference xwikiPrefDoc = new DocumentReference(
           document.getDocumentReference().getLastSpaceReference().getParent().getName(), "XWiki",
           "XWikiPreferences");
-      if (document.getDocumentReference().equals(xwikiPrefDoc) && checkCycle()) {
-        LOGGER.info("changes on [" + xwikiPrefDoc + "] saved. Checking all Class Collections.");
-        classesCompositor.checkClasses();
+      if (!document.getDocumentReference().equals(xwikiPrefDoc)) {
+        LOGGER.trace("changes on [{}] saved. NOT checking all Class Collections", xwikiPrefDoc);
+      } else if (Boolean.TRUE.equals(getEContext().getProperty(NAME))) {
+        LOGGER.debug("cycle detected in [{}], skipping", NAME, new Throwable());
       } else {
-        LOGGER.trace("changes on [" + xwikiPrefDoc
-            + "] saved. NOT checking all Class Collections.");
+        getEContext().setProperty(NAME, true);
+        LOGGER.info("changes on [{}] saved. Checking all Class Collections", xwikiPrefDoc);
+        classesCompositor.checkClasses();
+        getEContext().removeProperty(NAME);
       }
     } else {
-      LOGGER.warn("unrecognised event [" + event.getClass() + "] in classes.CompositorComonent.");
+      LOGGER.warn("unrecognised event [{}] in classes.CompositorComonent", event.getClass());
     }
-  }
-
-  private boolean checkCycle() {
-    if (Boolean.TRUE.equals(getEContext().getProperty(getName()))) {
-      LOGGER.warn("cycle detected in [" + getName() + "].", new Throwable());
-      return true;
-    }
-    getEContext().setProperty(getName(), true);
-    return false;
   }
 
 }

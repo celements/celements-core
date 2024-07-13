@@ -100,6 +100,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
         .filter(new ClassReference(getDocRef()))
         .createFirstIfNotExists();
     boolean dirty = false;
+    dirty |= setStringValue(prefsObj, "title", "Celements");
     dirty |= setStringValue(prefsObj, "skin", "celskin");
     dirty |= setStringValue(prefsObj, "editor", "Text");
     dirty |= setIntValue(prefsObj, "renderXWikiRadeoxRenderer", 1);
@@ -109,7 +110,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     dirty |= setStringValue(prefsObj, "default_language", defaultLang);
     dirty |= setStringValue(prefsObj, "admin_language", defaultLang);
     dirty |= setIntValue(prefsObj, "authenticate_edit", 1);
-    dirty |= setIntValue(prefsObj, "authenticate_view", 0);
+    dirty |= setIntValue(prefsObj, "authenticate_view", 1);
     dirty |= setLongValue(prefsObj, "upload_maxsize", 104857600L);
     dirty |= additionalChecks.test(prefsObj);
     return dirty;
@@ -118,6 +119,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
   private boolean checkWikiPreferences(XWikiDocument wikiPrefDoc) {
     return checkWikiPreferences(wikiPrefDoc, (prefsObj) -> {
       boolean dirty = false;
+      dirty |= setIntValue(prefsObj, "authenticate_view", 0);
       String documentBundles = prefsObj.getStringValue("documentBundles");
       if (isNullOrEmpty(documentBundles) || !documentBundles.contains(
           "celements2web:Celements2.Dictionary")) {
@@ -131,14 +133,8 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
             getWiki());
         dirty = true;
       }
-      String centralfilebaseConfig = prefsObj.getStringValue("cel_centralfilebase");
-      if (isNullOrEmpty(centralfilebaseConfig)) {
-        prefsObj.set("cel_centralfilebase", IFileBaseAccessRole.FILE_BASE_DEFAULT_DOC_FN,
-            modelContext.getXWikiContext());
-        LOGGER.debug("XWikiPreferences missing cel_centralfilebase configuration added for"
-            + " database [{}].", getWiki());
-        dirty = true;
-      }
+      dirty |= setStringValue(prefsObj, "cel_centralfilebase",
+          IFileBaseAccessRole.FILE_BASE_DEFAULT_DOC_FN);
       return dirty;
     });
   }

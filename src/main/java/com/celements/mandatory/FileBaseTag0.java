@@ -32,6 +32,8 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.pagetype.PageTypeClasses;
@@ -58,6 +60,12 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
 
   @Requirement
   private IModelAccessFacade modelAccess;
+
+  @Requirement
+  private ModelUtils modelUtils;
+
+  @Requirement
+  private ModelContext context;
 
   @Requirement
   Execution execution;
@@ -104,9 +112,7 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
   }
 
   boolean noMainWiki() {
-    String wikiName = getContext().getDatabase();
-    LOGGER.trace("noMainWiki for database [" + wikiName + "].");
-    return (wikiName != null) && !wikiName.equals(getContext().getMainXWiki());
+    return !modelUtils.isMainWiki(context.getWikiRef());
   }
 
   void checkFileBaseTag0() throws XWikiException {
