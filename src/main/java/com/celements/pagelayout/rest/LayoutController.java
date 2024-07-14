@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
+import org.apache.velocity.VelocityContext;
 import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.velocity.VelocityManager;
 
 import com.celements.common.rest.RestPreconditions;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
 import com.celements.model.reference.RefBuilder;
 import com.celements.pagelayout.LayoutServiceRole;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @RestController
@@ -33,13 +36,15 @@ public class LayoutController {
 
   private final LayoutServiceRole layoutService;
   private final IModelAccessFacade modelAccess;
+  private final VelocityManager velocityManager;
   private final ModelContext context;
 
   @Inject
   public LayoutController(LayoutServiceRole layoutService, IModelAccessFacade modelAccess,
-      ModelContext context) {
+      VelocityManager velocityManager, ModelContext context) {
     this.layoutService = layoutService;
     this.modelAccess = modelAccess;
+    this.velocityManager = velocityManager;
     this.context = context;
   }
 
@@ -64,6 +69,10 @@ public class LayoutController {
         buildDocRef(renderPartialRequest.contextDocSpace, renderPartialRequest.contextDocName))
         .map((XWikiDocument contextDoc) -> {
           context.setDoc(contextDoc);
+          VelocityContext velocityContext = velocityManager.getVelocityContext();
+          LOGGER.debug("partial doc in vcontext before is {}", context.getDocRef().orElse(null));
+          velocityContext.put("doc",
+              new Document(contextDoc, context.getXWikiContext()));
           return RestPreconditions.checkFound(Strings.emptyToNull(layoutService.renderLayoutPartial(
               buildDocRef(renderPartialRequest.layoutSpace,
                   renderPartialRequest.startNodeName))));
