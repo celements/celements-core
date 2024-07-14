@@ -5,6 +5,8 @@ import java.util.Objects;
 import javax.inject.Inject;
 
 import org.python.google.common.base.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @RestController
 @RequestMapping("/v1/layouts")
 public class LayoutController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(LayoutController.class);
 
   private final LayoutServiceRole layoutService;
   private final IModelAccessFacade modelAccess;
@@ -49,10 +53,13 @@ public class LayoutController {
 
   @CrossOrigin
   @PostMapping(
-      value = "/partial/",
+      value = "/partial",
       produces = MediaType.APPLICATION_XML_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   public String renderLayoutPartial(@RequestBody RenderPartialRequest renderPartialRequest) {
+    LOGGER.info("partial api contextDoc '{}.{}', startDoc: {}.{}",
+        renderPartialRequest.contextDocSpace, renderPartialRequest.contextDocName,
+        renderPartialRequest.layoutSpace, renderPartialRequest.startNodeName);
     return modelAccess.getDocumentOpt(
         buildDocRef(renderPartialRequest.contextDocSpace, renderPartialRequest.contextDocName))
         .map((XWikiDocument contextDoc) -> {
