@@ -49,7 +49,7 @@ public class LayoutController {
 
   @CrossOrigin
   @PostMapping(
-      value = "/partial/{space}/{docName}",
+      value = "/partial/",
       produces = MediaType.APPLICATION_XML_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   public String renderLayoutPartial(@RequestBody RenderPartialRequest renderPartialRequest) {
