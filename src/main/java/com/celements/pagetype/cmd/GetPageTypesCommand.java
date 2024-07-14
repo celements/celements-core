@@ -105,7 +105,7 @@ public class GetPageTypesCommand {
     try {
       result = context.getWiki().search(getPThql(catList, onlyVisible), context);
     } catch (XWikiException exp) {
-      LOGGER.error("getPageTypesForCategories: Failed to get pagetypes.", exp);
+      LOGGER.info("getPageTypesForCategories: Failed to get pagetypes.", exp);
     }
     return result;
   }
