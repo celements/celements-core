@@ -81,7 +81,6 @@ public class PageLayoutPropertiesClassTest extends AbstractComponentTest {
     final DocumentReference pageTypeClassRef = pageLayoutPropClass.getClassRef();
     final XWikiDocument doc = new XWikiDocument(pageTypeClassRef);
     expect(modelAccessMock.getOrCreateDocument(eq(pageTypeClassRef))).andReturn(doc).once();
-    expect(modelAccessMock.exists(doc.getDocRef())).andReturn(false);
     modelAccessMock.saveDocument(same(doc), anyObject(String.class));
     expectLastCall().once();
     replayDefault();
