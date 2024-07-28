@@ -32,7 +32,7 @@ public class NextFreeDocScriptServiceTest extends AbstractComponentTest {
     String prefix = "";
 
     expect(getMock(IModelAccessFacade.class).exists(anyObject(DocumentReference.class)))
-        .andReturn(true).anyTimes();
+        .andReturn(false).anyTimes();
 
     replayDefault();
     DocumentReference docRef = nextFreeDoc.getNextRandomPageDocRef(spaceRef,
@@ -51,7 +51,7 @@ public class NextFreeDocScriptServiceTest extends AbstractComponentTest {
     String prefix = "";
 
     expect(getMock(IModelAccessFacade.class).exists(anyObject(DocumentReference.class)))
-        .andReturn(true).anyTimes();
+        .andReturn(false).anyTimes();
 
     replayDefault();
     DocumentReference docRef = nextFreeDoc.getNextRandomPageDocRef(spaceRef,
