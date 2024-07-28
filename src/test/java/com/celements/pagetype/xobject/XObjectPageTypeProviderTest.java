@@ -19,7 +19,6 @@
  */
 package com.celements.pagetype.xobject;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -31,6 +30,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.IPageTypeProviderRole;
@@ -38,6 +38,7 @@ import com.celements.pagetype.PageTypeReference;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
 public class XObjectPageTypeProviderTest extends AbstractComponentTest {
@@ -45,13 +46,17 @@ public class XObjectPageTypeProviderTest extends AbstractComponentTest {
   private XObjectPageTypeProvider xObjPTprovider;
   private XWikiContext context;
   private XWiki xwiki;
+  private XWikiStoreInterface store;
 
   @Before
   public void setUp_XObjectPageTypeProviderTest() throws Exception {
-    context = getContext();
-    xwiki = getWikiMock();
     xObjPTprovider = (XObjectPageTypeProvider) Utils.getComponent(IPageTypeProviderRole.class,
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER);
+    context = getXContext();
+    xwiki = getMock(XWiki.class);
+    store = createDefaultMock(XWikiStoreInterface.class);
+    expect(xwiki.getStore()).andReturn(store).anyTimes();
+    expect(store.existsWiki(anyObject(WikiReference.class))).andReturn(true).anyTimes();
   }
 
   @Test

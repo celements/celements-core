@@ -30,10 +30,8 @@ import org.slf4j.LoggerFactory;
 import com.celements.auth.AccountActivationFailedException;
 import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.mailsender.IMailSenderRole;
-import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
-import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebService;
 import com.celements.web.service.ICelementsWebServiceRole;
@@ -88,14 +86,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   @Override
   public void virtualInit(XWikiContext context) {
-    // TODO move to ApplicationReadyEvent listener after migration to xwiki 4
     LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
-    if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart", "1"))) {
-      new CheckClassesCommand().checkClasses();
-    }
-    if ("1".equals(context.getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
-      new CheckMandatoryDocuments().checkMandatoryDocuments();
-    }
     super.virtualInit(context);
   }
 

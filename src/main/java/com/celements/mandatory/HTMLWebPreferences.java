@@ -30,8 +30,9 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.pagetype.PageTypeClasses;
-import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -46,6 +47,9 @@ public class HTMLWebPreferences implements IMandatoryDocumentRole {
 
   @Requirement("celements.celPageTypeClasses")
   IClassCollectionRole pageTypeClasses;
+
+  @Requirement
+  private IModelAccessFacade modelAccess;
 
   @Requirement
   Execution execution;
@@ -65,56 +69,40 @@ public class HTMLWebPreferences implements IMandatoryDocumentRole {
 
   @Override
   public void checkDocuments() throws XWikiException {
-    LOGGER.trace("Start checkDocuments in HTMLwebPreferences for database ["
-        + getContext().getDatabase() + "].");
+    LOGGER.trace("Start checkDocuments in HTMLwebPreferences for [{}]", getContext().getDatabase());
     if (!isSkipCelementsHTMLwebPreferences()) {
-      LOGGER.trace("before checkHTMLwebPreferences for database [" + getContext().getDatabase()
-          + "].");
+      LOGGER.trace("before checkHTMLwebPreferences for [{}]", getContext().getDatabase());
       checkHTMLwebPreferences();
     } else {
-      LOGGER.info("skip mandatory checkHTMLwebPreferences for database ["
-          + getContext().getDatabase() + "], skipCelementsParam ["
-          + isSkipCelementsHTMLwebPreferences() + "].");
+      LOGGER.info("skip mandatory checkHTMLwebPreferences for [{}], isSkip [{}]",
+          getContext().getDatabase(), isSkipCelementsHTMLwebPreferences());
     }
-    LOGGER.trace("end checkDocuments in HTMLwebPreferences for database ["
-        + getContext().getDatabase() + "].");
+    LOGGER.trace("end checkDocuments in HTMLwebPreferences for [{}]", getContext().getDatabase());
   }
 
   boolean isSkipCelementsHTMLwebPreferences() {
     boolean isSkip = getContext().getWiki().ParamAsLong(
         "celements.mandatory.skipHTMLwebPreferences", 0) == 1L;
-    LOGGER.trace("skipCelementsHTMLwebPreferences for database [" + getContext().getDatabase()
-        + "] returning [" + isSkip + "].");
+    LOGGER.trace("skipCelementsHTMLwebPreferences for [{}]: [{}]",
+        getContext().getDatabase(), isSkip);
     return isSkip;
   }
 
   void checkHTMLwebPreferences() throws XWikiException {
     DocumentReference htmlWebPreferencesRef = getHTMLwebPreferencesRef(getContext().getDatabase());
-    XWikiDocument wikiPrefDoc;
-    if (!getContext().getWiki().exists(htmlWebPreferencesRef, getContext())) {
-      LOGGER.debug("HTMLwebPreferencesDocument is missing that we create it. ["
-          + getContext().getDatabase() + "]");
-      wikiPrefDoc = new CreateDocumentCommand().createDocument(htmlWebPreferencesRef,
-          _SPACE_PREFERENCE_PAGE_TYPE);
-    } else {
-      wikiPrefDoc = getContext().getWiki().getDocument(htmlWebPreferencesRef, getContext());
-      LOGGER.trace("HTMLwebPreferencesDocument already exists. [" + getContext().getDatabase()
-          + "]");
-    }
-    if (wikiPrefDoc != null) {
-      boolean dirty = checkPageType(wikiPrefDoc);
-      dirty |= checkHTMLwebPreferences(wikiPrefDoc);
-      if (dirty) {
-        LOGGER.info("HTMLwebPreferencesDocument updated for [" + getContext().getDatabase() + "].");
-        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate" + " HTML.WebPreferences.",
-            getContext());
-      } else {
-        LOGGER.debug("HTMLwebPreferencesDocument not saved. Everything uptodate. ["
-            + getContext().getDatabase() + "].");
+    XWikiDocument wikiPrefDoc = modelAccess.getOrCreateDocument(htmlWebPreferencesRef);
+    boolean dirty = checkPageType(wikiPrefDoc);
+    dirty |= checkHTMLwebPreferences(wikiPrefDoc);
+    if (dirty) {
+      try {
+        LOGGER.info("HTMLwebPreferencesDocument updated for [{}]", getContext().getDatabase());
+        modelAccess.saveDocument(wikiPrefDoc, "autocreate HTML.WebPreferences.");
+      } catch (DocumentSaveException dse) {
+        throw new XWikiException(0, 0, "failed saving", dse);
       }
     } else {
-      LOGGER.trace("skip checkHTMLwebPreferences because wikiPrefDoc is null! ["
-          + getContext().getDatabase() + "]");
+      LOGGER.debug("HTMLwebPreferencesDocument not saved. Everything uptodate. [{}]",
+          getContext().getDatabase());
     }
   }
 
@@ -125,8 +113,8 @@ public class HTMLWebPreferences implements IMandatoryDocumentRole {
     if (prefsObj == null) {
       prefsObj = wikiPrefDoc.newXObject(getXWikiPreferencesRef(wikiName), getContext());
       prefsObj.set("skin", "htmlskin", getContext());
-      LOGGER.debug("XWikiPreferences missing fields in wiki preferences object fixed for"
-          + " database [" + getContext().getDatabase() + "].");
+      LOGGER.debug("XWikiPreferences missing fields in wiki preferences object fixed [{}]",
+          getContext().getDatabase());
       return true;
     }
     return false;
@@ -139,8 +127,8 @@ public class HTMLWebPreferences implements IMandatoryDocumentRole {
     if (pageTypeObj == null) {
       pageTypeObj = wikiPrefDoc.newXObject(pageTypeClassRef, getContext());
       pageTypeObj.setStringValue("page_type", _SPACE_PREFERENCE_PAGE_TYPE);
-      LOGGER.debug("HTML.WebPreferences missing page type object fixed for database ["
-          + getContext().getDatabase() + "].");
+      LOGGER.debug("HTML.WebPreferences missing page type object fixed for [{}]",
+          getContext().getDatabase());
       return true;
     }
     return false;

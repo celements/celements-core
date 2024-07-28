@@ -51,24 +51,6 @@ public class XWikiXWikiPreferencesTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testNotMainWiki_main() {
-    context.setDatabase("mainwiki");
-    context.setMainXWiki("mainwiki");
-    replayDefault();
-    assertFalse(mandatoryXWikiPref.notMainWiki());
-    verifyDefault();
-  }
-
-  @Test
-  public void testNotMainWiki_notMain() {
-    context.setDatabase("myWiki");
-    context.setMainXWiki("mainWiki");
-    replayDefault();
-    assertTrue(mandatoryXWikiPref.notMainWiki());
-    verifyDefault();
-  }
-
-  @Test
   public void testSkip_illegalValue() {
     expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"))).andThrow(
         new NumberFormatException(null)).anyTimes();

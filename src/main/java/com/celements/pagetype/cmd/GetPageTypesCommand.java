@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.pagetype.PageType;
 import com.xpn.xwiki.XWikiContext;
@@ -103,7 +104,10 @@ public class GetPageTypesCommand {
       XWikiContext context) {
     List<String> result = Collections.emptyList();
     try {
-      result = context.getWiki().search(getPThql(catList, onlyVisible), context);
+      var wikiRef = new WikiReference(context.getDatabase());
+      if (context.getWiki().getStore().existsWiki(wikiRef)) {
+        result = context.getWiki().search(getPThql(catList, onlyVisible), context);
+      }
     } catch (XWikiException exp) {
       LOGGER.error("getPageTypesForCategories: Failed to get pagetypes.", exp);
     }

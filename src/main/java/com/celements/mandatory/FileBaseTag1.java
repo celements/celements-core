@@ -30,10 +30,13 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.pagetype.PageTypeClasses;
-import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -54,6 +57,15 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
 
   @Requirement
   ITreeNodeCache treeNodeCache;
+
+  @Requirement
+  private IModelAccessFacade modelAccess;
+
+  @Requirement
+  private ModelUtils modelUtils;
+
+  @Requirement
+  private ModelContext context;
 
   @Requirement
   Execution execution;
@@ -77,63 +89,46 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
 
   @Override
   public void checkDocuments() throws XWikiException {
-    LOGGER.trace("Start checkDocuments in FileBaseTag1 for database [" + getContext().getDatabase()
-        + "].");
+    LOGGER.trace("Start checkDocuments in FileBaseTag1 for [{}]", getContext().getDatabase());
     if (noMainWiki() && !isSkipCelementsFileBaseTag1()) {
-      LOGGER.trace("before checkFileBaseTag1 for database [" + getContext().getDatabase() + "].");
+      LOGGER.trace("before checkFileBaseTag1 for [{}]", getContext().getDatabase());
       checkFileBaseTag1();
     } else {
-      LOGGER.info("skip mandatory checkFileBaseTag1 for database [" + getContext().getDatabase()
-          + "], noMainWiki [" + noMainWiki() + "], skipCelementsParam ["
-          + isSkipCelementsFileBaseTag1() + "].");
+      LOGGER.info("skip mandatory checkFileBaseTag1 for [{}], noMainWiki [{}], isSkip [{}]",
+          getContext().getDatabase(), noMainWiki(), isSkipCelementsFileBaseTag1());
     }
-    LOGGER.trace("end checkDocuments in FileBaseTag1 for database [" + getContext().getDatabase()
-        + "].");
+    LOGGER.trace("end checkDocuments in FileBaseTag1 for [{}]", getContext().getDatabase());
   }
 
   boolean isSkipCelementsFileBaseTag1() {
     boolean isSkip = getContext().getWiki().ParamAsLong("celements.mandatory.skipFileBaseTag1",
         0) == 1L;
-    LOGGER.trace("skipFileBaseTag1 for database [" + getContext().getDatabase() + "] returning ["
-        + isSkip + "].");
+    LOGGER.trace("skipFileBaseTag1 for [{}]: [{}]", getContext().getDatabase(), isSkip);
     return isSkip;
   }
 
   boolean noMainWiki() {
-    String wikiName = getContext().getDatabase();
-    LOGGER.trace("noMainWiki for database [" + wikiName + "].");
-    return (wikiName != null) && !wikiName.equals(getContext().getMainXWiki());
+    return !modelUtils.isMainWiki(context.getWikiRef());
   }
 
   void checkFileBaseTag1() throws XWikiException {
     DocumentReference fileBaseTag1Ref = getFileBaseTag1Ref(getContext().getDatabase());
-    XWikiDocument fileBaseTag1Doc;
-    if (!getContext().getWiki().exists(fileBaseTag1Ref, getContext())) {
-      LOGGER.debug("FileBaseTag1Document is missing that we create it. ["
-          + getContext().getDatabase() + "]");
-      fileBaseTag1Doc = new CreateDocumentCommand().createDocument(fileBaseTag1Ref,
-          _FILE_BASE_TAG_PAGE_TYPE);
-    } else {
-      fileBaseTag1Doc = getContext().getWiki().getDocument(fileBaseTag1Ref, getContext());
-      LOGGER.trace("FileBaseTag1Document already exists. [" + getContext().getDatabase() + "]");
-    }
-    if (fileBaseTag1Doc != null) {
-      boolean dirty = checkPageType(fileBaseTag1Doc);
-      dirty |= checkMenuItem(fileBaseTag1Doc);
-      dirty |= checkMenuName(fileBaseTag1Doc, "en", ".zip");
-      dirty |= checkMenuName(fileBaseTag1Doc, "de", ".zip");
-      if (dirty) {
-        LOGGER.info("FileBaseTag1Document updated for [" + getContext().getDatabase() + "].");
-        getContext().getWiki().saveDocument(fileBaseTag1Doc, "autocreate"
-            + " Content_attachments.FileBaseTag1.", getContext());
+    XWikiDocument fileBaseTag1Doc = modelAccess.getOrCreateDocument(fileBaseTag1Ref);
+    boolean dirty = checkPageType(fileBaseTag1Doc);
+    dirty |= checkMenuItem(fileBaseTag1Doc);
+    dirty |= checkMenuName(fileBaseTag1Doc, "en", ".zip");
+    dirty |= checkMenuName(fileBaseTag1Doc, "de", ".zip");
+    if (dirty) {
+      try {
+        LOGGER.info("FileBaseTag1Document updated for [{}]", getContext().getDatabase());
+        modelAccess.saveDocument(fileBaseTag1Doc, "autocreate Content_attachments.FileBaseTag1.");
         treeNodeCache.flushMenuItemCache();
-      } else {
-        LOGGER.debug("FileBaseTag1Document not saved. Everything uptodate. ["
-            + getContext().getDatabase() + "].");
+      } catch (DocumentSaveException dse) {
+        throw new XWikiException(0, 0, "failed saving", dse);
       }
     } else {
-      LOGGER.trace("skip checkFileBaseTag1 because fileBaseTag1Doc is null! ["
-          + getContext().getDatabase() + "]");
+      LOGGER.debug("FileBaseTag1Document not saved. Everything uptodate. [{}]",
+          getContext().getDatabase());
     }
   }
 
@@ -144,8 +139,8 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
     if (menuItemObj == null) {
       menuItemObj = fileBaseTag1Doc.newXObject(menuItemClassRef, getContext());
       menuItemObj.set("menu_position", 2, getContext());
-      LOGGER.debug("FileBaseTag1 missing fields in menu item object fixed for" + " database ["
-          + getContext().getDatabase() + "].");
+      LOGGER.debug("FileBaseTag1 missing fields in menu item object fixed for [{}]",
+          getContext().getDatabase());
       return true;
     }
     return false;
@@ -160,8 +155,8 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
       menuNameEN = fileBaseTag1Doc.newXObject(menuNameClassRef, getContext());
       menuNameEN.set("lang", lang, getContext());
       menuNameEN.set("menu_name", menuname, getContext());
-      LOGGER.debug("FileBaseTag1 missing fields in menu name en object fixed for" + " database ["
-          + getContext().getDatabase() + "].");
+      LOGGER.debug("FileBaseTag1 missing fields in menu name en object fixed for [{}]",
+          getContext().getDatabase());
       return true;
     }
     return false;
@@ -174,8 +169,8 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
     if (pageTypeObj == null) {
       pageTypeObj = fileBaseTag1Doc.newXObject(pageTypeClassRef, getContext());
       pageTypeObj.setStringValue("page_type", _FILE_BASE_TAG_PAGE_TYPE);
-      LOGGER.debug("FileBaseTag1 missing page type object fixed for database ["
-          + getContext().getDatabase() + "].");
+      LOGGER.debug("FileBaseTag1 missing page type object fixed for [{}]",
+          getContext().getDatabase());
       return true;
     }
     return false;
