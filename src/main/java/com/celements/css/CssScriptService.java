@@ -2,6 +2,8 @@ package com.celements.css;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -17,6 +19,8 @@ public class CssScriptService implements ScriptService {
 
   public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
 
+  public static final Logger LOGGER = LoggerFactory.getLogger(CssScriptService.class);
+
   @Requirement
   private Execution execution;
 
@@ -24,40 +28,43 @@ public class CssScriptService implements ScriptService {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
-   */
-  public List<CSS> getAllCSS() throws XWikiException {
-    return getCssCmd().getAllCSS(getContext());
+  public List<CSS> getAllCSS() {
+    try {
+      return getCssCmd().getAllCSS(getContext());
+    } catch (XWikiException e) {
+      LOGGER.error("Call to CssComman.getAllCss failed.", e);
+      return List.of();
+    }
   }
 
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
-   */
-  public String displayAllCSS() throws XWikiException {
-    return getCssCmd().displayAllCSS(getContext());
+  public String displayAllCSS() {
+    try {
+      return getCssCmd().displayAllCSS(getContext());
+    } catch (XWikiException e) {
+      LOGGER.error("Call to CssCommand.displayAllCss failed.", e);
+      return "";
+    }
   }
 
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
-   */
-  public List<CSS> getRTEContentCSS() throws XWikiException {
-    return getCssCmd().getRTEContentCSS(getContext());
+  public List<CSS> getRTEContentCSS() {
+    try {
+      return getCssCmd().getRTEContentCSS(getContext());
+    } catch (XWikiException e) {
+      LOGGER.error("Call to CssCommand.getRTEContentCSS failed.", e);
+      return List.of();
+    }
   }
 
   public void includeCSSPage(String css) {
     getCssCmd().includeCSSPage(css, getContext());
   }
 
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
-   */
-  public void includeCSSAfterPreferences(String css) throws XWikiException {
-    getCssCmd().includeCSSAfterPreferences(css, getContext());
+  public void includeCSSAfterPreferences(String css) {
+    try {
+      getCssCmd().includeCSSAfterPreferences(css, getContext());
+    } catch (XWikiException e) {
+      LOGGER.error("Call to CssCommand.includeCSSAfterPreferences failed.", e);
+    }
   }
 
   /**
