@@ -48,7 +48,7 @@ public class LayoutController {
     this.context = context;
   }
 
-  @CrossOrigin
+  @CrossOrigin(origins = "*")
   @GetMapping(value = "/json/{layoutSpaceName}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   public String renderLayoutAsJson(@PathVariable("layoutSpaceName") String layoutSpaceName) {
@@ -56,7 +56,7 @@ public class LayoutController {
         buildSpaceRef(layoutSpaceName).build(SpaceReference.class)));
   }
 
-  @CrossOrigin
+  @CrossOrigin(origins = "*")
   @PostMapping(
       value = "/partial",
       produces = MediaType.APPLICATION_XML_VALUE,
