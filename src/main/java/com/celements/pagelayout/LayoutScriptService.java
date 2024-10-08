@@ -99,7 +99,7 @@ public class LayoutScriptService implements ScriptService {
   }
 
   @NotNull
-  public String renderLayoutPartial(@Nullable DocumentReference startNodeRef) {
+  public Optional<String> renderLayoutPartial(@Nullable DocumentReference startNodeRef) {
     return layoutService.renderLayoutPartial(startNodeRef);
   }
 

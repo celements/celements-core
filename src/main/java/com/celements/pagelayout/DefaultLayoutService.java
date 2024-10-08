@@ -243,9 +243,9 @@ public final class DefaultLayoutService implements LayoutServiceRole {
 
   @Override
   @NotNull
-  public String renderLayoutPartial(@Nullable DocumentReference startNodeRef) {
+  public Optional<String> renderLayoutPartial(@Nullable DocumentReference startNodeRef) {
     if (startNodeRef == null) {
-      return "";
+      return Optional.empty();
     }
     SpaceReference layoutSpaceRef = startNodeRef.getLastSpaceReference();
     LOGGER.info("renderLayoutPartial: for layoutRef '{}'", layoutSpaceRef);
@@ -258,14 +258,14 @@ public final class DefaultLayoutService implements LayoutServiceRole {
       TreeNode startNode;
       try {
         startNode = treeNodeService.getTreeNodeForDocRef(localStartNodeRef);
-        return renderLayoutPartialLocal(startNode);
+        return Optional.ofNullable(renderLayoutPartialLocal(startNode));
       } catch (XWikiException exp) {
-        LOGGER.error("Failed to get TreeNode for {}", localStartNodeRef, exp);
+        LOGGER.warn("Failed to get TreeNode for {}", localStartNodeRef, exp);
       }
     } else {
       LOGGER.info("cannot render {}, because it must be a TreeNode.", localStartNodeRef);
     }
-    return "";
+    return Optional.empty();
   }
 
   /**

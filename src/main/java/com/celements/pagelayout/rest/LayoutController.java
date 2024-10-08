@@ -67,15 +67,15 @@ public class LayoutController {
         renderPartialRequest.layoutSpace, renderPartialRequest.startNodeName);
     return modelAccess.getDocumentOpt(
         buildDocRef(renderPartialRequest.contextDocSpace, renderPartialRequest.contextDocName))
-        .map((XWikiDocument contextDoc) -> {
+        .flatMap((XWikiDocument contextDoc) -> {
           context.setDoc(contextDoc);
           VelocityContext velocityContext = velocityManager.getVelocityContext();
           LOGGER.debug("partial doc in vcontext before is {}", context.getDocRef().orElse(null));
           velocityContext.put("doc",
               new Document(contextDoc, context.getXWikiContext()));
-          return RestPreconditions.checkFound(Strings.emptyToNull(layoutService.renderLayoutPartial(
+          return layoutService.renderLayoutPartial(
               buildDocRef(renderPartialRequest.layoutSpace,
-                  renderPartialRequest.startNodeName))));
+                  renderPartialRequest.startNodeName));
         }).orElse("");
   }
 

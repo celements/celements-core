@@ -58,7 +58,7 @@ public interface LayoutServiceRole {
   String renderLayoutAsJson(@Nullable SpaceReference layoutSpaceRef);
 
   @NotNull
-  String renderLayoutPartial(@Nullable DocumentReference startNodeRef);
+  Optional<String> renderLayoutPartial(@Nullable DocumentReference startNodeRef);
 
   /**
    * getPageLayoutForCurrentDoc checks that the layout returned exists and that it may be
