@@ -305,9 +305,7 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   String getAllExternalJavaScriptFiles(@Nullable AttachmentURLCommand attUrlCmdMock) {
-    streamDocRefs2CollectJsExtFileObj()
-        .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmdMock));
-    notifyExtJavaScriptFileListener();
+    collectJsFiles(attUrlCmdMock);
     final StringBuilder jsIncludesBuilder = generateJsImportString();
     displayedAll = true;
     return jsIncludesBuilder.toString();
@@ -319,6 +317,17 @@ public class ExternalJavaScriptFilesCommand {
         .append(extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
         .forEach(tag -> jsIncludesBuilder.append(tag).append("\n"));
     return jsIncludesBuilder;
+  }
+
+  public Stream<JsFileEntry> collectJsFiles() {
+    return collectJsFiles(null);
+  }
+
+  private Stream<JsFileEntry> collectJsFiles(@Nullable AttachmentURLCommand attUrlCmdMock) {
+    streamDocRefs2CollectJsExtFileObj()
+        .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmdMock));
+    notifyExtJavaScriptFileListener();
+    return extJSfileSet.stream();
   }
 
   private Stream<DocumentReference> streamDocRefs2CollectJsExtFileObj() {
