@@ -1,6 +1,10 @@
 package com.celements.pagelayout.rest;
 
+import java.net.URL;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -21,10 +25,15 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.velocity.VelocityManager;
 
 import com.celements.common.rest.RestPreconditions;
+import com.celements.javascript.JsLoadMode;
+import com.celements.metatag.MetaTag;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
 import com.celements.model.reference.RefBuilder;
 import com.celements.pagelayout.LayoutServiceRole;
+import com.celements.web.plugin.cmd.CssCommand;
+import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
+import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -49,8 +58,98 @@ public class LayoutController {
   }
 
   @CrossOrigin(origins = "*")
-  @GetMapping(value = "/json/{layoutSpaceName}",
-      produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/head", produces = MediaType.APPLICATION_JSON_VALUE)
+  public HeaderData getHead(
+      @PathVariable("docSpace") String space,
+      @PathVariable("docName") String doc) {
+    var docRef = buildDocRef(space, doc);
+    var h = new HeaderData();
+    h.title = new DocHeaderTitleCommand().getDocHeaderTitle(docRef);
+    h.language = context.getLanguage().orElseGet(() -> context.getDefaultLanguage(docRef));
+    h.stylesheets = collectStylesheets().collect(Collectors.toList());
+    h.scripts = collectScripts().collect(Collectors.toList());
+    return h;
+  }
+
+  public class HeaderData {
+
+    public String title;
+    public String description;
+    public String language;
+    public URL favicon;
+    public List<CssEntry> stylesheets;
+    public List<JsEntry> scripts;
+    public List<MetaTag> metaTags;
+
+  }
+
+  private Stream<CssEntry> collectStylesheets() {
+    var cssCmd = new CssCommand();
+    return CSS_FILES.stream()
+        .flatMap(css -> cssCmd.includeCSSPage("TODO", context.getXWikiContext()).stream())
+        .map(css -> {
+          var cssEntry = new CssEntry();
+          cssEntry.path = css.getCSS(context.getXWikiContext());
+          cssEntry.alternate = css.isAlternate();
+          cssEntry.title = css.getTitle();
+          cssEntry.media = css.getMedia();
+          return cssEntry;
+        });
+  }
+
+  public class CssEntry {
+
+    public String path;
+    public boolean alternate;
+    public String title;
+    public String media;
+
+  }
+
+  private static final List<String> CSS_FILES = List.of(
+      ":celRes/celements2.css",
+      ":celRes/login.css",
+      ":celJS/bootstrap/bootstrap-multiselect.css",
+      ":celJS/jquery-datetimepicker/2.5/jquery.datetimepicker.min.css");
+
+  private Stream<JsEntry> collectScripts() {
+    var jsCmd = new ExternalJavaScriptFilesCommand();
+    JS_FILES.forEach(jsCmd::addExtJSfileOnce);
+    return jsCmd.collectJsFiles()
+        .map(jsFile -> {
+          var jsEntry = new JsEntry();
+          jsEntry.path = jsFile.getFilepath();
+          jsEntry.module = jsFile.isModule();
+          jsEntry.mode = jsFile.getLoadMode();
+          return jsEntry;
+        });
+  }
+
+  public class JsEntry {
+
+    public String path;
+    public boolean module;
+    public JsLoadMode mode;
+
+  }
+
+  private static final List<String> JS_FILES = List.of(
+      ":celJS/prototype.js",
+      ":celJS/jquery.min.js",
+      ":celJS/jquery-noconflict.js",
+      ":celJS/initCelements.min.js",
+      ":celJS/validation.js",
+      ":celJS/mobile/MobileSupport.js",
+      ":celJS/scriptaculous/effects.js",
+      ":celJS/bootstrap/bootstrap.min.js",
+      ":celJS/bootstrap/bootstrap-multiselect.js",
+      ":celJS/jquery-datetimepicker/2.5/jquery.datetimepicker.full.min.js",
+      ":celJS/dateTimePicker/generateDateTimePicker.js",
+      ":celJS/adminUi/overlayResize.js",
+      ":celDynJS/DynamicLoader/celLazyLoader.mjs");
+
+  @CrossOrigin(origins = "*")
+  @GetMapping(value = "/json/{layoutSpaceName}", produces = MediaType.APPLICATION_JSON_VALUE)
   public String renderLayoutAsJson(@PathVariable("layoutSpaceName") String layoutSpaceName) {
     return RestPreconditions.checkFound(layoutService.renderLayoutAsJson(
         buildSpaceRef(layoutSpaceName).build(SpaceReference.class)));
