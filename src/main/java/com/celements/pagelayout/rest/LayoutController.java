@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -28,6 +29,7 @@ import com.celements.common.rest.RestPreconditions;
 import com.celements.javascript.JsLoadMode;
 import com.celements.metatag.MetaTag;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
 import com.celements.model.reference.RefBuilder;
 import com.celements.pagelayout.LayoutServiceRole;
@@ -60,9 +62,11 @@ public class LayoutController {
   @CrossOrigin(origins = "*")
   @GetMapping(value = "/head", produces = MediaType.APPLICATION_JSON_VALUE)
   public HeaderData getHead(
-      @PathVariable("docSpace") String space,
-      @PathVariable("docName") String doc) {
+      @RequestParam("space") String space,
+      @RequestParam("doc") String doc)
+      throws DocumentNotExistsException {
     var docRef = buildDocRef(space, doc);
+    context.setDoc(modelAccess.getDocument(docRef));
     var h = new HeaderData();
     h.title = new DocHeaderTitleCommand().getDocHeaderTitle(docRef);
     h.language = context.getLanguage().orElseGet(() -> context.getDefaultLanguage(docRef));
@@ -86,7 +90,7 @@ public class LayoutController {
   private Stream<CssEntry> collectStylesheets() {
     var cssCmd = new CssCommand();
     return CSS_FILES.stream()
-        .flatMap(css -> cssCmd.includeCSSPage("TODO", context.getXWikiContext()).stream())
+        .flatMap(css -> cssCmd.includeCSSPage(css, context.getXWikiContext()).stream())
         .map(css -> {
           var cssEntry = new CssEntry();
           cssEntry.path = css.getCSS(context.getXWikiContext());
@@ -125,6 +129,7 @@ public class LayoutController {
         });
   }
 
+  // @JsonInclude(NON_EMPTY)
   public class JsEntry {
 
     public String path;
