@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.WikiCreatedEvent;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
@@ -81,6 +82,10 @@ public class WikiCreatedEventListenerTest extends AbstractComponentTest {
       assertEquals(database, getContext().getDatabase());
     }
 
+    @Override
+    public void checkAllMandatoryDocuments(WikiReference wikiRef) {
+      assertEquals(database, wikiRef.getName());
+    }
   }
 
 }
