@@ -19,7 +19,6 @@
  */
 package com.celements.mandatory;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -64,7 +63,7 @@ public class Robots_TXT implements IMandatoryDocumentRole {
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
-    return Collections.emptyList();
+    return List.of("celements.mandatory.MandatoryXClasses");
   }
 
   @Override
