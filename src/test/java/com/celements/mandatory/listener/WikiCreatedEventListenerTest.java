@@ -1,72 +1,46 @@
 package com.celements.mandatory.listener;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.Event;
-import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
-import com.xpn.xwiki.web.Utils;
+import com.celements.wiki.event.WikiCreatedEvent;
 
 public class WikiCreatedEventListenerTest extends AbstractComponentTest {
 
   private WikiCreatedEventListener listener;
 
-  private RemoteObservationManagerContext remoteObsMngContextMock;
   private IMandatoryDocumentCompositorRole mandatoryDocCmpMock;
 
   @Before
-  public void setUp_WikiCreatedEventListenerTest() throws Exception {
-    listener = (WikiCreatedEventListener) Utils.getComponent(EventListener.class,
-        "celements.mandatory.WikiCreatedEventListener");
-    remoteObsMngContextMock = createDefaultMock(RemoteObservationManagerContext.class);
-    listener.remoteObservationManagerContext = remoteObsMngContextMock;
-    mandatoryDocCmpMock = createDefaultMock(IMandatoryDocumentCompositorRole.class);
-    listener.mandatoryDocCmp = mandatoryDocCmpMock;
+  public void prepare() throws Exception {
+    mandatoryDocCmpMock = registerComponentMock(IMandatoryDocumentCompositorRole.class);
+    listener = getBeanFactory().getBean(WikiCreatedEventListener.class);
   }
 
   @Test
-  public void testGetName() {
-    assertEquals("celements.mandatory.WikiCreatedEventListener", listener.getName());
+  public void test_getOrder() {
+    assertEquals(-100, listener.getOrder());
   }
 
   @Test
-  public void testGetEvents() {
-    assertEquals(1, listener.getEvents().size());
-    assertSame(WikiCreatedEvent.class, listener.getEvents().get(0).getClass());
-  }
-
-  @Test
-  public void testOnEvent() {
+  public void test_onApplicationEvent() {
     String database = "db";
-    Event event = new WikiCreatedEvent(database);
+    WikiCreatedEvent event = new WikiCreatedEvent(new WikiReference(database));
 
-    expect(remoteObsMngContextMock.isRemoteState()).andReturn(false).atLeastOnce();
     mandatoryDocCmpMock.checkAllMandatoryDocuments();
     expectLastCall().andDelegateTo(new TestMandatoryDocumentCompositor(database)).once();
 
-    String db = getContext().getDatabase();
+    String db = getXContext().getDatabase();
     replayDefault();
-    listener.onEvent(event, null, null);
+    listener.onApplicationEvent(event);
     verifyDefault();
-    assertEquals(db, getContext().getDatabase());
-  }
-
-  @Test
-  public void testOnEvent_remote() {
-    expect(remoteObsMngContextMock.isRemoteState()).andReturn(true).atLeastOnce();
-
-    replayDefault();
-    listener.onEvent(new WikiCreatedEvent(), null, null);
-    verifyDefault();
+    assertEquals(db, getXContext().getDatabase());
   }
 
   private class TestMandatoryDocumentCompositor implements IMandatoryDocumentCompositorRole {
@@ -79,7 +53,7 @@ public class WikiCreatedEventListenerTest extends AbstractComponentTest {
 
     @Override
     public void checkAllMandatoryDocuments() {
-      assertEquals(database, getContext().getDatabase());
+      assertEquals(database, getXContext().getDatabase());
     }
 
     @Override

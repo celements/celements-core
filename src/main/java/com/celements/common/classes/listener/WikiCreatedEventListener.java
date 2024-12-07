@@ -19,69 +19,57 @@
  */
 package com.celements.common.classes.listener;
 
-import java.util.Arrays;
-import java.util.List;
+import static com.celements.execution.XWikiExecutionProp.*;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.event.WikiCreatedEvent;
-import org.xwiki.bridge.event.WikiEvent;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.springframework.context.ApplicationListener;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.Event;
-import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassesCompositorComponent;
+import com.celements.wiki.event.WikiCreatedEvent;
 import com.xpn.xwiki.XWikiContext;
 
-@Component(WikiCreatedEventListener.NAME)
-public class WikiCreatedEventListener implements EventListener {
+@Component
+public class WikiCreatedEventListener implements ApplicationListener<WikiCreatedEvent>, Ordered {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WikiCreatedEventListener.class);
 
-  public static final String NAME = "celements.classes.WikiCreatedEventListener";
-
-  @Requirement
-  IClassesCompositorComponent classesCompositor;
-
-  @Requirement
-  RemoteObservationManagerContext remoteObservationManagerContext;
-
-  @Requirement
+  private IClassesCompositorComponent classesCompositor;
   private Execution execution;
 
+  @Inject
+  public WikiCreatedEventListener(
+      IClassesCompositorComponent classesCompositor,
+      Execution execution) {
+    this.classesCompositor = classesCompositor;
+    this.execution = execution;
+  }
+
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+    return execution.getContext().get(XWIKI_CONTEXT).orElseThrow();
   }
 
   @Override
-  public String getName() {
-    return NAME;
+  public int getOrder() {
+    return -200;
   }
 
   @Override
-  public List<Event> getEvents() {
-    LOGGER.info("getEvents: registering for wiki created events.");
-    return Arrays.<Event>asList(new WikiCreatedEvent());
-  }
-
-  @Override
-  public void onEvent(Event event, Object source, Object data) {
-    WikiEvent wikiEvent = (WikiEvent) event;
-    String database = wikiEvent.getWikiId();
-    LOGGER.debug("received WikiCreatedEvent for database '{}', remote state '{}'", database,
-        remoteObservationManagerContext.isRemoteState());
-    if (!remoteObservationManagerContext.isRemoteState()) {
-      String dbBackup = getContext().getDatabase();
-      try {
-        LOGGER.info("checking all class collections for db '{}'", database);
-        getContext().setDatabase(database);
-        classesCompositor.checkClasses();
-      } finally {
-        getContext().setDatabase(dbBackup);
-      }
+  public void onApplicationEvent(WikiCreatedEvent event) {
+    String database = event.getWiki().getName();
+    LOGGER.debug("received WikiCreatedEvent for database '{}'", database);
+    String dbBackup = getContext().getDatabase();
+    try {
+      LOGGER.info("checking all class collections for db '{}'", database);
+      getContext().setDatabase(database);
+      classesCompositor.checkClasses();
+    } finally {
+      getContext().setDatabase(dbBackup);
     }
   }
 
