@@ -19,7 +19,6 @@
  */
 package com.celements.mandatory;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -84,7 +83,7 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
-    return Collections.emptyList();
+    return List.of("celements.mandatory.MandatoryXClasses");
   }
 
   @Override
