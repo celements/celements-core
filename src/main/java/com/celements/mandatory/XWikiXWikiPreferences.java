@@ -100,7 +100,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
         .createFirstIfNotExists();
     boolean dirty = false;
     dirty |= setStringValue(prefsObj, "title", "Celements");
-    dirty |= setStringValue(prefsObj, "skin", "celskin");
+    dirty |= setStringValue(prefsObj, "skin", "");
     dirty |= setStringValue(prefsObj, "editor", "Text");
     dirty |= setIntValue(prefsObj, "renderXWikiRadeoxRenderer", 1);
     dirty |= setStringValue(prefsObj, "pageWidth", "default");
