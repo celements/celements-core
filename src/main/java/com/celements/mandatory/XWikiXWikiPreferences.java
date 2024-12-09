@@ -21,6 +21,7 @@ package com.celements.mandatory;
 
 import static com.google.common.base.Strings.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -56,7 +57,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
-    return List.of("celements.mandatory.MandatoryXClasses");
+    return Collections.emptyList();
   }
 
   @Override
@@ -100,7 +101,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
         .createFirstIfNotExists();
     boolean dirty = false;
     dirty |= setStringValue(prefsObj, "title", "Celements");
-    dirty |= setStringValue(prefsObj, "skin", "cellskin");
+    dirty |= setStringValue(prefsObj, "skin", "");
     dirty |= setStringValue(prefsObj, "editor", "Text");
     dirty |= setIntValue(prefsObj, "renderXWikiRadeoxRenderer", 1);
     dirty |= setStringValue(prefsObj, "pageWidth", "default");

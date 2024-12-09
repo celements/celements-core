@@ -1,5 +1,6 @@
 package com.celements.mandatory;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ public abstract class AbstractXWikiClassRights extends AbstractMandatoryDocument
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
-    return List.of("celements.mandatory.MandatoryXClasses");
+    return Collections.emptyList();
   }
 
   boolean checkRightsObject(XWikiDocument classDoc) {
