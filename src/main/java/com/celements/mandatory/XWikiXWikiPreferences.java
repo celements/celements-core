@@ -21,6 +21,7 @@ package com.celements.mandatory;
 
 import static com.google.common.base.Strings.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -56,7 +57,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
-    return List.of("celements.mandatory.MandatoryXClasses");
+    return Collections.emptyList();
   }
 
   @Override
