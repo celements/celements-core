@@ -24,17 +24,17 @@
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements</artifactId>
-    <version>6.1-SNAPSHOT</version>
+    <version>6.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-core</artifactId>
-  <version>6.7-SNAPSHOT</version>
+  <version>6.9-SNAPSHOT</version>
   <description>Celements Core</description>
   <dependencies>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-model</artifactId>
-      <version>6.2-SNAPSHOT</version>
+      <version>6.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
