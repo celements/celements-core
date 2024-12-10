@@ -78,15 +78,20 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   @Override
   protected boolean checkDocuments(XWikiDocument doc) throws XWikiException {
-    boolean dirty = checkPageType(doc);
+    boolean dirty = setUnsetPageType(doc);
     dirty |= checkWikiPreferences(doc);
     return dirty;
   }
 
   @Override
   protected boolean checkDocumentsMain(XWikiDocument doc) throws XWikiException {
-    boolean dirty = checkPageType(doc);
-    dirty |= checkWikiPreferences(doc, (prefsObj) -> false);
+    boolean dirty = setUnsetPageType(doc);
+    dirty |= checkWikiPreferences(doc, (prefsObj) -> {
+      boolean dirtyAdditional = false;
+      dirtyAdditional |= setUnsetInt(prefsObj, "authenticate_view", 1);
+      dirtyAdditional |= setUnsetInt(prefsObj, "renderXWikiRadeoxRenderer", 1);
+      return dirtyAdditional;
+    });
     return dirty;
   }
 
@@ -100,26 +105,23 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
         .filter(new ClassReference(getDocRef()))
         .createFirstIfNotExists();
     boolean dirty = false;
-    dirty |= setStringValue(prefsObj, "title", "Celements");
-    dirty |= setStringValue(prefsObj, "skin", "");
-    dirty |= setStringValue(prefsObj, "editor", "Text");
-    dirty |= setIntValue(prefsObj, "renderXWikiRadeoxRenderer", 1);
-    dirty |= setStringValue(prefsObj, "pageWidth", "default");
-    dirty |= setIntValue(prefsObj, "multilingual", 1);
-    dirty |= setStringValue(prefsObj, "languages", defaultLang);
-    dirty |= setStringValue(prefsObj, "default_language", defaultLang);
-    dirty |= setStringValue(prefsObj, "admin_language", defaultLang);
-    dirty |= setIntValue(prefsObj, "authenticate_edit", 1);
-    dirty |= setIntValue(prefsObj, "authenticate_view", 1);
-    dirty |= setLongValue(prefsObj, "upload_maxsize", 104857600L);
     dirty |= additionalChecks.test(prefsObj);
+    dirty |= setEmptyString(prefsObj, "editor", "Text");
+    dirty |= setUnsetInt(prefsObj, "renderXWikiRadeoxRenderer", 0);
+    dirty |= setEmptyString(prefsObj, "pageWidth", "default");
+    dirty |= setUnsetInt(prefsObj, "multilingual", 1);
+    dirty |= setEmptyString(prefsObj, "languages", defaultLang);
+    dirty |= setEmptyString(prefsObj, "default_language", defaultLang);
+    dirty |= setEmptyString(prefsObj, "admin_language", defaultLang);
+    dirty |= setUnsetInt(prefsObj, "authenticate_edit", 1);
+    dirty |= setUnsetInt(prefsObj, "authenticate_view", 0);
+    dirty |= setUnsetLong(prefsObj, "upload_maxsize", 104857600L);
     return dirty;
   }
 
   private boolean checkWikiPreferences(XWikiDocument wikiPrefDoc) {
     return checkWikiPreferences(wikiPrefDoc, (prefsObj) -> {
       boolean dirty = false;
-      dirty |= setIntValue(prefsObj, "authenticate_view", 0);
       String documentBundles = prefsObj.getStringValue("documentBundles");
       if (isNullOrEmpty(documentBundles) || !documentBundles.contains(
           "celements2web:Celements2.Dictionary")) {
@@ -133,13 +135,13 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
             getWiki());
         dirty = true;
       }
-      dirty |= setStringValue(prefsObj, "cel_centralfilebase",
+      dirty |= setEmptyString(prefsObj, "cel_centralfilebase",
           IFileBaseAccessRole.FILE_BASE_DEFAULT_DOC_FN);
       return dirty;
     });
   }
 
-  private boolean checkPageType(XWikiDocument wikiPrefDoc) throws XWikiException {
+  private boolean setUnsetPageType(XWikiDocument wikiPrefDoc) throws XWikiException {
     boolean dirty = false;
     DocumentReference pageTypeClassRef = PageTypeClass.CLASS_REF
         .getDocRef(modelContext.getWikiRef());
@@ -154,7 +156,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     return dirty;
   }
 
-  private boolean setStringValue(BaseObject prefsObj, String field, String value) {
+  private boolean setEmptyString(BaseObject prefsObj, String field, String value) {
     if (isNullOrEmpty(prefsObj.getStringValue(field))) {
       prefsObj.setStringValue(field, value);
       LOGGER.debug("[{}] missing XWikiPref [{}], setting default: {}", getWiki(), field, value);
@@ -163,7 +165,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     return false;
   }
 
-  private boolean setIntValue(BaseObject prefsObj, String field, int value) {
+  private boolean setUnsetInt(BaseObject prefsObj, String field, int value) {
     if (prefsObj.getIntValue(field, -1) < 0) {
       prefsObj.setIntValue(field, value);
       LOGGER.debug("[{}] missing XWikiPref [{}], setting default: {}", getWiki(), field, value);
@@ -172,7 +174,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     return false;
   }
 
-  private boolean setLongValue(BaseObject prefsObj, String field, long value) {
+  private boolean setUnsetLong(BaseObject prefsObj, String field, long value) {
     if (prefsObj.getLongValue(field) <= 0) {
       prefsObj.set(field, value, modelContext.getXWikiContext());
       LOGGER.debug("[{}] missing XWikiPref [{}], setting default: {}", getWiki(), field, value);
