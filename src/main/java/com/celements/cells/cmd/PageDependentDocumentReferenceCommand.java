@@ -40,6 +40,7 @@ import com.celements.inheritor.InheritorFactory;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -252,7 +253,7 @@ public class PageDependentDocumentReferenceCommand {
 
   SpaceReference getCurrentLayoutRef() {
     if (currentLayoutRef == null) {
-      currentLayoutRef = getPageLayoutCmd().getPageLayoutForCurrentDoc();
+      currentLayoutRef = getLayoutService().getPageLayoutForCurrentDoc();
       LOGGER.info("getCurrentLayoutRef: '{}'", currentLayoutRef);
     }
     return currentLayoutRef;
@@ -422,19 +423,16 @@ public class PageDependentDocumentReferenceCommand {
     return Utils.getComponent(EntityReferenceValueProvider.class);
   }
 
-  PageLayoutCommand getPageLayoutCmd() {
-    if (this.pageLayoutCmd == null) {
-      this.pageLayoutCmd = new PageLayoutCommand();
-    }
-    return this.pageLayoutCmd;
-  }
-
   private EntityReferenceSerializer<String> getRefSerializer() {
     return getWebUtilsService().getRefDefaultSerializer();
   }
 
   private IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private LayoutServiceRole getLayoutService() {
+    return Utils.getComponent(LayoutServiceRole.class);
   }
 
 }
