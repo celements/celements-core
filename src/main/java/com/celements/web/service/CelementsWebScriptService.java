@@ -800,24 +800,9 @@ public class CelementsWebScriptService implements ScriptService {
   /**
    * @deprecated since 6.5 instead use {@link CelementsUserScriptService#getPossibleLoginFields()}
    */
-  @Deprecated
+  @Deprecated(since = "6.5", forRemoval = true)
   public String getPossibleLogins() {
     return new PossibleLoginsCommand().getPossibleLogins();
-  }
-
-  @Deprecated
-  public String cleanupXHTMLtoHTML5(String xhtml) {
-    return webUtilsService.cleanupXHTMLtoHTML5(xhtml);
-  }
-
-  @Deprecated
-  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference docRef) {
-    return webUtilsService.cleanupXHTMLtoHTML5(xhtml, docRef);
-  }
-
-  @Deprecated
-  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef) {
-    return webUtilsService.cleanupXHTMLtoHTML5(xhtml, layoutRef);
   }
 
   /**

@@ -444,15 +444,6 @@ public interface IWebUtilsService {
   String renderInheritableDocument(DocumentReference docRef, String lang, String defLang)
       throws XWikiException;
 
-  @Deprecated
-  String cleanupXHTMLtoHTML5(String xhtml);
-
-  @Deprecated
-  String cleanupXHTMLtoHTML5(String xhtml, DocumentReference doc);
-
-  @Deprecated
-  String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
-
   List<Attachment> getAttachmentsForDocs(List<String> docsFN);
 
   String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
