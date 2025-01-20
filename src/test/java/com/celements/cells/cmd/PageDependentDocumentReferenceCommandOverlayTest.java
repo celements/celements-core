@@ -1,6 +1,5 @@
 package com.celements.cells.cmd;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -20,7 +19,7 @@ import com.celements.cells.classes.PageDepCellConfigClass;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.service.ITreeNodeService;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -37,13 +36,14 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
   private IWebUtilsService savedWebUtilsService;
   private ComponentDescriptor<IWebUtilsService> webUtilsServiceDesc;
   private EntityReferenceSerializer<String> refDefaultSerializerMock;
-  private PageLayoutCommand pageLayoutCmdMock;
+  private LayoutServiceRole layoutService;
 
   @SuppressWarnings("unchecked")
   @Before
   public void prepare() throws Exception {
-    context = getContext();
-    registerComponentMock(IModelAccessFacade.class);
+    registerComponentMocks(IModelAccessFacade.class, LayoutServiceRole.class);
+    context = getXContext();
+    layoutService = getMock(LayoutServiceRole.class);
     cellDocRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
     cellDoc = new XWikiDocument(cellDocRef);
     cellDoc.setNew(false);
@@ -58,8 +58,6 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     getComponentManager().registerComponent(webUtilsServiceDesc, webUtilsMock);
     refDefaultSerializerMock = createDefaultMock(EntityReferenceSerializer.class);
     expect(webUtilsMock.getRefDefaultSerializer()).andReturn(refDefaultSerializerMock).anyTimes();
-    pageLayoutCmdMock = createDefaultMock(PageLayoutCommand.class);
-    pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
   }
 
   @After
@@ -188,7 +186,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         pdcWikiDefaultDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(pdcWikiDefaultDocRef))).andReturn(false)
         .anyTimes();
-    expect(pageLayoutCmdMock.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
+    expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
     replayDefault();
     DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
         cellDocRef);
@@ -242,7 +240,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
     expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef))).andReturn(
         wikiLeftColumnDefaultFN);
-    expect(pageLayoutCmdMock.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
+    expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
     replayDefault();
     DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
         cellDocRef);
@@ -300,7 +298,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     wikiDefaultDocument.setContent("no empty content");
     expect(getMock(IModelAccessFacade.class).getDocument(eq(pdcWikiDefaultDocRef)))
         .andReturn(wikiDefaultDocument);
-    expect(pageLayoutCmdMock.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
+    expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
     replayDefault();
     DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
         cellDocRef);
@@ -358,7 +356,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
             + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
     SpaceReference layoutSpace = new SpaceReference(layoutSpaceName, new WikiReference(
         context.getDatabase()));
-    expect(pageLayoutCmdMock.getPageLayoutForCurrentDoc()).andReturn(layoutSpace).atLeastOnce();
+    expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(layoutSpace).atLeastOnce();
     String layoutDefaultFN = context.getDatabase() + ":" + layoutSpaceName + "." + "leftColumn-"
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
     expect(refDefaultSerializerMock.serialize(eq(expectedLayoutDefaultRef))).andReturn(
@@ -504,7 +502,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
             + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
     SpaceReference layoutSpace = new SpaceReference(layoutSpaceName, new WikiReference(
         layoutDatabase));
-    expect(pageLayoutCmdMock.getPageLayoutForCurrentDoc()).andReturn(layoutSpace).atLeastOnce();
+    expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(layoutSpace).atLeastOnce();
     String layoutDefaultFN = layoutDatabase + ":" + layoutSpaceName + "." + "leftColumn-"
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
     expect(refDefaultSerializerMock.serialize(eq(expectedLayoutDefaultRef))).andReturn(
