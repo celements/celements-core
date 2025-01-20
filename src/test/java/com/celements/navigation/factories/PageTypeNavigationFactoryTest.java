@@ -1,6 +1,5 @@
 package com.celements.navigation.factories;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -18,6 +17,7 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.NavigationConfig;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeProvider;
@@ -41,12 +41,12 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
 
   @Before
   public void setUp_PageTypeNavigationFactoryTest() throws Exception {
-    xwiki = getWikiMock();
-    registerComponentMocks(IModelAccessFacade.class);
+    registerComponentMocks(IModelAccessFacade.class, LayoutServiceRole.class);
+    xwiki = getMock(XWiki.class);
     mockPageTypeResolver = registerComponentMock(IPageTypeResolverRole.class);
     xobjNavFactory = (PageTypeNavigationFactory) Utils.getComponent(NavigationFactory.class,
         PageTypeNavigationFactory.PAGETYPE_NAV_FACTORY_HINT);
-    defaultPageTypeDocRef = new DocumentReference(getContext().getDatabase(), "PageTypes",
+    defaultPageTypeDocRef = new DocumentReference(getXContext().getDatabase(), "PageTypes",
         "RichText");
     defaultPageTypeDoc = new XWikiDocument(defaultPageTypeDocRef);
     defaultPageTypeDoc.setNew(false);
@@ -54,18 +54,18 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER, Collections.<String>emptyList());
     expect(mockPageTypeResolver.getPageTypeRefForCurrentDoc()).andReturn(
         defaultPageTypeRef).anyTimes();
-    pageTypeDocRef = new DocumentReference(getContext().getDatabase(), "PageTypes", "MyPageType");
+    pageTypeDocRef = new DocumentReference(getXContext().getDatabase(), "PageTypes", "MyPageType");
     pageTypeDoc = new XWikiDocument(pageTypeDocRef);
     pageTypeDoc.setNew(false);
     PageTypeReference pageTypeRef = new PageTypeReference(pageTypeDocRef.getName(),
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER, Collections.<String>emptyList());
-    testDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyTestDoc");
+    testDocRef = new DocumentReference(getXContext().getDatabase(), "MySpace", "MyTestDoc");
     expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(eq(testDocRef))).andReturn(
         pageTypeRef).anyTimes();
-    currDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyDoc");
+    currDocRef = new DocumentReference(getXContext().getDatabase(), "MySpace", "MyDoc");
     currDoc = new XWikiDocument(currDocRef);
     currDoc.setNew(false);
-    getContext().setDoc(currDoc);
+    getXContext().setDoc(currDoc);
   }
 
   @Test
@@ -73,14 +73,14 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(defaultPageTypeDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        getXContext().getDatabase()));
     defaultPageTypeDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(defaultPageTypeDocRef))
         .andReturn(defaultPageTypeDoc);
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
     EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
-        getContext().getDatabase()));
+        getXContext().getDatabase()));
     replayDefault();
     INavigation nav = xobjNavFactory.createNavigation();
     assertEquals(mySpaceRef, nav.getNodeSpaceRef());
@@ -92,14 +92,14 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(pageTypeDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        getXContext().getDatabase()));
     pageTypeDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(pageTypeDocRef))
         .andReturn(pageTypeDoc);
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
     EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
-        getContext().getDatabase()));
+        getXContext().getDatabase()));
     replayDefault();
     INavigation nav = xobjNavFactory.createNavigation(testDocRef);
     assertEquals(mySpaceRef, nav.getNodeSpaceRef());
@@ -111,7 +111,7 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(defaultPageTypeDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        getXContext().getDatabase()));
     defaultPageTypeDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(defaultPageTypeDocRef))
         .andReturn(defaultPageTypeDoc);
@@ -127,7 +127,7 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(pageTypeDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        getXContext().getDatabase()));
     pageTypeDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(pageTypeDocRef))
         .andReturn(pageTypeDoc);
@@ -162,14 +162,14 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(pageTypeDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        getContext().getDatabase()));
+        getXContext().getDatabase()));
     pageTypeDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(pageTypeDocRef))
         .andReturn(pageTypeDoc);
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
     EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
-        getContext().getDatabase()));
+        getXContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.getNavigationConfig(testDocRef);
     assertEquals(mySpaceRef, navConfig.getNodeSpaceRef().get());

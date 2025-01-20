@@ -17,6 +17,7 @@ import com.celements.navigation.INavigation;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.NavigationConfig;
 import com.celements.navigation.presentation.IPresentationTypeRole;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -27,7 +28,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
 
   @Before
   public void setUp_XObjectNavigationFactoryTest() throws Exception {
-    registerComponentMock(IModelAccessFacade.class);
+    registerComponentMocks(IModelAccessFacade.class, LayoutServiceRole.class);
     xobjNavFactory = (XObjectNavigationFactory) Utils.getComponent(NavigationFactory.class,
         XObjectNavigationFactory.XOBJECT_NAV_FACTORY_HINT);
   }

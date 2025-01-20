@@ -19,7 +19,6 @@
  */
 package com.celements.navigation.presentation;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -42,6 +41,7 @@ import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -70,7 +70,8 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
 
   @Before
   public void setUp_DefaultPresentationTypeTest() throws Exception {
-    context = getContext();
+    registerComponentMock(LayoutServiceRole.class);
+    context = getXContext();
     currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
@@ -79,7 +80,7 @@ public class LayoutEditorPresentationTypeTest extends AbstractComponentTest {
     nav.setNavFilter(navFilterMock);
     mockLayoutCmd = createDefaultMock(PageLayoutCommand.class);
     nav.pageLayoutCmd = mockLayoutCmd;
-    xwiki = getWikiMock();
+    xwiki = getMock(XWiki.class);
     tNServiceMock = createDefaultMock(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
     wUServiceMock = registerComponentMock(IWebUtilsService.class);
