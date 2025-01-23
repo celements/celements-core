@@ -39,6 +39,22 @@ public interface ICellWriter {
   @NotNull
   ICellWriter appendContent(@Nullable String content);
 
+  /**
+   * @deprecated since 6.10, instead use {@link #openLevel(String)}
+   */
+  @Deprecated(since = "6.10", forRemoval = true)
+  default void openLevel() {
+    openLevel((String) null);
+  }
+
+  /**
+   * @deprecated since 6.10, instead use {@link #openLevel(String, List)}
+   */
+  @Deprecated
+  default void openLevel(@NotNull List<CellAttribute> attributes) {
+    openLevel((String) null, attributes);
+  }
+
   void openLevel(@Nullable String tagName);
 
   void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes);

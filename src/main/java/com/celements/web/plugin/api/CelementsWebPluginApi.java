@@ -104,15 +104,6 @@ public class CelementsWebPluginApi extends Api {
    * @deprecated since 2.59
    */
   @Deprecated
-  // FIXME must check programming Rights!!!
-  public CelementsWebPlugin getPlugin() {
-    return plugin;
-  }
-
-  /**
-   * @deprecated since 2.59
-   */
-  @Deprecated
   // FIXME must not be public! why do we need it in the API class anyway?
   public void setPlugin(CelementsWebPlugin plugin) {
     this.plugin = plugin;
