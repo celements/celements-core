@@ -19,52 +19,48 @@
  */
 package com.celements.cells;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import com.celements.cells.attribute.CellAttribute;
 
-public interface ICellWriter {
-
-  @NotNull
-  Stream<String> getOpenLevels();
-
-  void closeLevel();
-
-  void clear();
-
-  @NotNull
-  ICellWriter appendContent(@Nullable String content);
+@NotThreadSafe
+public abstract class AbstractWriter implements ICellWriter {
 
   /**
-   * @deprecated since 6.10, instead use {@link #openLevel(String)}
+   * Entry: tagName (String), hasContent (Boolean)
    */
-  @Deprecated(since = "6.10", forRemoval = true)
-  default void openLevel() {
-    openLevel((String) null);
+  protected final Deque<Entry<String, Boolean>> openLevels = new LinkedList<>();
+
+  protected Optional<Entry<String, Boolean>> getCurrentLevel() {
+    return Optional.ofNullable(openLevels.peek());
   }
 
-  /**
-   * @deprecated since 6.10, instead use {@link #openLevel(String, List)}
-   */
-  @Deprecated
-  default void openLevel(@NotNull List<CellAttribute> attributes) {
-    openLevel((String) null, attributes);
+  protected Optional<Boolean> hasLevelContentOptional() {
+    return getCurrentLevel()
+        .map(Entry::getValue);
   }
 
-  void openLevel(@Nullable String tagName);
+  @Override
+  public void openLevel(@Nullable String tagName) {
+    openLevel(tagName, Collections.<CellAttribute>emptyList());
+  }
 
-  void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes);
+  @Override
+  public final Stream<String> getOpenLevels() {
+    return openLevels.stream().map(Entry::getKey);
+  }
 
-  boolean hasLevelContent();
-
-  @NotNull
-  String getAsString();
-
-  @NotNull
-  StringBuilder getAsStringBuilder();
+  @Override
+  public void clear() {
+    openLevels.clear();
+  }
 
 }

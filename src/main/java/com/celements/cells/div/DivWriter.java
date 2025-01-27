@@ -17,41 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.cells;
+package com.celements.cells.div;
 
 import static com.celements.common.MoreOptional.*;
 import static com.google.common.base.Preconditions.*;
-import static com.google.common.base.Strings.*;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
+import com.celements.cells.AbstractWriter;
 import com.celements.cells.attribute.CellAttribute;
 
 @NotThreadSafe
-public class DivWriter implements ICellWriter {
+public class DivWriter extends AbstractWriter {
 
-  private static final String TAGNAME_DIV = "div";
+  public static final String DEFAULT_TAGNAME = "div";
   private static final Set<String> VOID_ELEMENTS = Set.of("area", "base", "br", "col", "embed",
       "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr");
 
   private final StringBuilder out;
-
-  /**
-   * Entry: tagName (String), hasContent (Boolean)
-   */
-  private final Deque<Entry<String, Boolean>> openLevels = new LinkedList<>();
 
   public DivWriter() {
     this(new StringBuilder());
@@ -59,15 +51,6 @@ public class DivWriter implements ICellWriter {
 
   public DivWriter(StringBuilder out) {
     this.out = checkNotNull(out);
-  }
-
-  private Optional<Entry<String, Boolean>> getCurrentLevel() {
-    return Optional.ofNullable(openLevels.peek());
-  }
-
-  @Override
-  public Stream<String> getOpenLevels() {
-    return openLevels.stream().map(Entry::getKey);
   }
 
   @Override
@@ -81,23 +64,8 @@ public class DivWriter implements ICellWriter {
   }
 
   @Override
-  public void openLevel() {
-    openLevel(TAGNAME_DIV);
-  }
-
-  @Override
-  public void openLevel(List<CellAttribute> attributes) {
-    openLevel(TAGNAME_DIV, attributes);
-  }
-
-  @Override
-  public void openLevel(String tagName) {
-    openLevel(tagName, Collections.<CellAttribute>emptyList());
-  }
-
-  @Override
-  public void openLevel(String tagName, List<CellAttribute> attributes) {
-    tagName = asNonBlank(tagName).orElse(TAGNAME_DIV);
+  public void openLevel(@Nullable String tagName, @NotNull List<CellAttribute> attributes) {
+    tagName = asNonBlank(tagName).orElse(DEFAULT_TAGNAME);
     getCurrentLevel().ifPresent(e -> e.setValue(true));
     openLevels.push(new SimpleEntry<>(tagName, false));
     out.append("<");
@@ -116,27 +84,26 @@ public class DivWriter implements ICellWriter {
   }
 
   @Override
-  public void clear() {
-    out.setLength(0);
-    openLevels.clear();
-  }
-
-  @Override
   public boolean hasLevelContent() {
-    return getCurrentLevel()
-        .map(Entry::getValue)
+    return hasLevelContentOptional()
         .orElse(out.length() > 0);
   }
 
   @Override
-  public DivWriter appendContent(String content) {
-    content = nullToEmpty(content).trim();
-    if (!content.isEmpty() && !getOpenLevels().findFirst()
+  public DivWriter appendContent(@Nullable String content) {
+    final String con = Objects.toString(content, "").trim();
+    if (!con.isEmpty() && !getOpenLevels().findFirst()
         .map(VOID_ELEMENTS::contains).orElse(false)) {
       getCurrentLevel().ifPresent(e -> e.setValue(true));
-      out.append(content);
+      out.append(con);
     }
     return this;
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    out.setLength(0);
   }
 
   @Override

@@ -29,7 +29,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.cells.cmd.PageDependentDocumentReferenceCommand;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -39,6 +39,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class CellsScriptService implements ScriptService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CellsScriptService.class);
+
+  @Requirement
+  LayoutServiceRole layoutService;
 
   @Requirement
   Execution execution;
@@ -134,7 +137,7 @@ public class CellsScriptService implements ScriptService {
       return injected_pageDepDocRefCmd;
     }
     PageDependentDocumentReferenceCommand pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
-    pageDepDocRefCmd.setCurrentLayoutRef(new PageLayoutCommand().getCurrentRenderingLayout());
+    pageDepDocRefCmd.setCurrentLayoutRef(layoutService.getCurrentRenderingLayout());
     return pageDepDocRefCmd;
   }
 

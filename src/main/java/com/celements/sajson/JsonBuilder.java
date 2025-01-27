@@ -63,6 +63,12 @@ public class JsonBuilder {
     onFirstElement = other.onFirstElement;
   }
 
+  public void clear() {
+    commandStack.clear();
+    json.setLength(0);
+    onFirstElement = true;
+  }
+
   Deque<ECommand> getCommandStack() {
     return commandStack;
   }

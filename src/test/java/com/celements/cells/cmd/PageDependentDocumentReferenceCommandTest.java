@@ -1,6 +1,5 @@
 package com.celements.cells.cmd;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -21,7 +20,7 @@ import com.celements.cells.classes.PageDepCellConfigClass;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.service.ITreeNodeService;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -40,12 +39,14 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
   private ComponentDescriptor<EntityReferenceValueProvider> defaultValueProviderDesc;
   private EntityReferenceValueProvider savedDefaultValueProviderService;
   private EntityReferenceValueProvider defValueProviderMock;
+  private LayoutServiceRole layoutService;
 
   @Before
   public void prepare() throws Exception {
-    context = getContext();
-    xwiki = getWikiMock();
-    registerComponentMock(IModelAccessFacade.class);
+    registerComponentMocks(IModelAccessFacade.class, LayoutServiceRole.class);
+    context = getXContext();
+    xwiki = getMock(XWiki.class);
+    layoutService = getMock(LayoutServiceRole.class);
     document = createDefaultMock(XWikiDocument.class);
     cellDocRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
     cellDoc = new XWikiDocument(cellDocRef);
@@ -68,23 +69,6 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
   }
 
   @Test
-  public void test_getPageLayoutCmd() {
-    pageDepDocRefCmd.pageLayoutCmd = null;
-    replayDefault();
-    assertNotNull(pageDepDocRefCmd.getPageLayoutCmd());
-    verifyDefault();
-  }
-
-  @Test
-  public void test_inject_pageLayoutCmdMock() {
-    PageLayoutCommand pageLayoutCmdMock = createDefaultMock(PageLayoutCommand.class);
-    pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
-    replayDefault();
-    assertSame(pageLayoutCmdMock, pageDepDocRefCmd.getPageLayoutCmd());
-    verifyDefault();
-  }
-
-  @Test
   public void test_getPageDepCellConfigClassDocRef() {
     replayDefault();
     assertEquals(new DocumentReference(context.getDatabase(),
@@ -96,11 +80,9 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
 
   @Test
   public void test_getCurrentLayoutRef() {
-    PageLayoutCommand pageLayoutCmdMock = createDefaultMock(PageLayoutCommand.class);
-    pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
     SpaceReference expectedLayoutRef = new SpaceReference("MyLayout", new WikiReference(
         context.getDatabase()));
-    expect(pageLayoutCmdMock.getPageLayoutForCurrentDoc()).andReturn(expectedLayoutRef).once();
+    expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(expectedLayoutRef).once();
     replayDefault();
     assertEquals(expectedLayoutRef, pageDepDocRefCmd.getCurrentLayoutRef());
     verifyDefault();
@@ -108,8 +90,6 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
 
   @Test
   public void test_getCurrentLayoutRef_injectLayout() {
-    PageLayoutCommand pageLayoutCmdMock = createDefaultMock(PageLayoutCommand.class);
-    pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
     SpaceReference expectedLayoutRef = new SpaceReference("MyLayout", new WikiReference(
         context.getDatabase()));
     pageDepDocRefCmd.setCurrentLayoutRef(expectedLayoutRef);

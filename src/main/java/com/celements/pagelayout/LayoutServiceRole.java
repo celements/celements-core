@@ -14,6 +14,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.cells.HtmlDoctype;
+import com.celements.navigation.TreeNode;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -26,11 +27,42 @@ public interface LayoutServiceRole {
 
   boolean deleteLayout(@NotNull SpaceReference layoutSpaceRef);
 
+  /**
+   * @deprecated instead use {@link #renderLayout()})
+   */
+  @Deprecated(since = "6.10", forRemoval = true)
   @NotNull
-  String renderPageLayout();
+  default String renderPageLayout() {
+    return renderLayout();
+  }
 
   @NotNull
-  String renderPageLayout(@Nullable SpaceReference layoutSpaceRef);
+  String renderLayout();
+
+  /**
+   * @deprecated instead use {@link #renderLayout(SpaceReference)})
+   */
+  @Deprecated(since = "6.10", forRemoval = true)
+  @NotNull
+  default String renderPageLayout(@Nullable SpaceReference layoutSpaceRef) {
+    return renderLayout(layoutSpaceRef);
+  }
+
+  /**
+   * renderLayout(SpaceReference) does NOT check any access rights. Or if the given
+   * layout exists. This MUST be done before calling renderLayout(SpaceReference).
+   *
+   * @param layoutSpaceRef
+   * @return
+   */
+  @NotNull
+  String renderLayout(@Nullable SpaceReference layoutSpaceRef);
+
+  @NotNull
+  String renderLayoutAsJson(@Nullable SpaceReference layoutSpaceRef);
+
+  @NotNull
+  Optional<String> renderLayoutPartial(@Nullable DocumentReference startNodeRef);
 
   /**
    * getPageLayoutForCurrentDoc checks that the layout returned exists and that it may be
@@ -42,14 +74,25 @@ public interface LayoutServiceRole {
   SpaceReference getPageLayoutForCurrentDoc();
 
   /**
-   * renderPageLayout(SpaceReference) does NOT check any access rights. Or if the given
-   * layout exists. This MUST be done before calling renderPageLayout(SpaceReference).
+   * @deprecated instead use {@link #renderLayoutLocal(SpaceReference)})
+   */
+  @Deprecated(since = "6.10", forRemoval = true)
+  @NotNull
+  default String renderPageLayoutLocal(@Nullable SpaceReference layoutSpaceRef) {
+    return renderLayoutLocal(layoutSpaceRef);
+  }
+
+  String renderLayoutPartialLocal(TreeNode startNode);
+
+  /**
+   * renderLayoutLocal(SpaceReference) does NOT check any access rights. Or if the given
+   * layout exists. This MUST be done before calling renderLayoutLocal(SpaceReference).
    *
    * @param layoutSpaceRef
    * @return
    */
   @NotNull
-  String renderPageLayoutLocal(@Nullable SpaceReference layoutSpaceRef);
+  String renderLayoutLocal(@Nullable SpaceReference layoutSpaceRef);
 
   @Nullable
   SpaceReference getPageLayoutForDoc(@Nullable DocumentReference documentReference);

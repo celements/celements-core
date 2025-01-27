@@ -73,18 +73,15 @@ import com.celements.model.context.ModelContext;
 import com.celements.model.util.EntityTypeUtil;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
-import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.rendering.RenderCommand;
-import com.celements.rendering.XHTMLtoHTML5cleanup;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.sajson.Builder;
 import com.celements.web.CelConstant;
 import com.celements.web.plugin.cmd.CelSendMail;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.google.common.base.MoreObjects;
 import com.xpn.xwiki.XWikiContext;
@@ -1238,36 +1235,6 @@ public class WebUtilsService implements IWebUtilsService {
       // on disk template path.
       return true;
     }
-  }
-
-  private PageLayoutCommand getPageLayoutCmd() {
-    if (!getContext().containsKey(LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND)) {
-      getContext().put(LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
-    }
-    return (PageLayoutCommand) getContext().get(LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND);
-  }
-
-  @Deprecated
-  @Override
-  public String cleanupXHTMLtoHTML5(String xhtml) {
-    return cleanupXHTMLtoHTML5(xhtml, getContext().getDoc().getDocumentReference());
-  }
-
-  @Deprecated
-  @Override
-  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference docRef) {
-    return cleanupXHTMLtoHTML5(xhtml, getPageLayoutCmd().getPageLayoutForDoc(docRef));
-  }
-
-  @Deprecated
-  @Override
-  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef) {
-    BaseObject layoutObj = getPageLayoutCmd().getLayoutPropertyObj(layoutRef);
-    if ((layoutObj != null) && "HTML 5".equals(layoutObj.getStringValue("doctype"))) {
-      XHTMLtoHTML5cleanup html5Cleaner = Utils.getComponent(XHTMLtoHTML5cleanup.class);
-      return html5Cleaner.cleanAll(xhtml);
-    }
-    return xhtml;
   }
 
   @Override

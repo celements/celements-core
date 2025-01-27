@@ -35,7 +35,6 @@ import com.celements.auth.AccountActivationFailedException;
 import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.css.CssScriptService;
 import com.celements.emptycheck.service.EmptyCheckScriptService;
-import com.celements.filebase.FileBaseScriptService;
 import com.celements.javascript.JSScriptService;
 import com.celements.mailsender.CelMailScriptService;
 import com.celements.navigation.NavigationApi;
@@ -44,7 +43,6 @@ import com.celements.navigation.service.ITreeNodeService;
 import com.celements.navigation.service.TreeNodeCache;
 import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.nextfreedoc.NextFreeDocScriptService;
-import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.sajson.Builder;
@@ -57,7 +55,6 @@ import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.ContextMenuScriptService;
 import com.celements.web.service.EditorSupportScriptService;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.service.LegacySkinScriptService;
 import com.celements.web.service.WebUtilsScriptService;
 import com.celements.web.service.WebUtilsService;
 import com.celements.web.utils.SuggestBaseClass;
@@ -90,12 +87,6 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public static final String JAVA_SCRIPT_FILES_COMMAND_KEY = JSScriptService.JAVA_SCRIPT_FILES_COMMAND_KEY;
 
-  /**
-   * @Deprecated: since 2.59 instead use variable in {@link IWebUtilsService}
-   */
-  @Deprecated
-  public static final String CELEMENTS_PAGE_LAYOUT_COMMAND = LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND;
-
   private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebPluginApi.class);
 
   private CelementsWebPlugin plugin;
@@ -107,15 +98,6 @@ public class CelementsWebPluginApi extends Api {
   public CelementsWebPluginApi(CelementsWebPlugin plugin, XWikiContext context) {
     super(context);
     setPlugin(plugin);
-  }
-
-  /**
-   * @deprecated since 2.59
-   */
-  @Deprecated
-  // FIXME must check programming Rights!!!
-  public CelementsWebPlugin getPlugin() {
-    return plugin;
   }
 
   /**
@@ -550,60 +532,6 @@ public class CelementsWebPluginApi extends Api {
         possibleLogins, noRedirect);
   }
 
-  private PageLayoutCommand getPageLayoutCmd() {
-    if (!context.containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
-      context.put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
-    }
-    return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
-  }
-
-  /**
-   * @deprecated since 2.82 instead use
-   *             {@link LayoutScriptService #canRenderLayout(SpaceReference)}
-   */
-  @Deprecated
-  public boolean canRenderLayout(SpaceReference spaceRef) {
-    return getPageLayoutCmd().canRenderLayout(spaceRef);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link LayoutScriptService #renderPageLayout(SpaceReference)}
-   */
-  @Deprecated
-  public String renderPageLayout(SpaceReference spaceRef) {
-    return getLayoutScriptService().renderPageLayout(spaceRef);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
-   *             {@link LayoutScriptService #renderCelementsDocumentWithLayout(DocumentReference,
-   *             SpaceReference)}
-   */
-  @Deprecated
-  public String renderCelementsDocumentWithLayout(DocumentReference docRef,
-      SpaceReference layoutSpaceRef) {
-    return getLayoutScriptService().renderCelementsDocumentWithLayout(docRef, layoutSpaceRef);
-  }
-
-  /**
-   * @deprecated since 2.18.0 instead use
-   *             {@link LayoutScriptService #renderPageLayout(SpaceReference)}
-   */
-  @Deprecated
-  public String renderPageLayout(String spaceName) {
-    return getPageLayoutCmd().renderPageLayoutLocal(getWebUtilsService().resolveSpaceReference(
-        spaceName));
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link LayoutScriptService #renderPageLayout()}
-   */
-  @Deprecated
-  public String renderPageLayout() {
-    return getLayoutScriptService().renderPageLayout();
-  }
-
   /**
    * @deprecated since 2.59 instead use
    *             {@link CelementsWebScriptService #addTranslation(DocumentReference, String)}
@@ -683,24 +611,6 @@ public class CelementsWebPluginApi extends Api {
   public String navReorderSave(String fullName, String structureJSON) {
     return getTreeNodeScriptService().navReorderSave(getWebUtilsService().resolveDocumentReference(
         fullName), structureJSON);
-  }
-
-  /**
-   * @deprecated since 2.34.0 instead use
-   *             {@link LayoutScriptService #layoutExists(SpaceReference)}
-   */
-  @Deprecated
-  public boolean layoutExists(String layoutSpaceName) {
-    return this.layoutExists(getWebUtilsService().resolveSpaceReference(layoutSpaceName));
-  }
-
-  /**
-   * @deprecated since 2.34.0 instead use
-   *             {@link LayoutScriptService #layoutExists(SpaceReference)}
-   */
-  @Deprecated
-  public boolean layoutExists(SpaceReference layoutSpaceRef) {
-    return getLayoutScriptService().layoutExists(layoutSpaceRef);
   }
 
   /**
@@ -837,14 +747,6 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public String getCaptchaId() {
     return new CaptchaCommand().getCaptchaId(context);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use {@link LayoutScriptService #useXWikiLoginLayout()}
-   */
-  @Deprecated
-  public boolean useXWikiLoginLayout() {
-    return getLayoutScriptService().useXWikiLoginLayout();
   }
 
   /**
@@ -1006,20 +908,8 @@ public class CelementsWebPluginApi extends Api {
     return (ActionScriptService) Utils.getComponent(ScriptService.class, "action");
   }
 
-  private LayoutScriptService getLayoutScriptService() {
-    return (LayoutScriptService) Utils.getComponent(ScriptService.class, "layout");
-  }
-
   private CssScriptService getCSSScriptService() {
     return (CssScriptService) Utils.getComponent(ScriptService.class, "css");
-  }
-
-  private LegacySkinScriptService getLegacySkinScriptService() {
-    return (LegacySkinScriptService) Utils.getComponent(ScriptService.class, "legacyskin");
-  }
-
-  private FileBaseScriptService getFileBaseScriptService() {
-    return (FileBaseScriptService) Utils.getComponent(ScriptService.class, "filebase");
   }
 
   private NextFreeDocScriptService getNextFreeDocScriptService() {

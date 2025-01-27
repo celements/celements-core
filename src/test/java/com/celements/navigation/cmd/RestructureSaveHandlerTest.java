@@ -19,7 +19,6 @@
  */
 package com.celements.navigation.cmd;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -39,6 +38,7 @@ import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
+import com.celements.pagelayout.LayoutServiceRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -51,10 +51,10 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
 
   @Before
   public void setUp_RestructureSaveCommandTest() throws Exception {
-    registerComponentMocks(IModelAccessFacade.class);
+    registerComponentMocks(IModelAccessFacade.class, LayoutServiceRole.class);
     registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
         getConfigurationSource());
-    context = getContext();
+    context = getXContext();
     restrSaveCmd = new ReorderSaveHandler();
   }
 
@@ -164,10 +164,10 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
 
   @Test
   public void testParentReference_DocumentReference_entityRef() {
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+    DocumentReference docRef = new DocumentReference(getXContext().getDatabase(), "MySpace",
         "MyDoc1");
     XWikiDocument xdoc = new XWikiDocument(docRef);
-    DocumentReference parentRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(getXContext().getDatabase(), "MySpace",
         "ParentDoc");
     xdoc.setParentReference((EntityReference) parentRef);
     assertEquals(xdoc.getParentReference().getClass(), DocumentReference.class);
@@ -181,7 +181,7 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
 
   @Test
   public void testGetRelativeParentReference() {
-    DocumentReference parentRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(getXContext().getDatabase(), "MySpace",
         "ParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     EntityReference parentEntityRef = restrSaveCmd.getRelativeParentReference();

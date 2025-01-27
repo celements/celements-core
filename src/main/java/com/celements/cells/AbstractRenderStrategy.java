@@ -29,7 +29,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,77 +52,71 @@ import com.celements.model.context.Contextualiser;
 import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.TreeNode;
-import com.celements.pagelayout.LayoutServiceRole;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
-import com.celements.rendering.RenderCommand;
 import com.celements.velocity.VelocityService;
 import com.celements.web.classes.KeyValueClass;
 import com.celements.web.service.CelementsWebScriptService;
 import com.google.common.primitives.Ints;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 @Immutable
-public class CellRenderStrategy implements IRenderStrategy {
+public abstract class AbstractRenderStrategy implements IRenderStrategy {
 
-  public static final String EXEC_CTX_KEY = "celements.cell";
-  public static final String EXEC_CTX_KEY_DOC_SUFFIX = ".document";
-  public static final String EXEC_CTX_KEY_DOC = EXEC_CTX_KEY + EXEC_CTX_KEY_DOC_SUFFIX;
-  public static final String EXEC_CTX_KEY_OBJ_NB_SUFFIX = ".number";
-  public static final String EXEC_CTX_KEY_OBJ_NB = EXEC_CTX_KEY + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
-  public static final String EXEC_CTX_KEY_GLOBAL = CelementsWebScriptService.CEL_GLOBALVAL_PREFIX
+  protected static final String EXEC_CTX_KEY = "celements.cell";
+  protected static final String EXEC_CTX_KEY_DOC_SUFFIX = ".document";
+  protected static final String EXEC_CTX_KEY_DOC = EXEC_CTX_KEY + EXEC_CTX_KEY_DOC_SUFFIX;
+  protected static final String EXEC_CTX_KEY_OBJ_NB_SUFFIX = ".number";
+  protected static final String EXEC_CTX_KEY_OBJ_NB = EXEC_CTX_KEY + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
+  protected static final String EXEC_CTX_KEY_GLOBAL = CelementsWebScriptService.CEL_GLOBALVAL_PREFIX
       + "cell";
-  public static final String EXEC_CTX_KEY_GLOBAL_OBJ_NB = EXEC_CTX_KEY_GLOBAL
+  protected static final String EXEC_CTX_KEY_GLOBAL_OBJ_NB = EXEC_CTX_KEY_GLOBAL
       + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
   public static final String EXEC_CTX_KEY_REPETITIVE = EXEC_CTX_KEY + ".repetitive";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CellRenderStrategy.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRenderStrategy.class);
 
-  private final ICellWriter cellWriter;
-  private final RenderCommand rendererCmd;
+  protected final ICellWriter cellWriter;
 
-  private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-  private final ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
-  private final Execution execution = Utils.getComponent(Execution.class);
-  private final VelocityService velocityService = Utils.getComponent(VelocityService.class);
+  protected final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
+  protected final ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
+  protected final Execution execution = Utils.getComponent(Execution.class);
+  protected final VelocityService velocityService = Utils.getComponent(VelocityService.class);
+  protected final IPageTypeResolverRole pageTypeResolver = Utils
+      .getComponent(IPageTypeResolverRole.class);
+  protected final IPageTypeRole pageTypeService = Utils.getComponent(IPageTypeRole.class);
 
-  public CellRenderStrategy() {
-    this(new DivWriter(), new RenderCommand());
-  }
-
-  public CellRenderStrategy(ICellWriter cellWriter, RenderCommand rendererCmd) {
+  protected AbstractRenderStrategy(ICellWriter cellWriter) {
     this.cellWriter = checkNotNull(cellWriter);
-    this.rendererCmd = checkNotNull(rendererCmd);
   }
 
   @Override
-  public void endRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
+  public void endRenderCell(@Nullable TreeNode node, boolean isFirstItem, boolean isLastItem) {
     cellWriter.closeLevel();
   }
 
   @Override
-  public void endRenderChildren(EntityReference parentRef) {}
+  public void endRenderChildren(@Nullable EntityReference parentRef) {}
 
   @Override
   public void endRendering() {}
 
   @Override
-  public String getMenuPart(TreeNode node) {
+  public String getMenuPart(@Nullable TreeNode node) {
     return "";
   }
 
   @Override
-  public boolean isRenderCell(TreeNode node) {
+  public boolean isRenderCell(@Nullable TreeNode node) {
     return node != null;
   }
 
   @Override
-  public Contextualiser getContextualiser(TreeNode node) {
+  public final Contextualiser getContextualiser(@Nullable TreeNode node) {
     Contextualiser contextualiser = new Contextualiser();
     if (node != null) {
       LOGGER.trace("getContextualiser: cell [{}]", node.getDocumentReference());
@@ -147,12 +143,12 @@ public class CellRenderStrategy implements IRenderStrategy {
   }
 
   @Override
-  public boolean isRenderSubCells(EntityReference parentRef) {
+  public boolean isRenderSubCells(@Nullable EntityReference parentRef) {
     return parentRef != null;
   }
 
   @Override
-  public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
+  public void startRenderCell(@NotNull TreeNode node, boolean isFirstItem, boolean isLastItem) {
     AttributeBuilder attrBuilder = new DefaultAttributeBuilder().addCssClasses("cel_cell");
     DocumentReference cellDocRef = node.getDocumentReference();
     LOGGER.debug("startRenderCell: cellDocRef [{}]", cellDocRef);
@@ -182,7 +178,7 @@ public class CellRenderStrategy implements IRenderStrategy {
     }
   }
 
-  Optional<String> getTagName(DocumentReference cellDocRef) {
+  protected Optional<String> getTagName(DocumentReference cellDocRef) {
     Optional<String> tagName = XWikiObjectFetcher.on(modelAccess.getOrCreateDocument(cellDocRef))
         .fetchField(CellClass.FIELD_TAG_NAME).stream().findFirst();
     if (!tagName.isPresent()) {
@@ -245,16 +241,15 @@ public class CellRenderStrategy implements IRenderStrategy {
     }
   }
 
-  Optional<IPageTypeConfig> getCellTypeConfig(DocumentReference cellDocRef) {
-    PageTypeReference cellTypeRef = getPageTypeResolver()
+  protected Optional<IPageTypeConfig> getCellTypeConfig(DocumentReference cellDocRef) {
+    PageTypeReference cellTypeRef = pageTypeResolver
         .resolvePageTypeReferenceWithDefault(cellDocRef);
-    IPageTypeConfig cellTypeConfig = getPageTypeService()
-        .getPageTypeConfigForPageTypeRef(cellTypeRef);
+    IPageTypeConfig cellTypeConfig = pageTypeService.getPageTypeConfigForPageTypeRef(cellTypeRef);
     return Optional.ofNullable(cellTypeConfig);
   }
 
   @Override
-  public void startRenderChildren(EntityReference parentRef) {}
+  public void startRenderChildren(@Nullable EntityReference parentRef) {}
 
   @Override
   public void startRendering() {
@@ -264,33 +259,6 @@ public class CellRenderStrategy implements IRenderStrategy {
   @Override
   public String getAsString() {
     return cellWriter.getAsString();
-  }
-
-  @Override
-  public void renderEmptyChildren(TreeNode node) {
-    String cellContent = "";
-    try {
-      LOGGER.debug("renderEmptyChildren: parent [{}].", node);
-      long millisec = System.currentTimeMillis();
-      cellContent = rendererCmd.renderCelementsCell(node.getDocumentReference());
-      LOGGER.info("renderEmptyChildren: rendered parent [{}]. Time used in millisec: {}", node,
-          (System.currentTimeMillis() - millisec));
-    } catch (XWikiException exp) {
-      LOGGER.error("failed to get cell [{}] document to render cell content.", node, exp);
-    }
-    cellWriter.appendContent(cellContent);
-  }
-
-  IPageTypeResolverRole getPageTypeResolver() {
-    return Utils.getComponent(IPageTypeResolverRole.class);
-  }
-
-  IPageTypeRole getPageTypeService() {
-    return Utils.getComponent(IPageTypeRole.class);
-  }
-
-  LayoutServiceRole getLayoutService() {
-    return Utils.getComponent(LayoutServiceRole.class);
   }
 
 }
