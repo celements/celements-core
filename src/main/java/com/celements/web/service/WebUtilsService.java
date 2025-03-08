@@ -1284,6 +1284,11 @@ public class WebUtilsService implements IWebUtilsService {
     return Utils.getComponent(IPageTypeResolverRole.class);
   }
 
+  /**
+   * @deprecated since 6.11 use {@link com.celements.mailsender.IMailSenderRole#sendMail} directly
+   *             instead
+   */
+  @Deprecated(since = "6.11", forRemoval = true)
   @Override
   public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
       List<String> params) {
