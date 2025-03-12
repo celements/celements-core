@@ -60,7 +60,6 @@ com.celements.navigation.NavigationClassConfig
 com.celements.webform.ActionScriptService
 com.celements.webform.ActionService
 com.celements.css.CssScriptService
-com.celements.mailsender.CelMailScriptService
 com.celements.docform.DocFormScriptService
 com.celements.web.service.EditorSupportScriptService
 com.celements.emptycheck.service.EmptyCheckScriptService
@@ -95,8 +94,6 @@ com.celements.parents.NavigationParents
 com.celements.navigation.listener.NavigationCacheFlushingListener
 com.celements.web.service.DeprecatedUsageScriptService
 com.celements.web.classcollections.OldCoreClassConfig
-com.celements.web.plugin.cmd.CelSendMail
-com.celements.mailsender.CelMailSenderService
 com.celements.lastChanged.LastChangedService
 com.celements.lastChanged.DocumentChangesListener
 com.celements.filebase.SingleDocFileBaseService

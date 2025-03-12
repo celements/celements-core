@@ -1135,10 +1135,10 @@ public class WebUtilsService implements IWebUtilsService {
             && getModelAccess().exists(getCentralTemplateRef(localTemplateRef))) {
           templatePath = "celements2web:" + templatePath;
         } else {
-          templatePath = ":" + templatePath.replaceAll("celements2web:", "");
+          templatePath = ":" + templatePath.replace("celements2web:", "");
         }
       }
-      return templatePath.replaceAll(getContext().getDatabase() + ":", "");
+      return templatePath.replace(getContext().getDatabase() + ":", "");
     }
     return null;
   }
@@ -1208,8 +1208,8 @@ public class WebUtilsService implements IWebUtilsService {
       renderCommand.setRenderingEngine(this.injectedRenderingEngine);
     }
     String templatePath = getInheritedTemplatedPath(docRef);
-    LOGGER.debug("renderInheritableDocument: call renderTemplatePath for [" + templatePath
-        + "] and lang [" + lang + "] and defLang [" + defLang + "].");
+    LOGGER.debug("renderInheritableDocument: call renderTemplatePath for [{}] and lang [{}]"
+        + " and defLang [{}].", templatePath, lang, defLang);
     return renderCommand.renderTemplatePath(templatePath, lang, defLang);
   }
 
@@ -1284,6 +1284,11 @@ public class WebUtilsService implements IWebUtilsService {
     return Utils.getComponent(IPageTypeResolverRole.class);
   }
 
+  /**
+   * @deprecated since 6.11 use {@link com.celements.mailsender.IMailSenderRole#sendMail} directly
+   *             instead
+   */
+  @Deprecated(since = "6.11", forRemoval = true)
   @Override
   public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
       List<String> params) {

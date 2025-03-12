@@ -36,7 +36,6 @@ import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.css.CssScriptService;
 import com.celements.emptycheck.service.EmptyCheckScriptService;
 import com.celements.javascript.JSScriptService;
-import com.celements.mailsender.CelMailScriptService;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
@@ -385,38 +384,11 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link CelMailScriptService #sendMail(String, String, String, String, String,
-   *             String, String, String, List, Map)}
-   */
-  @Deprecated
-  public int sendMail(String from, String replyTo, String to, String cc, String bcc, String subject,
-      String htmlContent, String textContent, List<Attachment> attachments,
-      Map<String, String> others) {
-    return getCelMailScriptService().sendMail(from, replyTo, to, cc, bcc, subject, htmlContent,
-        textContent, attachments, others);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
    *             {@link WebUtilsScriptService #getAttachmentsForDocs(List)}
    */
   @Deprecated
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
     return getWebUtilsScriptService().getAttachmentsForDocs(docsFN);
-  }
-
-  /**
-   * @deprecated since 2.59
-   */
-  @Deprecated
-  public int sendLatin1Mail(String from, String replyTo, String to, String cc, String bcc,
-      String subject, String htmlContent, String textContent, List<Attachment> attachments,
-      Map<String, String> others) {
-    DocumentReference docRef = context.getDoc().getDocumentReference();
-    LOGGER.warn("usage of deprecated sendLatin1Mail on [" + getWebUtilsService().serializeRef(
-        docRef) + "].");
-    return plugin.sendMail(from, replyTo, to, cc, bcc, subject, htmlContent, textContent,
-        attachments, others, true, context);
   }
 
   /**
@@ -914,10 +886,6 @@ public class CelementsWebPluginApi extends Api {
 
   private NextFreeDocScriptService getNextFreeDocScriptService() {
     return (NextFreeDocScriptService) Utils.getComponent(ScriptService.class, "nextfreedoc");
-  }
-
-  private CelMailScriptService getCelMailScriptService() {
-    return (CelMailScriptService) Utils.getComponent(ScriptService.class, "celmail");
   }
 
   private JSScriptService getJSScriptService() {

@@ -468,7 +468,10 @@ public interface IWebUtilsService {
    *          recipients
    * @param params
    *          list of strings passed through to dictionary subject resolving
+   * @deprecated since 6.11 use {@link com.celements.mailsender.IMailSenderRole#sendMail} directly
+   *             instead
    */
+  @Deprecated(since = "6.11", forRemoval = true)
   void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
       List<String> params);
 

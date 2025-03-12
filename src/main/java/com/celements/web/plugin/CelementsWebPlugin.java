@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import com.celements.auth.AccountActivationFailedException;
 import com.celements.auth.IAuthenticationServiceRole;
-import com.celements.mailsender.IMailSenderRole;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
@@ -158,33 +157,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
           XWikiException.ERROR_XWIKI_UNKNOWN, "activateAccount failed.", authExp);
     }
-  }
-
-  // TODO Delegation can be removed as soon as latin1 flag can be removed
-  /**
-   * @deprecated since 2.19.0 instead use IMailSenderRole service directly.
-   */
-  @Deprecated
-  public int sendMail(String from, String replyTo, String to, String cc, String bcc, String subject,
-      String htmlContent, String textContent, List<Attachment> attachments,
-      Map<String, String> others, XWikiContext context) {
-    return sendMail(from, replyTo, to, cc, bcc, subject, htmlContent, textContent, attachments,
-        others, false, context);
-  }
-
-  /**
-   * @deprecated since 2.19.0 instead use IMailSenderRole service directly.
-   */
-  @Deprecated
-  public int sendMail(String from, String replyTo, String to, String cc, String bcc, String subject,
-      String htmlContent, String textContent, List<Attachment> attachments,
-      Map<String, String> others, boolean isLatin1, XWikiContext context) {
-    return getMailSenderService().sendMail(from, replyTo, to, cc, bcc, subject, htmlContent,
-        textContent, attachments, others, isLatin1);
-  }
-
-  private IMailSenderRole getMailSenderService() {
-    return Utils.getComponent(IMailSenderRole.class);
   }
 
   /**
