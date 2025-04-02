@@ -67,14 +67,14 @@ import com.xpn.xwiki.web.Utils;
 @Immutable
 public abstract class AbstractRenderStrategy implements IRenderStrategy {
 
-  protected static final String EXEC_CTX_KEY = "celements.cell";
-  protected static final String EXEC_CTX_KEY_DOC_SUFFIX = ".document";
-  protected static final String EXEC_CTX_KEY_DOC = EXEC_CTX_KEY + EXEC_CTX_KEY_DOC_SUFFIX;
-  protected static final String EXEC_CTX_KEY_OBJ_NB_SUFFIX = ".number";
-  protected static final String EXEC_CTX_KEY_OBJ_NB = EXEC_CTX_KEY + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
-  protected static final String EXEC_CTX_KEY_GLOBAL = CelementsWebScriptService.CEL_GLOBALVAL_PREFIX
+  public static final String EXEC_CTX_KEY = "celements.cell";
+  public static final String EXEC_CTX_KEY_DOC_SUFFIX = ".document";
+  public static final String EXEC_CTX_KEY_DOC = EXEC_CTX_KEY + EXEC_CTX_KEY_DOC_SUFFIX;
+  public static final String EXEC_CTX_KEY_OBJ_NB_SUFFIX = ".number";
+  public static final String EXEC_CTX_KEY_OBJ_NB = EXEC_CTX_KEY + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
+  public static final String EXEC_CTX_KEY_GLOBAL = CelementsWebScriptService.CEL_GLOBALVAL_PREFIX
       + "cell";
-  protected static final String EXEC_CTX_KEY_GLOBAL_OBJ_NB = EXEC_CTX_KEY_GLOBAL
+  public static final String EXEC_CTX_KEY_GLOBAL_OBJ_NB = EXEC_CTX_KEY_GLOBAL
       + EXEC_CTX_KEY_OBJ_NB_SUFFIX;
   public static final String EXEC_CTX_KEY_REPETITIVE = EXEC_CTX_KEY + ".repetitive";
 
