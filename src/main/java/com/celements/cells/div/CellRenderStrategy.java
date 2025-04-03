@@ -21,8 +21,8 @@ package com.celements.cells.div;
 
 import static com.google.common.base.Preconditions.*;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,18 +50,19 @@ public class CellRenderStrategy extends AbstractRenderStrategy {
   }
 
   @Override
-  public void renderEmptyChildren(@NotNull TreeNode node) {
-    String cellContent = "";
-    try {
-      LOGGER.debug("renderEmptyChildren: parent [{}].", node);
-      long millisec = System.currentTimeMillis();
-      cellContent = rendererCmd.renderCelementsCell(node.getDocumentReference());
-      LOGGER.info("renderEmptyChildren: rendered parent [{}]. Time used in millisec: {}", node,
-          (System.currentTimeMillis() - millisec));
-    } catch (XWikiException exp) {
-      LOGGER.error("failed to get cell [{}] document to render cell content.", node, exp);
+  public void renderEmptyChildren(@Nullable TreeNode node) {
+    if (node != null) {
+      try {
+        LOGGER.debug("renderEmptyChildren: parent [{}].", node);
+        long millisec = System.currentTimeMillis();
+        String cellContent = rendererCmd.renderCelementsCell(node.getDocumentReference());
+        LOGGER.info("renderEmptyChildren: rendered parent [{}]. Time used in millisec: {}", node,
+            (System.currentTimeMillis() - millisec));
+        cellWriter.appendContent(cellContent);
+      } catch (XWikiException exp) {
+        LOGGER.error("failed to get cell [{}] document to render cell content.", node, exp);
+      }
     }
-    cellWriter.appendContent(cellContent);
   }
 
 }
