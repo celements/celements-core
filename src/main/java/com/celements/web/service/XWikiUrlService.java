@@ -19,6 +19,10 @@ import com.celements.model.context.ModelContext;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
+/**
+ * @deprecated instead use {@link com.celements.url.UrlService}
+ */
+@Deprecated(since = "6.5", forRemoval = true)
 @Component
 public class XWikiUrlService implements UrlService {
 
