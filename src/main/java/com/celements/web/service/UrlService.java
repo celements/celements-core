@@ -26,6 +26,10 @@ import javax.ws.rs.core.UriBuilder;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.EntityReference;
 
+/**
+ * @deprecated instead use {@link com.celements.url.UrlService}
+ */
+@Deprecated(since = "6.5", forRemoval = true)
 @ComponentRole
 public interface UrlService {
 

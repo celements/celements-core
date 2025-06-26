@@ -29,7 +29,7 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
 import com.celements.model.reference.RefBuilder;
 import com.celements.model.util.ModelUtils;
-import com.celements.web.service.UrlService;
+import com.celements.url.UrlService;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiConfigSource;
 import com.xpn.xwiki.XWikiConstant;

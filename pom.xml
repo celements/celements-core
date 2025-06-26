@@ -24,7 +24,7 @@
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements</artifactId>
-    <version>6.2</version>
+    <version>6.3-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-core</artifactId>
@@ -34,7 +34,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-model</artifactId>
-      <version>6.3</version>
+      <version>6.4-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -51,6 +51,11 @@
     <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <!-- JTidy Has been picked up at https://github.com/jtidy/jtidy and immediately was reabandoned.
