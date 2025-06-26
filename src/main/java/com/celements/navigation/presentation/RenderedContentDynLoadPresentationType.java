@@ -1,10 +1,8 @@
 package com.celements.navigation.presentation;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -16,7 +14,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.context.ModelContext;
 import com.celements.navigation.INavigation;
-import com.celements.web.service.UrlService;
+import com.celements.url.UrlService;
 
 @Component("renderedContentDynLoad")
 public class RenderedContentDynLoadPresentationType extends RenderedContentPresentationType
@@ -55,10 +53,10 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
 
   private @NotNull String getPassThroughParams() {
     return mContext.request()
-    .map(r -> r.getParameterMap().entrySet())
-    .orElse(Set.of())
-    .stream()
-    .filter(entry1 -> !keyBlackList.contains(entry1.getKey()))
+        .map(r -> r.getParameterMap().entrySet())
+        .orElse(Set.of())
+        .stream()
+        .filter(entry1 -> !keyBlackList.contains(entry1.getKey()))
         .flatMap(entry -> List.of(entry.getValue()).stream()
             .map(v -> entry.getKey() + "=" + v))
         .collect(() -> new StringJoiner("&", "&", "").setEmptyValue(""), StringJoiner::add,

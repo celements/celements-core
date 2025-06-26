@@ -14,7 +14,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.reference.RefBuilder;
-import com.celements.web.service.UrlService;
+import com.celements.url.UrlService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
