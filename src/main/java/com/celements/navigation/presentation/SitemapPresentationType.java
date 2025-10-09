@@ -31,7 +31,7 @@ public class SitemapPresentationType extends DefaultPresentationType {
       appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem, navigation);
       addLanguageLinks(outStream, docRef);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to writeNodeContent for docRef [" + docRef + "].", exp);
+      LOGGER.error("Failed to writeNodeContent for docRef '{}'.", docRef, exp);
     }
   }
 
@@ -46,8 +46,8 @@ public class SitemapPresentationType extends DefaultPresentationType {
       for (String lang : webUtilsService.getAllowedLanguages(spaceName)) {
         outStream.append("<a ");
         outStream.append("title=\"" + getLangName(lang) + "\" ");
-        outStream.append("href=\"" + nodeDoc.getURL("edit", "language=" + lang, getContext())
-            + "\" ");
+        outStream.append("href=\"" + nodeDoc.getURL("edit", "language=" + lang
+            + "&windowClose=true", getContext()) + "\" ");
         String cssClasses = "";
         if (lang.equals(defaultLanguage)) {
           cssClasses += " defaultLanguage";
