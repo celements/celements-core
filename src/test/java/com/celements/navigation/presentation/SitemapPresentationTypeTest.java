@@ -92,25 +92,27 @@ public class SitemapPresentationTypeTest extends AbstractComponentTest {
     expect(admMessTool.get(eq("cel_de"))).andReturn("German").once();
     expect(admMessTool.get(eq("cel_fr"))).andReturn("French").once();
     expect(admMessTool.get(eq("cel_en"))).andReturn("English").once();
-    String currDocDeEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=de";
+    String currDocDeEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=de"
+        + "&windowClose=true";
     URL currentDocDeEditUrl = new URL(currDocDeEditUrlStr);
     expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"), eq(
-        "language=de"), (String) isNull(), eq("xwikidb"), same(context))).andReturn(
-            currentDocDeEditUrl);
+        "language=de&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
+            .andReturn(currentDocDeEditUrl);
     expect(urlFactoryMock.getURL(same(currentDocDeEditUrl), same(context))).andReturn(
         currDocDeEditUrlStr);
-    String currDocFrEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=fr";
+    String currDocFrEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=fr"
+        + "&windowClose=true";
     URL currentDocFrEditUrl = new URL(currDocFrEditUrlStr);
     expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"), eq(
-        "language=fr"), (String) isNull(), eq("xwikidb"), same(context))).andReturn(
-            currentDocFrEditUrl);
+        "language=fr&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
+            .andReturn(currentDocFrEditUrl);
     expect(urlFactoryMock.getURL(same(currentDocFrEditUrl), same(context))).andReturn(
         currDocFrEditUrlStr);
-    String currDocEnEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=en";
+    String currDocEnEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=en&windowClose=true";
     URL currentDocEnEditUrl = new URL(currDocEnEditUrlStr);
     expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"), eq(
-        "language=en"), (String) isNull(), eq("xwikidb"), same(context))).andReturn(
-            currentDocEnEditUrl);
+        "language=en&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
+            .andReturn(currentDocEnEditUrl);
     expect(urlFactoryMock.getURL(same(currentDocEnEditUrl), same(context))).andReturn(
         currDocEnEditUrlStr);
     replayAll();
