@@ -118,10 +118,11 @@ public class SitemapPresentationTypeTest extends AbstractComponentTest {
     replayAll();
     sitemapPres.addLanguageLinks(outStream, currentDocRef);
     assertEquals("<div class=\"docLangs\"><a title=\"German\" href=\"" + currDocDeEditUrlStr
-        + "\" target=\"_blank\" class=\"defaultLanguage transExists\">de</a>"
+        + "\" target=\"_blank\" rel=\"opener\" class=\"defaultLanguage transExists\">de</a>"
         + "<a title=\"French\" href=\"" + currDocFrEditUrlStr
-        + "\" target=\"_blank\" class=\"transNotExists\">fr</a><a title=\"English\"" + " href=\""
-        + currDocEnEditUrlStr + "\" target=\"_blank\" class=\"transExists\">" + "en</a></div>",
+        + "\" target=\"_blank\" rel=\"opener\" class=\"transNotExists\">fr</a>"
+        + "<a title=\"English\"" + " href=\"" + currDocEnEditUrlStr + "\" target=\"_blank\""
+        + " rel=\"opener\" class=\"transExists\">" + "en</a></div>",
         outStream.toString());
     verifyAll();
   }
