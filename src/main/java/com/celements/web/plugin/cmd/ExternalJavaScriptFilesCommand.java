@@ -25,10 +25,12 @@ import static com.google.common.base.Preconditions.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
@@ -51,6 +53,7 @@ import com.celements.convert.bean.XObjectBeanConverter;
 import com.celements.javascript.ExtJsFileParameter;
 import com.celements.javascript.JavaScriptExternalFilesClass;
 import com.celements.javascript.JsFileEntry;
+import com.celements.javascript.JsIsRteContent;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.ModelContext;
@@ -300,6 +303,12 @@ public class ExternalJavaScriptFilesCommand {
         + "\"></script>";
   }
 
+  public List<JsFileEntry> getAllRteContentJsFiles() {
+    return extJSfileSet.stream()
+        .filter(fs -> fs.isRteContent() != JsIsRteContent.NO)
+        .collect(Collectors.toList());
+  }
+
   public String getAllExternalJavaScriptFiles() {
     return getAllExternalJavaScriptFiles(null);
   }
@@ -315,7 +324,9 @@ public class ExternalJavaScriptFilesCommand {
 
   private StringBuilder generateJsImportString() {
     final StringBuilder jsIncludesBuilder = new StringBuilder();
-    StreamEx.of(extJSfileSet.stream().map(this::getExtStringForJsFile))
+    StreamEx.of(extJSfileSet.stream()
+        .filter(fs -> fs.isRteContent() != JsIsRteContent.ONLY)
+        .map(this::getExtStringForJsFile))
         .append(extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
         .forEach(tag -> jsIncludesBuilder.append(tag).append("\n"));
     return jsIncludesBuilder;

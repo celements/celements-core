@@ -64,6 +64,12 @@ public final class ExtJsFileParameter {
       return this;
     }
 
+    @NotNull
+    public Builder setIsRteContent(@Nullable JsIsRteContent isRteContent) {
+      this.jsFileEntry.setIsRteContent(isRteContent);
+      return this;
+    }
+
     /**
      * Each call of {@link #build()} creates a new immutable ExtJsFileParameter instance.
      *
@@ -109,6 +115,11 @@ public final class ExtJsFileParameter {
   @NotNull
   public JsLoadMode getLoadMode() {
     return jsFileEntry.getLoadMode();
+  }
+
+  @NotNull
+  public JsIsRteContent getIsRteContent() {
+    return jsFileEntry.isRteContent();
   }
 
   @NotNull

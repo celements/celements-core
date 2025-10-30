@@ -17,10 +17,12 @@ import com.google.common.base.Strings;
 @NotThreadSafe
 public final class JsFileEntry extends ObjectBean {
 
+  private static final JsIsRteContent IS_RTE_CONTENT_DEFAULT = JsIsRteContent.NO;
   private static final JsLoadMode LOAD_MODE_DEFAULT = JsLoadMode.SYNC;
 
   private String jsFileUrl = "";
   private JsLoadMode loadMode = LOAD_MODE_DEFAULT;
+  private JsIsRteContent isRteContent = IS_RTE_CONTENT_DEFAULT;
 
   public JsFileEntry() {
     // Bean needs default constructor
@@ -33,6 +35,7 @@ public final class JsFileEntry extends ObjectBean {
     this.setClassReference(jsFileEntry.getClassReference());
     this.jsFileUrl = jsFileEntry.jsFileUrl;
     this.loadMode = jsFileEntry.loadMode;
+    this.isRteContent = jsFileEntry.isRteContent;
   }
 
   @NotNull
@@ -63,6 +66,10 @@ public final class JsFileEntry extends ObjectBean {
     this.loadMode = Optional.ofNullable(loadMode).orElse(LOAD_MODE_DEFAULT);
   }
 
+  public void setIsRteContent(@Nullable JsIsRteContent isRteContent) {
+    this.isRteContent = Optional.ofNullable(isRteContent).orElse(IS_RTE_CONTENT_DEFAULT);
+  }
+
   /**
    * may contain a query part '/path?x=a&y=b'
    */
@@ -77,6 +84,11 @@ public final class JsFileEntry extends ObjectBean {
       return JsLoadMode.DEFER;
     }
     return loadMode;
+  }
+
+  @NotNull
+  public JsIsRteContent isRteContent() {
+    return isRteContent;
   }
 
   public boolean isValid() {
@@ -101,7 +113,7 @@ public final class JsFileEntry extends ObjectBean {
   @Override
   public String toString() {
     return "JsFileEntry [jsFileUrl=" + jsFileUrl + ", loadMode=" + loadMode
-        + ", " + super.toString() + "]";
+        + ", isRteContent=" + isRteContent + ", " + super.toString() + "]";
   }
 
 }

@@ -1,5 +1,8 @@
 package com.celements.javascript;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -29,6 +32,12 @@ public class JSScriptService implements ScriptService {
 
   public String getAllExternalJavaScriptFiles() {
     return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
+  }
+
+  public List<String> getRteContentJsFiles() {
+    return getExtJavaScriptFileCmd().getAllRteContentJsFiles().stream()
+        .map(JsFileEntry::getFilepath)
+        .collect(Collectors.toList());
   }
 
   /**
