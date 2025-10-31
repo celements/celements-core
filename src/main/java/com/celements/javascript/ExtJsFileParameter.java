@@ -118,7 +118,7 @@ public final class ExtJsFileParameter {
   }
 
   @NotNull
-  public JsIsRteContent getIsRteContent() {
+  public JsIsRteContent isRteContent() {
     return jsFileEntry.isRteContent();
   }
 
