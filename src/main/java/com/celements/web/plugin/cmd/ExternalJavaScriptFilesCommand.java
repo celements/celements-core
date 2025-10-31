@@ -101,6 +101,7 @@ public class ExternalJavaScriptFilesCommand {
   private final Set<String> extJSAttUrlSet = new HashSet<>();
   private final Set<String> extJSnotFoundSet = new LinkedHashSet<>();
   private boolean displayedAll = false;
+  private boolean collectedAll = false;
 
   /**
    * @deprecated since 5.4 instead use {@link ExternalJavaScriptFilesCommand()}
@@ -304,7 +305,11 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public List<JsFileEntry> getAllRteContentJsFiles() {
-    return extJSfileSet.stream()
+    return getAllRteContentJsFiles(null);
+  }
+
+  List<JsFileEntry> getAllRteContentJsFiles(@Nullable AttachmentURLCommand attUrlCmdMock) {
+    return getExtJsFileStream(attUrlCmdMock)
         .filter(fs -> fs.isRteContent() != JsIsRteContent.NO)
         .collect(Collectors.toList());
   }
@@ -314,17 +319,29 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   String getAllExternalJavaScriptFiles(@Nullable AttachmentURLCommand attUrlCmdMock) {
-    streamDocRefs2CollectJsExtFileObj()
-        .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmdMock));
+    getExtJsFileStream(attUrlCmdMock);
     notifyExtJavaScriptFileListener();
     final StringBuilder jsIncludesBuilder = generateJsImportString();
     displayedAll = true;
     return jsIncludesBuilder.toString();
   }
 
+  private Stream<JsFileEntry> getExtJsFileStream(@Nullable AttachmentURLCommand attUrlCmdMock) {
+    ensureCollectAllJsExtFile(attUrlCmdMock);
+    return extJSfileSet.stream();
+  }
+
+  private void ensureCollectAllJsExtFile(AttachmentURLCommand attUrlCmdMock) {
+    if (!collectedAll) {
+      streamDocRefs2CollectJsExtFileObj()
+          .forEachOrdered(docRef -> addAllExtJSfilesFromDocRef(docRef, attUrlCmdMock));
+      collectedAll = true;
+    }
+  }
+
   private StringBuilder generateJsImportString() {
     final StringBuilder jsIncludesBuilder = new StringBuilder();
-    StreamEx.of(extJSfileSet.stream()
+    StreamEx.of(getExtJsFileStream(null)
         .filter(fs -> fs.isRteContent() != JsIsRteContent.ONLY)
         .map(this::getExtStringForJsFile))
         .append(extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
