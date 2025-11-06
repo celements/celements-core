@@ -66,7 +66,7 @@ public final class ExtJsFileParameter {
 
     @NotNull
     public Builder setIsRteContent(@Nullable JsIsRteContent isRteContent) {
-      this.jsFileEntry.setIsRteContent(isRteContent);
+      jsFileEntry.setIsRteContent(isRteContent);
       return this;
     }
 
