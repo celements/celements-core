@@ -24,6 +24,7 @@ import static org.junit.Assert.*;
 import static org.springframework.web.util.UriComponentsBuilder.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
@@ -37,6 +38,7 @@ import com.celements.javascript.ExtJsFileParameter;
 import com.celements.javascript.ExtJsFileParameter.Builder;
 import com.celements.javascript.JavaScriptExternalFilesClass;
 import com.celements.javascript.JsFileEntry;
+import com.celements.javascript.JsIsRteContent;
 import com.celements.javascript.JsLoadMode;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
@@ -255,6 +257,122 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     String scriptEnd = "\"></script>";
     JsFileEntry jsFile = new JsFileEntry().addFilepath(url).addLoadMode(JsLoadMode.ASYNC);
     assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(jsFile));
+  }
+
+  @Test
+  public void test_getAllRteContentJsFiles_Both() throws Exception {
+    String attExtFilePath = "AlumniLayout.WebHome;tailwind.js";
+    String attExtFileUrl = "/file/AlumniLayout/WebHome/tailwind.js";
+    BaseObject extJsFileObj = new BaseObject();
+    extJsFileObj.setXClassReference(JavaScriptExternalFilesClass.CLASS_REF);
+    expect(attUrlCmd.isAttachmentLink(eq(attExtFilePath))).andReturn(true).atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(attExtFilePath, null, (String) null))
+        .andReturn(Optional.of(fromUriString(attExtFileUrl).build())).atLeastOnce();
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(),
+        attExtFilePath);
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_IS_RTE_CONTENT.getName(),
+        JsIsRteContent.BOTH.name());
+    DocumentReference simpleLayoutDocRef = new DocumentReference(context.getDatabase(),
+        "SimpleLayout", "WebHome");
+    XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
+    simpleLayoutDoc.addXObject(extJsFileObj);
+    expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
+        .atLeastOnce();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
+        simpleLayoutDocRef)).atLeastOnce();
+    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiPreferences");
+    XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
+    expect(modelAccessMock.getDocument(eq(xwikiPrefDocRef))).andReturn(xwikiPrefDoc).atLeastOnce();
+    PageTypeReference pageTypeRef = new PageTypeReference("TestPageType", "providerHint",
+        Arrays.asList(""));
+    expect(pageTypeResolverMock.resolvePageTypeRefForCurrentDoc()).andReturn(pageTypeRef);
+    DocumentReference pageTypesDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
+        "TestPageType");
+    XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
+    expect(modelAccessMock.getDocument(eq(pageTypesDocRef))).andReturn(pageTypesDoc).atLeastOnce();
+    replayDefault();
+    List<JsFileEntry> jsFileList = command.getAllRteContentJsFiles(attUrlCmd);
+    verifyDefault();
+    assertEquals(1, jsFileList.size());
+    assertEquals(attExtFileUrl, jsFileList.get(0).getFilepath());
+  }
+
+  @Test
+  public void test_getAllRteContentJsFiles_only() throws Exception {
+    String attExtFilePath = "AlumniLayout.WebHome;tailwind.js";
+    String attExtFileUrl = "/file/AlumniLayout/WebHome/tailwind.js";
+    BaseObject extJsFileObj = new BaseObject();
+    extJsFileObj.setXClassReference(JavaScriptExternalFilesClass.CLASS_REF);
+    expect(attUrlCmd.isAttachmentLink(eq(attExtFilePath))).andReturn(true).atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(attExtFilePath, null, (String) null))
+        .andReturn(Optional.of(fromUriString(attExtFileUrl).build())).atLeastOnce();
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(),
+        attExtFilePath);
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_IS_RTE_CONTENT.getName(),
+        JsIsRteContent.ONLY.name());
+    DocumentReference simpleLayoutDocRef = new DocumentReference(context.getDatabase(),
+        "SimpleLayout", "WebHome");
+    XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
+    simpleLayoutDoc.addXObject(extJsFileObj);
+    expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
+        .atLeastOnce();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
+        simpleLayoutDocRef)).atLeastOnce();
+    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiPreferences");
+    XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
+    expect(modelAccessMock.getDocument(eq(xwikiPrefDocRef))).andReturn(xwikiPrefDoc).atLeastOnce();
+    PageTypeReference pageTypeRef = new PageTypeReference("TestPageType", "providerHint",
+        Arrays.asList(""));
+    expect(pageTypeResolverMock.resolvePageTypeRefForCurrentDoc()).andReturn(pageTypeRef);
+    DocumentReference pageTypesDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
+        "TestPageType");
+    XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
+    expect(modelAccessMock.getDocument(eq(pageTypesDocRef))).andReturn(pageTypesDoc).atLeastOnce();
+    replayDefault();
+    List<JsFileEntry> jsFileList = command.getAllRteContentJsFiles(attUrlCmd);
+    verifyDefault();
+    assertEquals(1, jsFileList.size());
+    assertEquals(attExtFileUrl, jsFileList.get(0).getFilepath());
+  }
+
+  @Test
+  public void test_getAllRteContentJsFiles_No() throws Exception {
+    String attExtFilePath = "AlumniLayout.WebHome;tailwind.js";
+    String attExtFileUrl = "/file/AlumniLayout/WebHome/tailwind.js";
+    BaseObject extJsFileObj = new BaseObject();
+    extJsFileObj.setXClassReference(JavaScriptExternalFilesClass.CLASS_REF);
+    expect(attUrlCmd.isAttachmentLink(eq(attExtFilePath))).andReturn(true).atLeastOnce();
+    expect(attUrlCmd.getAttachmentURL(attExtFilePath, null, (String) null))
+        .andReturn(Optional.of(fromUriString(attExtFileUrl).build())).atLeastOnce();
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_FILEPATH.getName(),
+        attExtFilePath);
+    extJsFileObj.setStringValue(JavaScriptExternalFilesClass.FIELD_IS_RTE_CONTENT.getName(),
+        JsIsRteContent.NO.name());
+    DocumentReference simpleLayoutDocRef = new DocumentReference(context.getDatabase(),
+        "SimpleLayout", "WebHome");
+    XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
+    simpleLayoutDoc.addXObject(extJsFileObj);
+    expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
+        .atLeastOnce();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
+        simpleLayoutDocRef)).atLeastOnce();
+    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiPreferences");
+    XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
+    expect(modelAccessMock.getDocument(eq(xwikiPrefDocRef))).andReturn(xwikiPrefDoc).atLeastOnce();
+    PageTypeReference pageTypeRef = new PageTypeReference("TestPageType", "providerHint",
+        Arrays.asList(""));
+    expect(pageTypeResolverMock.resolvePageTypeRefForCurrentDoc()).andReturn(pageTypeRef);
+    DocumentReference pageTypesDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
+        "TestPageType");
+    XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
+    expect(modelAccessMock.getDocument(eq(pageTypesDocRef))).andReturn(pageTypesDoc).atLeastOnce();
+    replayDefault();
+    List<JsFileEntry> jsFileList = command.getAllRteContentJsFiles(attUrlCmd);
+    verifyDefault();
+    assertTrue(jsFileList.isEmpty());
   }
 
   @Test
