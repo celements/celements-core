@@ -39,11 +39,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.init.XWikiProvider;
+import com.celements.javascript.FrontendResourceResolver;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.util.ModelUtils;
 import com.celements.url.UrlService;
 import com.celements.web.service.LastStartupTimeStampRole;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.web.Utils;
@@ -59,7 +62,7 @@ public class AttachmentURLCommand {
   }
 
   protected String getDefaultAction() {
-    return getContext().getWiki().getXWikiPreference("celdefaultAttAction",
+    return getXWiki().getXWikiPreference("celdefaultAttAction",
         "celements.attachmenturl.defaultaction", "file", getContext());
   }
 
@@ -101,10 +104,13 @@ public class AttachmentURLCommand {
         return Optional.empty();
       }
     } else if (isOnDiskLink(link)) {
-      String path = link.trim().substring(1);
-      url = getContext().getWiki().getSkinFile(path, true, getContext())
+      var resolved = getFrontendResourceResolver().resolve(link);
+      var path = resolved.orElseGet(() -> link.trim().substring(1));
+      url = getXWiki().getSkinFile(path, true, getContext())
           .replace("/skin/", "/" + action + "/");
-      versionProvider = () -> getLastStartupTimeStamp().getFileModificationDate(path);
+      if (resolved.isEmpty()) { // frontend resource is already versioned by build process
+        versionProvider = () -> getLastStartupTimeStamp().getFileModificationDate(path);
+      }
     }
     if (url.startsWith("?")) {
       url = getUrlService().getURL(getContext().getDoc().getDocRef(), "view") + url;
@@ -168,6 +174,10 @@ public class AttachmentURLCommand {
     return "";
   }
 
+  private FrontendResourceResolver getFrontendResourceResolver() {
+    return Utils.getComponent(FrontendResourceResolver.class);
+  }
+
   private IAttachmentServiceRole getAttachmentService() {
     return Utils.getComponent(IAttachmentServiceRole.class);
   }
@@ -186,6 +196,10 @@ public class AttachmentURLCommand {
 
   private ExecutionContext getEContext() {
     return Utils.getComponent(Execution.class).getContext();
+  }
+
+  private XWiki getXWiki() {
+    return Utils.getComponent(XWikiProvider.class).get().orElseThrow();
   }
 
 }
