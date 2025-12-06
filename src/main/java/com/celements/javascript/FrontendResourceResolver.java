@@ -60,7 +60,7 @@ public class FrontendResourceResolver {
 
   /**
    * Resolves a source path to a production dist path.
-   * * @param sourcePath e.g. ":frontend/file.ts"
+   * @param sourcePath e.g. ":frontend/file.ts"
    *
    * @return The resolved path e.g. "dist/file.a8b3.mjs"
    */
