@@ -104,7 +104,7 @@ public class AttachmentURLCommand {
         return Optional.empty();
       }
     } else if (isOnDiskLink(link)) {
-      var resolved = getFrontendResourceResolver().resolve(link);
+      var resolved = getFrontendResourceResolver().resolve(link.trim());
       var path = resolved.orElseGet(() -> link.trim().substring(1));
       url = getXWiki().getSkinFile(path, true, getContext())
           .replace("/skin/", "/" + action + "/");
