@@ -148,6 +148,18 @@ public class JsFileEntryTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_isModule_mts() {
+    jsFileEntry.setFilepath("/space/doc/attachment.mts");
+    assertTrue(jsFileEntry.isModule());
+  }
+
+  @Test
+  public void test_isModule_ts() {
+    jsFileEntry.setFilepath("/space/doc/attachment.ts");
+    assertTrue(jsFileEntry.isModule());
+  }
+
+  @Test
   public void test_isValid_null() {
     jsFileEntry.setFilepath(null);
     assertFalse(jsFileEntry.isValid());

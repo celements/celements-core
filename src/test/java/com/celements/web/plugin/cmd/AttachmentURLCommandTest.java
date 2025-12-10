@@ -25,6 +25,7 @@ import static org.junit.Assert.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,11 +34,11 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.javascript.FrontendResourceResolver;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.url.UrlService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -51,7 +52,10 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   @Before
   public void setUp_AttachmentURLCommandTest() throws Exception {
-    registerComponentMocks(IAttachmentServiceRole.class, UrlService.class);
+    registerComponentMocks(
+        IAttachmentServiceRole.class,
+        UrlService.class,
+        FrontendResourceResolver.class);
     context = getXContext();
     wiki = getMock(XWiki.class);
     attUrlCmd = new AttachmentURLCommand();
@@ -141,15 +145,32 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getAttachmentURL_onDiskLink() throws XWikiException, MalformedURLException {
+  public void test_getAttachmentURL_onDiskLink() {
+    var input = ":celJS/bla.js";
     String resultURL = "/appname/skin/resources/celJS/bla.js";
     expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
         new Date());
+    expect(getMock(FrontendResourceResolver.class).resolve(eq(input)))
+        .andReturn(Optional.empty());
     replayDefault();
-    String attachmentURL = attUrlCmd.getAttachmentURL("  :celJS/bla.js", context);
+    String attachmentURL = attUrlCmd.getAttachmentURL(input, context);
     String expectedURL = "/appname/file/resources/celJS/bla.js";
     assertTrue(attachmentURL, attachmentURL.matches(expectedURL + "\\?version=\\d{14}"));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAttachmentURL_frontend() {
+    var input = ":frontend/bla.ts";
+    var resolved = "dist/bla.mjs";
+    expect(getMock(FrontendResourceResolver.class).resolve(eq(input)))
+        .andReturn(Optional.of(resolved));
+    expect(wiki.getSkinFile(eq(resolved), eq(true), same(context)))
+        .andReturn("/appname/skin/resources/dist/bla.mjs");
+    replayDefault();
+    String attachmentURL = attUrlCmd.getAttachmentURL(input, context);
+    assertEquals("/appname/file/resources/dist/bla.mjs", attachmentURL);
     verifyDefault();
   }
 

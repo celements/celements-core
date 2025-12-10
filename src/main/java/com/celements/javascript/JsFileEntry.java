@@ -96,7 +96,10 @@ public final class JsFileEntry extends ObjectBean {
   }
 
   public boolean isModule() {
-    return getFilePathOnly().endsWith(".mjs");
+    var filepath = getFilePathOnly();
+    return filepath.endsWith(".mjs")
+        || filepath.endsWith(".mts")
+        || filepath.endsWith(".ts"); // are transpiled to mjs
   }
 
   @Override
