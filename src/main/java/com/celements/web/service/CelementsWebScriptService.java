@@ -19,6 +19,7 @@
  */
 package com.celements.web.service;
 
+import static com.celements.spring.context.SpringContextProvider.*;
 import static com.google.common.base.Strings.*;
 
 import java.io.InputStream;
@@ -159,6 +160,10 @@ public class CelementsWebScriptService implements ScriptService {
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  }
+
+  public String getNodeName() {
+    return getBeanFactory().getBean("nodeName", String.class);
   }
 
   /**
