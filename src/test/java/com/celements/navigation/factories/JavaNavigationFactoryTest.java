@@ -85,9 +85,12 @@ public class JavaNavigationFactoryTest extends AbstractComponentTest {
     String cmCssClass = "cm_cssTestClass2";
     final NavigationConfig expectedNavConfig = new NavigationConfig.Builder().configName(
         configName).fromHierarchyLevel(fromHierarchyLevel).toHierarchyLevel(
-            toHierarchyLevel).showInactiveToLevel(showInactiveToLevel).menuPart(menuPart).dataType(
-                dataType).nodeSpaceRef(nodeSpaceRef).layoutType(layoutType).nrOfItemsPerPage(
-                    itemsPerPage).cmCssClass(cmCssClass).build();
+            toHierarchyLevel)
+        .showInactiveToLevel(showInactiveToLevel).menuPart(menuPart).dataType(
+            dataType)
+        .nodeSpaceRef(nodeSpaceRef).layoutType(layoutType).nrOfItemsPerPage(
+            itemsPerPage)
+        .cmCssClass(cmCssClass).build();
     expect(testConfigurator.handles(eq(pageTypeRef))).andReturn(true);
     expect(testConfigurator.getNavigationConfig(eq(pageTypeRef))).andReturn(expectedNavConfig);
     replayDefault();

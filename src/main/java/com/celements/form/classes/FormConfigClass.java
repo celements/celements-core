@@ -30,8 +30,8 @@ public class FormConfigClass extends AbstractClassDefinition implements FormClas
 
   public static final ClassField<String> FIELD_EXCLUDE_FORM_IS_FILLED = new StringField.Builder(
       CLASS_REF, "excludeFromIsFilledCheck").size(30)
-          .prettyName("Exclude fields from 'isFilled' check. (separator: ',')")
-          .build();
+      .prettyName("Exclude fields from 'isFilled' check. (separator: ',')")
+      .build();
 
   public FormConfigClass() {
     super(CLASS_REF);

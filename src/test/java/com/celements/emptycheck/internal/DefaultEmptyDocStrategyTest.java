@@ -405,7 +405,8 @@ public class DefaultEmptyDocStrategyTest extends AbstractComponentTest {
     assertTrue("Non breaking spaces in a paragraph should be treated as empty",
         defEmptyDocStrategy.isEmptyRTEDocument(getTestDoc("<p>&nbsp;</p>")));
     assertTrue("Non breaking spaces in a paragraph with white spaces"
-        + " should be treated as empty", defEmptyDocStrategy.isEmptyRTEDocument(getTestDoc(
+        + " should be treated as empty",
+        defEmptyDocStrategy.isEmptyRTEDocument(getTestDoc(
             "<p>  &nbsp; </p>")));
     assertFalse("Regular Text should not be treated as empty.",
         defEmptyDocStrategy.isEmptyRTEDocument(getTestDoc("<p>adsf  &nbsp; </p>")));

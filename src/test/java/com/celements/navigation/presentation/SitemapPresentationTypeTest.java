@@ -97,7 +97,7 @@ public class SitemapPresentationTypeTest extends AbstractComponentTest {
     URL currentDocDeEditUrl = new URL(currDocDeEditUrlStr);
     expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"), eq(
         "language=de&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
-            .andReturn(currentDocDeEditUrl);
+        .andReturn(currentDocDeEditUrl);
     expect(urlFactoryMock.getURL(same(currentDocDeEditUrl), same(context))).andReturn(
         currDocDeEditUrlStr);
     String currDocFrEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=fr"
@@ -105,14 +105,14 @@ public class SitemapPresentationTypeTest extends AbstractComponentTest {
     URL currentDocFrEditUrl = new URL(currDocFrEditUrlStr);
     expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"), eq(
         "language=fr&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
-            .andReturn(currentDocFrEditUrl);
+        .andReturn(currentDocFrEditUrl);
     expect(urlFactoryMock.getURL(same(currentDocFrEditUrl), same(context))).andReturn(
         currDocFrEditUrlStr);
     String currDocEnEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=en&windowClose=true";
     URL currentDocEnEditUrl = new URL(currDocEnEditUrlStr);
     expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"), eq(
         "language=en&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
-            .andReturn(currentDocEnEditUrl);
+        .andReturn(currentDocEnEditUrl);
     expect(urlFactoryMock.getURL(same(currentDocEnEditUrl), same(context))).andReturn(
         currDocEnEditUrlStr);
     replayAll();

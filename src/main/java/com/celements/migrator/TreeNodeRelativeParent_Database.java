@@ -60,8 +60,8 @@ public class TreeNodeRelativeParent_Database extends AbstractCelementsHibernateM
   }
 
   @Override
-  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context
-      ) throws XWikiException {
+  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
+      throws XWikiException {
     Query theQuery;
     try {
       theQuery = queryManager.createQuery("from doc.object(Celements2.MenuItem) as mItem"
@@ -87,7 +87,8 @@ public class TreeNodeRelativeParent_Database extends AbstractCelementsHibernateM
           exp);
       throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
           XWikiException.MODULE_XWIKI, "Failed to execute migration"
-          + " TreeNodeRelativeParent_Database", exp);
+              + " TreeNodeRelativeParent_Database",
+          exp);
     }
   }
 

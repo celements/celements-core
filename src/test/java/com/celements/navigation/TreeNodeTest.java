@@ -102,7 +102,8 @@ public class TreeNodeTest extends AbstractComponentTest {
         context.getDatabase())), 1, partNameGetterMock);
     expect(partNameGetterMock.getPartName(eq(docRef2))).andThrow(new RuntimeException(
         "partNameGetter must be called lazily for"
-            + " NotMappedMenuItems for performance reasons.")).anyTimes();
+            + " NotMappedMenuItems for performance reasons."))
+        .anyTimes();
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     verifyDefault();

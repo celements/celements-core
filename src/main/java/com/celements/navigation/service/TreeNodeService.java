@@ -267,12 +267,14 @@ public class TreeNodeService implements ITreeNodeService {
   private List<TreeNode> fetchNodesForParentKey(String parentKey) {
     long starttotal = System.currentTimeMillis();
     long start = starttotal;
-    List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd().getTreeNodesForParentKey(
-        parentKey);
+    List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd()
+        .getTreeNodesForParentKey(
+            parentKey);
     LOGGER.debug("fetchNodesForParentKey: time for getNotMappedMenuItemsFromDatabase: {}",
         (System.currentTimeMillis() - start));
-    List<TreeNode> mappedTreeNodes = treeNodeCache.getMappedMenuItemsForParentCmd().getTreeNodesForParentKey(
-        parentKey);
+    List<TreeNode> mappedTreeNodes = treeNodeCache.getMappedMenuItemsForParentCmd()
+        .getTreeNodesForParentKey(
+            parentKey);
     LOGGER.debug("fetchNodesForParentKey: time for getMappedMenuItemsForParentCmd: {}",
         (System.currentTimeMillis() - start));
     start = System.currentTimeMillis();
@@ -449,12 +451,14 @@ public class TreeNodeService implements ITreeNodeService {
     try {
       BaseCollection navConfigObj = getInheritorFactory().getConfigDocFieldInheritor(
           INavigationClassConfig.NAVIGATION_CONFIG_CLASS, getParentKey(
-              getContext().getDoc().getDocumentReference(), false), getContext()).getObject(
-                  "menu_element_name");
+              getContext().getDoc().getDocumentReference(), false),
+          getContext()).getObject(
+              "menu_element_name");
       if (navConfigObj != null) {
         XWikiDocument navConfigDoc = getContext().getWiki().getDocument(
             navConfigObj.getDocumentReference(), getContext());
-        String navConfigDocWikiName = navConfigDoc.getDocumentReference().getLastSpaceReference().getParent().getName();
+        String navConfigDocWikiName = navConfigDoc.getDocumentReference().getLastSpaceReference()
+            .getParent().getName();
         navConfigObjects2 = navConfigDoc.getXObjects(navClassConfig.getNavigationConfigClassRef(
             navConfigDocWikiName));
       } else {

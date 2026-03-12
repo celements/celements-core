@@ -44,7 +44,8 @@ import com.xpn.xwiki.objects.BaseObject;
 public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentListener implements
     EventListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TreeNodeDocumentDeletedListener.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(TreeNodeDocumentDeletedListener.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;

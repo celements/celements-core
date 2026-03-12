@@ -123,7 +123,8 @@ public class RenderedExtractPresentationTypeTest extends AbstractComponentTest {
         "id=\"N3:Content:Content.MyPage\"").once();
     expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
         isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
-            + " first cel_nav_isLeaf RichText\"").once();
+            + " first cel_nav_isLeaf RichText\"")
+        .once();
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).atLeastOnce();
     DocumentReference templateDocRef = new DocumentReference(context.getDatabase(), "Templates",
         "RenderedExtract");

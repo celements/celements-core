@@ -23,15 +23,15 @@ public class TranslationBoxCellConfigClass extends AbstractClassDefinition
 
   public static final ClassField<String> FIELD_PAGE_EXCEPTIONS = new StringField.Builder(CLASS_REF,
       "page_exceptions")
-          .prettyName("Page Exceptions (FullNames comma separated)")
-          .size(30)
-          .build();
+      .prettyName("Page Exceptions (FullNames comma separated)")
+      .size(30)
+      .build();
 
   public static final ClassField<String> FIELD_PAGETYPE_EXCEPTIONS = new StringField.Builder(
       CLASS_REF, "pagetype_exceptions")
-          .prettyName("Page Type Exceptions (FullNames comma separated)")
-          .size(30)
-          .build();
+      .prettyName("Page Type Exceptions (FullNames comma separated)")
+      .size(30)
+      .build();
 
   public TranslationBoxCellConfigClass() {
     super(CLASS_REF);

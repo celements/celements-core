@@ -93,7 +93,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   public void testGetCheckImplNamesConfig_noConfig() {
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(Arrays.asList("default"), emptyCheckService.getCheckImplNamesConfig());
     verifyDefault();
@@ -103,7 +104,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   public void testGetCheckImplNamesConfig_commaSeparated() {
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default,sharedContent").anyTimes();
+            "default,sharedContent")
+        .anyTimes();
     replayDefault();
     assertEquals(Arrays.asList("default", "sharedContent"),
         emptyCheckService.getCheckImplNamesConfig());
@@ -114,7 +116,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
   public void testGetCheckImplNames_semicolonSeparated() {
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default;sharedContent").anyTimes();
+            "default;sharedContent")
+        .anyTimes();
     replayDefault();
     assertEquals(Arrays.asList("default", "sharedContent"),
         emptyCheckService.getCheckImplNamesConfig());
@@ -136,7 +139,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
     expect(testOneMock.isEmptyRTEDocument(eq(docRef))).andReturn(false).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "testOne;testTwo;;wrongTest;").anyTimes();
+            "testOne;testTwo;;wrongTest;")
+        .anyTimes();
     replayDefault();
     assertFalse(emptyCheckService.isEmptyRTEDocument(docRef));
     verifyDefault();
@@ -158,7 +162,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
     expect(testTwoMock.isEmptyRTEDocument(eq(docRef))).andReturn(false).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "testOne;testTwo;;wrongTest;").anyTimes();
+            "testOne;testTwo;;wrongTest;")
+        .anyTimes();
     replayDefault();
     assertFalse(emptyCheckService.isEmptyRTEDocument(docRef));
     verifyDefault();
@@ -180,7 +185,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
     expect(testTwoMock.isEmptyRTEDocument(eq(docRef))).andReturn(true).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "testOne;testTwo;;wrongTest;").anyTimes();
+            "testOne;testTwo;;wrongTest;")
+        .anyTimes();
     replayDefault();
     assertTrue(emptyCheckService.isEmptyRTEDocument(docRef));
     verifyDefault();
@@ -201,7 +207,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
     expect(testOneMock.isEmptyDocument(eq(docRef))).andReturn(false).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "testOne;testTwo;;wrongTest;").anyTimes();
+            "testOne;testTwo;;wrongTest;")
+        .anyTimes();
     replayDefault();
     assertFalse(emptyCheckService.isEmptyDocument(docRef));
     verifyDefault();
@@ -223,7 +230,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
     expect(testTwoMock.isEmptyDocument(eq(docRef))).andReturn(false).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "testOne;testTwo;;wrongTest;").anyTimes();
+            "testOne;testTwo;;wrongTest;")
+        .anyTimes();
     replayDefault();
     assertFalse(emptyCheckService.isEmptyDocument(docRef));
     verifyDefault();
@@ -245,7 +253,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
     expect(testTwoMock.isEmptyDocument(eq(docRef))).andReturn(true).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "testOne;testTwo;;wrongTest;").anyTimes();
+            "testOne;testTwo;;wrongTest;")
+        .anyTimes();
     replayDefault();
     assertTrue(emptyCheckService.isEmptyDocument(docRef));
     verifyDefault();
@@ -260,7 +269,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(documentRef, emptyCheckService.getNextNonEmptyChildren(documentRef));
     verifyDefault();
@@ -276,7 +286,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
         noChildrenList).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(emptyDocRef, emptyCheckService.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -299,7 +310,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, emptyCheckService.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -332,7 +344,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
         childChildXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, emptyCheckService.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -375,7 +388,8 @@ public class EmptyCheckServiceTest extends AbstractComponentTest {
         Collections.<TreeNode>emptyList()).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(emptyDocRef, emptyCheckService.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();

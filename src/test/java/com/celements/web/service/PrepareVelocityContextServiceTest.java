@@ -317,7 +317,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"), eq(
         "celements.language.suppressInvalid"), eq("0"), same(context))).andReturn(
-            "1").atLeastOnce();
+            "1")
+        .atLeastOnce();
     responseMock.addCookie(isA(Cookie.class));
     expectLastCall().once();
     expect(requestMock.getParameter(eq("language"))).andReturn("fr").atLeastOnce();
@@ -354,7 +355,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
         "de")).atLeastOnce();
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"), eq(
         "celements.language.suppressInvalid"), eq("0"), same(context))).andReturn(
-            "1").atLeastOnce();
+            "1")
+        .atLeastOnce();
     replayDefault();
     assertFalse(prepVeloContextService.isInvalidLanguageOrDefault("en"));
     verifyDefault();
@@ -366,7 +368,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
         "de")).atLeastOnce();
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"), eq(
         "celements.language.suppressInvalid"), eq("0"), same(context))).andReturn(
-            "1").atLeastOnce();
+            "1")
+        .atLeastOnce();
     replayDefault();
     assertTrue(prepVeloContextService.isInvalidLanguageOrDefault("fr"));
     verifyDefault();
@@ -376,7 +379,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testIsInvalidLanguageOrDefault_no_noSuppress() {
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"), eq(
         "celements.language.suppressInvalid"), eq("0"), same(context))).andReturn(
-            "0").atLeastOnce();
+            "0")
+        .atLeastOnce();
     replayDefault();
     assertFalse(prepVeloContextService.isInvalidLanguageOrDefault("fr"));
     verifyDefault();

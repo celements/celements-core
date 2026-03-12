@@ -136,7 +136,8 @@ public class EmptyCheckCommandTest extends AbstractComponentTest {
     assertTrue("Non breaking spaces in a paragraph should be treated as empty",
         emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("<p>&nbsp;</p>")));
     assertTrue("Non breaking spaces in a paragraph with white spaces"
-        + " should be treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
+        + " should be treated as empty",
+        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
             "<p>  &nbsp; </p>")));
     assertFalse("Regular Text should not be treated as empty.",
         emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("<p>adsf  &nbsp; </p>")));
@@ -152,7 +153,8 @@ public class EmptyCheckCommandTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(documentRef, emptyChildCheckCmd.getNextNonEmptyChildren(documentRef));
     verifyDefault();
@@ -169,7 +171,8 @@ public class EmptyCheckCommandTest extends AbstractComponentTest {
         noChildrenList).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(emptyDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -193,7 +196,8 @@ public class EmptyCheckCommandTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -227,7 +231,8 @@ public class EmptyCheckCommandTest extends AbstractComponentTest {
         childChildXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -271,7 +276,8 @@ public class EmptyCheckCommandTest extends AbstractComponentTest {
         Collections.<TreeNode>emptyList()).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(emptyDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();

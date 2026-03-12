@@ -88,7 +88,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     HttpServletRequest httpRequest = createDefaultMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.<User>absent());
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com"))
+        .andReturn(Optional.<User>absent());
 
     replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
@@ -107,7 +108,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     User userMock = createUserMock("XWiki.7sh2lya35");
-    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com"))
+        .andReturn(Optional.of(userMock));
     expect(xWikiAuthServiceMock.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(
         context))).andReturn(null).once();
 
@@ -128,7 +130,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     User userMock = createUserMock("XWiki.7sh2lya35");
-    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com"))
+        .andReturn(Optional.of(userMock));
     expectAuth("XWiki.7sh2lya35", "pwd");
     expectInGroup(userMock, "grp", false);
 
@@ -149,7 +152,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     User userMock = createUserMock("XWiki.7sh2lya35");
-    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com"))
+        .andReturn(Optional.of(userMock));
     expectAuth("XWiki.7sh2lya35", "pwd");
     expectInGroup(userMock, "grp", true);
     expect(userMock.isActive()).andReturn(false);
@@ -171,7 +175,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     User userMock = createUserMock("XWiki.7sh2lya35");
-    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com"))
+        .andReturn(Optional.of(userMock));
     expectAuth("XWiki.7sh2lya35", "pwd");
     expectInGroup(userMock, "grp", true);
     expect(userMock.isActive()).andReturn(true);
@@ -181,7 +186,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
     assertEquals("{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", "
-        + "\"group_membership\" : {}}", cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null,
+        + "\"group_membership\" : {}}",
+        cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null,
             context));
     verifyDefault();
   }
@@ -199,7 +205,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     expect(context.getMessageTool()).andReturn(getMessageToolStub()).anyTimes();
 
     User userMock = createUserMock("XWiki.7sh2lya35");
-    expect(userServiceMock.getUserForLoginField("blabla@mail.com")).andReturn(Optional.of(userMock));
+    expect(userServiceMock.getUserForLoginField("blabla@mail.com"))
+        .andReturn(Optional.of(userMock));
     expectAuth("XWiki.7sh2lya35", "pwd");
     expect(userMock.isActive()).andReturn(true);
     List<String> returnGroups = Arrays.asList("XWiki.TestGroup1", "XWiki.TestGroup2",
@@ -285,7 +292,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
     replayDefault();
     assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
-        + "\"group_membership\" : {}}", cmd.getResultJSON(userMock, "user@synventis.com", null,
+        + "\"group_membership\" : {}}",
+        cmd.getResultJSON(userMock, "user@synventis.com", null,
             context));
     verifyDefault();
   }

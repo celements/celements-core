@@ -23,8 +23,7 @@ import java.util.List;
 
 public class ListUtils {
 
-  private ListUtils() {
-  }
+  private ListUtils() {}
 
   /**
    * Provides a type safe substract for Lists.

@@ -104,7 +104,8 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
         "id=\"N3:Content:Content.MyPage\"").once();
     expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
         isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
-            + " first cel_nav_isLeaf RichText\"").once();
+            + " first cel_nav_isLeaf RichText\"")
+        .once();
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
