@@ -9,7 +9,12 @@ import org.xwiki.observation.event.Event;
 
 public enum SaveEventOperation {
 
-  UPDATING, CREATING, DELETING, UPDATED, CREATED, DELETED;
+  UPDATING,
+  CREATING,
+  DELETING,
+  UPDATED,
+  CREATED,
+  DELETED;
 
   public boolean isBeforeSave() {
     return ordinal() < 3;

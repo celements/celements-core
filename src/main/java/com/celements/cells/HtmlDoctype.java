@@ -9,7 +9,8 @@ import com.google.common.base.Optional;
 
 public enum HtmlDoctype implements ValueGetter<String> {
 
-  XHTML("XHTML 1.1"), HTML5("HTML 5");
+  XHTML("XHTML 1.1"),
+  HTML5("HTML 5");
 
   private String dbName;
 

@@ -9,7 +9,9 @@ import com.google.common.base.Optional;
 
 public enum EHttpEquiv implements ValueGetter<String> {
 
-  CONTENT_SECURITY_POLICY("Content-Security-Policy"), DEFAULT_STYLE("default-style"), REFRESH(
+  CONTENT_SECURITY_POLICY("Content-Security-Policy"),
+  DEFAULT_STYLE("default-style"),
+  REFRESH(
       "refresh");
 
   public final static String ATTRIB_NAME = "http-equiv";

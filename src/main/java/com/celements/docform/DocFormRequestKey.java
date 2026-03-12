@@ -18,7 +18,9 @@ import com.google.common.collect.Ordering;
 public class DocFormRequestKey implements Comparable<DocFormRequestKey> {
 
   public enum Type {
-    DOC_FIELD, OBJ_FIELD, OBJ_REMOVE;
+    DOC_FIELD,
+    OBJ_FIELD,
+    OBJ_REMOVE;
   }
 
   private final String keyString;

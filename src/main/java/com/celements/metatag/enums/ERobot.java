@@ -9,9 +9,17 @@ import com.google.common.base.Optional;
 
 public enum ERobot implements ValueGetter<String> {
 
-  INDEX("index"), NOINDEX("noindex"), FOLLOW("follow"), NOFOLLOW("nofollow"), NOODP(
-      "noodp"), NOARCHIVE(
-          "noarchive"), NOSNIPPET("nosnippet"), NOIMAGEINDEX("noimageindex"), NOCACHE("nocache");
+  INDEX("index"),
+  NOINDEX("noindex"),
+  FOLLOW("follow"),
+  NOFOLLOW("nofollow"),
+  NOODP(
+      "noodp"),
+  NOARCHIVE(
+      "noarchive"),
+  NOSNIPPET("nosnippet"),
+  NOIMAGEINDEX("noimageindex"),
+  NOCACHE("nocache");
 
   private final static ReverseMap<ERobot, String> ID_MAP = new ReverseMap<>(ERobot.values());
 
