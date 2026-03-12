@@ -23,8 +23,7 @@ public class JSONExporter {
 
   private static JSONExporter exporter;
 
-  private JSONExporter() {
-  }
+  private JSONExporter() {}
 
   public static JSONExporter getInstance() {
     if (exporter == null) {

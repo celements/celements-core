@@ -30,7 +30,8 @@ public class MobileLoggingScriptService implements ScriptService {
     LOGGER.info("dimensionAndAgentLog: mobileDim [" + getContext().getRequest().getParameter(
         "mobileDim") + "], userAgent [" + getContext().getRequest().getParameter("userAgent")
         + "], isOrientationLandscape [" + getContext().getRequest().getParameter(
-            "isOrientationLandscape") + "], message [" + message + "]");
+            "isOrientationLandscape")
+        + "], message [" + message + "]");
     Builder jsonBuilder = new Builder();
     jsonBuilder.openDictionary();
     jsonBuilder.addStringProperty("message", "OK");

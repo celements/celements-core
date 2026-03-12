@@ -32,52 +32,52 @@ public class PageLayoutPropertiesClass extends AbstractClassDefinition
 
   public static final ClassField<String> FIELD_PRETTYNAME = new StringField.Builder(CLASS_REF,
       "prettyname")
-          .prettyName("Layout Pretty Name")
-          .size(30)
-          .build();
+      .prettyName("Layout Pretty Name")
+      .size(30)
+      .build();
 
   public static final ClassField<Boolean> FIELD_IS_ACTIVE = new BooleanField.Builder(CLASS_REF,
       "isActive")
-          .displayType("yesno")
-          .prettyName("is active")
-          .build();
+      .displayType("yesno")
+      .prettyName("is active")
+      .build();
 
   public static final ClassField<String> FIELD_AUTHORS = new StringField.Builder(CLASS_REF,
       "authors")
-          .prettyName("Authors")
-          .size(30)
-          .build();
+      .prettyName("Authors")
+      .size(30)
+      .build();
 
   public static final ClassField<String> FIELD_LICENSE = new LargeStringField.Builder(CLASS_REF,
       "license")
-          .rows(30)
-          .size(15)
-          .prettyName("License")
-          .build();
+      .rows(30)
+      .size(15)
+      .prettyName("License")
+      .build();
 
   public static final ClassField<String> FIELD_VERSION = new StringField.Builder(CLASS_REF,
       "version")
-          .prettyName("Version")
-          .size(30)
-          .build();
+      .prettyName("Version")
+      .size(30)
+      .build();
 
   public static final ClassField<String> FIELD_LAYOUT_DOCTYPE = new StringSingleListField.Builder(
       CLASS_REF, "doctype")
-          .size(1)
-          .displayType(DisplayType.select)
-          .values(ImmutableList.of(HtmlDoctype.XHTML.toString(), HtmlDoctype.HTML5.toString()))
-          .prettyName("Doctype")
-          /* .relationalStorage(true) */
-          .build();
+      .size(1)
+      .displayType(DisplayType.select)
+      .values(ImmutableList.of(HtmlDoctype.XHTML.toString(), HtmlDoctype.HTML5.toString()))
+      .prettyName("Doctype")
+      /* .relationalStorage(true) */
+      .build();
 
   public static final ClassField<String> FIELD_LAYOUT_TYPE = new StringSingleListField.Builder(
       CLASS_REF, "layout_type")
-          .size(1)
-          .displayType(DisplayType.select)
-          .values(ImmutableList.of(PAGE_LAYOUT_VALUE, EDITOR_LAYOUT_VALUE))
-          .prettyName("Layout Type")
-          /* .relationalStorage(true) */
-          .build();
+      .size(1)
+      .displayType(DisplayType.select)
+      .values(ImmutableList.of(PAGE_LAYOUT_VALUE, EDITOR_LAYOUT_VALUE))
+      .prettyName("Layout Type")
+      /* .relationalStorage(true) */
+      .build();
 
   public PageLayoutPropertiesClass() {
     super(CLASS_REF);

@@ -66,7 +66,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Content.login").anyTimes();
+            "Content.login")
+        .anyTimes();
     replayDefault(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
     verifyDefault(mockRequest);
@@ -111,7 +112,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Content.login,Content.WhatsNew").anyTimes();
+            "Content.login,Content.WhatsNew")
+        .anyTimes();
     replayDefault(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
     verifyDefault(mockRequest);
@@ -129,7 +131,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Content.WhatsNew Content.login").anyTimes();
+            "Content.WhatsNew Content.login")
+        .anyTimes();
     replayDefault(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
     verifyDefault(mockRequest);
@@ -147,7 +150,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"), eq(
         "com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
-            "-").anyTimes();
+            "-")
+        .anyTimes();
     replayDefault(mockRequest);
     assertFalse(appScriptService.isAppScriptRequest());
     verifyDefault(mockRequest);
@@ -165,7 +169,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"), eq(
         "com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
-            "-").anyTimes();
+            "-")
+        .anyTimes();
     replayDefault(mockRequest);
     assertFalse(appScriptService.isAppScriptRequest());
     verifyDefault(mockRequest);
@@ -185,7 +190,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Content.login").anyTimes();
+            "Content.login")
+        .anyTimes();
     replayDefault(mockRequest);
     assertEquals("myScript", appScriptService.getAppScriptNameFromRequestURL());
     verifyDefault(mockRequest);
@@ -268,7 +274,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         IAppScriptService.APP_SCRIPT_XPAGE);
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Content.login").anyTimes();
+            "Content.login")
+        .anyTimes();
     replayDefault(mockRequest);
     assertEquals("", appScriptService.getAppScriptNameFromRequestURL());
     verifyDefault(mockRequest);
@@ -290,7 +297,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         IAppScriptService.APP_SCRIPT_XPAGE);
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Content.WhatsNew Content.login").anyTimes();
+            "Content.WhatsNew Content.login")
+        .anyTimes();
     replayDefault(mockRequest);
     assertEquals("login", appScriptService.getAppScriptNameFromRequestURL());
     verifyDefault(mockRequest);
@@ -366,7 +374,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
         appScriptDoc).anyTimes();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).anyTimes();
     replayDefault(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference(context.getDatabase(),
@@ -421,7 +430,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Main.WebHome").anyTimes();
+            "Main.WebHome")
+        .anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("").anyTimes();
     replayDefault(mockRequest);
     assertEquals("WebHome", appScriptService.getScriptNameFromURL());
@@ -440,7 +450,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Main.Test").anyTimes();
+            "Main.Test")
+        .anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Main/Test").anyTimes();
     replayDefault(mockRequest);
     assertEquals("Test", appScriptService.getScriptNameFromURL());
@@ -460,7 +471,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Test.WebHome").anyTimes();
+            "Test.WebHome")
+        .anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Test/WebHome").anyTimes();
     replayDefault(mockRequest);
     assertEquals("Test/WebHome", appScriptService.getScriptNameFromURL());
@@ -480,7 +492,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Test.WebHome").anyTimes();
+            "Test.WebHome")
+        .anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Test/").anyTimes();
     replayDefault(mockRequest);
     assertEquals("Test/WebHome", appScriptService.getScriptNameFromURL());
@@ -500,7 +513,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Main.WebHome").anyTimes();
+            "Main.WebHome")
+        .anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Main/WebHome").anyTimes();
     replayDefault(mockRequest);
     assertEquals("WebHome", appScriptService.getScriptNameFromURL());
@@ -520,7 +534,8 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "TestSpace.TestScript").anyTimes();
+            "TestSpace.TestScript")
+        .anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/export/TestSpace/TestScript").anyTimes();
     replayDefault(mockRequest);
     assertEquals("TestSpace/TestScript", appScriptService.getScriptNameFromURL());

@@ -48,7 +48,8 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
   @Deprecated
   public boolean includeMenuItem(BaseObject baseObj, XWikiContext context) {
     return getRightsAccess().hasAccessLevel(baseObj.getDocumentReference(), EAccessLevel.VIEW,
-        context.getXWikiUser()) && (getMenuPart().isEmpty() || getMenuPart().equals(
+        context.getXWikiUser())
+        && (getMenuPart().isEmpty() || getMenuPart().equals(
             baseObj.getStringValue("part_name")));
   }
 

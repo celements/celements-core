@@ -9,12 +9,7 @@ import org.xwiki.observation.event.Event;
 
 public enum SaveEventOperation {
 
-  UPDATING,
-  CREATING,
-  DELETING,
-  UPDATED,
-  CREATED,
-  DELETED;
+  UPDATING, CREATING, DELETING, UPDATED, CREATED, DELETED;
 
   public boolean isBeforeSave() {
     return ordinal() < 3;
@@ -37,7 +32,8 @@ public enum SaveEventOperation {
    *         A) if an original and new entity (doc, object, ...) exists
    *         B) if the operation is before or after save.
    */
-  public static Optional<SaveEventOperation> from(boolean origExists, boolean newExists, boolean beforeSave) {
+  public static Optional<SaveEventOperation> from(boolean origExists, boolean newExists,
+      boolean beforeSave) {
     int val = ((newExists ? 0 : 1) << 1) | (origExists ? 0 : 1);
     if (val < 3) {
       return Optional.of(values()[val + (beforeSave ? 0 : 3)]);

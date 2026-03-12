@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * @deprecated instead use {@link IRequestValidationRule}
- *
  */
 @Deprecated
 @ComponentRole

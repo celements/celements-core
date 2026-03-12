@@ -47,7 +47,8 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     Collection<DocumentReference> emptyGroupsList = Collections.emptyList();
     expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
         "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))).andReturn(
-            emptyGroupsList).anyTimes();
+            emptyGroupsList)
+        .anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
         "TestSpace", "TestDoc"));
@@ -78,7 +79,8 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     Collection<DocumentReference> emptyGroupsList = Collections.emptyList();
     expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
         "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))).andReturn(
-            emptyGroupsList).anyTimes();
+            emptyGroupsList)
+        .anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), same(
         getContext()))).andReturn("1").anyTimes();
@@ -109,7 +111,8 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     Collection<DocumentReference> emptyGroupsList = Collections.emptyList();
     expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
         "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))).andReturn(
-            emptyGroupsList).anyTimes();
+            emptyGroupsList)
+        .anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), same(
         getContext()))).andReturn("1").anyTimes();
@@ -147,7 +150,8 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     Collection<DocumentReference> emptyGroupsList = Collections.emptyList();
     expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
         "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))).andReturn(
-            emptyGroupsList).anyTimes();
+            emptyGroupsList)
+        .anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), same(
         getContext()))).andReturn("1").anyTimes();

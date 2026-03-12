@@ -9,8 +9,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class MenuItemsUtils {
 
-  private MenuItemsUtils() {
-  }
+  private MenuItemsUtils() {}
 
   public static EntityReference resolveParentRef(@NotNull String parentFN) {
     return (parentFN.isEmpty()) ? null : Utils.getComponent(ModelUtils.class).resolveRef(parentFN);

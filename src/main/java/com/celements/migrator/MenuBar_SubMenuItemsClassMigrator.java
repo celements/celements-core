@@ -60,7 +60,7 @@ public class MenuBar_SubMenuItemsClassMigrator
   IWebUtilsService webUtilsService;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   @Override
@@ -73,12 +73,13 @@ public class MenuBar_SubMenuItemsClassMigrator
   }
 
   @Override
-  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context
-      ) throws XWikiException {
+  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
+      throws XWikiException {
     getMenuClasses().runUpdate(getContext());
     List<String> result = context.getWiki().search(
         "select distinct o.name from BaseObject o"
-        + " where o.className = 'Celements2.MenuBarSubItem'", context);
+            + " where o.className = 'Celements2.MenuBarSubItem'",
+        context);
     LOGGER.info("found [" + ((result != null) ? result.size() : result)
         + "] documents to migrate.");
     for (Object fullName : result) {
@@ -97,8 +98,7 @@ public class MenuBar_SubMenuItemsClassMigrator
     }
   }
 
-  private void migrateSubItem(BaseObject oldSubItemObj, XWikiDocument doc
-      ) throws XWikiException {
+  private void migrateSubItem(BaseObject oldSubItemObj, XWikiDocument doc) throws XWikiException {
     BaseObject newSubItemObj = doc.newXObject(menuService.getMenuBarSubItemClassRef(),
         getContext());
     newSubItemObj.setStringValue("name", oldSubItemObj.getStringValue("name"));

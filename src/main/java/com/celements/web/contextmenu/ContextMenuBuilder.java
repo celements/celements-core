@@ -81,8 +81,7 @@ public class ContextMenuBuilder {
     }
 
     @Override
-    public void readPropertyKey(String key) {
-    }
+    public void readPropertyKey(String key) {}
 
     @Override
     public void stringEvent(String value) {

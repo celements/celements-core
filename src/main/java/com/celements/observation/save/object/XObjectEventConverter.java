@@ -56,7 +56,8 @@ public class XObjectEventConverter extends AbstractLocalEventListener<XWikiDocum
   protected void onEventInternal(Event sourceEvent, XWikiDocument doc, XWikiContext context) {
     if (doc.getTranslation() == 0) {
       Map<ImmutableObjectReference, BaseObject> newObjMap = getObjectMap(doc);
-      Map<ImmutableObjectReference, BaseObject> origObjMap = getObjectMap(doc.getOriginalDocument());
+      Map<ImmutableObjectReference, BaseObject> origObjMap = getObjectMap(
+          doc.getOriginalDocument());
       for (ImmutableObjectReference objRef : Sets.union(newObjMap.keySet(), origObjMap.keySet())) {
         BaseObject newObj = newObjMap.get(objRef);
         BaseObject origObj = origObjMap.get(objRef);

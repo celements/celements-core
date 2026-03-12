@@ -51,7 +51,8 @@ public class PageTypePropertiesClass extends AbstractClassDefinition implements
       CLASS_REF, "show_frame").prettyName("Show Frame").displayType("yesno").build();
   public static final ClassField<Boolean> PAGETYPE_PROP_LOAD_RICHTEXT = new BooleanField.Builder(
       CLASS_REF, "load_richtext").prettyName("Load Richtext Editor").displayType(
-          "yesno").build();
+          "yesno")
+      .build();
   public static final ClassField<Integer> PAGETYPE_PROP_RTE_WIDTH = new IntField.Builder(
       CLASS_REF, "rte_width").prettyName("Richtext Editor Width").size(30).build();
   public static final ClassField<Integer> PAGETYPE_PROP_RTE_HEIGHT = new IntField.Builder(
@@ -60,12 +61,14 @@ public class PageTypePropertiesClass extends AbstractClassDefinition implements
       CLASS_REF, "haspagetitle").prettyName("Has Page Title").displayType("yesno").build();
   public static final ClassField<Boolean> PAGETYPE_PROP_IS_UNCONNECTED_PARENT = new BooleanField.Builder(
       CLASS_REF, "unconnected_parent").prettyName("Is Unconnected Parent").displayType(
-          "yesno").build();
+          "yesno")
+      .build();
   public static final ClassField<String> PAGETYPE_PROP_TAG_NAME = new StringField.Builder(
       CLASS_REF, "tag_name").size(30).prettyName("Tag Name").build();
   public static final ClassField<Boolean> PAGETYPE_PROP_INLINE_EDITOR_MODE = new BooleanField.Builder(
       CLASS_REF, "inline_editor").prettyName("Use Inline Editor Mode").displayType(
-          "yesno").build();
+          "yesno")
+      .build();
 
   public PageTypePropertiesClass() {
     super(CLASS_REF);

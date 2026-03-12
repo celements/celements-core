@@ -60,7 +60,8 @@ public class TreeNodeCacheTest extends AbstractComponentTest {
 
   @Test
   public void testGetNotMappedMenuItemsForParentCmd_singleton() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = treeNodeCache.getNotMappedMenuItemsForParentCmd();
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = treeNodeCache
+        .getNotMappedMenuItemsForParentCmd();
     assertNotNull(testGetMenuItemCommand);
     assertSame("Expecting injected cmd object", testGetMenuItemCommand,
         treeNodeCache.getNotMappedMenuItemsForParentCmd());
