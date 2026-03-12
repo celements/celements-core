@@ -35,8 +35,7 @@ public class CSSEngine implements ICSSEngine {
   private static final String _CSS_ENGINE_OBJECT_KEY = "com.celements.web.css.CSSEngine";
   static final Logger LOGGER = LoggerFactory.getLogger(CSSEngine.class);
 
-  private CSSEngine() {
-  }
+  private CSSEngine() {}
 
   public static ICSSEngine getCSSEngine(XWikiContext context) {
     Object storeObj = context.get(_CSS_ENGINE_OBJECT_KEY);

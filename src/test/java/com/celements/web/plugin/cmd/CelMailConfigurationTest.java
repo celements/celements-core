@@ -75,7 +75,8 @@ public class CelMailConfigurationTest extends AbstractComponentTest {
   public void testGetFrom() {
     expect(xwiki.getXWikiPreference(eq("smtp_from"), eq(
         CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))).andReturn(
-            "test@unit.test").once();
+            "test@unit.test")
+        .once();
     replayDefault();
     assertEquals("test@unit.test", celMailConfiguration.getFrom());
     assertEquals("multiple reads must not lead to multiple config reads.", "test@unit.test",
@@ -87,7 +88,8 @@ public class CelMailConfigurationTest extends AbstractComponentTest {
   public void testGetFrom_setBackToEmpty() {
     expect(xwiki.getXWikiPreference(eq("smtp_from"), eq(
         CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))).andReturn(
-            "test@unit.test").times(2);
+            "test@unit.test")
+        .times(2);
     replayDefault();
     assertEquals("test@unit.test", celMailConfiguration.getFrom());
     celMailConfiguration.setFrom("");
@@ -100,7 +102,8 @@ public class CelMailConfigurationTest extends AbstractComponentTest {
   public void testGetFrom_overwrittenBy_setFrom() {
     expect(xwiki.getXWikiPreference(eq("smtp_from"), eq(
         CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))).andReturn(
-            "test@unit.test").anyTimes();
+            "test@unit.test")
+        .anyTimes();
     replayDefault();
     celMailConfiguration.setFrom("myTest@specialUnit.test");
     assertEquals("myTest@specialUnit.test", celMailConfiguration.getFrom());
@@ -111,10 +114,12 @@ public class CelMailConfigurationTest extends AbstractComponentTest {
   public void testGetFrom_fallbackToAdminEmailAdress() {
     expect(xwiki.getXWikiPreference(eq("smtp_from"), eq(
         CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))).andReturn(
-            "").once();
+            "")
+        .once();
     expect(xwiki.getXWikiPreference(eq("admin_email"), eq(
         CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))).andReturn(
-            "test@unit.test").once();
+            "test@unit.test")
+        .once();
     replayDefault();
     assertEquals("test@unit.test", celMailConfiguration.getFrom());
     assertEquals("multiple reads must not lead to multiple config reads.", "test@unit.test",

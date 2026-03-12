@@ -484,7 +484,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private boolean isGlobalPref(XWikiContext context) {
     if ((context.getDoc() != null) && (context.getRequest() != null)) {
       return new DocumentReference(context.getDatabase(), "XWiki", "XWikiPreferences").equals(
-          context.getDoc().getDocumentReference()) || "globaladmin".equals(context.getRequest().get(
+          context.getDoc().getDocumentReference())
+          || "globaladmin".equals(context.getRequest().get(
               "editor"));
     }
     return false;

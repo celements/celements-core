@@ -81,7 +81,8 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(documentRef, nextNonEmptChildCmd.getNextNonEmptyChildren(documentRef));
     verifyDefault();
@@ -96,7 +97,8 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
         Collections.<TreeNode>emptyList()).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -119,7 +121,8 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -155,7 +158,8 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -188,7 +192,8 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
         childChildXdoc).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -231,7 +236,8 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
         Collections.<TreeNode>emptyList()).once();
     expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
         "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default").anyTimes();
+            "default")
+        .anyTimes();
     replayDefault();
     assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();

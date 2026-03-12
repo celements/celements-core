@@ -51,13 +51,12 @@ public class MenuNameMappingCelements2_8Test extends AbstractComponentTest {
     verifyAll();
   }
 
-
-  private void replayAll(Object ... mocks) {
+  private void replayAll(Object... mocks) {
     replay(xwiki);
     replay(mocks);
   }
 
-  private void verifyAll(Object ... mocks) {
+  private void verifyAll(Object... mocks) {
     verify(xwiki);
     verify(mocks);
   }

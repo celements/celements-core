@@ -196,8 +196,8 @@ public class AppScriptService implements IAppScriptService {
     return findAppScriptRecursivly(scriptName,
         sn -> isAppScriptAvailable(sn + "++"),
         sn -> sn.lastIndexOf("/") > 0)
-            .map(sNT -> sNT + "++")
-            .filter(sNT -> !Strings.isNullOrEmpty(sNT) && isAppScriptAvailable(sNT));
+        .map(sNT -> sNT + "++")
+        .filter(sNT -> !Strings.isNullOrEmpty(sNT) && isAppScriptAvailable(sNT));
   }
 
   private Optional<String> findAppScriptRecursivly(String scriptName,

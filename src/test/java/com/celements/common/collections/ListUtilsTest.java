@@ -30,8 +30,7 @@ import org.junit.Test;
 public class ListUtilsTest {
 
   @Before
-  public void prepareTest() throws Exception {
-  }
+  public void prepareTest() throws Exception {}
 
   @Test
   public void testImplode_null() {

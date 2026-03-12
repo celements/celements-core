@@ -290,6 +290,7 @@ public class LexicalParserTest {
   }
 
   private enum ERulesLiteral implements IGenericLiteral {
+
     OBJECT_VALUE(ECommand.VALUE_COMMAND),
     RULE_ATTRIBUTE(OBJECT_VALUE, "name", "*"),
     CON_OR_ACT_ATTRIBUTE(OBJECT_VALUE, "type"),

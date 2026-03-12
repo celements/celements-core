@@ -63,7 +63,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     context.setURLFactory(mockURLFactory);
     expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
         "celements.attachmenturl.defaultaction"), eq("file"), same(context)))
-            .andReturn("file").anyTimes();
+        .andReturn("file").anyTimes();
   }
 
   @Test
@@ -108,7 +108,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     blaAtt.setFilename("bla.txt");
     expect(getMock(IAttachmentServiceRole.class)
         .getAttachmentNameEqual(anyObject(AttachmentReference.class)))
-            .andReturn(blaAtt);
+        .andReturn(blaAtt);
     replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL("celements2web:A.B;bla.txt", context);
     verifyDefault();
@@ -125,7 +125,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     blaAtt.setFilename(attRef.getName());
     expect(getMock(IAttachmentServiceRole.class)
         .getAttachmentNameEqual(anyObject(AttachmentReference.class)))
-            .andReturn(blaAtt);
+        .andReturn(blaAtt);
     replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL("A.B;bla.txt", context);
     verifyDefault();
@@ -138,7 +138,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
         new DocumentReference(context.getDatabase(), "A", "B"));
     expect(getMock(IAttachmentServiceRole.class)
         .getAttachmentNameEqual(anyObject(AttachmentReference.class)))
-            .andThrow(new AttachmentNotExistsException(attRef));
+        .andThrow(new AttachmentNotExistsException(attRef));
     replayDefault();
     assertNull(attUrlCmd.getAttachmentURL("A.B;bla.txt", context));
     verifyDefault();

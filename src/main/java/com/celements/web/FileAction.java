@@ -198,7 +198,8 @@ public class FileAction extends SkinAction {
         }
       } else {
         return renderFileFromObjectField(filename, doc, context) || renderFileFromAttachment(
-            filename, doc, context) || (SKINS_DIRECTORY.equals(doc.getSpace())
+            filename, doc, context)
+            || (SKINS_DIRECTORY.equals(doc.getSpace())
                 && renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()), context));
       }
     } catch (IOException e) {

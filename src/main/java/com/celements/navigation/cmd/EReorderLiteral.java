@@ -26,6 +26,7 @@ import com.celements.sajson.ECommand;
 import com.celements.sajson.IGenericLiteral;
 
 public enum EReorderLiteral implements IGenericLiteral {
+
   ELEMENT_ID(ECommand.VALUE_COMMAND),
   ELEM_IDS_ARRAY(ECommand.ARRAY_COMMAND, ELEMENT_ID),
   PARENT_CHILDREN_PROPERTY(ECommand.PROPERTY_COMMAND, ELEM_IDS_ARRAY),

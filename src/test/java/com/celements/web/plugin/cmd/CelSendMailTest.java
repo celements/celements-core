@@ -191,13 +191,16 @@ public class CelSendMailTest extends AbstractComponentTest {
         ""), same(context))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreference(eq("smtp_server_username"), eq(
         "celements.mail.default.smtp_server_username"), eq(""), same(context))).andReturn(
-            "").anyTimes();
+            "")
+        .anyTimes();
     expect(xwiki.getXWikiPreference(eq("smtp_server_password"), eq(
         "celements.mail.default.smtp_server_password"), eq(""), same(context))).andReturn(
-            "").anyTimes();
+            "")
+        .anyTimes();
     expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), eq(
         "celements.mail.default.javamail_extra_props"), eq(""), same(context))).andReturn(
-            "").anyTimes();
+            "")
+        .anyTimes();
     replayDefault();
     assertEquals(1, sendMail.sendMail());
     verifyDefault();

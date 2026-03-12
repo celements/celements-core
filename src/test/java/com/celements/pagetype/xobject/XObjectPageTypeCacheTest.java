@@ -71,7 +71,8 @@ public class XObjectPageTypeCacheTest extends AbstractComponentTest {
 
   @Test
   public void testInvalidateCacheForWiki() {
-    Map<WikiReference, List<PageTypeReference>> pageTypeRefCache = xObjPageTypeCache.getPageTypeRefCache();
+    Map<WikiReference, List<PageTypeReference>> pageTypeRefCache = xObjPageTypeCache
+        .getPageTypeRefCache();
     assertNotNull(pageTypeRefCache);
     PageTypeReference pageTypeRefMack = createDefaultMock(PageTypeReference.class);
     pageTypeRefCache.put(wikiRef, Arrays.asList(pageTypeRefMack));
