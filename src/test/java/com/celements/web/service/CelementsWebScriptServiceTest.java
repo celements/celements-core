@@ -104,9 +104,11 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn(
         IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
+    expect(appScriptServiceMock.isAppScriptRequest()).andReturn(true).anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Content.login").anyTimes();
+            "Content.login")
+        .anyTimes();
     replayDefault(mockRequest);
     assertTrue(celWebService.isAppScriptRequest());
     verifyDefault(mockRequest);

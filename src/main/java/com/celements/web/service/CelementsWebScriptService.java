@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringUtils;
@@ -132,15 +133,15 @@ public class CelementsWebScriptService implements ScriptService {
       ConfigurationSource configSource,
       ITreeNodeCache treeNodeCacheService,
       ITreeNodeService treeNodeService,
-      ScriptService treeNodeScriptService,
+      @Named("treeNode") ScriptService treeNodeScriptService,
       IClassesCompositorComponent classesComp,
       IMandatoryDocumentCompositorRole mandatoryDocComp,
-      ScriptService deprecatedUsage,
+      @Named("deprecated") ScriptService deprecatedUsage,
       ILastChangedRole lastChangedSrv,
       LastStartupTimeStampRole lastStartupTimeStamp,
       ModelContext modelContext,
       Execution execution,
-      ConfigurationSource xwikiPropertiesSource) {
+      @Named("xwikiproperties") ConfigurationSource xwikiPropertiesSource) {
     this.queryManager = queryManager;
     this.appScriptService = appScriptService;
     this.webUtilsService = webUtilsService;
