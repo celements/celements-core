@@ -12,7 +12,6 @@ com.celements.cells.CellsClasses
 com.celements.navigation.NavigationClasses
 com.celements.navigation.service.TreeNodeCache
 com.celements.navigation.service.TreeNodeService
-com.celements.web.service.CelementsWebScriptService
 com.celements.web.service.WebUtilsService
 com.celements.web.service.ContextMenuScriptService
 com.celements.menu.MenuClasses
@@ -68,6 +67,7 @@ com.celements.javascript.JSScriptService
 com.celements.web.service.LegacySkinScriptService
 com.celements.navigation.service.TreeNodeScriptService
 com.celements.cells.CellsClassConfig
+com.celements.web.service.CelementsWebService
 com.celements.navigation.presentation.RenderedExtractPresentationType
 com.celements.captcha.CaptchaService
 com.celements.pagetype.xobject.XObjectPageTypeCache
