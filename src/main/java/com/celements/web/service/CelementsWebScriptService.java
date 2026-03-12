@@ -34,6 +34,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringUtils;
@@ -42,8 +44,7 @@ import org.hibernate.Transaction;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.springframework.stereotype.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
@@ -61,6 +62,7 @@ import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.celements.metatag.BaseObjectMetaTagProvider;
 import com.celements.model.access.ModelAccessScriptService;
+import com.celements.model.context.ModelContext;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
@@ -107,50 +109,55 @@ public class CelementsWebScriptService implements ScriptService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CelementsWebScriptService.class);
 
-  @Requirement
-  QueryManager queryManager;
+  private final QueryManager queryManager;
+  private final IAppScriptService appScriptService;
+  private final IWebUtilsService webUtilsService;
+  private final ConfigurationSource configSource;
+  private final ITreeNodeCache treeNodeCacheService;
+  private final ITreeNodeService treeNodeService;
+  private final ScriptService treeNodeScriptService;
+  private final IClassesCompositorComponent classesComp;
+  private final IMandatoryDocumentCompositorRole mandatoryDocComp;
+  private final ScriptService deprecatedUsage;
+  private final ILastChangedRole lastChangedSrv;
+  private final LastStartupTimeStampRole lastStartupTimeStamp;
+  private final ModelContext modelContext;
+  private final Execution execution;
+  private final ConfigurationSource xwikiPropertiesSource;
 
-  @Requirement
-  IAppScriptService appScriptService;
-
-  @Requirement
-  IWebUtilsService webUtilsService;
-
-  @Requirement
-  ConfigurationSource configSource;
-
-  @Requirement("legacyskin")
-  ScriptService legacySkinScriptService;
-
-  @Requirement
-  ITreeNodeCache treeNodeCacheService;
-
-  @Requirement
-  ITreeNodeService treeNodeService;
-
-  @Requirement("treeNode")
-  ScriptService treeNodeScriptService;
-
-  @Requirement
-  IClassesCompositorComponent classesComp;
-
-  @Requirement
-  IMandatoryDocumentCompositorRole mandatoryDocComp;
-
-  @Requirement("deprecated")
-  ScriptService deprecatedUsage;
-
-  @Requirement
-  ILastChangedRole lastChangedSrv;
-
-  @Requirement
-  LastStartupTimeStampRole lastStartupTimeStamp;
-
-  @Requirement
-  Execution execution;
-
-  @Requirement("xwikiproperties")
-  private ConfigurationSource xwikiPropertiesSource;
+  @Inject
+  public CelementsWebScriptService(
+      QueryManager queryManager,
+      IAppScriptService appScriptService,
+      IWebUtilsService webUtilsService,
+      ConfigurationSource configSource,
+      ITreeNodeCache treeNodeCacheService,
+      ITreeNodeService treeNodeService,
+      @Named("treeNode") ScriptService treeNodeScriptService,
+      IClassesCompositorComponent classesComp,
+      IMandatoryDocumentCompositorRole mandatoryDocComp,
+      @Named("deprecated") ScriptService deprecatedUsage,
+      ILastChangedRole lastChangedSrv,
+      LastStartupTimeStampRole lastStartupTimeStamp,
+      ModelContext modelContext,
+      Execution execution,
+      @Named("xwikiproperties") ConfigurationSource xwikiPropertiesSource) {
+    this.queryManager = queryManager;
+    this.appScriptService = appScriptService;
+    this.webUtilsService = webUtilsService;
+    this.configSource = configSource;
+    this.treeNodeCacheService = treeNodeCacheService;
+    this.treeNodeService = treeNodeService;
+    this.treeNodeScriptService = treeNodeScriptService;
+    this.classesComp = classesComp;
+    this.mandatoryDocComp = mandatoryDocComp;
+    this.deprecatedUsage = deprecatedUsage;
+    this.lastChangedSrv = lastChangedSrv;
+    this.lastStartupTimeStamp = lastStartupTimeStamp;
+    this.modelContext = modelContext;
+    this.execution = execution;
+    this.xwikiPropertiesSource = xwikiPropertiesSource;
+  }
 
   /**
    * Property containing the version value in the {@link #VERSION_FILE} file.
@@ -819,7 +826,7 @@ public class CelementsWebScriptService implements ScriptService {
    * The context.isMainWiki method is broken for virtual usage. This is a replacement.
    */
   public boolean isMainWiki() {
-    return getContext() == null ? null : isMainWiki(getContext().getDatabase());
+    return modelContext.isMainWiki();
   }
 
   /**

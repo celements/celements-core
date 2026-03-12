@@ -24,11 +24,13 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
   private XWiki xwiki;
   private CelementsWebScriptService celWebService;
   private XWikiRightService mockRightService;
+  private IAppScriptService appScriptServiceMock;
 
   @Before
   public void setUp_CelementsWebScriptServiceTest() throws Exception {
     context = getXContext();
     xwiki = getMock(XWiki.class);
+    appScriptServiceMock = registerComponentMock(IAppScriptService.class);
     mockRightService = createDefaultMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
     celWebService = (CelementsWebScriptService) Utils.getComponent(ScriptService.class,
@@ -102,9 +104,11 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn(
         IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
+    expect(appScriptServiceMock.isAppScriptRequest()).andReturn(true).anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
         IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Content.login").anyTimes();
+            "Content.login")
+        .anyTimes();
     replayDefault(mockRequest);
     assertTrue(celWebService.isAppScriptRequest());
     verifyDefault(mockRequest);
@@ -112,8 +116,6 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetCurrentPageURL_isAppScriptRequest() {
-    IAppScriptService appScriptServiceMock = createMock(AppScriptService.class);
-    celWebService.appScriptService = appScriptServiceMock;
     String queryString = "myQueryString";
     String scriptName = "myScript/Name";
 
@@ -122,22 +124,20 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
     expect(appScriptServiceMock.getAppScriptURL(eq(scriptName), eq(queryString))).andReturn(
         "theURL").once();
 
-    replayDefault(appScriptServiceMock);
+    replayDefault();
     assertEquals("theURL", celWebService.getCurrentPageURL(queryString));
-    verifyDefault(appScriptServiceMock);
+    verifyDefault();
   }
 
   @Test
   public void testGetCurrentPageURL_isNotAppScriptRequest() {
-    IAppScriptService appScriptServiceMock = createMock(AppScriptService.class);
-    celWebService.appScriptService = appScriptServiceMock;
     String queryString = "my[Query}String";
 
     expect(appScriptServiceMock.isAppScriptRequest()).andReturn(false).once();
 
-    replayDefault(appScriptServiceMock);
+    replayDefault();
     assertEquals("?my%5BQuery%7DString", celWebService.getCurrentPageURL(queryString));
-    verifyDefault(appScriptServiceMock);
+    verifyDefault();
   }
 
   @Test
