@@ -67,7 +67,6 @@ com.celements.filebase.FileBaseScriptService
 com.celements.javascript.JSScriptService
 com.celements.web.service.LegacySkinScriptService
 com.celements.navigation.service.TreeNodeScriptService
-com.celements.web.service.CelementsWebService
 com.celements.cells.CellsClassConfig
 com.celements.navigation.presentation.RenderedExtractPresentationType
 com.celements.captcha.CaptchaService
