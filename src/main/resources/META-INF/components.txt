@@ -98,7 +98,6 @@ com.celements.lastChanged.DocumentChangesListener
 com.celements.filebase.SingleDocFileBaseService
 com.celements.filebase.FileBaseAccessService
 com.celements.rights.publication.PublicationService
-com.celements.common.observation.listener.LocalEventListener
 com.celements.pagetype.category.DefaultPageTypeCategory
 com.celements.cells.CellTypeCategory
 com.celements.web.service.LastStartupTimeStamp
