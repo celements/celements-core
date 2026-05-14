@@ -95,7 +95,6 @@ com.celements.web.classcollections.OldCoreClassConfig
 com.celements.lastChanged.LastChangedService
 com.celements.lastChanged.DocumentChangesListener
 com.celements.rights.publication.PublicationService
-com.celements.common.observation.listener.LocalEventListener
 com.celements.pagetype.category.DefaultPageTypeCategory
 com.celements.cells.CellTypeCategory
 com.celements.web.service.LastStartupTimeStamp
