@@ -62,7 +62,6 @@ com.celements.css.CssScriptService
 com.celements.docform.DocFormScriptService
 com.celements.web.service.EditorSupportScriptService
 com.celements.emptycheck.service.EmptyCheckScriptService
-com.celements.filebase.FileBaseScriptService
 com.celements.javascript.JSScriptService
 com.celements.web.service.LegacySkinScriptService
 com.celements.navigation.service.TreeNodeScriptService
@@ -95,8 +94,6 @@ com.celements.web.service.DeprecatedUsageScriptService
 com.celements.web.classcollections.OldCoreClassConfig
 com.celements.lastChanged.LastChangedService
 com.celements.lastChanged.DocumentChangesListener
-com.celements.filebase.SingleDocFileBaseService
-com.celements.filebase.FileBaseAccessService
 com.celements.rights.publication.PublicationService
 com.celements.pagetype.category.DefaultPageTypeCategory
 com.celements.cells.CellTypeCategory

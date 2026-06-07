@@ -680,15 +680,6 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link CelementsWebScriptService #clearFileName(String)}
-   */
-  @Deprecated
-  public String clearFileName(String fileName) {
-    return getScriptService().clearFileName(fileName);
-  }
-
-  /**
-   * @deprecated since 2.59 instead use
    *             {@link CelementsWebScriptService #getDocHeaderTitle(DocumentReference)}
    */
   @Deprecated

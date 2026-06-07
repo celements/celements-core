@@ -57,7 +57,6 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
 import com.celements.common.classes.IClassesCompositorComponent;
-import com.celements.filebase.FileBaseScriptService;
 import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.celements.metatag.BaseObjectMetaTagProvider;
@@ -903,15 +902,6 @@ public class CelementsWebScriptService implements ScriptService {
 
   public String getDocHeaderTitle(DocumentReference docRef) {
     return new DocHeaderTitleCommand().getDocHeaderTitle(docRef);
-  }
-
-  /**
-   * @deprecated since 2.59.1 instead use clearFileName in FileBaseScriptService
-   */
-  @Deprecated
-  public String clearFileName(String fileName) {
-    return ((FileBaseScriptService) Utils.getComponent(ScriptService.class,
-        "filebase")).clearFileName(fileName);
   }
 
   public boolean isTranslationAvailable(Document doc, String language) {
