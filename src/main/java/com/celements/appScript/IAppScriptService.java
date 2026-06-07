@@ -49,6 +49,8 @@ public interface IAppScriptService {
 
   Optional<String> getAppRecursiveScript(String scriptName);
 
+  Optional<String> getAppRecursiveSetupScript(String scriptName);
+
   String getAppScriptURL(String scriptName);
 
   String getAppScriptURL(String scriptName, String queryString);

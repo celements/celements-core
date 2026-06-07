@@ -41,33 +41,37 @@ public class AppScriptService implements IAppScriptService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AppScriptService.class);
 
-  @Inject
-  private IEmptyCheckRole emptyCheck;
+  private final IEmptyCheckRole emptyCheck;
+  private final Execution execution;
+  private final EntityReferenceValueProvider defaultEntityReferenceValueProvider;
+  private final XWikiProvider wikiProvider;
+  private final IModelAccessFacade modelAccess;
+  private final ModelUtils modelUtils;
+  private final ModelContext mContext;
+  private final UrlService urlService;
+  private final ConfigurationSource xwikiConfigSource;
 
   @Inject
-  private Execution execution;
-
-  @Inject
-  private EntityReferenceValueProvider defaultEntityReferenceValueProvider;
-
-  @Inject
-  private XWikiProvider wikiProvider;
-
-  @Inject
-  private IModelAccessFacade modelAccess;
-
-  @Inject
-  private ModelUtils modelUtils;
-
-  @Inject
-  private ModelContext mContext;
-
-  @Inject
-  private UrlService urlService;
-
-  @Inject
-  @Named(XWikiConfigSource.NAME)
-  private ConfigurationSource xwikiConfigSource;
+  public AppScriptService(
+      IEmptyCheckRole emptyCheck,
+      Execution execution,
+      EntityReferenceValueProvider defaultEntityReferenceValueProvider,
+      XWikiProvider wikiProvider,
+      IModelAccessFacade modelAccess,
+      ModelUtils modelUtils,
+      ModelContext mContext,
+      UrlService urlService,
+      @Named(XWikiConfigSource.NAME) ConfigurationSource xwikiConfigSource) {
+    this.emptyCheck = emptyCheck;
+    this.execution = execution;
+    this.defaultEntityReferenceValueProvider = defaultEntityReferenceValueProvider;
+    this.wikiProvider = wikiProvider;
+    this.modelAccess = modelAccess;
+    this.modelUtils = modelUtils;
+    this.mContext = mContext;
+    this.urlService = urlService;
+    this.xwikiConfigSource = xwikiConfigSource;
+  }
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -196,8 +200,16 @@ public class AppScriptService implements IAppScriptService {
     return findAppScriptRecursivly(scriptName,
         sn -> isAppScriptAvailable(sn + "++"),
         sn -> sn.lastIndexOf("/") > 0)
-            .map(sNT -> sNT + "++")
-            .filter(sNT -> !Strings.isNullOrEmpty(sNT) && isAppScriptAvailable(sNT));
+        .map(sNT -> sNT + "++")
+        .filter(sNT -> !Strings.isNullOrEmpty(sNT) && isAppScriptAvailable(sNT));
+  }
+
+  @Override
+  public Optional<String> getAppRecursiveSetupScript(String scriptName) {
+    return getAppRecursiveScript(scriptName)
+        .filter(script -> script.endsWith("++"))
+        .map(script -> script.substring(0, script.length() - 2) + "_setup++")
+        .filter(this::isAppScriptAvailable);
   }
 
   private Optional<String> findAppScriptRecursivly(String scriptName,

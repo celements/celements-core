@@ -712,6 +712,42 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void test_getAppRecursiveSetupScript_exists() throws Exception {
+    String scriptName = "path/to/my/appscript";
+    String scriptNamePathBase = "/templates/celAppScripts/";
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path/to/my++.vm")))
+        .andThrow(new IOException())
+        .atLeastOnce();
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path/to++.vm")))
+        .andReturn(new byte[0])
+        .atLeastOnce();
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path/to_setup++.vm")))
+        .andReturn(new byte[0])
+        .once();
+    replayDefault();
+    assertEquals("path/to_setup++", appScriptService.getAppRecursiveSetupScript(scriptName).get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveSetupScript_setupNotExists() throws Exception {
+    String scriptName = "path/to/my/appscript";
+    String scriptNamePathBase = "/templates/celAppScripts/";
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path/to/my++.vm")))
+        .andThrow(new IOException())
+        .atLeastOnce();
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path/to++.vm")))
+        .andReturn(new byte[0])
+        .atLeastOnce();
+    expect(xwiki.getResourceContentAsBytes(eq(scriptNamePathBase + "path/to_setup++.vm")))
+        .andThrow(new IOException())
+        .once();
+    replayDefault();
+    assertFalse(appScriptService.getAppRecursiveSetupScript(scriptName).isPresent());
+    verifyDefault();
+  }
+
   private DocumentReference createScriptDocRef(String scriptName) {
     return RefBuilder
         .from(new WikiReference(getXContext().getDatabase()))
