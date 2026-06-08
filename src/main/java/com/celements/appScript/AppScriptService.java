@@ -217,8 +217,8 @@ public class AppScriptService implements IAppScriptService {
     String scriptNameTest = scriptName;
     do {
       scriptNameTest = reduceOneDirectory(scriptNameTest);
-    } while (!hasFound.test(scriptNameTest) && hasMore.test(scriptNameTest));
-    if (hasFound.test(scriptNameTest)) {
+    } while (scriptNameTest != null && !hasFound.test(scriptNameTest) && hasMore.test(scriptNameTest));
+    if (scriptNameTest != null && hasFound.test(scriptNameTest)) {
       return Optional.of(scriptNameTest);
     }
     return Optional.empty();
