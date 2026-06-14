@@ -748,6 +748,34 @@ public class AppScriptServiceTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void test_getAppRecursiveScript_singleSegment() {
+    replayDefault();
+    assertFalse(appScriptService.getAppRecursiveScript("path").isPresent());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveScript_null() {
+    replayDefault();
+    assertFalse(appScriptService.getAppRecursiveScript(null).isPresent());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveScriptDocRef_singleSegment() {
+    replayDefault();
+    assertFalse(appScriptService.getAppRecursiveScriptDocRef("path").isPresent());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAppRecursiveScriptDocRef_null() {
+    replayDefault();
+    assertFalse(appScriptService.getAppRecursiveScriptDocRef(null).isPresent());
+    verifyDefault();
+  }
+
   private DocumentReference createScriptDocRef(String scriptName) {
     return RefBuilder
         .from(new WikiReference(getXContext().getDatabase()))
