@@ -23,9 +23,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
+import org.springframework.stereotype.Component;
 
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
