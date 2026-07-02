@@ -25,18 +25,27 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.ClassReference;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.xpn.xwiki.web.Utils;
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.fields.ClassField;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.web.classes.oldcore.XWikiGlobalRightsClass;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 public class XWikiXWikiRightsTest extends AbstractComponentTest {
 
   private XWikiXWikiRights mandatoryXWikiRights;
 
   @Before
-  public void setUp_XWikiXWikiPreferencesTest() throws Exception {
-    mandatoryXWikiRights = (XWikiXWikiRights) Utils.getComponent(IMandatoryDocumentRole.class,
-        "celements.mandatory.wikirights");
+  public void prepareTest() throws Exception {
+    mandatoryXWikiRights = (XWikiXWikiRights) getBeanFactory().getBean(
+        "celements.mandatory.wikirights", IMandatoryDocumentRole.class);
   }
 
   @Test
@@ -47,23 +56,72 @@ public class XWikiXWikiRightsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSkip() {
-    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))).andReturn(
-        1L).anyTimes();
+  public void checkAccessRightObjs_createsMissingBaselineRightsWhenOtherGlobalRightsExist()
+      throws Exception {
+    XWikiDocument doc = new XWikiDocument(mandatoryXWikiRights.getDocRef());
+    expectGlobalRightsClass();
     replayDefault();
-    assertTrue(mandatoryXWikiRights.skip());
+
+    createGlobalRights(doc, "XWiki.OtherGroup", "view");
+
+    assertTrue(mandatoryXWikiRights.checkAccessRightObjs(doc));
+
+    assertEquals(1, countGlobalRights(doc, "XWiki.OtherGroup", "view"));
+    assertEquals(1, countGlobalRights(doc, "XWiki.ContentEditorsGroup", "edit,delete,undelete"));
+    assertEquals(1, countGlobalRights(doc, "XWiki.XWikiAdminGroup",
+        "admin,edit,comment,delete,undelete,register"));
     verifyDefault();
   }
 
   @Test
-  public void testSkip_illegalValue() {
-    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"))).andThrow(
-        new NumberFormatException(null)).anyTimes();
-    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))).andReturn(
-        0L).anyTimes();
+  public void checkAccessRightObjs_isIdempotent() throws Exception {
+    XWikiDocument doc = new XWikiDocument(mandatoryXWikiRights.getDocRef());
+    expectGlobalRightsClass();
     replayDefault();
-    assertFalse(mandatoryXWikiRights.skip());
+
+    assertTrue(mandatoryXWikiRights.checkAccessRightObjs(doc));
+    assertFalse(mandatoryXWikiRights.checkAccessRightObjs(doc));
+
+    assertEquals(1, countGlobalRights(doc, "XWiki.ContentEditorsGroup", "edit,delete,undelete"));
+    assertEquals(1, countGlobalRights(doc, "XWiki.XWikiAdminGroup",
+        "admin,edit,comment,delete,undelete,register"));
     verifyDefault();
+  }
+
+  private BaseObject createGlobalRights(XWikiDocument doc, String groupFN, String levels) {
+    BaseObject obj = XWikiObjectEditor.on(doc)
+        .filter(new ClassReference(getGlobalRightsRef()))
+        .createFirst();
+    obj.setStringValue("groups", groupFN);
+    obj.setStringValue("levels", levels);
+    obj.setStringValue("users", "");
+    obj.setIntValue("allow", 1);
+    return obj;
+  }
+
+  private int countGlobalRights(XWikiDocument doc, String groupFN, String levels) {
+    return XWikiObjectFetcher.on(doc)
+        .filter(new ClassReference(getGlobalRightsRef()))
+        .filter(obj -> obj.getIntValue("allow", 0) == 1)
+        .filter(obj -> groupFN.equals(obj.getStringValue("groups")))
+        .filter(obj -> levels.equals(obj.getStringValue("levels")))
+        .filter(obj -> "".equals(obj.getStringValue("users")))
+        .count();
+  }
+
+  private DocumentReference getGlobalRightsRef() {
+    return XWikiGlobalRightsClass.CLASS_REF.getDocRef(mandatoryXWikiRights.getDocRef()
+        .getWikiReference());
+  }
+
+  private void expectGlobalRightsClass() throws Exception {
+    ClassDefinition classDef = getBeanFactory().getBean(XWikiGlobalRightsClass.CLASS_DEF_HINT,
+        ClassDefinition.class);
+    BaseClass bClass = expectNewBaseObject(classDef.getDocRef(mandatoryXWikiRights.getDocRef()
+        .getWikiReference()));
+    for (ClassField<?> field : classDef.getFields()) {
+      expect(bClass.get(field.getName())).andReturn(field.getXField()).anyTimes();
+    }
   }
 
 }
