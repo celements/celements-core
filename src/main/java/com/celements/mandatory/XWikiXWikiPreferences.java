@@ -21,24 +21,23 @@ package com.celements.mandatory;
 
 import static com.google.common.base.Strings.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.springframework.stereotype.Component;
 
 import com.celements.filebase.IFileBaseAccessRole;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
+import com.celements.model.reference.RefBuilder;
 import com.celements.pagetype.classes.PageTypeClass;
-import com.google.common.primitives.Ints;
 import com.xpn.xwiki.XWikiConfigSource;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -57,7 +56,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
@@ -67,13 +66,15 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   @Override
   protected DocumentReference getDocRef() {
-    return new DocumentReference(getWiki(), "XWiki", "XWikiPreferences");
+    return new RefBuilder().with(modelContext.getWikiRef())
+        .space(XWikiConstant.XWIKI_SPACE)
+        .doc(XWikiConstant.XWIKI_PREF_DOC_NAME)
+        .build(DocumentReference.class);
   }
 
   @Override
   protected boolean skip() {
-    var skip = xwikiCfg.getProperty("celements.mandatory.skipWikiPreferences", "");
-    return Optional.ofNullable(Ints.tryParse(skip)).orElse(0) == 1;
+    return false;
   }
 
   @Override
