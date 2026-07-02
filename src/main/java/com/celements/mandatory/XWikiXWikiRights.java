@@ -19,9 +19,6 @@
  */
 package com.celements.mandatory;
 
-import static com.celements.logging.LogUtils.*;
-
-import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,7 +28,11 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.object.xwiki.XWikiObjectEditor;
+import com.celements.model.object.xwiki.XWikiObjectFetcher;
+import com.celements.model.reference.RefBuilder;
 import com.celements.web.classes.oldcore.XWikiGlobalRightsClass;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -39,14 +40,14 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("celements.mandatory.wikirights")
 public class XWikiXWikiRights extends AbstractMandatoryDocument {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(XWikiXWikiRights.class);
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Requirement(XWikiGlobalRightsClass.CLASS_DEF_HINT)
   private ClassDefinition globalRightsClass;
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
-    return Arrays.asList("celements.MandatoryGroups");
+    return List.of("celements.MandatoryGroups");
   }
 
   @Override
@@ -56,12 +57,15 @@ public class XWikiXWikiRights extends AbstractMandatoryDocument {
 
   @Override
   protected DocumentReference getDocRef() {
-    return new DocumentReference(getWiki(), "XWiki", "XWikiPreferences");
+    return new RefBuilder().with(modelContext.getWikiRef())
+        .space(XWikiConstant.XWIKI_SPACE)
+        .doc(XWikiConstant.XWIKI_PREF_DOC_NAME)
+        .build(DocumentReference.class);
   }
 
   @Override
   protected boolean skip() {
-    return getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiRights", 0) == 1L;
+    return false;
   }
 
   @Override
@@ -75,39 +79,41 @@ public class XWikiXWikiRights extends AbstractMandatoryDocument {
   }
 
   boolean checkAccessRights(XWikiDocument wikiPrefDoc) throws XWikiException {
-    BaseObject editRightsObj = wikiPrefDoc.getXObject(getGlobalRightsRef(), false, getContext());
-    if (editRightsObj == null) {
-      LOGGER.trace("checkAccessRights [{}], global rights class exists: {}", getWiki(),
-          defer(() -> getContext().getWiki().exists(getGlobalRightsRef(), getContext())));
-      LOGGER.trace("checkAccessRights [{}], XWiki.ContentEditorsGroup exists: {}", getWiki(),
-          defer(() -> getContext().getWiki().exists(new DocumentReference(getWiki(), "XWiki",
-              "ContentEditorsGroup"), getContext())));
-      editRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(), getContext());
-      editRightsObj.set("groups", "XWiki.ContentEditorsGroup", getContext());
-      editRightsObj.set("levels", "edit,delete,undelete", getContext());
-      editRightsObj.set("users", "", getContext());
-      editRightsObj.set("allow", 1, getContext());
-      BaseObject adminRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(), getContext());
-      LOGGER.trace("checkAccessRights [{}], XWiki.XWikiAdminGroup exists: {}", getWiki(),
-          defer(() -> getContext().getWiki().exists(new DocumentReference(getWiki(), "XWiki",
-              "XWikiAdminGroup"), getContext())));
-      adminRightsObj.set("groups", "XWiki.XWikiAdminGroup", getContext());
-      adminRightsObj.set("levels", "admin,edit,comment,delete,undelete,register", getContext());
-      adminRightsObj.set("users", "", getContext());
-      adminRightsObj.set("allow", 1, getContext());
-      LOGGER.debug("XWikiPreferences missing access rights fixed for [{}]", getWiki());
-      return true;
-    }
-    return false;
+    boolean dirty = false;
+    dirty |= checkGlobalRights(wikiPrefDoc, "XWiki.ContentEditorsGroup", "edit,delete,undelete");
+    dirty |= checkGlobalRights(wikiPrefDoc, "XWiki.XWikiAdminGroup",
+        "admin,edit,comment,delete,undelete,register");
+    return dirty;
   }
 
-  private DocumentReference getGlobalRightsRef() {
-    return globalRightsClass.getClassReference().getDocRef();
+  protected boolean checkGlobalRights(XWikiDocument wikiPrefDoc, String groupFN, String levels) {
+    if (XWikiObjectFetcher.on(wikiPrefDoc)
+        .filter(globalRightsClass)
+        .filter(obj -> hasGlobalRights(obj, groupFN, levels))
+        .exists()) {
+      return false;
+    }
+    BaseObject rightsObj = XWikiObjectEditor.on(wikiPrefDoc)
+        .filter(globalRightsClass)
+        .createFirst();
+    rightsObj.setStringValue("groups", groupFN);
+    rightsObj.setStringValue("levels", levels);
+    rightsObj.setStringValue("users", "");
+    rightsObj.setIntValue("allow", 1);
+    logger.debug("XWikiGlobalRights added missing [{}] for database [{}].", groupFN, getWiki());
+    return true;
+  }
+
+  private boolean hasGlobalRights(BaseObject obj, String groupFN, String levels) {
+    return (obj.getIntValue("allow", 0) == 1)
+        && groupFN.equals(obj.getStringValue("groups"))
+        && levels.equals(obj.getStringValue("levels"))
+        && "".equals(obj.getStringValue("users"));
   }
 
   @Override
   public Logger getLogger() {
-    return LOGGER;
+    return logger;
   }
 
 }
