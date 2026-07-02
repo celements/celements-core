@@ -29,7 +29,6 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
-import com.celements.model.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.reference.RefBuilder;
 import com.celements.web.classes.oldcore.XWikiGlobalRightsClass;
 import com.xpn.xwiki.XWikiConstant;
@@ -70,32 +69,28 @@ public class XWikiXWikiRights extends AbstractMandatoryDocument {
 
   @Override
   protected boolean checkDocuments(XWikiDocument doc) throws XWikiException {
-    return checkAccessRights(doc);
+    return checkAccessRightObjs(doc);
   }
 
   @Override
   protected boolean checkDocumentsMain(XWikiDocument doc) throws XWikiException {
-    return checkAccessRights(doc);
+    return checkAccessRightObjs(doc);
   }
 
-  boolean checkAccessRights(XWikiDocument wikiPrefDoc) throws XWikiException {
+  boolean checkAccessRightObjs(XWikiDocument wikiPrefDoc) throws XWikiException {
     boolean dirty = false;
-    dirty |= checkGlobalRights(wikiPrefDoc, "XWiki.ContentEditorsGroup", "edit,delete,undelete");
-    dirty |= checkGlobalRights(wikiPrefDoc, "XWiki.XWikiAdminGroup",
+    dirty |= checkGlobalRightObj(wikiPrefDoc, "XWiki.ContentEditorsGroup", "edit,delete,undelete");
+    dirty |= checkGlobalRightObj(wikiPrefDoc, "XWiki.XWikiAdminGroup",
         "admin,edit,comment,delete,undelete,register");
     return dirty;
   }
 
-  protected boolean checkGlobalRights(XWikiDocument wikiPrefDoc, String groupFN, String levels) {
-    if (XWikiObjectFetcher.on(wikiPrefDoc)
-        .filter(globalRightsClass)
-        .filter(obj -> hasGlobalRights(obj, groupFN, levels))
-        .exists()) {
+  protected boolean checkGlobalRightObj(XWikiDocument wikiPrefDoc, String groupFN, String levels) {
+    var editor = XWikiObjectEditor.on(wikiPrefDoc).filter(globalRightsClass);
+    if (editor.fetch().filter(obj -> hasGlobalRights(obj, groupFN, levels)).exists()) {
       return false;
     }
-    BaseObject rightsObj = XWikiObjectEditor.on(wikiPrefDoc)
-        .filter(globalRightsClass)
-        .createFirst();
+    BaseObject rightsObj = editor.createFirst();
     rightsObj.setStringValue("groups", groupFN);
     rightsObj.setStringValue("levels", levels);
     rightsObj.setStringValue("users", "");

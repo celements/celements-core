@@ -52,7 +52,7 @@ public class XWikiXWikiRightsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void checkAccessRights_createsMissingBaselineRightsWhenOtherGlobalRightsExist()
+  public void checkAccessRightObjs_createsMissingBaselineRightsWhenOtherGlobalRightsExist()
       throws Exception {
     XWikiDocument doc = new XWikiDocument(mandatoryXWikiRights.getDocRef());
     expectNewBaseObject(getGlobalRightsRef());
@@ -62,7 +62,7 @@ public class XWikiXWikiRightsTest extends AbstractComponentTest {
 
     createGlobalRights(doc, "XWiki.OtherGroup", "view");
 
-    assertTrue(mandatoryXWikiRights.checkAccessRights(doc));
+    assertTrue(mandatoryXWikiRights.checkAccessRightObjs(doc));
 
     assertEquals(1, countGlobalRights(doc, "XWiki.OtherGroup", "view"));
     assertEquals(1, countGlobalRights(doc, "XWiki.ContentEditorsGroup", "edit,delete,undelete"));
@@ -72,14 +72,14 @@ public class XWikiXWikiRightsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void checkAccessRights_isIdempotent() throws Exception {
+  public void checkAccessRightObjs_isIdempotent() throws Exception {
     XWikiDocument doc = new XWikiDocument(mandatoryXWikiRights.getDocRef());
     expectNewBaseObject(getGlobalRightsRef());
     expectNewBaseObject(getGlobalRightsRef());
     replayDefault();
 
-    assertTrue(mandatoryXWikiRights.checkAccessRights(doc));
-    assertFalse(mandatoryXWikiRights.checkAccessRights(doc));
+    assertTrue(mandatoryXWikiRights.checkAccessRightObjs(doc));
+    assertFalse(mandatoryXWikiRights.checkAccessRightObjs(doc));
 
     assertEquals(1, countGlobalRights(doc, "XWiki.ContentEditorsGroup", "edit,delete,undelete"));
     assertEquals(1, countGlobalRights(doc, "XWiki.XWikiAdminGroup",

@@ -40,7 +40,6 @@ com.celements.web.classcollections.DocumentDetailsClasses
 com.celements.web.service.WebUtilsScriptService
 com.celements.web.classcollections.OldCoreClasses
 com.celements.web.classcollections.OldCoreLegacyClasses
-com.celements.mandatory.XWikiXWikiPreferences
 com.celements.menu.access.MenuAccessService
 com.celements.menu.access.DefaultMenuAccessProvider
 com.celements.navigation.listener.TreeNodeDocumentCreatedListener
@@ -81,7 +80,6 @@ com.celements.copydoc.CopyDocumentService
 com.celements.webform.WebFormService
 com.celements.webform.WebFormScriptService
 com.celements.appScript.AppScriptScriptService
-com.celements.mandatory.XWikiXWikiRights
 com.celements.parents.XDocParents
 com.celements.parents.DocumentParentsLister
 com.celements.navigation.listener.NavigationCreateListener

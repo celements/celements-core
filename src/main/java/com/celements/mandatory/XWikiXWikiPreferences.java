@@ -28,9 +28,9 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.springframework.stereotype.Component;
 
 import com.celements.filebase.IFileBaseAccessRole;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
