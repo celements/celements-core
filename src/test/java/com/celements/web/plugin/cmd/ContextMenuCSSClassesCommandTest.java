@@ -90,18 +90,18 @@ public class ContextMenuCSSClassesCommandTest extends AbstractComponentTest {
   @Test
   public void testGetCM_CSSclasses_notViewAction() {
     context.setAction("edit");
-    context.setDatabase("myCelements");
+    context.setDatabase("mycelements");
     replay(xwiki);
     List<String> resultSet = cmCssClassesCmd.getCM_CSSclasses(context);
     assertTrue("do not return any classes if action != 'view'", resultSet.isEmpty());
-    assertEquals("Must switch back the database", "myCelements", context.getDatabase());
+    assertEquals("Must switch back the database", "mycelements", context.getDatabase());
     verify(xwiki);
   }
 
   @Test
   public void testGetCM_CSSclasses() throws Exception {
     context.setAction("view");
-    context.setDatabase("myCelements");
+    context.setDatabase("mycelements");
     List<Object> cmStringList = new ArrayList<Object>(Arrays.asList("abcClass", "secondClass"));
     expect(xwiki.search(isA(String.class), same(context))).andReturn(cmStringList);
     List<Object> cmStringList2 = new ArrayList<Object>(Arrays.asList("abcClass", "secondClass",
@@ -113,7 +113,7 @@ public class ContextMenuCSSClassesCommandTest extends AbstractComponentTest {
     assertTrue(resultSet.contains("secondClass"));
     assertTrue(resultSet.contains("thirdClass"));
     assertEquals("Douplicates must be removed.", 3, resultSet.size());
-    assertEquals("Must switch back the database", "myCelements", context.getDatabase());
+    assertEquals("Must switch back the database", "mycelements", context.getDatabase());
     verify(xwiki);
   }
 

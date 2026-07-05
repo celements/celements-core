@@ -68,6 +68,7 @@ import com.celements.navigation.service.ITreeNodeService;
 import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.pagetype.service.PageTypeScriptService;
 import com.celements.rendering.RenderCommand;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.sajson.Builder;
 import com.celements.sajson.JsonScriptService;
 import com.celements.servlet.NodeConfig.NodeIdentity;
@@ -120,6 +121,7 @@ public class CelementsWebScriptService implements ScriptService {
   private final ScriptService deprecatedUsage;
   private final ILastChangedRole lastChangedSrv;
   private final LastStartupTimeStampRole lastStartupTimeStamp;
+  private final IRightsAccessFacadeRole rightsAccess;
   private final ModelContext modelContext;
   private final Execution execution;
   private final ConfigurationSource xwikiPropertiesSource;
@@ -138,6 +140,7 @@ public class CelementsWebScriptService implements ScriptService {
       @Named("deprecated") ScriptService deprecatedUsage,
       ILastChangedRole lastChangedSrv,
       LastStartupTimeStampRole lastStartupTimeStamp,
+      IRightsAccessFacadeRole rightsAccess,
       ModelContext modelContext,
       Execution execution,
       @Named("xwikiproperties") ConfigurationSource xwikiPropertiesSource) {
@@ -153,6 +156,7 @@ public class CelementsWebScriptService implements ScriptService {
     this.deprecatedUsage = deprecatedUsage;
     this.lastChangedSrv = lastChangedSrv;
     this.lastStartupTimeStamp = lastStartupTimeStamp;
+    this.rightsAccess = rightsAccess;
     this.modelContext = modelContext;
     this.execution = execution;
     this.xwikiPropertiesSource = xwikiPropertiesSource;
@@ -856,7 +860,9 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public void checkClasses() {
-    classesComp.checkClasses();
+    if (rightsAccess.isSuperAdmin()) {
+      classesComp.checkClasses();
+    }
   }
 
   public boolean isClassCollectionActivated(String name) {
@@ -864,7 +870,9 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public void checkMandatoryDocuments() {
-    mandatoryDocComp.checkAllMandatoryDocuments();
+    if (rightsAccess.isSuperAdmin()) {
+      mandatoryDocComp.checkAllMandatoryDocuments();
+    }
   }
 
   public String getDefaultSpace() {

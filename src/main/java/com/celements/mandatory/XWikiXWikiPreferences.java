@@ -28,9 +28,9 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.springframework.stereotype.Component;
 
 import com.celements.filebase.IFileBaseAccessRole;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
@@ -91,6 +91,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
       boolean dirtyAdditional = false;
       dirtyAdditional |= setUnsetInt(prefsObj, "authenticate_view", 1);
       dirtyAdditional |= setUnsetInt(prefsObj, "renderXWikiRadeoxRenderer", 1);
+      dirtyAdditional |= setEmptyString(prefsObj, "skin", "albatross");
       return dirtyAdditional;
     });
     return dirty;

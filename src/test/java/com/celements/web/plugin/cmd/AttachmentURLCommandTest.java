@@ -38,6 +38,7 @@ import com.celements.javascript.FrontendResourceResolver;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.url.UrlService;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -100,8 +101,9 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_getAttachmentURL_fullInternalLink() throws Exception {
+    context.setDatabase(XWikiConstant.CENTRAL_WIKI.getName());
     var attRef = new AttachmentReference("bla.txt",
-        new DocumentReference("celements2web", "A", "B"));
+        new DocumentReference(XWikiConstant.CENTRAL_WIKI.getName(), "A", "B"));
     String resultURL = "http://celements2web.localhost/file/A/B/bla.txt";
     expect(getMock(UrlService.class).getURL(attRef, "file")).andReturn(resultURL);
     XWikiAttachment blaAtt = new XWikiAttachment();
