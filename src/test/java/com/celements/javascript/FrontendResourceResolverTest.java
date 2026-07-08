@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -65,6 +66,41 @@ public class FrontendResourceResolverTest {
 
     assertEquals(Optional.of(new FrontendResource("dist/eventview.Cq6C1_9z.mjs",
         Collections.emptyList())), resolver.get(":frontend/progon/eventview/main.ts"));
+
+    verify(resourceLoader);
+  }
+
+  @Test
+  public void test_get_importedCss() throws Exception {
+    expect(resourceLoader.getResources("/resources/dist/.vite/manifest*.json"))
+        .andReturn(new Resource[] { manifestResource("""
+            {
+              "_tailwind.BUC6EzWv.mjs": {
+                "file": "tailwind.BUC6EzWv.mjs",
+                "imports": [
+                  "_reactivity.esm-bundler.DLdBTi3W.mjs"
+                ],
+                "css": [
+                  "assets/tailwind-5_VRq81v.css"
+                ]
+              },
+              "_reactivity.esm-bundler.DLdBTi3W.mjs": {
+                "file": "reactivity.esm-bundler.DLdBTi3W.mjs"
+              },
+              "src/main/frontend/progon/vue-poc/main.ts": {
+                "file": "vue-poc.CPN5BtMj.mjs",
+                "imports": [
+                  "_tailwind.BUC6EzWv.mjs",
+                  "_reactivity.esm-bundler.DLdBTi3W.mjs"
+                ]
+              }
+            }
+            """) });
+    replay(resourceLoader);
+
+    assertEquals(Optional.of(new FrontendResource("dist/vue-poc.CPN5BtMj.mjs",
+        List.of("dist/assets/tailwind-5_VRq81v.css"))),
+        resolver.get(":frontend/progon/vue-poc/main.ts"));
 
     verify(resourceLoader);
   }

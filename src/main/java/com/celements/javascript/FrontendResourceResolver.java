@@ -1,12 +1,13 @@
 package com.celements.javascript;
 
+import static com.google.common.base.Predicates.*;
 import static java.util.Objects.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Suppliers;
 
+import one.util.streamex.EntryStream;
 import one.util.streamex.StreamEx;
 
 /**
@@ -59,11 +61,11 @@ public class FrontendResourceResolver {
 
   @PostConstruct
   public void init() {
-    manifest.get();
+    getManifest();
   }
 
-  public boolean isFrontendSource(String path) {
-    return requireNonNullElse(path, "").trim().startsWith(SOURCE_PREFIX);
+  public Map<String, FrontendResource> getManifest() {
+    return manifest.get();
   }
 
   /**
@@ -76,7 +78,11 @@ public class FrontendResourceResolver {
    *         "dist/file.a8b3.mjs" and ["dist/assets/file.a8b3.css"]
    */
   public Optional<FrontendResource> get(String sourcePath) {
-    return Optional.ofNullable(manifest.get().get(sourcePath));
+    return Optional.ofNullable(getManifest().get(sourcePath));
+  }
+
+  public boolean isFrontendSource(String path) {
+    return requireNonNullElse(path, "").trim().startsWith(SOURCE_PREFIX);
   }
 
   private Map<String, FrontendResource> readManifestFiles() {
@@ -89,10 +95,7 @@ public class FrontendResourceResolver {
     var map = StreamEx.of(resources)
         .filter(Resource::exists)
         .flatMap(this::readJson)
-        .flatMap(rootNode -> StreamEx.of(rootNode.fields()))
-        .mapToEntry(Entry::getKey, Entry::getValue)
-        .flatMapKeys(this::prefixKey)
-        .flatMapValues(this::extractResource)
+        .flatMapToEntry(json -> new ViteManifest(json).frontendResources())
         .toImmutableMap(); // ISE on duplicate keys, we expect unique source files
     LOGGER.info("readManifest - {}", map);
     return map;
@@ -107,40 +110,85 @@ public class FrontendResourceResolver {
     }
   }
 
-  private Stream<String> prefixKey(String key) {
-    return Stream.ofNullable(key)
-        .filter(k -> k.startsWith(MANIFEST_KEY_PREFIX))
-        .map(k -> k.replaceFirst(MANIFEST_KEY_PREFIX, SOURCE_PREFIX));
-  }
-
-  private Stream<FrontendResource> extractResource(JsonNode node) {
-    return extractFilePath(node)
-        .map(jsPath -> new FrontendResource(jsPath, extractCssPaths(node)))
-        .stream();
-  }
-
-  private Optional<String> extractFilePath(JsonNode node) {
-    return Optional.ofNullable(node)
-        .map(n -> n.get("file"))
-        .map(this::toTargetPath);
-  }
-
-  private List<String> extractCssPaths(JsonNode node) {
-    return Optional.ofNullable(node)
-        .map(n -> n.get("css"))
-        .filter(JsonNode::isArray)
-        .stream().flatMap(css -> StreamEx.of(css.elements()))
-        .map(this::toTargetPath)
-        .toList();
-  }
-
-  private String toTargetPath(JsonNode node) {
-    return Optional.ofNullable(node)
-        .map(f -> f.asText())
-        .filter(f -> !f.isEmpty())
-        .map(f -> TARGET_DIR + f)
-        .orElse(null);
-  }
-
   public record FrontendResource(String jsPath, List<String> cssPaths) {}
+
+  static final class ViteManifest {
+
+    private final JsonNode manifest;
+
+    ViteManifest(JsonNode manifest) {
+      this.manifest = manifest;
+    }
+
+    Map<String, FrontendResource> frontendResources() {
+      return EntryStream.of(manifest.fields())
+          .mapToValue(ViteManifestEntry::new)
+          .mapToKeyPartial((key, entry) -> entry.sourcePath())
+          .mapToValuePartial((sourcePath, entry) -> entry.jsPath()
+              .map(jsPath -> toFrontendResource(jsPath, entry)))
+          .toImmutableMap();
+    }
+
+    private FrontendResource toFrontendResource(String jsPath, ViteManifestEntry entry) {
+      var cssPaths = collectCssPaths(entry).distinct().toList();
+      return new FrontendResource(jsPath, cssPaths);
+    }
+
+    private StreamEx<String> collectCssPaths(ViteManifestEntry entry) {
+      return StreamEx.of(entry.imports()
+          .flatMap(key -> entry(key).stream())
+          .flatMap(this::collectCssPaths))
+          .append(entry.cssPaths());
+    }
+
+    private Optional<ViteManifestEntry> entry(String key) {
+      return Optional.ofNullable(manifest.get(key))
+          .map(json -> new ViteManifestEntry(key, json));
+    }
+  }
+
+  record ViteManifestEntry(String key, JsonNode json) {
+
+    private static final String FIELD_FILE = "file";
+    private static final String FIELD_CSS = "css";
+    private static final String FIELD_IMPORTS = "imports";
+
+    Optional<String> sourcePath() {
+      return Optional.ofNullable(key)
+          .filter(k -> k.startsWith(MANIFEST_KEY_PREFIX))
+          .map(k -> k.replaceFirst(MANIFEST_KEY_PREFIX, SOURCE_PREFIX));
+    }
+
+    Optional<String> jsPath() {
+      return getNode(FIELD_FILE).map(this::toTargetPath);
+    }
+
+    Stream<String> cssPaths() {
+      return getArray(FIELD_CSS).map(this::toTargetPath).filter(Objects::nonNull);
+    }
+
+    public Stream<String> imports() {
+      return getArray(FIELD_IMPORTS).map(JsonNode::asText).filter(not(String::isEmpty));
+    }
+
+    private Optional<JsonNode> getNode(String name) {
+      return Optional.ofNullable(json.get(name));
+    }
+
+    private Stream<JsonNode> getArray(String fieldName) {
+      return getNode(fieldName)
+          .filter(JsonNode::isArray)
+          .stream()
+          .map(JsonNode::elements)
+          .flatMap(StreamEx::of);
+    }
+
+    private String toTargetPath(JsonNode node) {
+      return Optional.ofNullable(node)
+          .map(JsonNode::asText)
+          .filter(not(String::isEmpty))
+          .map(file -> TARGET_DIR + file)
+          .orElse(null);
+    }
+  }
 }
