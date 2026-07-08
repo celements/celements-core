@@ -75,12 +75,6 @@ import com.xpn.xwiki.web.Utils;
 public class CelementsWebPluginApi extends Api {
 
   /**
-   * @Deprecated: since 2.59 instead use variable in {@link CssScriptService}
-   */
-  @Deprecated
-  public static final String CELEMENTS_CSSCOMMAND = CssScriptService.CELEMENTS_CSSCOMMAND;
-
-  /**
    * @Deprecated: since 2.59 instead use variable in {@link JSScriptService}
    */
   @Deprecated
@@ -203,6 +197,7 @@ public class CelementsWebPluginApi extends Api {
         imagesOnly, start, nb);
   }
 
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator)
       throws ClassNotFoundException {
     return getWebUtilsScriptService().getAttachmentListSorted(doc, comparator);
@@ -220,6 +215,7 @@ public class CelementsWebPluginApi extends Api {
         nb);
   }
 
+  @Deprecated
   public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
       String comparator, boolean imagesOnly, int start, int nb) {
     return getWebUtilsService().getAttachmentListForTagSorted(doc, tagName, comparator, imagesOnly,

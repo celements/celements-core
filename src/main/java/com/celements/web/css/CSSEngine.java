@@ -19,31 +19,36 @@
  */
 package com.celements.web.css;
 
-import java.util.ArrayList;
+import static java.util.Objects.*;
+import static java.util.stream.Collectors.*;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import javax.inject.Inject;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import com.celements.javascript.FrontendResourceResolver;
+import com.google.common.base.Splitter;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
+@Component
 public class CSSEngine implements ICSSEngine {
 
-  private static final String _CSS_ENGINE_OBJECT_KEY = "com.celements.web.css.CSSEngine";
   static final Logger LOGGER = LoggerFactory.getLogger(CSSEngine.class);
 
-  private CSSEngine() {
-  }
+  private final FrontendResourceResolver resolver;
 
-  public static ICSSEngine getCSSEngine(XWikiContext context) {
-    Object storeObj = context.get(_CSS_ENGINE_OBJECT_KEY);
-    if ((storeObj == null) || !(storeObj instanceof ICSSEngine)) {
-      context.put(_CSS_ENGINE_OBJECT_KEY, new CSSEngine());
-    }
-    return (ICSSEngine) context.get(_CSS_ENGINE_OBJECT_KEY);
+  @Inject
+  public CSSEngine(FrontendResourceResolver resolver) {
+    this.resolver = resolver;
   }
 
   /**
@@ -60,38 +65,35 @@ public class CSSEngine implements ICSSEngine {
   @SuppressWarnings("unchecked")
   public List<CSS> includeCSS(String css, String field, List<BaseObject> baseCSSList,
       XWikiContext context) {
-    LOGGER.debug("adding '" + css + "' to " + field + ". List contains already "
-        + ((baseCSSList != null) ? baseCSSList.size() : "0") + " items.");
+    LOGGER.debug("includeCSS: adding '{}' to {}. List contains already {} items.", css, field,
+        ((baseCSSList != null) ? baseCSSList.size() : "0"));
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
-    List<CSS> cssList = Collections.emptyList();
-
-    if (vcontext != null) {
-      if (vcontext.containsKey(field)) {
-        cssList = (List<CSS>) vcontext.get(field);
-      } else {
-        cssList = new ArrayList<>();
-        if (baseCSSList != null) {
-          for (BaseObject cssObj : baseCSSList) {
-            if (cssObj != null) {
-              LOGGER.debug("includeCSS: adding baseObject [" + cssObj.getStringValue("cssname")
-                  + "].");
-              cssList.add(new CSSBaseObject(cssObj));
-            }
-          }
-        }
-      }
-
-      String[] newCSSList = css.split(" ");
-      for (int i = 0; i < newCSSList.length; i++) {
-        if ((newCSSList[i] != null) && (!newCSSList[i].trim().equals(""))) {
-          cssList.add(new CSSString(newCSSList[i], context));
-        }
-      }
-
-      vcontext.put(field, cssList);
+    List<CSS> cssList;
+    if (vcontext == null) {
+      return Collections.emptyList();
+    } else if (vcontext.containsKey(field)) {
+      cssList = (List<CSS>) vcontext.get(field);
+    } else {
+      cssList = Stream.ofNullable(baseCSSList).flatMap(List::stream)
+          .filter(Objects::nonNull)
+          .<CSS>map(CSSBaseObject::new)
+          .collect(toList());
     }
-
+    Splitter.on(" ").trimResults().omitEmptyStrings()
+        .splitToStream(requireNonNullElse(css, ""))
+        .flatMap(this::collectCssPaths)
+        .forEach(cssList::add);
+    vcontext.put(field, cssList);
     return cssList;
   }
 
+  private Stream<CSS> collectCssPaths(String path) {
+    if (resolver.isFrontendSource(path)) {
+      return resolver.get(path).stream()
+          .flatMap(resource -> resource.cssPaths().stream())
+          .map(CSSFrontendResource::new);
+    } else {
+      return Stream.of(new CSSString(path));
+    }
+  }
 }
