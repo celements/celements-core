@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,7 @@ public class FrontendResourceResolver {
   private static final String TARGET_DIR = "dist/";
 
   private final ResourcePatternResolver resourceLoader;
+  private final Environment springEnv;
   private final ObjectMapper objectMapper;
 
   // ":frontend/file.ts" -> ("dist/file.a8b3.mjs", ["dist/assets/file.a8b3.css"])
@@ -56,8 +58,11 @@ public class FrontendResourceResolver {
       this::readManifestFiles);
 
   @Inject
-  public FrontendResourceResolver(ResourcePatternResolver resourceLoader) {
+  public FrontendResourceResolver(
+      Environment springEnv,
+      ResourcePatternResolver resourceLoader) {
     this.resourceLoader = resourceLoader;
+    this.springEnv = springEnv;
     this.objectMapper = new ObjectMapper();
   }
 
@@ -67,6 +72,9 @@ public class FrontendResourceResolver {
   }
 
   public Map<String, FrontendResource> getManifest() {
+    if (springEnv.matchesProfiles("local")) {
+      return readManifestFiles(); // support hot reload in local profile
+    }
     return manifest.get();
   }
 

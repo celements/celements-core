@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,17 +16,18 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.javascript.FrontendResourceResolver.FrontendResource;
 
-public class FrontendResourceResolverTest {
+public class FrontendResourceResolverTest extends AbstractComponentTest {
 
   private ResourcePatternResolver resourceLoader;
-  private FrontendResourceResolver resolver;
+  private Supplier<FrontendResourceResolver> resolver;
 
   @Before
-  public void prepareTest() {
-    resourceLoader = createMock(ResourcePatternResolver.class);
-    resolver = new FrontendResourceResolver(resourceLoader);
+  public void prepareTest() throws Exception {
+    resourceLoader = registerComponentMock(ResourcePatternResolver.class);
+    resolver = () -> getBeanFactory().getBean(FrontendResourceResolver.class);
   }
 
   @Test
@@ -42,14 +44,14 @@ public class FrontendResourceResolverTest {
               }
             }
             """) });
-    replay(resourceLoader);
+    replayDefault();
 
     assertEquals(Optional.of(new FrontendResource(
         "dist/vue-poc.BOsmCSyo.mjs",
         Arrays.asList("dist/assets/vue-poc-ahBOTvOT.css", "dist/assets/shared.Df9z3kSS.css"))),
-        resolver.get(":frontend/progon/vue-poc/main.ts"));
+        resolver.get().get(":frontend/progon/vue-poc/main.ts"));
 
-    verify(resourceLoader);
+    verifyDefault();
   }
 
   @Test
@@ -62,12 +64,12 @@ public class FrontendResourceResolverTest {
               }
             }
             """) });
-    replay(resourceLoader);
+    replayDefault();
 
     assertEquals(Optional.of(new FrontendResource("dist/eventview.Cq6C1_9z.mjs",
-        Collections.emptyList())), resolver.get(":frontend/progon/eventview/main.ts"));
+        Collections.emptyList())), resolver.get().get(":frontend/progon/eventview/main.ts"));
 
-    verify(resourceLoader);
+    verifyDefault();
   }
 
   @Test
@@ -96,13 +98,13 @@ public class FrontendResourceResolverTest {
               }
             }
             """) });
-    replay(resourceLoader);
+    replayDefault();
 
     assertEquals(Optional.of(new FrontendResource("dist/vue-poc.CPN5BtMj.mjs",
         List.of("dist/assets/tailwind-5_VRq81v.css"))),
-        resolver.get(":frontend/progon/vue-poc/main.ts"));
+        resolver.get().get(":frontend/progon/vue-poc/main.ts"));
 
-    verify(resourceLoader);
+    verifyDefault();
   }
 
   @Test
@@ -115,11 +117,11 @@ public class FrontendResourceResolverTest {
               }
             }
             """) });
-    replay(resourceLoader);
+    replayDefault();
 
-    assertEquals(Optional.empty(), resolver.get(":frontend/progon/vue-poc/main.ts"));
+    assertEquals(Optional.empty(), resolver.get().get(":frontend/progon/vue-poc/main.ts"));
 
-    verify(resourceLoader);
+    verifyDefault();
   }
 
   private Resource manifestResource(String content) {
