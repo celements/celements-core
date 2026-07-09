@@ -5,10 +5,12 @@ import static java.util.Objects.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -134,10 +136,17 @@ public class FrontendResourceResolver {
       return new FrontendResource(jsPath, cssPaths);
     }
 
-    private StreamEx<String> collectCssPaths(ViteManifestEntry entry) {
+    private Stream<String> collectCssPaths(ViteManifestEntry entry) {
+      return collectCssPaths(entry, new HashSet<>());
+    }
+
+    private Stream<String> collectCssPaths(ViteManifestEntry entry, Set<String> visited) {
+      if (!visited.add(entry.key())) {
+        return Stream.empty();
+      }
       return StreamEx.of(entry.imports()
-          .flatMap(key -> entry(key).stream())
-          .flatMap(this::collectCssPaths))
+          .flatMap(k -> entry(k).stream())
+          .flatMap(e -> collectCssPaths(e, visited)))
           .append(entry.cssPaths());
     }
 
