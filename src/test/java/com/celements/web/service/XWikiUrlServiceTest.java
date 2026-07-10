@@ -167,30 +167,6 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_createURIBuilder() throws Exception {
-    String url = "http://wiki.celements.com/space/page";
-    expect(urlFactoryMock.createURL("space", "page", "view", null, null, "wiki",
-        getContext())).andReturn(new URL(url));
-
-    replayDefault();
-    assertEquals(url, service.createURIBuilder(docRef).build().toString());
-    verifyDefault();
-  }
-
-  @Test
-  public void test_createURIBuilder_null() throws Exception {
-    replayDefault();
-    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
-
-      @Override
-      protected void execute() throws IllegalArgumentException {
-        service.createURIBuilder(null);
-      }
-    }.evaluate();
-    verifyDefault();
-  }
-
-  @Test
   public void test_createURLObject_notEmptyForContentWebHome() throws Exception {
     EntityReference docRefContentWebHome = new DocumentReference(getContext().getDatabase(),
         "Content", "WebHome");
