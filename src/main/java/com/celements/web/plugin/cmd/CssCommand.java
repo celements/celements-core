@@ -19,8 +19,6 @@
  */
 package com.celements.web.plugin.cmd;
 
-import static com.celements.spring.context.SpringContextProvider.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,12 +27,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.inject.Inject;
+
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.css.ICssExtensionRole;
+import com.celements.execution.XWikiExecutionProp;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.pagelayout.LayoutServiceRole;
@@ -45,9 +48,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.Utils;
 
+@Component
 public class CssCommand {
+
+  public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
 
   public static final String SKINS_USER_CSS_CLASS_SPACE = "Skins";
   public static final String SKINS_USER_CSS_CLASS_DOC = "UserCSS";
@@ -55,6 +60,26 @@ public class CssCommand {
       + SKINS_USER_CSS_CLASS_DOC;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CssCommand.class);
+
+  private final CSSEngine cssEngine;
+  private final IModelAccessFacade modelAccess;
+  private final LayoutServiceRole layoutService;
+  private final List<ICssExtensionRole> cssExtensions;
+  private final Execution execution;
+
+  @Inject
+  public CssCommand(
+      CSSEngine cssEngine,
+      IModelAccessFacade modelAccess,
+      LayoutServiceRole layoutService,
+      List<ICssExtensionRole> cssExtensions,
+      Execution execution) {
+    this.cssEngine = cssEngine;
+    this.modelAccess = modelAccess;
+    this.layoutService = layoutService;
+    this.cssExtensions = cssExtensions;
+    this.execution = execution;
+  }
 
   public DocumentReference getSkinsUserCssClassRef(String wikiName) {
     return new DocumentReference(wikiName, SKINS_USER_CSS_CLASS_SPACE, SKINS_USER_CSS_CLASS_DOC);
@@ -120,6 +145,10 @@ public class CssCommand {
     return cssResultList;
   }
 
+  public List<CSS> includeCSSPage(String css) {
+    return includeCSSPage(css, getXContext());
+  }
+
   public List<CSS> includeCSSPage(String css, XWikiContext context) {
     List<BaseObject> skins = null;
     if ((context != null) && (context.getDoc() != null) && !new PageLayoutCommand().layoutExists(
@@ -171,10 +200,9 @@ public class CssCommand {
 
   List<CSS> includeApplicationDefaultCSS() {
     List<CSS> cssList = Collections.emptyList();
-    List<ICssExtensionRole> cssExtList = Utils.getComponentList(ICssExtensionRole.class);
-    if (!cssExtList.isEmpty()) {
+    if (!cssExtensions.isEmpty()) {
       cssList = new Vector<>();
-      for (ICssExtensionRole cssExt : cssExtList) {
+      for (ICssExtensionRole cssExt : cssExtensions) {
         LOGGER.debug("includeApplicationDefaultCSS: for '{}'", cssExt.getClass());
         cssList.addAll(cssExt.getCssList());
       }
@@ -213,7 +241,7 @@ public class CssCommand {
   }
 
   public List<CSS> includeCSSAfterPageLayout(String css, XWikiContext context) {
-    Optional<DocumentReference> pageLayoutDocRefOpt = getLayoutService()
+    Optional<DocumentReference> pageLayoutDocRefOpt = layoutService
         .getLayoutPropDocRefForCurrentDoc();
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
@@ -221,7 +249,7 @@ public class CssCommand {
     if (pageLayoutDocRefOpt.isPresent() && (vcontext != null)) {
       List<BaseObject> baseList = new ArrayList<>();
       try {
-        XWikiDocument pageLayoutDoc = getModelAccess().getDocument(pageLayoutDocRefOpt.get());
+        XWikiDocument pageLayoutDoc = modelAccess.getDocument(pageLayoutDocRefOpt.get());
         baseList.addAll(addUserSkinCss(pageLayoutDoc));
       } catch (DocumentNotExistsException dne) {
         LOGGER.info("includeCSSAfterPageLayout pageLayoutDoc {} does not exist",
@@ -237,7 +265,7 @@ public class CssCommand {
   private List<BaseObject> addUserSkinCss(DocumentReference docRef) {
     if (docRef != null) {
       try {
-        return addUserSkinCss(getModelAccess().getDocument(docRef));
+        return addUserSkinCss(modelAccess.getDocument(docRef));
       } catch (DocumentNotExistsException exp) {
         LOGGER.info("addUserSkinCss: document does not exist '{}'", docRef);
       }
@@ -272,15 +300,10 @@ public class CssCommand {
    */
   private List<CSS> includeCSS(String css, String field, List<BaseObject> baseCSSList,
       XWikiContext context) {
-    return CSSEngine.getCSSEngine(context).includeCSS(css, field, baseCSSList, context);
+    return cssEngine.includeCSS(css, field, baseCSSList, context);
   }
 
-  private IModelAccessFacade getModelAccess() {
-    return Utils.getComponent(IModelAccessFacade.class);
+  private XWikiContext getXContext() {
+    return execution.getContext().get(XWikiExecutionProp.XWIKI_CONTEXT).orElseThrow();
   }
-
-  private LayoutServiceRole getLayoutService() {
-    return getSpringContext().getBean(LayoutServiceRole.class);
-  }
-
 }

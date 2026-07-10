@@ -2,13 +2,15 @@ package com.celements.css;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.execution.XWikiExecutionProp;
 import com.celements.web.css.CSS;
 import com.celements.web.plugin.cmd.CssCommand;
 import com.xpn.xwiki.XWikiContext;
@@ -17,20 +19,21 @@ import com.xpn.xwiki.XWikiException;
 @Component("css")
 public class CssScriptService implements ScriptService {
 
-  public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
-
   public static final Logger LOGGER = LoggerFactory.getLogger(CssScriptService.class);
 
-  @Requirement
+  @Inject
   private Execution execution;
 
+  @Inject
+  private CssCommand cssCommand;
+
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    return execution.getContext().get(XWikiExecutionProp.XWIKI_CONTEXT).orElseThrow();
   }
 
   public List<CSS> getAllCSS() {
     try {
-      return getCssCmd().getAllCSS(getContext());
+      return cssCommand.getAllCSS(getContext());
     } catch (XWikiException e) {
       LOGGER.error("Call to CssComman.getAllCss failed.", e);
       return List.of();
@@ -39,7 +42,7 @@ public class CssScriptService implements ScriptService {
 
   public String displayAllCSS() {
     try {
-      return getCssCmd().displayAllCSS(getContext());
+      return cssCommand.displayAllCSS(getContext());
     } catch (XWikiException e) {
       LOGGER.error("Call to CssCommand.displayAllCss failed.", e);
       return "";
@@ -48,7 +51,7 @@ public class CssScriptService implements ScriptService {
 
   public List<CSS> getRTEContentCSS() {
     try {
-      return getCssCmd().getRTEContentCSS(getContext());
+      return cssCommand.getRTEContentCSS(getContext());
     } catch (XWikiException e) {
       LOGGER.error("Call to CssCommand.getRTEContentCSS failed.", e);
       return List.of();
@@ -56,12 +59,12 @@ public class CssScriptService implements ScriptService {
   }
 
   public void includeCSSPage(String css) {
-    getCssCmd().includeCSSPage(css, getContext());
+    cssCommand.includeCSSPage(css, getContext());
   }
 
   public void includeCSSAfterPreferences(String css) {
     try {
-      getCssCmd().includeCSSAfterPreferences(css, getContext());
+      cssCommand.includeCSSAfterPreferences(css, getContext());
     } catch (XWikiException e) {
       LOGGER.error("Call to CssCommand.includeCSSAfterPreferences failed.", e);
     }
@@ -75,13 +78,6 @@ public class CssScriptService implements ScriptService {
    */
   @Deprecated(since = "6.7", forRemoval = true)
   public void includeCSSAfterSkin(String css) {
-    getCssCmd().includeCSSAfterSkin(css, getContext());
-  }
-
-  private CssCommand getCssCmd() {
-    if (!getContext().containsKey(CELEMENTS_CSSCOMMAND)) {
-      getContext().put(CELEMENTS_CSSCOMMAND, new CssCommand());
-    }
-    return (CssCommand) getContext().get(CELEMENTS_CSSCOMMAND);
+    cssCommand.includeCSSAfterSkin(css, getContext());
   }
 }

@@ -1,5 +1,7 @@
 package com.celements.javascript;
 
+import static com.celements.spring.context.SpringContextProvider.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -166,7 +168,8 @@ public class JSScriptService implements ScriptService {
 
   private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
     if (getContext().get(JAVA_SCRIPT_FILES_COMMAND_KEY) == null) {
-      getContext().put(JAVA_SCRIPT_FILES_COMMAND_KEY, new ExternalJavaScriptFilesCommand());
+      getContext().put(JAVA_SCRIPT_FILES_COMMAND_KEY, getSpringContext()
+          .getBean(ExternalJavaScriptFilesCommand.class));
     }
     return (ExternalJavaScriptFilesCommand) getContext().get(JAVA_SCRIPT_FILES_COMMAND_KEY);
   }
