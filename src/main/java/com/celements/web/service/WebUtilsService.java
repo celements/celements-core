@@ -357,10 +357,7 @@ public class WebUtilsService implements IWebUtilsService {
         if (bundle == null) {
           bundle = ResourceBundle.getBundle("ApplicationResources");
         }
-        XWikiContext adminContext = (XWikiContext) getContext().clone();
-        adminContext.putAll(getContext());
-        adminContext.setLanguage(adminLanguage);
-        return new XWikiMessageTool(bundle, adminContext);
+        return new XWikiMessageTool(bundle, getContext(), adminLanguage);
       }
     } else {
       return null;

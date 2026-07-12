@@ -181,11 +181,6 @@
       <artifactId>celements-shared-tests</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
-      <scope>test</scope>
-    </dependency>
     <!-- JTidy Has been picked up at https://github.com/jtidy/jtidy and immediately was reabandoned.
       However their release from Dec 2019 has at least some HTML5 support -->
     <dependency>
