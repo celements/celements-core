@@ -52,8 +52,7 @@ public class JavaPageTypeProvider implements IPageTypeProviderRole {
 
   Map<PageTypeReference, IJavaPageTypeRole> buildTypeRefsMap() {
     return javaPageTypes.stream().collect(toImmutableMap(
-        pt -> new PageTypeReference(pt.getName(), PROVIDER_HINT, pt.getCategoryNames()),
-        pt -> pt));
+        pt -> new PageTypeReference(pt.getName(), PROVIDER_HINT, pt.getCategoryNames()), pt -> pt));
   }
 
   @Override

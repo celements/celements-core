@@ -92,8 +92,8 @@ public class XObjectPageTypeCacheTest extends AbstractComponentTest {
     DocumentReference centralRichTextPTdocRef = new DocumentReference("celements2web", "PageTypes",
         "RichText");
     XWikiDocument centralRichTextPTdoc = new XWikiDocument(centralRichTextPTdocRef);
-    expect(xwiki.getDocument(eq("celements2web:PageTypes.RichText"), same(context))).andReturn(
-        centralRichTextPTdoc).anyTimes();
+    expect(xwiki.getDocument(eq("celements2web:PageTypes.RichText"), same(context)))
+        .andReturn(centralRichTextPTdoc).anyTimes();
     replayDefault();
     List<PageTypeReference> allPageTypes = xObjPageTypeCache.getPageTypesRefsForWiki(wikiRef);
     assertFalse("expecting RichtText page type reference.", allPageTypes.isEmpty());

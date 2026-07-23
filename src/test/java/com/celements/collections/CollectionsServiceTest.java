@@ -34,8 +34,8 @@ public class CollectionsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetObjectsOrdered_noObjects() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
-        "D"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "S", "D"));
     List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "s1", true,
         "s2", false);
     assertNotNull(list);
@@ -44,8 +44,8 @@ public class CollectionsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetObjectsOrdered_oneObject() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
-        "D"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "S", "D"));
     doc.addXObject(getSortTestBaseObjects().get(0));
     List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "s1", true,
         "s2", true);
@@ -54,8 +54,8 @@ public class CollectionsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetObjectsOrdered_onlyOneFieldSort() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
-        "D"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "S", "D"));
     for (BaseObject obj : getSortTestBaseObjects()) {
       doc.addXObject(obj);
     }
@@ -72,8 +72,8 @@ public class CollectionsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetObjectsOrdered_severalObjects_asc() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
-        "D"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "S", "D"));
     for (BaseObject obj : getSortTestBaseObjects()) {
       doc.addXObject(obj);
     }
@@ -91,8 +91,8 @@ public class CollectionsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetObjectsOrdered_severalObjects_desc() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
-        "D"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "S", "D"));
     for (BaseObject obj : getSortTestBaseObjects()) {
       doc.addXObject(obj);
     }
@@ -111,8 +111,8 @@ public class CollectionsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetObjectsOrdered_severalObjects_unset_fields() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
-        "D"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "S", "D"));
     for (BaseObject obj : getSortTestBaseObjects()) {
       doc.addXObject(obj);
     }

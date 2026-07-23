@@ -57,8 +57,8 @@ public class XObjectIteratorTest extends AbstractComponentTest {
     _context.setWiki(_xwiki);
     _testClassRef = new DocumentReference(_context.getDatabase(), "Celements", "TestClass");
     _iterator = new XObjectIterator(_context);
-    _iterator.setClassName(_testClassRef.getLastSpaceReference().getName() + "."
-        + _testClassRef.getName());
+    _iterator.setClassName(
+        _testClassRef.getLastSpaceReference().getName() + "." + _testClassRef.getName());
     _docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc");
     _testDoc = new XWikiDocument(_docRef);
     _docRef2 = new DocumentReference(_context.getDatabase(), "Test", "Doc2");

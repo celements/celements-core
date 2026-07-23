@@ -153,8 +153,8 @@ public class ContentInheritor {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext()
+        .getProperty("xwikicontext");
   }
 
 }

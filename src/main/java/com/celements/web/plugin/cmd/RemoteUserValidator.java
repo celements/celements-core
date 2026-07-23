@@ -75,10 +75,10 @@ public class RemoteUserValidator {
 
   private boolean authenticate(User user, String password, XWikiContext context)
       throws XWikiException {
-    Principal principal = context.getWiki().getAuthService().authenticate(
-        getModelUtils().serializeRefLocal(user.getDocRef()), password, context);
-    return (principal != null) && user.getDocRef().equals(getModelUtils().resolveRef(
-        principal.getName()));
+    Principal principal = context.getWiki().getAuthService()
+        .authenticate(getModelUtils().serializeRefLocal(user.getDocRef()), password, context);
+    return (principal != null)
+        && user.getDocRef().equals(getModelUtils().resolveRef(principal.getName()));
   }
 
   String getErrorJSON(String errorMsg) {
@@ -133,16 +133,16 @@ public class RemoteUserValidator {
         String requestSecret = context.getRequest().get("secret");
         if ((serverSecret != null) && (serverSecret.trim().length() > 0)
             && serverSecret.trim().equals(requestSecret.trim())) {
-          LOGGER.debug("ALLOWING validation for host " + requestHost + " with secret "
-              + requestSecret);
+          LOGGER.debug(
+              "ALLOWING validation for host " + requestHost + " with secret " + requestSecret);
           return true;
         } else {
           LOGGER.warn("DENYING validation: Server secret '" + requestSecret + "' does "
               + "not match expectation!");
         }
       } else {
-        LOGGER.warn("DENYING validation: No configuration object found for host '" + requestHost
-            + "'.");
+        LOGGER.warn(
+            "DENYING validation: No configuration object found for host '" + requestHost + "'.");
       }
     } else {
       LOGGER.warn("DENYING validation: Received no requester host!");
@@ -159,8 +159,8 @@ public class RemoteUserValidator {
     boolean active;
     // These users are necessarly active
     String accountName = getModelUtils().serializeRefLocal(user.getDocRef());
-    if (accountName.equals(XWikiRightService.GUEST_USER_FULLNAME) || (accountName.equals(
-        XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
+    if (accountName.equals(XWikiRightService.GUEST_USER_FULLNAME)
+        || (accountName.equals(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
       active = true;
     } else {
       String checkactivefield = context.getWiki().getXWikiPreference("auth_active_check", context);

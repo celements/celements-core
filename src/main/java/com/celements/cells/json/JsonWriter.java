@@ -54,11 +54,9 @@ public class JsonWriter extends AbstractWriter {
     jsonBuilder.openDictionary();
     jsonBuilder.addPropertyNonEmpty("tagName", tagName);
     jsonBuilder.openDictionary("attributes");
-    attributes.stream()
-        .filter(attribute -> attribute.getValue().isPresent())
-        .forEach(
-            attribute -> jsonBuilder.addPropertyNonEmpty(attribute.getName(),
-                attribute.getValue().get()));
+    attributes.stream().filter(attribute -> attribute.getValue().isPresent())
+        .forEach(attribute -> jsonBuilder.addPropertyNonEmpty(attribute.getName(),
+            attribute.getValue().get()));
     jsonBuilder.closeDictionary();
     jsonBuilder.openArray("subnodes");
   }

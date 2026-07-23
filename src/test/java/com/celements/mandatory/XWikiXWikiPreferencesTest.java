@@ -32,8 +32,8 @@ public class XWikiXWikiPreferencesTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    mandatoryXWikiPref = (XWikiXWikiPreferences) getBeanFactory().getBean(
-        "celements.mandatory.wikipreferences", IMandatoryDocumentRole.class);
+    mandatoryXWikiPref = (XWikiXWikiPreferences) getBeanFactory()
+        .getBean("celements.mandatory.wikipreferences", IMandatoryDocumentRole.class);
   }
 
   @Test

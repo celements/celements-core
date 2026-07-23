@@ -22,10 +22,8 @@ public class BaseObjectComparatorTest extends AbstractComponentTest {
 
   @Before
   public void setUp_BaseObjectComparatorTest() throws Exception {
-    compAsc = BaseObjectComparator.create("x")
-        .thenComparing(BaseObjectComparator.create("y"));
-    compDesc = BaseObjectComparator.reversed("x")
-        .thenComparing(BaseObjectComparator.reversed("y"));
+    compAsc = BaseObjectComparator.create("x").thenComparing(BaseObjectComparator.create("y"));
+    compDesc = BaseObjectComparator.reversed("x").thenComparing(BaseObjectComparator.reversed("y"));
   }
 
   @Test

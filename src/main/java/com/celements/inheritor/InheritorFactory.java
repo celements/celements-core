@@ -125,8 +125,9 @@ public class InheritorFactory {
   }
 
   public FieldInheritor getPageLayoutInheritor(String fullName, XWikiContext context) {
-    return getFieldInheritor("Celements2.PageType", Arrays.asList(fullName,
-        getSpacePreferencesFullName(fullName), "XWiki.XWikiPreferences"), context);
+    return getFieldInheritor("Celements2.PageType",
+        Arrays.asList(fullName, getSpacePreferencesFullName(fullName), "XWiki.XWikiPreferences"),
+        context);
   }
 
   /**
@@ -145,9 +146,9 @@ public class InheritorFactory {
   public FieldInheritor getConfigFieldInheritor(ClassReference classRef,
       EntityReference reference) {
     checkArgument(isAbsoluteRef(reference));
-    Iterable<DocumentReference> docRefs = FluentIterable.of(extractRef(reference,
-        DocumentReference.class).orNull(), getSpacePrefDocRef(reference), getXWikiPrefDocRef(
-            reference))
+    Iterable<DocumentReference> docRefs = FluentIterable
+        .of(extractRef(reference, DocumentReference.class).orNull(), getSpacePrefDocRef(reference),
+            getXWikiPrefDocRef(reference))
         .filter(Predicates.notNull());
     return getFieldInheritor(classRef, docRefs);
   }
@@ -163,8 +164,8 @@ public class InheritorFactory {
   private DocumentReference getXWikiPrefDocRef(EntityReference reference) {
     Optional<WikiReference> wikiRef = extractRef(reference, WikiReference.class);
     if (wikiRef.isPresent()) {
-      return create(DocumentReference.class, "XWikiPreferences", create(SpaceReference.class,
-          "XWiki", wikiRef.get()));
+      return create(DocumentReference.class, "XWikiPreferences",
+          create(SpaceReference.class, "XWiki", wikiRef.get()));
     }
     return null;
   }

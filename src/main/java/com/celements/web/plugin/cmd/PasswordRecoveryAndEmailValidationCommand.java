@@ -58,8 +58,8 @@ import com.xpn.xwiki.web.Utils;
 
 public class PasswordRecoveryAndEmailValidationCommand {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      PasswordRecoveryAndEmailValidationCommand.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(PasswordRecoveryAndEmailValidationCommand.class);
 
   public static final String CEL_PASSWORD_RECOVERY_FAILED = "cel_password_recovery_failed";
   public static final String CEL_PASSWORD_RECOVERY_SUCCESS = "cel_password_recovery_success";
@@ -145,8 +145,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return validkey;
   }
 
-  private boolean sendRecoveryMail(String email, String lang, String defLang) throws XWikiException,
-      DocumentNotExistsException {
+  private boolean sendRecoveryMail(String email, String lang, String defLang)
+      throws XWikiException, DocumentNotExistsException {
     String sender = new CelMailConfiguration().getDefaultAdminSenderAddress();
     String subject = getPasswordRecoverySubject(lang, defLang);
     String textContent = getPasswordRecoveryMailContent("PasswordRecoverMailTextContent", lang,
@@ -164,15 +164,15 @@ public class PasswordRecoveryAndEmailValidationCommand {
       throws XWikiException, DocumentLoadException, DocumentNotExistsException {
     String mailContent = null;
     String newContent = "";
-    XWikiDocument doc = getRTEDocWithCelementswebFallback(new DocumentReference(
-        getContext().getDatabase(), "Tools", template));
+    XWikiDocument doc = getRTEDocWithCelementswebFallback(
+        new DocumentReference(getContext().getDatabase(), "Tools", template));
     if (doc != null) {
-      newContent = getContext().getWiki().getRenderingEngine().renderText(doc.getTranslatedContent(
-          getContext()), getContext().getDoc(), getContext());
+      newContent = getContext().getWiki().getRenderingEngine()
+          .renderText(doc.getTranslatedContent(getContext()), getContext().getDoc(), getContext());
     }
     if ("".equals(newContent)) {
-      newContent = getWebUtilsService().renderInheritableDocument(new DocumentReference(
-          getContext().getDatabase(), "Mails", template), lang, defLang);
+      newContent = getWebUtilsService().renderInheritableDocument(
+          new DocumentReference(getContext().getDatabase(), "Mails", template), lang, defLang);
     }
     if (!"".equals(newContent)) {
       mailContent = newContent;
@@ -199,8 +199,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
       subject = getWebUtilsService().getMessageTool(lang).get(CEL_PASSWORD_RECOVERY_SUBJECT_KEY,
           params);
       if (CEL_PASSWORD_RECOVERY_SUBJECT_KEY.equals(subject) && (defLang != null)) {
-        subject = getWebUtilsService().getMessageTool(defLang).get(
-            CEL_PASSWORD_RECOVERY_SUBJECT_KEY, params);
+        subject = getWebUtilsService().getMessageTool(defLang)
+            .get(CEL_PASSWORD_RECOVERY_SUBJECT_KEY, params);
       }
     }
     return subject;
@@ -275,8 +275,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
           getContext());
       return sendNewValidationToAccountEmail(user);
     } catch (XWikiException exp) {
-      throw new SendValidationFailedException("sending new validation to accountName '" + login
-          + "' failed", exp);
+      throw new SendValidationFailedException(
+          "sending new validation to accountName '" + login + "' failed", exp);
     }
   }
 
@@ -288,8 +288,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
           getContext());
       sendNewValidationToAccountEmail(user, activationMailDocRef);
     } catch (XWikiException exp) {
-      throw new SendValidationFailedException("sending new validation to accountName '" + login
-          + "' failed", exp);
+      throw new SendValidationFailedException(
+          "sending new validation to accountName '" + login + "' failed", exp);
     }
   }
 
@@ -329,8 +329,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
       if (activationMailDocRef == null) {
         activationMailDocRef = getDefaultAccountActivationMailDocRef();
       } else if (!getModelAccess().exists(activationMailDocRef)) {
-        LOGGER.warn("Failed to get activation mail [" + activationMailDocRef
-            + "] now using default.");
+        LOGGER.warn(
+            "Failed to get activation mail [" + activationMailDocRef + "] now using default.");
         activationMailDocRef = getDefaultAccountActivationMailDocRef();
       }
       boolean sentSuccessful = false;
@@ -348,8 +348,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
       }
       return sentSuccessful;
     } catch (UserInstantiationException | CreatingValidationTokenFailedException exp) {
-      throw new SendValidationFailedException("sending new validation to user '" + userDocRef
-          + "' failed", exp);
+      throw new SendValidationFailedException(
+          "sending new validation to user '" + userDocRef + "' failed", exp);
     }
   }
 
@@ -393,8 +393,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
       getModelAccess().saveDocument(userDoc, "creating new validkey");
       return validkey;
     } catch (UserInstantiationException | QueryException | DocumentSaveException exp) {
-      throw new CreatingValidationTokenFailedException("Failed to create a new validkey for user: "
-          + userDocRef.getName(), exp);
+      throw new CreatingValidationTokenFailedException(
+          "Failed to create a new validkey for user: " + userDocRef.getName(), exp);
     }
   }
 
@@ -481,11 +481,11 @@ public class PasswordRecoveryAndEmailValidationCommand {
     }
     if (getDefaultEmptyDocStrategy().isEmptyRTEString(subject)) {
       List<String> params = Arrays.asList(getContext().getRequest().getHeader("host"));
-      subject = getWebUtilsService().getMessageTool(lang).get(
-          CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY, params);
+      subject = getWebUtilsService().getMessageTool(lang)
+          .get(CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY, params);
       if (CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY.equals(subject) && (defLang != null)) {
-        subject = getWebUtilsService().getMessageTool(defLang).get(
-            CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY, params);
+        subject = getWebUtilsService().getMessageTool(defLang)
+            .get(CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY, params);
       }
     }
     return subject;
@@ -495,8 +495,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
       @Nullable String defLang) throws XWikiException {
     String content = "";
     if (contentDoc != null) {
-      content = contentDoc.getTranslatedDocument(lang, getContext()).getRenderedContent(
-          getContext());
+      content = contentDoc.getTranslatedDocument(lang, getContext())
+          .getRenderedContent(getContext());
     }
     if (getDefaultEmptyDocStrategy().isEmptyRTEString(content)) {
       content = getWebUtilsService().renderInheritableDocument(getDefaultMailDocRef(), lang,
@@ -536,11 +536,11 @@ public class PasswordRecoveryAndEmailValidationCommand {
     try {
       if (getContext().getWiki().getRightService().hasAccessLevel("view", "XWiki.XWikiGuest",
           "Content.login", getContext())) {
-        return getContext().getWiki().getExternalURL("Content.login", "view", "email="
-            + URLEncoder.encode(to, "UTF-8") + "&ac=" + validkey, getContext());
+        return getContext().getWiki().getExternalURL("Content.login", "view",
+            "email=" + URLEncoder.encode(to, "UTF-8") + "&ac=" + validkey, getContext());
       } else {
-        return getContext().getWiki().getExternalURL("XWiki.XWikiLogin", "login", "email="
-            + URLEncoder.encode(to, "UTF-8") + "&ac=" + validkey, getContext());
+        return getContext().getWiki().getExternalURL("XWiki.XWikiLogin", "login",
+            "email=" + URLEncoder.encode(to, "UTF-8") + "&ac=" + validkey, getContext());
       }
     } catch (UnsupportedEncodingException exp) {
       LOGGER.error("Failed to encode [" + to + "] for activation link.", exp);

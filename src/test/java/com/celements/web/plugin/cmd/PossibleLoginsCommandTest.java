@@ -44,8 +44,7 @@ public class PossibleLoginsCommandTest extends AbstractComponentTest {
   @Test
   public void testGetPossibleLogins_local() {
     expect(userServiceMock.getPossibleLoginFields())
-        .andReturn(new HashSet<>(Arrays.<String>asList("email", "loginname")))
-        .atLeastOnce();
+        .andReturn(new HashSet<>(Arrays.<String>asList("email", "loginname"))).atLeastOnce();
     replayDefault();
     List<String> logins = Arrays.<String>asList(possibleLoginsCmd.getPossibleLogins().split(","));
     assertTrue("email", logins.contains("email"));

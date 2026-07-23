@@ -31,8 +31,9 @@ public class NavigationDeleteListenerTest extends AbstractComponentTest {
   @Test
   public void testGetRequiredObjClassRef() {
     WikiReference wikiRef = new WikiReference("myWiki");
-    assertEquals(Utils.getComponent(INavigationClassConfig.class).getNavigationConfigClassRef(
-        wikiRef), listener.getRequiredObjClassRef(wikiRef));
+    assertEquals(
+        Utils.getComponent(INavigationClassConfig.class).getNavigationConfigClassRef(wikiRef),
+        listener.getRequiredObjClassRef(wikiRef));
   }
 
   @Test

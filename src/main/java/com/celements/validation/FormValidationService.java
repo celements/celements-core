@@ -62,8 +62,7 @@ public class FormValidationService implements IFormValidationServiceRole {
   @Requirement
   private ModelContext context;
 
-  void injectValidationRules(
-      Map<String, IRequestValidationRule> requestValidationRules,
+  void injectValidationRules(Map<String, IRequestValidationRule> requestValidationRules,
       Map<String, IRequestValidationRuleRole> legacyRequestValidationRules,
       Map<String, IFieldValidationRuleRole> fieldValidationRules) {
     this.requestValidationRules = requestValidationRules;
@@ -80,12 +79,11 @@ public class FormValidationService implements IFormValidationServiceRole {
   public Map<String, Map<ValidationType, Set<String>>> validateMap(
       Map<String, String[]> requestMap) {
     Map<String, Map<ValidationType, Set<String>>> ret = new HashMap<>();
-    DocFormRequestKeyParser parser = new DocFormRequestKeyParser(context.getDocRef()
-        .orElseThrow(IllegalStateException::new));
+    DocFormRequestKeyParser parser = new DocFormRequestKeyParser(
+        context.getDocRef().orElseThrow(IllegalStateException::new));
     for (ValidationResult v : validate(parser.parseParameterMap(requestMap))) {
       ret.computeIfAbsent(v.getName(), k -> new EnumMap<>(ValidationType.class))
-          .computeIfAbsent(v.getType(), k -> new HashSet<>())
-          .add(v.getMessage());
+          .computeIfAbsent(v.getType(), k -> new HashSet<>()).add(v.getMessage());
     }
     return ret;
   }
@@ -102,16 +100,15 @@ public class FormValidationService implements IFormValidationServiceRole {
   }
 
   private List<ValidationResult> validateLegacy(List<DocFormRequestParam> params) {
-    Map<RequestParameter, String[]> paramMap = StreamEx.of(params).mapToEntry(
-        p -> RequestParameter.create(p.getKey().getKeyString()),
-        p -> p.getValues().toArray(new String[0]))
-        .filterKeys(Objects::nonNull)
-        .toImmutableMap();
+    Map<RequestParameter, String[]> paramMap = StreamEx.of(params)
+        .mapToEntry(p -> RequestParameter.create(p.getKey().getKeyString()),
+            p -> p.getValues().toArray(new String[0]))
+        .filterKeys(Objects::nonNull).toImmutableMap();
     List<ValidationResult> ret = new ArrayList<>();
     for (IRequestValidationRuleRole validationRule : legacyRequestValidationRules.values()) {
       LOGGER.trace("validateLegacy - for rule: {}", validationRule);
-      validationRule.validateRequest(paramMap).forEach((name, x) -> x.forEach((type, msgs) -> msgs
-          .forEach(msg -> ret.add(new ValidationResult(type, name, msg)))));
+      validationRule.validateRequest(paramMap).forEach((name, x) -> x.forEach(
+          (type, msgs) -> msgs.forEach(msg -> ret.add(new ValidationResult(type, name, msg)))));
     }
     LOGGER.debug("validateLegacy - params [{}], result [{}]", paramMap, ret);
     return ret;

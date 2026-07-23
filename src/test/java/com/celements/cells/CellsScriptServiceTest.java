@@ -90,8 +90,8 @@ public class CellsScriptServiceTest extends AbstractComponentTest {
   public void testGetPageDependentDocRef_DocumentReference() {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myExpectedDoc");
-    expect(mockPageDepDocRefCmd.getDocumentReference(eq(currentDocRef), same(
-        cellDocRef))).andReturn(expectedDocRef).once();
+    expect(mockPageDepDocRefCmd.getDocumentReference(eq(currentDocRef), same(cellDocRef)))
+        .andReturn(expectedDocRef).once();
     replayDefault();
     assertEquals(expectedDocRef, cellsScriptService.getPageDependentDocRef(cellDocRef));
     verifyDefault();
@@ -101,60 +101,60 @@ public class CellsScriptServiceTest extends AbstractComponentTest {
   public void testGetPageDependentDocRef_DocumentReferenceDocumentReference() throws Exception {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myExpectedDoc");
-    expect(mockPageDepDocRefCmd.getDocumentReference(eq(currentDocRef), same(
-        cellDocRef))).andReturn(expectedDocRef).once();
+    expect(mockPageDepDocRefCmd.getDocumentReference(eq(currentDocRef), same(cellDocRef)))
+        .andReturn(expectedDocRef).once();
     replayDefault();
-    assertEquals(expectedDocRef, cellsScriptService.getPageDependentDocRef(currentDocRef,
-        cellDocRef));
+    assertEquals(expectedDocRef,
+        cellsScriptService.getPageDependentDocRef(currentDocRef, cellDocRef));
     verifyDefault();
   }
 
   @Test
   public void testGetPageDependentTranslatedDocument() throws XWikiException {
     XWikiDocument expectedXDoc = createDefaultMock(XWikiDocument.class);
-    expect(mockPageDepDocRefCmd.getTranslatedDocument(same(currentXDoc), same(
-        cellDocRef))).andReturn(expectedXDoc).once();
+    expect(mockPageDepDocRefCmd.getTranslatedDocument(same(currentXDoc), same(cellDocRef)))
+        .andReturn(expectedXDoc).once();
     expect(currentDoc.getDocumentReference()).andReturn(currentDocRef).anyTimes();
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentXDoc).once();
     expect(currentDoc.getLanguage()).andReturn("").once();
     Document expectedDoc = new Document(expectedXDoc, context);
     expect(expectedXDoc.newDocument(same(context))).andReturn(expectedDoc).once();
     replayDefault();
-    assertSame(expectedDoc, cellsScriptService.getPageDependentTranslatedDocument(currentDoc,
-        cellDocRef));
+    assertSame(expectedDoc,
+        cellsScriptService.getPageDependentTranslatedDocument(currentDoc, cellDocRef));
     verifyDefault();
   }
 
   @Test
   public void testGetPageDependentTranslatedDocument_translations() throws XWikiException {
     XWikiDocument expectedXDoc = createDefaultMock(XWikiDocument.class);
-    expect(mockPageDepDocRefCmd.getTranslatedDocument(same(currentXDoc), same(
-        cellDocRef))).andReturn(expectedXDoc).once();
+    expect(mockPageDepDocRefCmd.getTranslatedDocument(same(currentXDoc), same(cellDocRef)))
+        .andReturn(expectedXDoc).once();
     expect(currentDoc.getDocumentReference()).andReturn(currentDocRef).anyTimes();
     XWikiDocument currentXDocDef = createDefaultMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentXDocDef).once();
-    expect(currentXDocDef.getTranslatedDocument(eq("fr"), same(context))).andReturn(
-        currentXDoc).once();
+    expect(currentXDocDef.getTranslatedDocument(eq("fr"), same(context))).andReturn(currentXDoc)
+        .once();
     expect(currentDoc.getLanguage()).andReturn("fr").atLeastOnce();
     Document expectedDoc = new Document(expectedXDoc, context);
     expect(expectedXDoc.newDocument(same(context))).andReturn(expectedDoc).once();
     replayDefault();
-    assertSame(expectedDoc, cellsScriptService.getPageDependentTranslatedDocument(currentDoc,
-        cellDocRef));
+    assertSame(expectedDoc,
+        cellsScriptService.getPageDependentTranslatedDocument(currentDoc, cellDocRef));
     verifyDefault();
   }
 
   @Test
   public void testGetPageDependentTranslatedDocument_Exception() throws XWikiException {
     try {
-      expect(mockPageDepDocRefCmd.getTranslatedDocument(same(currentXDoc), same(
-          cellDocRef))).andThrow(new XWikiException()).once();
+      expect(mockPageDepDocRefCmd.getTranslatedDocument(same(currentXDoc), same(cellDocRef)))
+          .andThrow(new XWikiException()).once();
       expect(currentDoc.getDocumentReference()).andReturn(currentDocRef).anyTimes();
       expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentXDoc).once();
       expect(currentDoc.getLanguage()).andReturn("").once();
       replayDefault();
-      assertSame(currentDoc, cellsScriptService.getPageDependentTranslatedDocument(currentDoc,
-          cellDocRef));
+      assertSame(currentDoc,
+          cellsScriptService.getPageDependentTranslatedDocument(currentDoc, cellDocRef));
       verifyDefault();
     } catch (XWikiException exp) {
       fail("Expecting to catch XWikiException and return currentDoc.");

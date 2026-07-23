@@ -128,8 +128,8 @@ public class PageTypeServiceTest extends AbstractComponentTest {
     testPageTypePropObj.setXClassReference(pageTypePropClassRef);
     testPageTypeDoc.addXObject(testPageTypePropObj);
     testPageTypePropObj.setIntValue("visible", 1);
-    expect(getWikiMock().getDocument(eq("PageTypes.TestPageType"), same(getContext()))).andReturn(
-        testPageTypeDoc);
+    expect(getWikiMock().getDocument(eq("PageTypes.TestPageType"), same(getContext())))
+        .andReturn(testPageTypeDoc);
     replayDefault();
     List<PageTypeReference> pageTypeRefs = ptService.getPageTypeRefsForCategories(catList, true);
     assertTrue(pageTypeRefs.size() == 1);
@@ -156,8 +156,8 @@ public class PageTypeServiceTest extends AbstractComponentTest {
     testPageTypePropObj.setXClassReference(pageTypePropClassRef);
     testPageTypeDoc.addXObject(testPageTypePropObj);
     testPageTypePropObj.setIntValue("visible", 0);
-    expect(getWikiMock().getDocument(eq("PageTypes.TestPageType"), same(getContext()))).andReturn(
-        testPageTypeDoc);
+    expect(getWikiMock().getDocument(eq("PageTypes.TestPageType"), same(getContext())))
+        .andReturn(testPageTypeDoc);
     replayDefault();
     List<PageTypeReference> pageTypeRefs = ptService.getPageTypeRefsForCategories(catList, true);
     assertTrue(pageTypeRefs.isEmpty());
@@ -180,8 +180,8 @@ public class PageTypeServiceTest extends AbstractComponentTest {
   @Test
   public void testGetPageTypeRefsForCategories_cat_emptyType() {
     Set<String> catList = new HashSet<>(Arrays.asList("", "PageTypes"));
-    PageTypeReference richTextRef = new PageTypeReference("RichText", MOCK_PROVIDER, Arrays.asList(
-        ""));
+    PageTypeReference richTextRef = new PageTypeReference("RichText", MOCK_PROVIDER,
+        Arrays.asList(""));
     PageTypeReference testCellTypeRef = new PageTypeReference("testCellPageType", MOCK_PROVIDER,
         Arrays.asList("cellType"));
     expect(providerMock.getPageTypes()).andReturn(Arrays.asList(richTextRef, testCellTypeRef));
@@ -195,8 +195,8 @@ public class PageTypeServiceTest extends AbstractComponentTest {
   @Test
   public void testGetPageTypeRefsForCategories_cat_PageTypes() {
     Set<String> catList = new HashSet<>(Arrays.asList("", "PageTypes"));
-    PageTypeReference richTextRef = new PageTypeReference("RichText", MOCK_PROVIDER, Arrays.asList(
-        "PageTypes"));
+    PageTypeReference richTextRef = new PageTypeReference("RichText", MOCK_PROVIDER,
+        Arrays.asList("PageTypes"));
     PageTypeReference testCellTypeRef = new PageTypeReference("testCellPageType", MOCK_PROVIDER,
         Arrays.asList("cellType"));
     expect(providerMock.getPageTypes()).andReturn(Arrays.asList(richTextRef, testCellTypeRef));
@@ -217,16 +217,16 @@ public class PageTypeServiceTest extends AbstractComponentTest {
     doc.addXObject(obj);
 
     BaseClass bClass = createBaseClassMock(getPageTypeClassRef());
-    expect(bClass.get(eq(IPageTypeClassConfig.PAGE_TYPE_FIELD))).andReturn(
-        new StringClass()).once();
+    expect(bClass.get(eq(IPageTypeClassConfig.PAGE_TYPE_FIELD))).andReturn(new StringClass())
+        .once();
 
     replayDefault();
     assertTrue(ptService.setPageType(doc, testPageTypeRef));
     verifyDefault();
 
     assertSame(obj, doc.getXObject(getPageTypeClassRef()));
-    assertEquals(testPageTypeRef.getConfigName(), obj.getStringValue(
-        IPageTypeClassConfig.PAGE_TYPE_FIELD));
+    assertEquals(testPageTypeRef.getConfigName(),
+        obj.getStringValue(IPageTypeClassConfig.PAGE_TYPE_FIELD));
   }
 
   @Test
@@ -236,16 +236,16 @@ public class PageTypeServiceTest extends AbstractComponentTest {
         Arrays.asList(""));
 
     BaseClass bClass = expectNewBaseObject(getPageTypeClassRef());
-    expect(bClass.get(eq(IPageTypeClassConfig.PAGE_TYPE_FIELD))).andReturn(
-        new StringClass()).once();
+    expect(bClass.get(eq(IPageTypeClassConfig.PAGE_TYPE_FIELD))).andReturn(new StringClass())
+        .once();
 
     replayDefault();
     assertTrue(ptService.setPageType(doc, testPageTypeRef));
     verifyDefault();
 
     assertNotNull(doc.getXObject(getPageTypeClassRef()));
-    assertEquals(testPageTypeRef.getConfigName(), doc.getXObject(
-        getPageTypeClassRef()).getStringValue(IPageTypeClassConfig.PAGE_TYPE_FIELD));
+    assertEquals(testPageTypeRef.getConfigName(),
+        doc.getXObject(getPageTypeClassRef()).getStringValue(IPageTypeClassConfig.PAGE_TYPE_FIELD));
   }
 
   @Test
@@ -263,8 +263,8 @@ public class PageTypeServiceTest extends AbstractComponentTest {
     verifyDefault();
 
     assertSame(obj, doc.getXObject(getPageTypeClassRef()));
-    assertEquals(testPageTypeRef.getConfigName(), obj.getStringValue(
-        IPageTypeClassConfig.PAGE_TYPE_FIELD));
+    assertEquals(testPageTypeRef.getConfigName(),
+        obj.getStringValue(IPageTypeClassConfig.PAGE_TYPE_FIELD));
   }
 
   @Test

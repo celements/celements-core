@@ -33,8 +33,7 @@ public class JsonWriterTest {
     writer.openLevel("div");
     writer.closeLevel();
     writer.closeLevel();
-    assertEquals("["
-        + "{\"tagName\" : \"div\", \"attributes\" : {},"
+    assertEquals("[" + "{\"tagName\" : \"div\", \"attributes\" : {},"
         + " \"subnodes\" : [{\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : []}]}"
         + "]", writer.getAsString());
   }
@@ -45,10 +44,10 @@ public class JsonWriterTest {
     writer.closeLevel();
     writer.openLevel("div");
     writer.closeLevel();
-    assertEquals("["
-        + "{\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : []},"
-        + " {\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : []}"
-        + "]", writer.getAsString());
+    assertEquals(
+        "[" + "{\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : []},"
+            + " {\"tagName\" : \"div\", \"attributes\" : {}, \"subnodes\" : []}" + "]",
+        writer.getAsString());
   }
 
   @Test

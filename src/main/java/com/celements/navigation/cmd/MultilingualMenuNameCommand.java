@@ -107,14 +107,12 @@ public class MultilingualMenuNameCommand {
       menuName = menuNameObj.getStringValue("menu_name").trim();
     }
     if (!allowEmptyMenuNames && menuName.isEmpty()) {
-      menuName = Stream.<Supplier<Optional<XWikiDocument>>>of(
-          () -> getModelAccess().getDocumentOpt(docRef, language),
-          () -> getModelAccess().getDocumentOpt(docRef))
-          .map(Supplier::get).flatMap(Optional::stream)
-          .map(XWikiDocument::getTitle)
-          .filter(not(String::isBlank))
-          .findFirst()
-          .orElseGet(() -> getFallbackMenuName(docRef));
+      menuName = Stream
+          .<Supplier<Optional<XWikiDocument>>>of(
+              () -> getModelAccess().getDocumentOpt(docRef, language),
+              () -> getModelAccess().getDocumentOpt(docRef))
+          .map(Supplier::get).flatMap(Optional::stream).map(XWikiDocument::getTitle)
+          .filter(not(String::isBlank)).findFirst().orElseGet(() -> getFallbackMenuName(docRef));
     }
     LOGGER.info("getMenuNameFromBaseObject: for '{}' returning '{}'", docRef, menuName);
     return menuName;
@@ -203,8 +201,8 @@ public class MultilingualMenuNameCommand {
   }
 
   private XWikiContext getContext() {
-    return Utils.getComponent(Execution.class).getContext()
-        .get(XWikiExecutionProp.XWIKI_CONTEXT).orElseThrow();
+    return Utils.getComponent(Execution.class).getContext().get(XWikiExecutionProp.XWIKI_CONTEXT)
+        .orElseThrow();
   }
 
   private IModelAccessFacade getModelAccess() {

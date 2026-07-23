@@ -49,7 +49,7 @@ public enum SaveEventOperation {
 
   public static SaveEventOperation from(Event event) {
     String eventName = checkNotNull(event).getClass().getSimpleName().toUpperCase();
-    return Arrays.stream(values()).filter(ops -> eventName.contains(ops.name()))
-        .findAny().orElseThrow(() -> new IllegalArgumentException("illegal save event: " + event));
+    return Arrays.stream(values()).filter(ops -> eventName.contains(ops.name())).findAny()
+        .orElseThrow(() -> new IllegalArgumentException("illegal save event: " + event));
   }
 }

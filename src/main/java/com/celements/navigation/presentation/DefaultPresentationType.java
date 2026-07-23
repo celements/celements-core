@@ -68,8 +68,8 @@ public class DefaultPresentationType implements IPresentationTypeRole<INavigatio
           + nav.getMenuLinkTarget(docRef).map(target -> " target=\"" + target + "\"").orElse("");
     }
     if (nav.useImagesForNavigation()) {
-      menuItemHTML += " " + menuNameCmd.addNavImageStyle(fullName, nav.getNavLanguage(),
-          getContext());
+      menuItemHTML += " "
+          + menuNameCmd.addNavImageStyle(fullName, nav.getNavLanguage(), getContext());
     }
     String tooltip = menuNameCmd.addToolTip(fullName, nav.getNavLanguage(), getContext());
     if (!"".equals(tooltip)) {

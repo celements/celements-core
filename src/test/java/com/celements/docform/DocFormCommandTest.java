@@ -79,8 +79,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     getContext().setDatabase(wiki.getName());
     docRef = new DocumentReference(wiki.getName(), "Space", "Doc");
     parser = new DocFormRequestKeyParser(docRef);
-    docFormCmd = (DocFormCommand) Utils.getComponent(IDocForm.class)
-        .initialize(docRef, true);
+    docFormCmd = (DocFormCommand) Utils.getComponent(IDocForm.class).initialize(docRef, true);
 
     xdoc = create(docRef);
     tdoc = create(docRef, "it");
@@ -138,9 +137,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDoc_objField_multipleFields() throws Exception {
-    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
-        "A.B_0_hi", "val1",
-        "A.B_0_content", "val2"));
+    List<DocFormRequestParam> params = parseParams(
+        ImmutableMap.of("A.B_0_hi", "val1", "A.B_0_content", "val2"));
     BaseObject obj = addXObject(xdoc, params.get(0).getKey());
 
     replayDefault();
@@ -180,9 +178,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDoc_objField_create_multiple_sameClass() throws Exception {
-    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
-        "A.B_0_hi", "val1",
-        "A.B_-1_hi", "val2"));
+    List<DocFormRequestParam> params = parseParams(
+        ImmutableMap.of("A.B_0_hi", "val1", "A.B_-1_hi", "val2"));
 
     replayDefault();
     assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(0)));
@@ -196,9 +193,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDoc_objField_create_multiple_otherClasses() throws Exception {
-    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
-        "A.B_-1_hi", "val1",
-        "X.Y_-1_hi", "val2"));
+    List<DocFormRequestParam> params = parseParams(
+        ImmutableMap.of("A.B_-1_hi", "val1", "X.Y_-1_hi", "val2"));
 
     replayDefault();
     assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(0)));
@@ -212,8 +208,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDoc_objField_list() throws Exception {
-    List<DocFormRequestParam> params = parseParamsArr(ImmutableMap.of(
-        "A.B_-1_hi", new String[] { "val1", "val2" }));
+    List<DocFormRequestParam> params = parseParamsArr(
+        ImmutableMap.of("A.B_-1_hi", new String[] { "val1", "val2" }));
 
     replayDefault();
     assertSame(xdoc, docFormCmd.updateDocFromParam(xdoc, tdoc, params.get(0)));
@@ -304,13 +300,12 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDocs_multipleDocs() throws Exception {
-    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
-        "This.Doc_A.B_0_foo", "val1",
-        "That.Doc_A.B_0_foo", "val1"));
-    XWikiDocument docThis = expectDocWithSave(create(
-        new DocumentReference(wiki.getName(), "This", "Doc")));
-    XWikiDocument docThat = expectDocWithSave(create(
-        new DocumentReference(wiki.getName(), "That", "Doc")));
+    List<DocFormRequestParam> params = parseParams(
+        ImmutableMap.of("This.Doc_A.B_0_foo", "val1", "That.Doc_A.B_0_foo", "val1"));
+    XWikiDocument docThis = expectDocWithSave(
+        create(new DocumentReference(wiki.getName(), "This", "Doc")));
+    XWikiDocument docThat = expectDocWithSave(
+        create(new DocumentReference(wiki.getName(), "That", "Doc")));
     expectDoc(xdoc);
 
     replayDefault();
@@ -346,9 +341,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDocs_docFields() throws Exception {
-    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
-        "Space.Doc_title", "Title",
-        "content", "Content"));
+    List<DocFormRequestParam> params = parseParams(
+        ImmutableMap.of("Space.Doc_title", "Title", "content", "Content"));
     expectDocWithSave(xdoc);
 
     replayDefault();
@@ -362,9 +356,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDocs_docFields_translation() throws Exception {
-    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
-        "Space.Doc_title", "Title",
-        "content", "Content"));
+    List<DocFormRequestParam> params = parseParams(
+        ImmutableMap.of("Space.Doc_title", "Title", "content", "Content"));
     expectDoc(xdoc);
     getContext().setLanguage(tdoc.getLanguage());
     docFormCmd.addTranslationCmd = createDefaultMock(AddTranslationCommand.class);
@@ -385,10 +378,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDocs_objFields_deleteAndSet() throws Exception {
-    List<DocFormRequestParam> params = parseParams(ImmutableMap.of(
-        "A.B_^0", "",
-        "A.B_1_foo", "val1",
-        "A.B_0_foo", "val2"));
+    List<DocFormRequestParam> params = parseParams(
+        ImmutableMap.of("A.B_^0", "", "A.B_1_foo", "val1", "A.B_0_foo", "val2"));
     addXObject(xdoc, params.get(0).getKey());
     expectDocWithSave(xdoc);
 
@@ -402,8 +393,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDocs_createNotAllowed() throws Exception {
-    docFormCmd = (DocFormCommand) Utils.getComponent(IDocForm.class)
-        .initialize(docRef, false);
+    docFormCmd = (DocFormCommand) Utils.getComponent(IDocForm.class).initialize(docRef, false);
     List<DocFormRequestParam> params = parseParams(ImmutableMap.of("A.B_0_foo", "val"));
     xdoc.setNew(true);
     expectDoc(xdoc);
@@ -417,8 +407,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_updateDocs_createNotAllowed_notNew() throws Exception {
-    docFormCmd = (DocFormCommand) Utils.getComponent(IDocForm.class)
-        .initialize(docRef, false);
+    docFormCmd = (DocFormCommand) Utils.getComponent(IDocForm.class).initialize(docRef, false);
     List<DocFormRequestParam> params = parseParams(ImmutableMap.of("A.B_0_foo", "val"));
     xdoc.setNew(false);
     expectDocWithSave(xdoc);
@@ -444,10 +433,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
     assertResponse(params, null, ImmutableSet.of(xdoc), null);
   }
 
-  private void assertResponse(List<DocFormRequestParam> params,
-      Set<XWikiDocument> successful,
-      Set<XWikiDocument> failed,
-      Set<XWikiDocument> unchanged) {
+  private void assertResponse(List<DocFormRequestParam> params, Set<XWikiDocument> successful,
+      Set<XWikiDocument> failed, Set<XWikiDocument> unchanged) {
     Map<ResponseState, Set<DocumentReference>> responseMap = docFormCmd.getResponseMap(params);
     assertEquals(3, responseMap.size());
     assertEquals("successful", convert(successful), responseMap.get(ResponseState.successful));
@@ -468,10 +455,10 @@ public class DocFormCommandTest extends AbstractComponentTest {
   }
 
   private XWikiDocument expectDoc(XWikiDocument doc) throws DocumentNotExistsException {
-    expect(getMock(IModelAccessFacade.class).exists(doc.getDocumentReference()))
-        .andReturn(true).anyTimes();
-    expect(getMock(IModelAccessFacade.class).getDocument(doc.getDocumentReference()))
-        .andReturn(doc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).exists(doc.getDocumentReference())).andReturn(true)
+        .anyTimes();
+    expect(getMock(IModelAccessFacade.class).getDocument(doc.getDocumentReference())).andReturn(doc)
+        .anyTimes();
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(doc.getDocumentReference()))
         .andReturn(doc).anyTimes();
     return doc;
@@ -493,14 +480,12 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   private List<DocFormRequestParam> parseParamsArr(Map<String, String[]> map) throws Exception {
     List<DocFormRequestParam> requestParams = parser.parseParameterMap(map);
-    requestParams.stream().map(DocFormRequestParam::getKey)
-        .filter(key -> key.getClassRef() != null)
+    requestParams.stream().map(DocFormRequestParam::getKey).filter(key -> key.getClassRef() != null)
         .collect(Collectors.groupingBy(key -> key.getClassRef()))
         .forEach(rethrowBiConsumer((classRef, keys) -> {
           final BaseClass bClass = expectNewBaseObject(classRef.getDocRef(wiki));
           keys.stream().forEach(key -> expect(bClass.get(key.getFieldName()))
-              .andReturn(new StringClass())
-              .anyTimes());
+              .andReturn(new StringClass()).anyTimes());
         }));
     return requestParams;
   }
@@ -509,10 +494,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
       throws XWikiException {
     DocFormRequestKey key = param.getKey();
     int actualObjNb = docFormCmd.getChangedObjects().get(key.getObjHash());
-    BaseObject obj = XWikiObjectEditor.on(xdoc)
-        .filter(param.getKey().getClassRef())
-        .filter(actualObjNb)
-        .fetch().unique();
+    BaseObject obj = XWikiObjectEditor.on(xdoc).filter(param.getKey().getClassRef())
+        .filter(actualObjNb).fetch().unique();
     assertEquals(param.getValuesAsString(), obj.getStringValue(key.getFieldName()));
     assertEquals(obj.getNumber(), actualObjNb);
     return obj;

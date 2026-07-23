@@ -19,8 +19,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("layoutEditor")
 public class LayoutEditorPresentationType extends DefaultPresentationType {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      LayoutEditorPresentationType.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LayoutEditorPresentationType.class);
 
   private static final String _CEL_CM_CELLEDITOR_MENUITEM = "cel_cm_celleditor_menuitem";
 
@@ -64,8 +63,8 @@ public class LayoutEditorPresentationType extends DefaultPresentationType {
     }
     if (nav.useImagesForNavigation()) {
       menuItemHTML.append(" ");
-      menuItemHTML.append(menuNameCmd.addNavImageStyle(fullName, nav.getNavLanguage(),
-          getContext()));
+      menuItemHTML
+          .append(menuNameCmd.addNavImageStyle(fullName, nav.getNavLanguage(), getContext()));
     }
     String tooltip = menuNameCmd.addToolTip(fullName, nav.getNavLanguage(), getContext());
     if (!Strings.isNullOrEmpty(tooltip)) {

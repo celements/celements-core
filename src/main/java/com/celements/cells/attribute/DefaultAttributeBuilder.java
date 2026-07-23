@@ -17,8 +17,8 @@ import com.google.common.base.Strings;
 @NotThreadSafe
 public class DefaultAttributeBuilder implements AttributeBuilder {
 
-  private static final Splitter CSS_CLASS_SPLITTER = Splitter.on(
-      " ").trimResults().omitEmptyStrings();
+  private static final Splitter CSS_CLASS_SPLITTER = Splitter.on(" ").trimResults()
+      .omitEmptyStrings();
 
   private final Map<String, DefaultCellAttribute.Builder> attributeMap = new LinkedHashMap<>();
 

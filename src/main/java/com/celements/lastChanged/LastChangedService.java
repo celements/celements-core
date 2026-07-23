@@ -95,8 +95,8 @@ public class LastChangedService implements ILastChangedRole {
       if (firstRow[1] != null) {
         lastChangedDocLang = firstRow[1].toString();
       }
-      DocumentReference lastChangedDocRef = webUtilsService.resolveDocumentReference(
-          lastChangedDocFN);
+      DocumentReference lastChangedDocRef = webUtilsService
+          .resolveDocumentReference(lastChangedDocFN);
       XWikiDocument lastChangedDoc;
       try {
         if (Strings.isNullOrEmpty(lastChangedDocLang)) {

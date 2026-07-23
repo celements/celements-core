@@ -15,8 +15,7 @@ public class FrontendResourceIncludeCssListener implements IExtJSFilesListener {
   private final FrontendResourceResolver resolver;
 
   @Inject
-  public FrontendResourceIncludeCssListener(
-      CssCommand cssCommand,
+  public FrontendResourceIncludeCssListener(CssCommand cssCommand,
       FrontendResourceResolver resolver) {
     this.cssCommand = cssCommand;
     this.resolver = resolver;
@@ -26,8 +25,7 @@ public class FrontendResourceIncludeCssListener implements IExtJSFilesListener {
   public void beforeAllExtFinish(ExternalJavaScriptFilesCommand jsCommand) {
     // Include frontend entry sources. CSSEngine treats :frontend/... values as manifest keys and
     // expands them to the CSS assets emitted for that entrypoint.
-    jsCommand.streamExtJsFiles()
-        .filter(resolver::isFrontendSource)
+    jsCommand.streamExtJsFiles().filter(resolver::isFrontendSource)
         .forEach(cssCommand::includeCSSPage);
   }
 }

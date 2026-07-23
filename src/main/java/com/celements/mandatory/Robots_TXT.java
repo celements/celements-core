@@ -117,8 +117,8 @@ public class Robots_TXT implements IMandatoryDocumentRole {
   }
 
   boolean checkPageType(XWikiDocument robotsTxtDoc) throws XWikiException {
-    DocumentReference pageTypeClassRef = getPageTypeClasses().getPageTypeClassRef(
-        getContext().getDatabase());
+    DocumentReference pageTypeClassRef = getPageTypeClasses()
+        .getPageTypeClassRef(getContext().getDatabase());
     BaseObject pageTypeObj = robotsTxtDoc.getXObject(pageTypeClassRef, false, getContext());
     if (pageTypeObj == null) {
       pageTypeObj = robotsTxtDoc.newXObject(pageTypeClassRef, getContext());

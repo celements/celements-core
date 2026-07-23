@@ -87,7 +87,6 @@ public class TranslationBoxCellConfigClassTest extends AbstractComponentTest {
     cellsClassesColl.getTranslationBoxCellConfigClass();
     verifyDefault();
 
-    assertEquals(doc.getXClass(),
-        xClassCreator.generateXClass(translationBoxCellConfigClass));
+    assertEquals(doc.getXClass(), xClassCreator.generateXClass(translationBoxCellConfigClass));
   }
 }

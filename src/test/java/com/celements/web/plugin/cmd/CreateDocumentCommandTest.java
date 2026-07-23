@@ -63,8 +63,8 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
     expect(getMock(IModelAccessFacade.class).createDocument(docRef))
         .andThrow(new DocumentAlreadyExistsException(docRef));
     replayDefault();
-    assertNull("only create document if NOT exists.", createDocumentCmd.createDocument(docRef,
-        pageType));
+    assertNull("only create document if NOT exists.",
+        createDocumentCmd.createDocument(docRef, pageType));
     verifyDefault();
   }
 

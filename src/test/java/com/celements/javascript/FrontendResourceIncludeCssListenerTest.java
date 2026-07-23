@@ -27,11 +27,8 @@ public class FrontendResourceIncludeCssListenerTest extends AbstractComponentTes
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMocks(
-        ExternalJavaScriptFilesCommand.class,
-        FrontendResourceResolver.class,
-        IModelAccessFacade.class,
-        LayoutServiceRole.class);
+    registerComponentMocks(ExternalJavaScriptFilesCommand.class, FrontendResourceResolver.class,
+        IModelAccessFacade.class, LayoutServiceRole.class);
     context = getXContext();
     context.put("vcontext", new VelocityContext());
     listener = getBeanFactory().getBean(FrontendResourceIncludeCssListener.class);
@@ -42,8 +39,8 @@ public class FrontendResourceIncludeCssListenerTest extends AbstractComponentTes
     String sourcePath = ":frontend/progon/vue-poc/main.ts";
     expect(getMock(ExternalJavaScriptFilesCommand.class).streamExtJsFiles())
         .andReturn(Stream.of(sourcePath)).anyTimes();
-    expect(getMock(FrontendResourceResolver.class).isFrontendSource(eq(sourcePath)))
-        .andReturn(true).anyTimes();
+    expect(getMock(FrontendResourceResolver.class).isFrontendSource(eq(sourcePath))).andReturn(true)
+        .anyTimes();
     expect(getMock(FrontendResourceResolver.class).get(eq(sourcePath)))
         .andReturn(Optional.of(new FrontendResource("dist/vue-poc.BOsmCSyo.mjs",
             Collections.singletonList("dist/assets/vue-poc-ahBOTvOT.css"))));
@@ -58,8 +55,6 @@ public class FrontendResourceIncludeCssListenerTest extends AbstractComponentTes
   private List<String> getIncludedCssBasePaths() {
     VelocityContext vcontext = (VelocityContext) context.get("vcontext");
     List<CSS> cssList = (List<CSS>) vcontext.get("cel_css_list_page");
-    return cssList.stream()
-        .map(CSS::getCssBasePath)
-        .toList();
+    return cssList.stream().map(CSS::getCssBasePath).toList();
   }
 }

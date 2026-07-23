@@ -76,16 +76,15 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
   public List<MetaTag> getHeaderMetaTags() {
     SortedMap<String, List<MetaTag>> tags = new TreeMap<>();
     addMetaTagsFromList(getMetaTagsForDoc(context.getXWikiPreferenceDoc()), tags);
-    addMetaTagsFromList(getMetaTagsForDoc(context.getSpacePreferenceDoc(context
-        .getCurrentSpaceRefOrDefault())), tags);
+    addMetaTagsFromList(
+        getMetaTagsForDoc(context.getSpacePreferenceDoc(context.getCurrentSpaceRefOrDefault())),
+        tags);
     Optional<XWikiDocument> doc = context.getCurrentDoc().toJavaUtil();
     if (doc.isPresent()) {
       addMetaTagsFromList(getMetaTagsForDoc(doc.get()), tags);
     }
-    return ImmutableList.copyOf(tags.values().parallelStream()
-        .flatMap(applyOverride())
-        .filter(Objects::nonNull)
-        .collect(Collectors.<MetaTag>toList()));
+    return ImmutableList.copyOf(tags.values().parallelStream().flatMap(applyOverride())
+        .filter(Objects::nonNull).collect(Collectors.<MetaTag>toList()));
   }
 
   Function<List<MetaTag>, Stream<MetaTag>> applyOverride() {
@@ -123,9 +122,8 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
                 } else if (reductor.getOverridable()) {
                   Collections.replaceAll(accu, reductor, tag);
                 } else {
-                  reductor.setValue(reductor.getValueOpt().orElse("") + "," + tag.getValueOpt()
-                      .orElse(
-                          ""));
+                  reductor.setValue(
+                      reductor.getValueOpt().orElse("") + "," + tag.getValueOpt().orElse(""));
                 }
               }
             };
@@ -137,8 +135,8 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
 
               @Override
               public List<MetaTag> apply(List<MetaTag> list1, List<MetaTag> list2) {
-                return Stream.of(list1, list2).flatMap(Collection::stream).collect(Collectors
-                    .toList());
+                return Stream.of(list1, list2).flatMap(Collection::stream)
+                    .collect(Collectors.toList());
               }
             };
           }
@@ -167,8 +165,8 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
   void addMetaTagsFromList(List<MetaTag> newTags, SortedMap<String, List<MetaTag>> finalTags) {
     for (MetaTag tag : newTags) {
       Optional<String> lang = tag.getLangOpt();
-      if (!lang.isPresent() || lang.get().equals(context.getLanguage().orElse(null)) || lang.get()
-          .equals(context.getDefaultLanguage())) {
+      if (!lang.isPresent() || lang.get().equals(context.getLanguage().orElse(null))
+          || lang.get().equals(context.getDefaultLanguage())) {
         String key = tag.getKeyOpt().orElse("");
         if (!finalTags.containsKey(key)) {
           finalTags.put(key, new ArrayList<MetaTag>());
@@ -180,17 +178,14 @@ public class BaseObjectMetaTagProvider implements MetaTagProviderRole, Initializ
 
   List<MetaTag> getMetaTagsForDoc(XWikiDocument doc) {
     return XWikiObjectFetcher.on(doc).filter(metaTagClass).filterPresent(MetaTagClass.FIELD_KEY)
-        .list().stream().parallel()
-        .map(
-            new Function<BaseObject, MetaTag>() {
+        .list().stream().parallel().map(new Function<BaseObject, MetaTag>() {
 
-              @Override
-              public MetaTag apply(BaseObject obj) {
-                return (MetaTag) metaTagConverter.apply(obj);
-              }
+          @Override
+          public MetaTag apply(BaseObject obj) {
+            return (MetaTag) metaTagConverter.apply(obj);
+          }
 
-            })
-        .collect(Collectors.<MetaTag>toList());
+        }).collect(Collectors.<MetaTag>toList());
   }
 
   @Override

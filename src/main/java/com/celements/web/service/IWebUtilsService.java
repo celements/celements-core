@@ -83,14 +83,12 @@ public interface IWebUtilsService {
    *             DocumentReference docRef, boolean includeDoc)
    */
   @Deprecated
-  List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
-      boolean includeDoc);
+  List<DocumentReference> getDocumentParentsList(DocumentReference docRef, boolean includeDoc);
 
   String getDocSectionAsJSON(String regex, DocumentReference docRef, int section)
       throws XWikiException;
 
-  String getDocSection(String regex, DocumentReference docRef, int section)
-      throws XWikiException;
+  String getDocSection(String regex, DocumentReference docRef, int section) throws XWikiException;
 
   int countSections(String regex, DocumentReference docRef) throws XWikiException;
 
@@ -208,24 +206,22 @@ public interface IWebUtilsService {
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
-  EntityReference resolveEntityReference(String name, EntityType type,
-      WikiReference wikiRef);
+  EntityReference resolveEntityReference(String name, EntityType type, WikiReference wikiRef);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
   @NotNull
-  <T extends EntityReference> T resolveReference(@NotNull String name,
-      @NotNull Class<T> token);
+  <T extends EntityReference> T resolveReference(@NotNull String name, @NotNull Class<T> token);
 
   /**
    * @deprecated instead use {@link ModelUtils#resolveRef(String, Class, EntityReference)}
    */
   @Deprecated
   @NotNull
-  <T extends EntityReference> T resolveReference(@NotNull String name,
-      @NotNull Class<T> token, @Nullable EntityReference baseRef);
+  <T extends EntityReference> T resolveReference(@NotNull String name, @NotNull Class<T> token,
+      @Nullable EntityReference baseRef);
 
   /**
    * @deprecated instead use {@link IRightsAccessFacadeRole#isAdmin()}
@@ -290,8 +286,7 @@ public interface IWebUtilsService {
    * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator, boolean)}
    */
   @Deprecated
-  List<Attachment> getAttachmentListSorted(Document doc, String comparator,
-      boolean imagesOnly);
+  List<Attachment> getAttachmentListSorted(Document doc, String comparator, boolean imagesOnly);
 
   List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator, boolean imagesOnly);
@@ -301,8 +296,8 @@ public interface IWebUtilsService {
    *             {@link #getAttachmentListSorted(XWikiDocument, Comparator, boolean, int, int)}
    */
   @Deprecated
-  List<Attachment> getAttachmentListSorted(Document doc, String comparator,
-      boolean imagesOnly, int start, int nb);
+  List<Attachment> getAttachmentListSorted(Document doc, String comparator, boolean imagesOnly,
+      int start, int nb);
 
   List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator, boolean imagesOnly, int start, int nb);
@@ -314,8 +309,8 @@ public interface IWebUtilsService {
 
   // TODO change signature requirement to XWikiDocument instead of document and mark
   // the old version as deprecated
-  List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
-      String comparator, boolean imagesOnly, int start, int nb);
+  List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName, String comparator,
+      boolean imagesOnly, int start, int nb);
 
   // TODO change signature requirement to XWikiDocument instead of document and mark
   // the old version as deprecated
@@ -438,21 +433,18 @@ public interface IWebUtilsService {
 
   String getTemplatePathOnDisk(String renderTemplatePath, String lang);
 
-  String renderInheritableDocument(DocumentReference docRef, String lang)
-      throws XWikiException;
+  String renderInheritableDocument(DocumentReference docRef, String lang) throws XWikiException;
 
   String renderInheritableDocument(DocumentReference docRef, String lang, String defLang)
       throws XWikiException;
 
   List<Attachment> getAttachmentsForDocs(List<String> docsFN);
 
-  String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
-      String defLang);
+  String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang, String defLang);
 
   boolean existsInheritableDocument(@NotNull DocumentReference docRef);
 
-  boolean existsInheritableDocument(@NotNull DocumentReference docRef,
-      @Nullable String lang);
+  boolean existsInheritableDocument(@NotNull DocumentReference docRef, @Nullable String lang);
 
   boolean existsInheritableDocument(@NotNull DocumentReference docRef, @Nullable String lang,
       @Nullable String defLang);
@@ -472,8 +464,7 @@ public interface IWebUtilsService {
    *             instead
    */
   @Deprecated(since = "6.11", forRemoval = true)
-  void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
-      List<String> params);
+  void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr, List<String> params);
 
   /**
    * @deprecated instead use {@link CelConstant#CENTRAL_WIKI}

@@ -45,8 +45,7 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
   }
 
   public static Optional<Comparator<BaseObject>> create(Collection<String> orderFields) {
-    return orderFields.stream()
-        .map(String::trim).filter(not(String::isEmpty))
+    return orderFields.stream().map(String::trim).filter(not(String::isEmpty))
         .map(sort -> create(sort.replaceFirst("-", ""), !sort.startsWith("-")))
         .reduce((c1, c2) -> c1.thenComparing(c2));
   }
@@ -66,15 +65,12 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
 
   @Override
   public int compare(BaseObject obj1, BaseObject obj2) {
-    return valueComparator.compare(
-        getProperty(obj1, orderField).getValue(),
+    return valueComparator.compare(getProperty(obj1, orderField).getValue(),
         getProperty(obj2, orderField).getValue());
   }
 
   BaseProperty getProperty(BaseObject obj, String field) {
-    return Optional.ofNullable(obj)
-        .map(o -> o.getField(field))
-        .flatMap(prop -> tryCast(prop, BaseProperty.class))
-        .orElseGet(BaseProperty::new);
+    return Optional.ofNullable(obj).map(o -> o.getField(field))
+        .flatMap(prop -> tryCast(prop, BaseProperty.class)).orElseGet(BaseProperty::new);
   }
 }

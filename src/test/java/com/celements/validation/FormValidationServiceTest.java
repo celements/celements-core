@@ -34,18 +34,17 @@ public class FormValidationServiceTest extends AbstractComponentTest {
 
   @Before
   public void prepare() throws Exception {
-    getContext().setDoc(new XWikiDocument(new DocumentReference(
-        getContext().getDatabase(), "space", "doc")));
+    getContext().setDoc(
+        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "space", "doc")));
     reqRule1 = createDefaultMock(IRequestValidationRule.class);
     reqRule2 = createDefaultMock(IRequestValidationRule.class);
     legReqRule1 = createDefaultMock(IRequestValidationRuleRole.class);
     legReqRule2 = createDefaultMock(IRequestValidationRuleRole.class);
     fieldRule1 = createDefaultMock(IFieldValidationRuleRole.class);
     fieldRUle2 = createDefaultMock(IFieldValidationRuleRole.class);
-    formValidationService = (FormValidationService) Utils.getComponent(
-        IFormValidationServiceRole.class);
-    formValidationService.injectValidationRules(
-        ImmutableMap.of("1", reqRule1, "2", reqRule2),
+    formValidationService = (FormValidationService) Utils
+        .getComponent(IFormValidationServiceRole.class);
+    formValidationService.injectValidationRules(ImmutableMap.of("1", reqRule1, "2", reqRule2),
         ImmutableMap.of("1", legReqRule1, "2", legReqRule2),
         ImmutableMap.of("1", fieldRule1, "2", fieldRUle2));
   }
@@ -81,8 +80,8 @@ public class FormValidationServiceTest extends AbstractComponentTest {
     innerMap.put(ValidationType.ERROR, set);
     map.put("asdf", innerMap);
 
-    expect(reqRule1.validate(anyObject(List.class))).andReturn(ImmutableList.of(
-        new ValidationResult(ValidationType.ERROR, "asdf", "invalid")));
+    expect(reqRule1.validate(anyObject(List.class)))
+        .andReturn(ImmutableList.of(new ValidationResult(ValidationType.ERROR, "asdf", "invalid")));
     expect(reqRule2.validate(anyObject(List.class))).andReturn(Collections.emptyList());
     expect(legReqRule1.validateRequest(anyObject(Map.class))).andReturn(getEmptyRetMap());
     expect(legReqRule2.validateRequest(anyObject(Map.class))).andReturn(getEmptyRetMap());
@@ -169,8 +168,8 @@ public class FormValidationServiceTest extends AbstractComponentTest {
         .andReturn(new HashMap<ValidationType, Set<String>>());
 
     replayDefault();
-    Map<ValidationType, Set<String>> validationSet = formValidationService
-        .validateField(className, fieldName, value);
+    Map<ValidationType, Set<String>> validationSet = formValidationService.validateField(className,
+        fieldName, value);
     verifyDefault();
     assertNotNull(validationSet);
     assertEquals(0, validationSet.size());
@@ -191,8 +190,8 @@ public class FormValidationServiceTest extends AbstractComponentTest {
         .andReturn(new HashMap<ValidationType, Set<String>>());
 
     replayDefault();
-    Map<ValidationType, Set<String>> validationMap = formValidationService
-        .validateField(className, fieldName, value);
+    Map<ValidationType, Set<String>> validationMap = formValidationService.validateField(className,
+        fieldName, value);
     verifyDefault();
 
     assertNotNull(validationMap);
@@ -221,8 +220,8 @@ public class FormValidationServiceTest extends AbstractComponentTest {
     expect(fieldRUle2.validateField(eq(className), eq(fieldName), eq(value))).andReturn(map2);
 
     replayDefault();
-    Map<ValidationType, Set<String>> validationMap = formValidationService
-        .validateField(className, fieldName, value);
+    Map<ValidationType, Set<String>> validationMap = formValidationService.validateField(className,
+        fieldName, value);
     verifyDefault();
 
     assertNotNull(validationMap);

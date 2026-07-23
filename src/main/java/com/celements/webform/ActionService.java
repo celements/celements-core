@@ -55,8 +55,8 @@ public class ActionService implements IActionServiceRole {
     XWikiDocument execAct = null;
     try {
       // TODO reimplement the celements2web:Macros.executeActions in Java
-      execAct = modelAccess.getDocument(create(DocumentReference.class, "executeActions", create(
-          EntityType.SPACE, "Macros", create(EntityType.WIKI, "celements2web"))));
+      execAct = modelAccess.getDocument(create(DocumentReference.class, "executeActions",
+          create(EntityType.SPACE, "Macros", create(EntityType.WIKI, "celements2web"))));
       final Object configJavaDebug = configSource.getProperty("celements.action.javaDebug");
       vcontext.put("javaDebug", configJavaDebug);
       execContent = execAct.getContent();
@@ -69,8 +69,8 @@ public class ActionService implements IActionServiceRole {
     final Object successfulObj = vcontext.get("successful");
     final boolean successful = (successfulObj != null) && "true".equals(successfulObj.toString());
     if (!successful) {
-      LOGGER.error("executeAction: Error executing action. Output: {}", vcontext.get(
-          "actionScriptOutput"));
+      LOGGER.error("executeAction: Error executing action. Output: {}",
+          vcontext.get("actionScriptOutput"));
       LOGGER.error("executeAction: Rendered Action Script: {}", actionContent);
       LOGGER.error("executeAction: execAct == {}", execAct);
       LOGGER.error("executeAction: includingDoc: {}", includingDoc);

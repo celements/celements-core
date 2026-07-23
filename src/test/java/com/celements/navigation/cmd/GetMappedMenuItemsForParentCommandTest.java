@@ -50,8 +50,8 @@ public class GetMappedMenuItemsForParentCommandTest extends AbstractComponentTes
   @Test
   public void testGetTreeNodesForParentKey_emptyResult_emptyKey_active() throws XWikiException {
     getMenuItemsCmd.setIsActive(true);
-    expect(mockStore.search(isA(String.class), eq(0), eq(0), (List<?>) anyObject(), same(
-        context))).andReturn(new ArrayList<>()).anyTimes();
+    expect(mockStore.search(isA(String.class), eq(0), eq(0), (List<?>) anyObject(), same(context)))
+        .andReturn(new ArrayList<>()).anyTimes();
     replayDefault();
     assertNotNull(getMenuItemsCmd.getTreeNodesForParentKey(""));
     assertEquals(0, getMenuItemsCmd.getTreeNodesForParentKey("").size());
@@ -61,8 +61,8 @@ public class GetMappedMenuItemsForParentCommandTest extends AbstractComponentTes
   @Test
   public void testGetTreeNodesForParentKey_emptyResult_emptyKey_inactive() throws XWikiException {
     getMenuItemsCmd.setIsActive(false);
-    expect(mockStore.search(isA(String.class), eq(0), eq(0), (List<?>) anyObject(), same(
-        context))).andReturn(new ArrayList<>()).anyTimes();
+    expect(mockStore.search(isA(String.class), eq(0), eq(0), (List<?>) anyObject(), same(context)))
+        .andReturn(new ArrayList<>()).anyTimes();
     replayDefault();
     assertNotNull(getMenuItemsCmd.getTreeNodesForParentKey(""));
     assertEquals(0, getMenuItemsCmd.getTreeNodesForParentKey("").size());

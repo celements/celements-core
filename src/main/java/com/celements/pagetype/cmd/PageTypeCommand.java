@@ -78,8 +78,8 @@ public class PageTypeCommand {
     if ((doc != null) && doc.isNew()) {
       doc = getTemplateDoc(doc, context);
     }
-    if ((doc != null) && (doc.getObjects(PAGE_TYPE_CLASSNAME) != null) && (doc.getObjects(
-        PAGE_TYPE_CLASSNAME).size() > 0)) {
+    if ((doc != null) && (doc.getObjects(PAGE_TYPE_CLASSNAME) != null)
+        && (doc.getObjects(PAGE_TYPE_CLASSNAME).size() > 0)) {
       return doc.getObject(PAGE_TYPE_CLASSNAME);
     }
     return null;
@@ -108,8 +108,8 @@ public class PageTypeCommand {
   XWikiDocument getTemplateDoc(XWikiDocument doc, XWikiContext context) {
     if (context.getRequest() != null) {
       String templName = context.getRequest().get("template");
-      if ((templName != null) && !"".equals(templName.trim()) && context.getWiki().exists(templName,
-          context)) {
+      if ((templName != null) && !"".equals(templName.trim())
+          && context.getWiki().exists(templName, context)) {
         try {
           doc = context.getWiki().getDocument(templName, context);
         } catch (XWikiException e) {

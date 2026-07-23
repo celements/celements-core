@@ -20,8 +20,8 @@ public class RemoteLoginClass extends AbstractClassDefinition implements AuthCla
   public static final String CLASS_NAME = "RemoteLoginClass";
   public static final String CLASS_DEF_HINT = AuthClass.CLASS_SPACE + "." + CLASS_NAME;
 
-  public static final ClassField<String> FIELD_URL = new StringField.Builder(CLASS_DEF_HINT,
-      "url").size(30).build();
+  public static final ClassField<String> FIELD_URL = new StringField.Builder(CLASS_DEF_HINT, "url")
+      .size(30).build();
 
   public static final ClassField<Integer> FIELD_TIMEOUT = new IntField.Builder(CLASS_DEF_HINT,
       "timeout").size(30).build();

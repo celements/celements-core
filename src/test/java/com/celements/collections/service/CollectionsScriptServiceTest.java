@@ -82,8 +82,8 @@ public class CollectionsScriptServiceTest extends AbstractComponentTest {
     BaseObject expectedBO = new BaseObject();
     expectedBO.setStringValue("myField", "abcd");
     List<BaseObject> expResultList = Arrays.asList(expectedBO);
-    expect(mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"), eq(true), eq(
-        "myField2"), eq(false))).andReturn(expResultList);
+    expect(mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"), eq(true),
+        eq("myField2"), eq(false))).andReturn(expResultList);
     replayAll();
     List<com.xpn.xwiki.api.Object> resultList = collScriptService.getObjectsOrdered(docRef,
         classRef, "myField", true, "myField2", false);

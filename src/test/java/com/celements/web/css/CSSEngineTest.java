@@ -65,11 +65,11 @@ public class CSSEngineTest extends AbstractComponentTest {
 
     List<CSS> cssList = cssEngine.includeCSS("", "", baseCSSList, context);
 
-    assertFalse("includeCSS must not add null objects to the css list.", cssListContains(cssList,
-        null));
+    assertFalse("includeCSS must not add null objects to the css list.",
+        cssListContains(cssList, null));
     assertTrue("includeCSS must add cssObj to the css list.", cssListContains(cssList, cssObj));
-    assertTrue("includeCSS must not add cssObj1 to the css list.", cssListContains(cssList,
-        cssObj1));
+    assertTrue("includeCSS must not add cssObj1 to the css list.",
+        cssListContains(cssList, cssObj1));
   }
 
   @Test
@@ -78,11 +78,8 @@ public class CSSEngineTest extends AbstractComponentTest {
     expect(getMock(FrontendResourceResolver.class).isFrontendSource(eq(sourcePath)))
         .andReturn(true);
     expect(getMock(FrontendResourceResolver.class).get(eq(sourcePath)))
-        .andReturn(Optional.of(new FrontendResource(
-            "dist/vue-poc.BOsmCSyo.mjs",
-            Arrays.asList(
-                "dist/assets/vue-poc-ahBOTvOT.css",
-                "dist/assets/shared.Df9z3kSS.css"))));
+        .andReturn(Optional.of(new FrontendResource("dist/vue-poc.BOsmCSyo.mjs",
+            Arrays.asList("dist/assets/vue-poc-ahBOTvOT.css", "dist/assets/shared.Df9z3kSS.css"))));
 
     replayDefault();
 
@@ -119,9 +116,8 @@ public class CSSEngineTest extends AbstractComponentTest {
     String sourcePath = ":frontend/progon/eventview/main.ts";
     expect(getMock(FrontendResourceResolver.class).isFrontendSource(eq(sourcePath)))
         .andReturn(true);
-    expect(getMock(FrontendResourceResolver.class).get(eq(sourcePath)))
-        .andReturn(Optional.of(new FrontendResource("dist/eventview.Cq6C1_9z.mjs",
-            Collections.emptyList())));
+    expect(getMock(FrontendResourceResolver.class).get(eq(sourcePath))).andReturn(
+        Optional.of(new FrontendResource("dist/eventview.Cq6C1_9z.mjs", Collections.emptyList())));
 
     replayDefault();
 

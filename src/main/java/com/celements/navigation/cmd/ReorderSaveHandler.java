@@ -84,8 +84,8 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
       }
       currentPos = 0;
     } else {
-      throw new IllegalStateException("readPropertyKey: expecting ParentChildren but" + " found "
-          + currentCommand);
+      throw new IllegalStateException(
+          "readPropertyKey: expecting ParentChildren but" + " found " + currentCommand);
     }
   }
 
@@ -157,10 +157,10 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
             updateNeeded = true;
           }
           BaseObject menuItemObj = XWikiObjectEditor.on(xdoc)
-              .filter(INavigationClassConfig.MENU_ITEM_CLASS_REF)
-              .fetch().stream().findFirst().orElse(null);
-          if ((menuItemObj != null) && (menuItemObj.getIntValue(
-              "menu_position") != getCurrentPos())) {
+              .filter(INavigationClassConfig.MENU_ITEM_CLASS_REF).fetch().stream().findFirst()
+              .orElse(null);
+          if ((menuItemObj != null)
+              && (menuItemObj.getIntValue("menu_position") != getCurrentPos())) {
             menuItemObj.setIntValue("menu_position", getCurrentPos());
             markParentDirty(xdoc.getParentReference());
             updateNeeded = true;

@@ -9,16 +9,16 @@ import com.celements.model.classes.fields.LargeStringField;
 import com.celements.model.classes.fields.StringField;
 
 @Component(DocumentExtractClass.NAME)
-public class DocumentExtractClass extends AbstractClassDefinition implements
-    CelementsClassDefinition {
+public class DocumentExtractClass extends AbstractClassDefinition
+    implements CelementsClassDefinition {
 
   public static final String SPACE_NAME = "Classes";
   public static final String DOC_NAME = "DocumentExtract";
   public static final String NAME = SPACE_NAME + "." + DOC_NAME;
   public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 
-  public static final ClassField<String> FIELD_LANG = new StringField.Builder(NAME,
-      "language").build();
+  public static final ClassField<String> FIELD_LANG = new StringField.Builder(NAME, "language")
+      .build();
 
   public static final ClassField<String> FIELD_EXTRACT = new LargeStringField.Builder(NAME,
       "extract").build();

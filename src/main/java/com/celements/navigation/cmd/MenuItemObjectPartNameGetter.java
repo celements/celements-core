@@ -41,9 +41,7 @@ final class MenuItemObjectPartNameGetter implements PartNameGetter {
   @Override
   public String getPartName(DocumentReference docRef) {
     return XWikiObjectFetcher.on(modelAccess.getOrCreateDocument(docRef))
-        .filter(INavigationClassConfig.MENU_ITEM_CLASS_REF)
-        .stream().findFirst()
-        .map(cobj -> cobj.getStringValue(INavigationClassConfig.PART_NAME_FIELD))
-        .orElse("");
+        .filter(INavigationClassConfig.MENU_ITEM_CLASS_REF).stream().findFirst()
+        .map(cobj -> cobj.getStringValue(INavigationClassConfig.PART_NAME_FIELD)).orElse("");
   }
 }

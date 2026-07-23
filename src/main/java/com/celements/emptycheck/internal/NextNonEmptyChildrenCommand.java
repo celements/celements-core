@@ -15,8 +15,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class NextNonEmptyChildrenCommand {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      NextNonEmptyChildrenCommand.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NextNonEmptyChildrenCommand.class);
 
   private Set<DocumentReference> visitedDocRefs;
 
@@ -32,8 +31,8 @@ public class NextNonEmptyChildrenCommand {
             return result;
           }
         } else {
-          LOGGER.warn("getNextNonEmptyChildren_internal: recursion detected on [" + nextChild
-              + "].");
+          LOGGER
+              .warn("getNextNonEmptyChildren_internal: recursion detected on [" + nextChild + "].");
         }
       }
       return null;

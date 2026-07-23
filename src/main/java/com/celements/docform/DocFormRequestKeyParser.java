@@ -55,18 +55,15 @@ public class DocFormRequestKeyParser {
    * Parses given map to {@link DocFormRequestParam} objects. See {@link #parse(String)}.
    */
   public List<DocFormRequestParam> parseParameterMap(Map<String, ?> map) {
-    return map.keySet().stream()
-        .filter(key -> !nullToEmpty(key).trim().isEmpty())
-        .map(key -> {
-          try {
-            return parse(key).orElse(null);
-          } catch (DocFormRequestParseException exc) {
-            LOGGER.warn("unable to parse {}", key, exc);
-            return null;
-          }
-        }).filter(Objects::nonNull)
-        .map(key -> new DocFormRequestParam(key, map.get(key.getKeyString())))
-        .sorted()
+    return map.keySet().stream().filter(key -> !nullToEmpty(key).trim().isEmpty()).map(key -> {
+      try {
+        return parse(key).orElse(null);
+      } catch (DocFormRequestParseException exc) {
+        LOGGER.warn("unable to parse {}", key, exc);
+        return null;
+      }
+    }).filter(Objects::nonNull)
+        .map(key -> new DocFormRequestParam(key, map.get(key.getKeyString()))).sorted()
         .collect(toImmutableList());
   }
 
@@ -82,8 +79,8 @@ public class DocFormRequestKeyParser {
    *           if the key matches the expected pattern but cannot be parsed
    */
   public Optional<DocFormRequestKey> parse(String key) throws DocFormRequestParseException {
-    List<String> keyParts = new ArrayList<>(Splitter.on(KEY_DELIM)
-        .trimResults().omitEmptyStrings().splitToList(key));
+    List<String> keyParts = new ArrayList<>(
+        Splitter.on(KEY_DELIM).trimResults().omitEmptyStrings().splitToList(key));
     try {
       DocumentReference docRef = parseDocRefIfPresent(keyParts).orElse(defaultDocRef);
       if (isAllowedDocField(asFieldName(keyParts))) {
@@ -95,8 +92,8 @@ public class DocFormRequestKeyParser {
         if (objNbKeyPart.startsWith("^")) {
           return Optional.of(createObjRemoveKey(key, docRef, classRef, objNb));
         } else {
-          return Optional.of(createObjFieldKey(key, docRef, classRef, objNb,
-              asFieldName(keyParts)));
+          return Optional
+              .of(createObjFieldKey(key, docRef, classRef, objNb, asFieldName(keyParts)));
         }
       } else {
         LOGGER.info("parse: skip key [{}]", key);
@@ -122,16 +119,14 @@ public class DocFormRequestKeyParser {
   private boolean isAllowedDocField(String key) {
     if (allowedDocFields == null) {
       allowedDocFields = getXDocClassDef().getFields().stream()
-          .filter(ImmutableSet.of(FIELD_TITLE, FIELD_CONTENT)::contains)
-          .map(ClassField::getName)
+          .filter(ImmutableSet.of(FIELD_TITLE, FIELD_CONTENT)::contains).map(ClassField::getName)
           .collect(toImmutableSet());
     }
     return allowedDocFields.contains(key);
   }
 
   private boolean isObjKey(List<String> keyParts) {
-    return (keyParts.size() > 1)
-        && PATTERN_FULLNAME.matcher(keyParts.get(0)).matches()
+    return (keyParts.size() > 1) && PATTERN_FULLNAME.matcher(keyParts.get(0)).matches()
         && PATTERN_OBJNB.matcher(keyParts.get(1)).matches();
   }
 

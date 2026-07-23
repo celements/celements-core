@@ -81,10 +81,10 @@ public class HTMLWebPreferences implements IMandatoryDocumentRole {
   }
 
   boolean isSkipCelementsHTMLwebPreferences() {
-    boolean isSkip = getContext().getWiki().ParamAsLong(
-        "celements.mandatory.skipHTMLwebPreferences", 0) == 1L;
-    LOGGER.trace("skipCelementsHTMLwebPreferences for [{}]: [{}]",
-        getContext().getDatabase(), isSkip);
+    boolean isSkip = getContext().getWiki()
+        .ParamAsLong("celements.mandatory.skipHTMLwebPreferences", 0) == 1L;
+    LOGGER.trace("skipCelementsHTMLwebPreferences for [{}]: [{}]", getContext().getDatabase(),
+        isSkip);
     return isSkip;
   }
 
@@ -121,8 +121,8 @@ public class HTMLWebPreferences implements IMandatoryDocumentRole {
   }
 
   boolean checkPageType(XWikiDocument wikiPrefDoc) throws XWikiException {
-    DocumentReference pageTypeClassRef = getPageTypeClasses().getPageTypeClassRef(
-        getContext().getDatabase());
+    DocumentReference pageTypeClassRef = getPageTypeClasses()
+        .getPageTypeClassRef(getContext().getDatabase());
     BaseObject pageTypeObj = wikiPrefDoc.getXObject(pageTypeClassRef, false, getContext());
     if (pageTypeObj == null) {
       pageTypeObj = wikiPrefDoc.newXObject(pageTypeClassRef, getContext());

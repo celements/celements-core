@@ -32,11 +32,7 @@ public class CollectionsService implements ICollectionsService {
     if (doc == null) {
       return new ArrayList<>();
     }
-    return XWikiObjectEditor
-        .on(doc)
-        .filter(new ClassReference(classRef))
-        .fetch()
-        .stream()
+    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).fetch().stream()
         .sorted(BaseObjectComparator.create(orderField1, asc1)
             .thenComparing(BaseObjectComparator.create(orderField2, asc2)))
         .collect(toList());

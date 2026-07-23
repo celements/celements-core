@@ -372,12 +372,12 @@ public class LexicalParserTest {
 
     private void checkPropertyLiteral(ERulesLiteral literal) {
       if (literal.getCommand() != ECommand.PROPERTY_COMMAND) {
-        throw new IllegalStateException("expecting only property literal inside"
-            + " dictionary but found [" + literal + "].");
+        throw new IllegalStateException(
+            "expecting only property literal inside" + " dictionary but found [" + literal + "].");
       }
       if (literal.getNames() == null) {
-        throw new IllegalStateException("missing property names for property literal [" + literal
-            + "]");
+        throw new IllegalStateException(
+            "missing property names for property literal [" + literal + "]");
       }
     }
 

@@ -46,8 +46,9 @@ public class SitemapPresentationType extends DefaultPresentationType {
       for (String lang : webUtilsService.getAllowedLanguages(spaceName)) {
         outStream.append("<a ");
         outStream.append("title=\"" + getLangName(lang) + "\" ");
-        outStream.append("href=\"" + nodeDoc.getURL("edit", "language=" + lang
-            + "&windowClose=true", getContext()) + "\" ");
+        outStream.append("href=\""
+            + nodeDoc.getURL("edit", "language=" + lang + "&windowClose=true", getContext())
+            + "\" ");
         String cssClasses = "";
         if (lang.equals(defaultLanguage)) {
           cssClasses += " defaultLanguage";

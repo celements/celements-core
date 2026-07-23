@@ -199,8 +199,8 @@ public class CelementsRightsCommandTest extends AbstractComponentTest {
     rightsObj.setLargeStringValue("users", users);
     String levels = "view";
     rightsObj.setLargeStringValue("levels", levels);
-    testDoc.setXObjects(xwikiRightsClassRef, Arrays.<BaseObject>asList((BaseObject) null,
-        rightsObj));
+    testDoc.setXObjects(xwikiRightsClassRef,
+        Arrays.<BaseObject>asList((BaseObject) null, rightsObj));
     String fullName = "MySpace.TestDoc";
     expect(xwiki.getDocument(eq(fullName), same(context))).andReturn(testDoc).once();
     replay(xwiki);

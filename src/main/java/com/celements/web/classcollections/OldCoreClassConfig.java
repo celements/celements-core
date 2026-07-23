@@ -30,14 +30,14 @@ public class OldCoreClassConfig implements IOldCoreClassConfig {
 
   @Override
   public DocumentReference getFromStorageClassRef(WikiReference wikiRef) {
-    return new DocumentReference(FORM_STORAGE_CLASS_DOC, new SpaceReference(
-        FORM_STORAGE_CLASS_SPACE, wikiRef));
+    return new DocumentReference(FORM_STORAGE_CLASS_DOC,
+        new SpaceReference(FORM_STORAGE_CLASS_SPACE, wikiRef));
   }
 
   @Override
   public DocumentReference getXWikiUsersClassRef(WikiReference wikiRef) {
-    return new DocumentReference(XWIKI_USERS_CLASS_DOC, new SpaceReference(XWIKI_USERS_CLASS_SPACE,
-        wikiRef));
+    return new DocumentReference(XWIKI_USERS_CLASS_DOC,
+        new SpaceReference(XWIKI_USERS_CLASS_SPACE, wikiRef));
   }
 
   @Override

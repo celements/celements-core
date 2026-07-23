@@ -391,8 +391,8 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     Date val2 = new Date();
     srcObj.setDateValue(name2, val2);
     BaseObject trgObj = createObj(classRef);
-    expectPropertyClasses(classRef, ImmutableMap.<String, PropertyClass>builder().put(name1,
-        new StringClass()).put(name2, new DateClass()).build());
+    expectPropertyClasses(classRef, ImmutableMap.<String, PropertyClass>builder()
+        .put(name1, new StringClass()).put(name2, new DateClass()).build());
 
     replayDefault();
     boolean ret = copyDocService.copyObject(srcObj, trgObj, set);

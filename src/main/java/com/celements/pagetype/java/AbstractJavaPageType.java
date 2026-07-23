@@ -40,9 +40,7 @@ public abstract class AbstractJavaPageType implements IJavaPageTypeRole {
     if (categories.isEmpty()) {
       categories.add(defaultCategory);
     }
-    return categories.stream()
-        .map(IPageTypeCategoryRole::getAllTypeNames)
-        .flatMap(Set::stream)
+    return categories.stream().map(IPageTypeCategoryRole::getAllTypeNames).flatMap(Set::stream)
         .collect(Collectors.toSet());
   }
 

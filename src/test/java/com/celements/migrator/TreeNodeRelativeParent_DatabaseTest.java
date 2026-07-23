@@ -31,8 +31,8 @@ public class TreeNodeRelativeParent_DatabaseTest extends AbstractComponentTest {
   @Before
   public void prepareTest() throws Exception {
     queryManagerMock = registerComponentMock(QueryManager.class);
-    migrator = (TreeNodeRelativeParent_Database) getComponentManager().lookup(
-        ICelementsMigrator.class, "TreeNodeRelativeParent_Database");
+    migrator = (TreeNodeRelativeParent_Database) getComponentManager()
+        .lookup(ICelementsMigrator.class, "TreeNodeRelativeParent_Database");
     xwiki = getWikiMock();
     context = getContext();
   }
@@ -42,20 +42,20 @@ public class TreeNodeRelativeParent_DatabaseTest extends AbstractComponentTest {
     SubSystemHibernateMigrationManager manager = createDefaultMock(
         SubSystemHibernateMigrationManager.class);
     Query queryMock = createDefaultMock(Query.class);
-    expect(queryManagerMock.createQuery(anyObject(String.class), eq(Query.XWQL))).andReturn(
-        queryMock);
+    expect(queryManagerMock.createQuery(anyObject(String.class), eq(Query.XWQL)))
+        .andReturn(queryMock);
     expect(queryMock.bindValue("buggyParent", "xwikidb:%")).andReturn(queryMock);
     List<String> resultList = Arrays.asList("MySpace.MyDoc");
     expect(queryMock.<String>execute()).andReturn(resultList);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
     XWikiDocument xwikiDoc = new XWikiDocument(docRef);
     EntityReference entityReference = new EntityReference("MyParent", EntityType.DOCUMENT,
-        new EntityReference("MySpace", EntityType.SPACE, new EntityReference(context.getDatabase(),
-            EntityType.WIKI)));
+        new EntityReference("MySpace", EntityType.SPACE,
+            new EntityReference(context.getDatabase(), EntityType.WIKI)));
     xwikiDoc.setParentReference(entityReference);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(xwikiDoc);
-    xwiki.saveDocument(same(xwikiDoc), eq("TreeNodeRelativeParent_Database Migration"), same(
-        context));
+    xwiki.saveDocument(same(xwikiDoc), eq("TreeNodeRelativeParent_Database Migration"),
+        same(context));
     expectLastCall().once();
     replayDefault();
     migrator.migrate(manager, context);

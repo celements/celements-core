@@ -36,8 +36,8 @@ public class NavigationCache extends AbstractDocumentReferenceCache<String> {
   @Override
   protected Collection<String> getKeysForResult(DocumentReference docRef) throws XWikiException {
     Collection<String> ret = new HashSet<>();
-    List<BaseObject> navConfObjs = getContext().getWiki().getDocument(docRef,
-        getContext()).getXObjects(getCacheClassRef(webUtils.getWikiRef(docRef)));
+    List<BaseObject> navConfObjs = getContext().getWiki().getDocument(docRef, getContext())
+        .getXObjects(getCacheClassRef(webUtils.getWikiRef(docRef)));
     if (navConfObjs != null) {
       for (BaseObject obj : navConfObjs) {
         String spaceName = getMenuSpaceName(obj);

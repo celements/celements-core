@@ -49,8 +49,7 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
   public boolean includeMenuItem(BaseObject baseObj, XWikiContext context) {
     return getRightsAccess().hasAccessLevel(baseObj.getDocumentReference(), EAccessLevel.VIEW,
         context.getXWikiUser())
-        && (getMenuPart().isEmpty() || getMenuPart().equals(
-            baseObj.getStringValue("part_name")));
+        && (getMenuPart().isEmpty() || getMenuPart().equals(baseObj.getStringValue("part_name")));
   }
 
   @Override
@@ -78,8 +77,8 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
   }
 
   private boolean checkMenuPart(TreeNode node, XWikiContext context) {
-    return (getMenuPart().isEmpty() || (node.isEmptyParentRef() && getMenuPart().equals(
-        node.getPartName())));
+    return (getMenuPart().isEmpty()
+        || (node.isEmptyParentRef() && getMenuPart().equals(node.getPartName())));
   }
 
   private IRightsAccessFacadeRole getRightsAccess() {

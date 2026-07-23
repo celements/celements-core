@@ -41,8 +41,8 @@ import com.xpn.xwiki.web.Utils;
 public abstract class CSS extends Api {
 
   private static XWikiContext getContext() {
-    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext()
+        .getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   public CSS() {

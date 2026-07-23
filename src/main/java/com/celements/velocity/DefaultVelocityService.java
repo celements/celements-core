@@ -74,8 +74,7 @@ public class DefaultVelocityService implements VelocityService {
   public String evaluateVelocityText(String text, VelocityContextModifier contextModifier)
       throws XWikiVelocityException {
     return context.getCurrentDoc().toJavaUtil()
-        .map(rethrowFunction(doc -> evaluateVelocityText(doc, text, contextModifier)))
-        .orElse("");
+        .map(rethrowFunction(doc -> evaluateVelocityText(doc, text, contextModifier))).orElse("");
   }
 
   @Override

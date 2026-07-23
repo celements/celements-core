@@ -60,8 +60,8 @@ public class GetPageTypesCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetPThql() {
-    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("myCat", "pageTypeCat",
-        "CelCat")), false);
+    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("myCat", "pageTypeCat", "CelCat")),
+        false);
     assertTrue(pThql.startsWith("select doc.fullName "));
     assertTrue(pThql.contains(" from XWikiDocument as doc"));
     assertTrue(pThql.contains(", BaseObject as obj"));
@@ -108,8 +108,8 @@ public class GetPageTypesCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetPThql_onlyVisible() {
-    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("myCat", "pageTypeCat",
-        "CelCat")), true);
+    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("myCat", "pageTypeCat", "CelCat")),
+        true);
     assertTrue(pThql.startsWith("select doc.fullName "));
     assertTrue(pThql.contains(" from XWikiDocument as doc"));
     assertTrue(pThql.contains(", BaseObject as obj"));
@@ -153,8 +153,7 @@ public class GetPageTypesCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetPThql_emptyCategoryDefault() {
-    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("", "pageTypeCat")), false)
-        + " ";
+    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("", "pageTypeCat")), false) + " ";
     assertTrue(pThql.startsWith("select doc.fullName "));
     assertTrue(pThql.contains(" from XWikiDocument as doc"));
     assertTrue(pThql.contains(", BaseObject as obj"));
@@ -178,8 +177,8 @@ public class GetPageTypesCommandTest extends AbstractComponentTest {
   public void testGetPageTypesForCategories() throws XWikiException {
     List expectedList = Arrays.asList("PageTypes.RichText", "PageTypes.Code");
     Set<String> catList = new HashSet<>(Arrays.asList("pageTypeCat"));
-    expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(
-        expectedList).times(2);
+    expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(expectedList)
+        .times(2);
     replayDefault();
     List<String> resultList = gptCmd.getPageTypesForCategories(catList, false, context);
     assertEquals(expectedList, resultList);
@@ -191,8 +190,8 @@ public class GetPageTypesCommandTest extends AbstractComponentTest {
   public void testGetPageTypesForCategories_emptyCategoryDefault() throws XWikiException {
     List allPTList = Arrays.asList("PageTypes.RichText", "PageTypes.Code");
     Set<String> catList = new HashSet<>(Arrays.asList(""));
-    expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(
-        allPTList).times(2);
+    expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(allPTList)
+        .times(2);
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).anyTimes();
     expect(xwiki.exists(eq("PageTypes.Code"), same(context))).andReturn(true).anyTimes();
     XWikiDocument ptRTE = new XWikiDocument();
@@ -219,8 +218,8 @@ public class GetPageTypesCommandTest extends AbstractComponentTest {
   public void testGetPageTypesForCategories_emptyCategory_nullValue() throws XWikiException {
     List allPTList = Arrays.asList("PageTypes.RichText", "PageTypes.Code");
     Set<String> catList = new HashSet<>(Arrays.asList(""));
-    expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(
-        allPTList).times(2);
+    expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(allPTList)
+        .times(2);
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).anyTimes();
     expect(xwiki.exists(eq("PageTypes.Code"), same(context))).andReturn(true).anyTimes();
     XWikiDocument ptRTE = new XWikiDocument();
@@ -245,8 +244,8 @@ public class GetPageTypesCommandTest extends AbstractComponentTest {
   @Test
   public void testGetPageTypesForCategories_Exception() throws XWikiException {
     Set<String> catList = new HashSet<>(Arrays.asList("pageTypeCat"));
-    expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andThrow(
-        new XWikiException()).atLeastOnce();
+    expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context)))
+        .andThrow(new XWikiException()).atLeastOnce();
     replayDefault();
     try {
       List<String> resultList = gptCmd.getPageTypesForCategories(catList, false, context);

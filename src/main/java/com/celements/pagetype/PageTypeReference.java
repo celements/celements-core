@@ -47,9 +47,7 @@ public class PageTypeReference {
   public PageTypeReference(String configName, String providerHint, Collection<String> categories) {
     this.configName = configName;
     this.providerHint = providerHint;
-    this.categories = (categories != null)
-        ? ImmutableList.copyOf(categories)
-        : ImmutableList.of();
+    this.categories = (categories != null) ? ImmutableList.copyOf(categories) : ImmutableList.of();
   }
 
   public String getConfigName() {

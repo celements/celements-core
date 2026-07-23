@@ -79,9 +79,8 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     XWikiDocument myXdoc = new XWikiDocument(documentRef);
     myXdoc.setContent("test content not empty");
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
-    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
-        "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default")
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn("default")
         .anyTimes();
     replayDefault();
     assertEquals(documentRef, nextNonEmptChildCmd.getNextNonEmptyChildren(documentRef));
@@ -93,11 +92,10 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyEmptyDoc");
     createEmptyDoc(emptyDocRef);
-    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(
-        Collections.<TreeNode>emptyList()).once();
-    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
-        "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default")
+    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq("")))
+        .andReturn(Collections.<TreeNode>emptyList()).once();
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn("default")
         .anyTimes();
     replayDefault();
     assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
@@ -109,19 +107,20 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyEmptyDoc");
     createEmptyDoc(emptyDocRef);
-    List<TreeNode> childrenList = Arrays.asList(new TreeNode(new DocumentReference(
-        context.getDatabase(), "mySpace", "myChild"), emptyDocRef, 0), new TreeNode(
-            new DocumentReference(context.getDatabase(), "mySpace", "myChild2"), emptyDocRef, 1));
-    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(
-        childrenList).once();
+    List<TreeNode> childrenList = Arrays.asList(
+        new TreeNode(new DocumentReference(context.getDatabase(), "mySpace", "myChild"),
+            emptyDocRef, 0),
+        new TreeNode(new DocumentReference(context.getDatabase(), "mySpace", "myChild2"),
+            emptyDocRef, 1));
+    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(childrenList)
+        .once();
     DocumentReference expectedChildDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myChild");
     XWikiDocument childXdoc = new XWikiDocument(expectedChildDocRef);
     childXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc).once();
-    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
-        "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default")
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn("default")
         .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
@@ -141,24 +140,23 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
         "myChild");
     List<TreeNode> childrenList = Arrays.asList(new TreeNode(emptyChildDocRef, emptyDocRef, 0),
         new TreeNode(expectedChildDocRef, emptyDocRef, 1));
-    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(
-        childrenList).once();
-    expect(treeNodeService.getSubNodesForParent(eq(emptyChildDocRef), eq(""))).andReturn(
-        Collections.<TreeNode>emptyList()).once();
+    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(childrenList)
+        .once();
+    expect(treeNodeService.getSubNodesForParent(eq(emptyChildDocRef), eq("")))
+        .andReturn(Collections.<TreeNode>emptyList()).once();
     XWikiDocument childEmptyXdoc = createDefaultMock(XWikiDocument.class);
     expect(childEmptyXdoc.getContent()).andReturn("").once();
-    expect(xwiki.getDocument(eq(emptyChildDocRef), same(context))).andReturn(childEmptyXdoc).times(
-        2);
+    expect(xwiki.getDocument(eq(emptyChildDocRef), same(context))).andReturn(childEmptyXdoc)
+        .times(2);
     XWikiDocument childEmptyXTdoc = new XWikiDocument(emptyChildDocRef);
     childEmptyXTdoc.setContent("");
-    expect(childEmptyXdoc.getTranslatedDocument(eq("fr"), same(context))).andReturn(
-        childEmptyXTdoc).once();
+    expect(childEmptyXdoc.getTranslatedDocument(eq("fr"), same(context))).andReturn(childEmptyXTdoc)
+        .once();
     XWikiDocument childXdoc = new XWikiDocument(expectedChildDocRef);
     childXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc).once();
-    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
-        "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default")
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn("default")
         .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
@@ -170,29 +168,31 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyEmptyDoc");
     createEmptyDoc(emptyDocRef);
-    List<TreeNode> childrenList = Arrays.asList(new TreeNode(new DocumentReference(
-        context.getDatabase(), "mySpace", "myChild"), emptyDocRef, 0), new TreeNode(
-            new DocumentReference(context.getDatabase(), "mySpace", "myChild2"), emptyDocRef, 1));
-    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(
-        childrenList).once();
+    List<TreeNode> childrenList = Arrays.asList(
+        new TreeNode(new DocumentReference(context.getDatabase(), "mySpace", "myChild"),
+            emptyDocRef, 0),
+        new TreeNode(new DocumentReference(context.getDatabase(), "mySpace", "myChild2"),
+            emptyDocRef, 1));
+    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(childrenList)
+        .once();
     DocumentReference childDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myChild");
     createEmptyDoc(childDocRef);
-    List<TreeNode> childrenList2 = Arrays.asList(new TreeNode(new DocumentReference(
-        context.getDatabase(), "mySpace", "myChildChild"), emptyDocRef, 0), new TreeNode(
-            new DocumentReference(context.getDatabase(), "mySpace", "myChildChild2"), emptyDocRef,
-            1));
-    expect(treeNodeService.getSubNodesForParent(eq(childDocRef), eq(""))).andReturn(
-        childrenList2).once();
+    List<TreeNode> childrenList2 = Arrays.asList(
+        new TreeNode(new DocumentReference(context.getDatabase(), "mySpace", "myChildChild"),
+            emptyDocRef, 0),
+        new TreeNode(new DocumentReference(context.getDatabase(), "mySpace", "myChildChild2"),
+            emptyDocRef, 1));
+    expect(treeNodeService.getSubNodesForParent(eq(childDocRef), eq(""))).andReturn(childrenList2)
+        .once();
     DocumentReference expectedChildDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myChildChild");
     XWikiDocument childChildXdoc = new XWikiDocument(expectedChildDocRef);
     childChildXdoc.setContent("non empty child content");
-    expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(
-        childChildXdoc).once();
-    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
-        "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default")
+    expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childChildXdoc)
+        .once();
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn("default")
         .anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
@@ -214,8 +214,8 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     List<TreeNode> childrenList = Arrays.asList(new TreeNode(childDocRef, emptyDocRef, 0),
         new TreeNode(child2DocRef, emptyDocRef, 1));
     // if called more than once the recursion detection is very likely broken!
-    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(
-        childrenList).once();
+    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(childrenList)
+        .once();
     DocumentReference childChildDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myChildChild");
     createEmptyDoc(childChildDocRef);
@@ -224,19 +224,18 @@ public class NextNonEmptyChildrenCommandTest extends AbstractComponentTest {
     createEmptyDoc(childChild2DocRef);
     List<TreeNode> childrenList2 = Arrays.asList(new TreeNode(childChildDocRef, emptyDocRef, 0),
         new TreeNode(childChild2DocRef, emptyDocRef, 1));
-    expect(treeNodeService.getSubNodesForParent(eq(childDocRef), eq(""))).andReturn(
-        childrenList2).once();
-    List<TreeNode> childrenList3 = Arrays.asList(new TreeNode(new DocumentReference(
-        context.getDatabase(), "mySpace", "MyEmptyDoc"), emptyDocRef, 0));
-    expect(treeNodeService.getSubNodesForParent(eq(childChildDocRef), eq(""))).andReturn(
-        childrenList3).once();
-    expect(treeNodeService.getSubNodesForParent(eq(child2DocRef), eq(""))).andReturn(
-        Collections.<TreeNode>emptyList()).once();
-    expect(treeNodeService.getSubNodesForParent(eq(childChild2DocRef), eq(""))).andReturn(
-        Collections.<TreeNode>emptyList()).once();
-    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
-        "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
-            "default")
+    expect(treeNodeService.getSubNodesForParent(eq(childDocRef), eq(""))).andReturn(childrenList2)
+        .once();
+    List<TreeNode> childrenList3 = Arrays.asList(new TreeNode(
+        new DocumentReference(context.getDatabase(), "mySpace", "MyEmptyDoc"), emptyDocRef, 0));
+    expect(treeNodeService.getSubNodesForParent(eq(childChildDocRef), eq("")))
+        .andReturn(childrenList3).once();
+    expect(treeNodeService.getSubNodesForParent(eq(child2DocRef), eq("")))
+        .andReturn(Collections.<TreeNode>emptyList()).once();
+    expect(treeNodeService.getSubNodesForParent(eq(childChild2DocRef), eq("")))
+        .andReturn(Collections.<TreeNode>emptyList()).once();
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn("default")
         .anyTimes();
     replayDefault();
     assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));

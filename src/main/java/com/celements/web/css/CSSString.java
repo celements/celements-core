@@ -108,8 +108,8 @@ public class CSSString extends CSS {
     if (isAttachment()) {
       String pageFN = getAttachmentURLcmd().getPageFullName(file);
       try {
-        XWikiDocument attDoc = context.getWiki().getDocument(
-            getWebUtilsService().resolveDocumentReference(pageFN), context);
+        XWikiDocument attDoc = context.getWiki()
+            .getDocument(getWebUtilsService().resolveDocumentReference(pageFN), context);
         XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(attDoc,
             getAttachmentURLcmd().getAttachmentName(file));
         return getAttachmentService().getApiAttachment(att);

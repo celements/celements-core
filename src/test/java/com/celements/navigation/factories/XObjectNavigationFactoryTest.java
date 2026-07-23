@@ -39,12 +39,12 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
         "MySpace", "MyDoc");
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
-    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        new WikiReference(getContext().getDatabase())));
+    navConfigObj.setXClassReference(
+        getNavClasses().getNavigationConfigClassRef(new WikiReference(getContext().getDatabase())));
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
-    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(getContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.loadConfigFromObject(navConfigObj);
     assertEquals(mySpaceRef, navConfig.getNodeSpaceRef().get());
@@ -59,12 +59,12 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
         "MySpace", "MyDoc");
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
-    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        new WikiReference(getContext().getDatabase())));
+    navConfigObj.setXClassReference(
+        getNavClasses().getNavigationConfigClassRef(new WikiReference(getContext().getDatabase())));
     String nodeSpaceName = "theMenuSpace";
     navConfigObj.setStringValue("menu_space", nodeSpaceName);
-    SpaceReference parentSpaceRef = new SpaceReference(nodeSpaceName, new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference parentSpaceRef = new SpaceReference(nodeSpaceName,
+        new WikiReference(getContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.loadConfigFromObject(navConfigObj);
     assertEquals(parentSpaceRef, navConfig.getNodeSpaceRef().get());
@@ -77,12 +77,12 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
         "MySpace", "MyDoc");
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
-    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        new WikiReference(getContext().getDatabase())));
+    navConfigObj.setXClassReference(
+        getNavClasses().getNavigationConfigClassRef(new WikiReference(getContext().getDatabase())));
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
-    EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
-        getContext().getDatabase()));
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(getContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.loadConfigFromObject(navConfigObj);
     assertEquals(mySpaceRef, navConfig.getNodeSpaceRef().get());
@@ -95,8 +95,8 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
         "MySpace", "MyDoc");
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
-    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        new WikiReference(getContext().getDatabase())));
+    navConfigObj.setXClassReference(
+        getNavClasses().getNavigationConfigClassRef(new WikiReference(getContext().getDatabase())));
     navConfigObj.setStringValue(INavigationClassConfig.PRESENTATION_TYPE_FIELD,
         "testPresentationType");
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
@@ -116,15 +116,15 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     getContext().setDoc(collConfigDoc);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
-    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        new WikiReference(getContext().getDatabase())));
+    navConfigObj.setXClassReference(
+        getNavClasses().getNavigationConfigClassRef(new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
-    EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
-        getContext().getDatabase()));
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(getContext().getDatabase()));
     replayDefault();
     INavigation nav = xobjNavFactory.createNavigation();
     assertEquals(mySpaceRef, nav.getNodeSpaceRef());
@@ -139,15 +139,15 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     collConfigDoc.setNew(false);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
-    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        new WikiReference(getContext().getDatabase())));
+    navConfigObj.setXClassReference(
+        getNavClasses().getNavigationConfigClassRef(new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
-    EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
-        getContext().getDatabase()));
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(getContext().getDatabase()));
     replayDefault();
     INavigation nav = xobjNavFactory.createNavigation(cellConfigDocRef);
     assertEquals(mySpaceRef, nav.getNodeSpaceRef());
@@ -163,8 +163,8 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     getContext().setDoc(collConfigDoc);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
-    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        new WikiReference(getContext().getDatabase())));
+    navConfigObj.setXClassReference(
+        getNavClasses().getNavigationConfigClassRef(new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
@@ -183,8 +183,8 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     collConfigDoc.setNew(false);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
-    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        new WikiReference(getContext().getDatabase())));
+    navConfigObj.setXClassReference(
+        getNavClasses().getNavigationConfigClassRef(new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
@@ -229,15 +229,15 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     collConfigDoc.setNew(false);
     BaseObject navConfigObj = new BaseObject();
     navConfigObj.setDocumentReference(cellConfigDocRef);
-    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
-        new WikiReference(getContext().getDatabase())));
+    navConfigObj.setXClassReference(
+        getNavClasses().getNavigationConfigClassRef(new WikiReference(getContext().getDatabase())));
     collConfigDoc.addXObject(navConfigObj);
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(cellConfigDocRef))
         .andReturn(collConfigDoc);
     String spaceName = "MySpace";
     navConfigObj.setStringValue("menu_space", spaceName);
-    EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
-        getContext().getDatabase()));
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(getContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.getNavigationConfig(cellConfigDocRef);
     assertEquals(mySpaceRef, navConfig.getNodeSpaceRef().get());

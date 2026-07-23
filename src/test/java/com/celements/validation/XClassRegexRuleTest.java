@@ -36,8 +36,8 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
     xClassRegexRule = (XClassRegexRule) Utils.getComponent(IRequestValidationRule.class,
         "XClassRegexValidation");
     bclassDocRef = new DocumentReference(getContext().getDatabase(), "Test", "TestClass");
-    parser = new DocFormRequestKeyParser(new DocumentReference(getContext().getDatabase(),
-        "space", "default"));
+    parser = new DocFormRequestKeyParser(
+        new DocumentReference(getContext().getDatabase(), "space", "default"));
   }
 
   @Test
@@ -46,8 +46,8 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
     List<ValidationResult> result = xClassRegexRule.validate(ImmutableList.of());
     verifyDefault();
 
-    assertTrue("Successful validation should result in an empty map", (result != null)
-        && result.isEmpty());
+    assertTrue("Successful validation should result in an empty map",
+        (result != null) && result.isEmpty());
   }
 
   @Test
@@ -76,8 +76,8 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
     List<ValidationResult> result = xClassRegexRule.validate(parser.parseParameterMap(requestMap));
     verifyDefault();
 
-    assertTrue("Successful validation should result in an empty map", (result != null)
-        && result.isEmpty());
+    assertTrue("Successful validation should result in an empty map",
+        (result != null) && result.isEmpty());
   }
 
   @Test
@@ -129,8 +129,8 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
     List<ValidationResult> result = xClassRegexRule.validate(parser.parseParameterMap(requestMap));
     verifyDefault();
 
-    assertTrue("Successful validation should result in an empty map", (result != null)
-        && result.isEmpty());
+    assertTrue("Successful validation should result in an empty map",
+        (result != null) && result.isEmpty());
   }
 
   @Test
@@ -205,8 +205,9 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
 
     expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))).andReturn(doc).once();
-    expect(xClassRegexRule.configSrc.getProperty(eq(
-        "celements.validation.xClassRegex.ignoreInvalidKey"), eq(true))).andReturn(false).once();
+    expect(xClassRegexRule.configSrc
+        .getProperty(eq("celements.validation.xClassRegex.ignoreInvalidKey"), eq(true)))
+        .andReturn(false).once();
 
     replayDefault();
     Map<ValidationType, Set<String>> result = xClassRegexRule.validateField("Test.TestClass",
@@ -217,8 +218,8 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
     assertEquals(1, result.size());
     assertTrue(result.containsKey(ValidationType.ERROR));
     assertEquals(1, result.get(ValidationType.ERROR).size());
-    assertEquals("cel_validation_xclassregex_invalidkey", result.get(
-        ValidationType.ERROR).iterator().next());
+    assertEquals("cel_validation_xclassregex_invalidkey",
+        result.get(ValidationType.ERROR).iterator().next());
 
     xClassRegexRule.configSrc = Utils.getComponent(ConfigurationSource.class);
   }
@@ -232,8 +233,8 @@ public class XClassRegexRuleTest extends AbstractComponentTest {
     List<ValidationResult> result = xClassRegexRule.validate(parser.parseParameterMap(requestMap));
     verifyDefault();
 
-    assertTrue("Successful validation should result in an empty map", (result != null)
-        && result.isEmpty());
+    assertTrue("Successful validation should result in an empty map",
+        (result != null) && result.isEmpty());
   }
 
   private BaseClass getBaseClass(String fieldName) {

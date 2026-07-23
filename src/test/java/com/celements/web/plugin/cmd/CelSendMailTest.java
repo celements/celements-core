@@ -183,23 +183,20 @@ public class CelSendMailTest extends AbstractComponentTest {
     expect(xwiki.getPluginApi(eq("mailsender"), same(context))).andReturn(mailPlugin);
     expect(mailPlugin.sendMail(isA(Mail.class), isA(CelMailConfiguration.class))).andReturn(1);
     sendMail.injectMail(new Mail());
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), eq("celements.mail.default.smtp_server"), eq(
-        ""), same(context))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), eq("celements.mail.default.smtp_server"),
+        eq(""), same(context))).andReturn("").anyTimes();
     expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq("celements.mail.default.smtp_port"),
         eq(25), same(context))).andReturn(25).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("admin_email"), eq("celements.mail.default.admin_email"), eq(
-        ""), same(context))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), eq(
-        "celements.mail.default.smtp_server_username"), eq(""), same(context))).andReturn(
-            "")
+    expect(xwiki.getXWikiPreference(eq("admin_email"), eq("celements.mail.default.admin_email"),
+        eq(""), same(context))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"),
+        eq("celements.mail.default.smtp_server_username"), eq(""), same(context))).andReturn("")
         .anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), eq(
-        "celements.mail.default.smtp_server_password"), eq(""), same(context))).andReturn(
-            "")
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"),
+        eq("celements.mail.default.smtp_server_password"), eq(""), same(context))).andReturn("")
         .anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), eq(
-        "celements.mail.default.javamail_extra_props"), eq(""), same(context))).andReturn(
-            "")
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"),
+        eq("celements.mail.default.javamail_extra_props"), eq(""), same(context))).andReturn("")
         .anyTimes();
     replayDefault();
     assertEquals(1, sendMail.sendMail());

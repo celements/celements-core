@@ -110,11 +110,11 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
     String expectedUrl = "/MySpace/MyCurrentDoc?" + queryString;
     String expectedNodeContent = "<cel-lazy-load src=\"" + expectedUrl
         + "\" size=32 ></cel-lazy-load>\n";
-    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
-        "id=\"N3:Content:Content.MyPage\"").once();
-    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
-        isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
-            + " first cel_nav_isLeaf RichText\"")
+    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn("id=\"N3:Content:Content.MyPage\"")
+        .once();
+    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem),
+        eq(isLeaf), eq(1)))
+        .andReturn("class=\"cel_cm_navigation_menuitem" + " first cel_nav_isLeaf RichText\"")
         .once();
     expect(urlServiceMock.getURL(eq(currentDocRef), eq("view"), eq(queryString)))
         .andReturn(expectedUrl);
@@ -123,8 +123,9 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
     expect(requestMock.getParameterMap()).andReturn(paramMap);
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
-    assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
-        + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
+    assertEquals(
+        "<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
+            + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
         outStream.toString());
     verifyDefault();
   }
@@ -141,18 +142,18 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
     boolean isLeaf = true;
     String additionalParams = "startDate=12.10.2023";
     Map<String, String[]> paramMap = Map.of("ajax", new String[] { "0" }, "xpage",
-        new String[] { "sfda" }, "startDate", new String[] { "12.10.2023" },
-        "ajax_mode", new String[] { "safd", "safd2" });
+        new String[] { "sfda" }, "startDate", new String[] { "12.10.2023" }, "ajax_mode",
+        new String[] { "safd", "safd2" });
     String queryString = "xpage=ajax&ajax_mode=rendering/renderDocumentWithPageType&ajax=1&"
         + additionalParams;
     String expectedUrl = "/MySpace/MyCurrentDoc?" + queryString;
     String expectedNodeContent = "<cel-lazy-load src=\"" + expectedUrl
         + "\" size=32 ></cel-lazy-load>\n";
-    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
-        "id=\"N3:Content:Content.MyPage\"").once();
-    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
-        isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
-            + " first cel_nav_isLeaf RichText\"")
+    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn("id=\"N3:Content:Content.MyPage\"")
+        .once();
+    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem),
+        eq(isLeaf), eq(1)))
+        .andReturn("class=\"cel_cm_navigation_menuitem" + " first cel_nav_isLeaf RichText\"")
         .once();
     expect(urlServiceMock.getURL(eq(currentDocRef), eq("view"), eq(queryString)))
         .andReturn(expectedUrl);
@@ -161,8 +162,9 @@ public class RenderedContentDynLoadPresentationTypeTest extends AbstractComponen
     expect(requestMock.getParameterMap()).andReturn(paramMap);
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
-    assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
-        + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
+    assertEquals(
+        "<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
+            + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
         outStream.toString());
     verifyDefault();
   }

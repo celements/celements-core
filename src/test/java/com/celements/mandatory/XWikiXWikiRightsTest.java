@@ -44,8 +44,8 @@ public class XWikiXWikiRightsTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    mandatoryXWikiRights = (XWikiXWikiRights) getBeanFactory().getBean(
-        "celements.mandatory.wikirights", IMandatoryDocumentRole.class);
+    mandatoryXWikiRights = (XWikiXWikiRights) getBeanFactory()
+        .getBean("celements.mandatory.wikirights", IMandatoryDocumentRole.class);
   }
 
   @Test
@@ -89,8 +89,7 @@ public class XWikiXWikiRightsTest extends AbstractComponentTest {
   }
 
   private BaseObject createGlobalRights(XWikiDocument doc, String groupFN, String levels) {
-    BaseObject obj = XWikiObjectEditor.on(doc)
-        .filter(new ClassReference(getGlobalRightsRef()))
+    BaseObject obj = XWikiObjectEditor.on(doc).filter(new ClassReference(getGlobalRightsRef()))
         .createFirst();
     obj.setStringValue("groups", groupFN);
     obj.setStringValue("levels", levels);
@@ -100,25 +99,23 @@ public class XWikiXWikiRightsTest extends AbstractComponentTest {
   }
 
   private int countGlobalRights(XWikiDocument doc, String groupFN, String levels) {
-    return XWikiObjectFetcher.on(doc)
-        .filter(new ClassReference(getGlobalRightsRef()))
+    return XWikiObjectFetcher.on(doc).filter(new ClassReference(getGlobalRightsRef()))
         .filter(obj -> obj.getIntValue("allow", 0) == 1)
         .filter(obj -> groupFN.equals(obj.getStringValue("groups")))
         .filter(obj -> levels.equals(obj.getStringValue("levels")))
-        .filter(obj -> "".equals(obj.getStringValue("users")))
-        .count();
+        .filter(obj -> "".equals(obj.getStringValue("users"))).count();
   }
 
   private DocumentReference getGlobalRightsRef() {
-    return XWikiGlobalRightsClass.CLASS_REF.getDocRef(mandatoryXWikiRights.getDocRef()
-        .getWikiReference());
+    return XWikiGlobalRightsClass.CLASS_REF
+        .getDocRef(mandatoryXWikiRights.getDocRef().getWikiReference());
   }
 
   private void expectGlobalRightsClass() throws Exception {
     ClassDefinition classDef = getBeanFactory().getBean(XWikiGlobalRightsClass.CLASS_DEF_HINT,
         ClassDefinition.class);
-    BaseClass bClass = expectNewBaseObject(classDef.getDocRef(mandatoryXWikiRights.getDocRef()
-        .getWikiReference()));
+    BaseClass bClass = expectNewBaseObject(
+        classDef.getDocRef(mandatoryXWikiRights.getDocRef().getWikiReference()));
     for (ClassField<?> field : classDef.getFields()) {
       expect(bClass.get(field.getName())).andReturn(field.getXField()).anyTimes();
     }

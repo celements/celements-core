@@ -64,8 +64,8 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
     LOGGER.debug("writeNodeContent for [" + docRef + "].");
     outStream.append("<div ");
-    outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
-        + " ");
+    outStream
+        .append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem) + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
     try {
       outStream.append(getRenderedExtract(docRef));
@@ -99,15 +99,14 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
 
   private String getDocExtract(DocumentReference docRef) throws XWikiException {
     XWikiDocument contentDoc = getContext().getWiki().getDocument(docRef, getContext());
-    DocumentReference documentExtractClassRef = getDocDetailsClasses().getDocumentExtractClassRef(
-        docRef.getLastSpaceReference().getParent().getName());
+    DocumentReference documentExtractClassRef = getDocDetailsClasses()
+        .getDocumentExtractClassRef(docRef.getLastSpaceReference().getParent().getName());
     BaseObject extractObj = contentDoc.getXObject(documentExtractClassRef,
         DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE, getContext().getLanguage(), false);
     if (extractObj == null) {
       extractObj = contentDoc.getXObject(documentExtractClassRef,
-          DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE, webUtilsService.getDefaultLanguage(
-              docRef.getLastSpaceReference()),
-          false);
+          DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE,
+          webUtilsService.getDefaultLanguage(docRef.getLastSpaceReference()), false);
     }
     if (extractObj != null) {
       return extractObj.getStringValue(DocumentDetailsClasses.FIELD_DOC_EXTRACT_CONTENT);

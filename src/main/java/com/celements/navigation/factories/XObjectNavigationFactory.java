@@ -60,8 +60,8 @@ public final class XObjectNavigationFactory extends AbstractNavigationFactory<Do
   @Override
   @NotNull
   public NavigationConfig getNavigationConfig(@NotNull DocumentReference configReference) {
-    return loadConfigFromObject(getConfigObjFetcher(configReference).stream()
-        .findFirst().orElse(null));
+    return loadConfigFromObject(
+        getConfigObjFetcher(configReference).stream().findFirst().orElse(null));
   }
 
   @Override
@@ -94,9 +94,9 @@ public final class XObjectNavigationFactory extends AbstractNavigationFactory<Do
             NavigationConfig.DEFAULT_MAX_LEVEL));
       }
       if (isValueSet(prefObj, INavigationClassConfig.SHOW_INACTIVE_TO_LEVEL_FIELD)) {
-        b.showInactiveToLevel(prefObj.getIntValue(
-            INavigationClassConfig.SHOW_INACTIVE_TO_LEVEL_FIELD, NavigationConfig.DEFAULT_MIN_LEVEL
-                - 1));
+        b.showInactiveToLevel(
+            prefObj.getIntValue(INavigationClassConfig.SHOW_INACTIVE_TO_LEVEL_FIELD,
+                NavigationConfig.DEFAULT_MIN_LEVEL - 1));
       }
       String menuPart = prefObj.getStringValue(INavigationClassConfig.MENU_PART_FIELD);
       if (!Strings.isNullOrEmpty(menuPart)) {

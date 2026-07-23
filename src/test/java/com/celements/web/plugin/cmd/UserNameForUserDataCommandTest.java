@@ -48,8 +48,9 @@ public class UserNameForUserDataCommandTest extends AbstractComponentTest {
   @Test
   public void testGetUsernameForUserData_loginname_notExists() throws XWikiException {
     String login = "testLogin";
-    expect(userServiceMock.getUserForLoginField(login, Arrays.asList(
-        UserService.DEFAULT_LOGIN_FIELD))).andReturn(Optional.<User>absent());
+    expect(
+        userServiceMock.getUserForLoginField(login, Arrays.asList(UserService.DEFAULT_LOGIN_FIELD)))
+        .andReturn(Optional.<User>absent());
 
     replayDefault();
     assertEquals("", cmd.getUsernameForUserData(login, "loginname,,", getContext()));
@@ -60,8 +61,9 @@ public class UserNameForUserDataCommandTest extends AbstractComponentTest {
   public void testGetUsernameForUserData_loginname_exists() throws XWikiException {
     String login = "testLogin";
     User user = createDefaultMock(User.class);
-    expect(userServiceMock.getUserForLoginField(login, Arrays.asList(
-        UserService.DEFAULT_LOGIN_FIELD))).andReturn(Optional.of(user));
+    expect(
+        userServiceMock.getUserForLoginField(login, Arrays.asList(UserService.DEFAULT_LOGIN_FIELD)))
+        .andReturn(Optional.of(user));
     expect(user.asXWikiUser()).andReturn(new XWikiUser("XWiki." + login));
 
     replayDefault();
@@ -73,13 +75,13 @@ public class UserNameForUserDataCommandTest extends AbstractComponentTest {
   public void testGetUsernameForUserData_multiplePossibleFields() throws XWikiException {
     String login = "testLogin";
     User user = createDefaultMock(User.class);
-    expect(userServiceMock.getUserForLoginField(login, Arrays.asList("email",
-        UserService.DEFAULT_LOGIN_FIELD))).andReturn(Optional.of(user));
+    expect(userServiceMock.getUserForLoginField(login,
+        Arrays.asList("email", UserService.DEFAULT_LOGIN_FIELD))).andReturn(Optional.of(user));
     expect(user.asXWikiUser()).andReturn(new XWikiUser("XWiki." + login));
 
     replayDefault();
-    assertEquals("XWiki." + login, cmd.getUsernameForUserData(login, "email,loginname",
-        getContext()));
+    assertEquals("XWiki." + login,
+        cmd.getUsernameForUserData(login, "email,loginname", getContext()));
     verifyDefault();
   }
 

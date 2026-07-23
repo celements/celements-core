@@ -41,11 +41,10 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 @Component("MenuBar_SubMenuItemsClass")
-public class MenuBar_SubMenuItemsClassMigrator
-    extends AbstractCelementsHibernateMigrator {
+public class MenuBar_SubMenuItemsClassMigrator extends AbstractCelementsHibernateMigrator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      MenuBar_SubMenuItemsClassMigrator.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(MenuBar_SubMenuItemsClassMigrator.class);
 
   @Requirement
   IMenuService menuService;
@@ -76,15 +75,13 @@ public class MenuBar_SubMenuItemsClassMigrator
   public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
       throws XWikiException {
     getMenuClasses().runUpdate(getContext());
-    List<String> result = context.getWiki().search(
-        "select distinct o.name from BaseObject o"
-            + " where o.className = 'Celements2.MenuBarSubItem'",
-        context);
-    LOGGER.info("found [" + ((result != null) ? result.size() : result)
-        + "] documents to migrate.");
+    List<String> result = context.getWiki().search("select distinct o.name from BaseObject o"
+        + " where o.className = 'Celements2.MenuBarSubItem'", context);
+    LOGGER
+        .info("found [" + ((result != null) ? result.size() : result) + "] documents to migrate.");
     for (Object fullName : result) {
-      XWikiDocument doc = context.getWiki().getDocument(
-          webUtilsService.resolveDocumentReference(fullName.toString()), context);
+      XWikiDocument doc = context.getWiki()
+          .getDocument(webUtilsService.resolveDocumentReference(fullName.toString()), context);
       XObjectIterator menuBarSubItemIterator = new XObjectIterator(getContext());
       menuBarSubItemIterator.setClassName("Celements2.MenuBarSubItem");
       menuBarSubItemIterator.setDocList(Arrays.asList(fullName.toString()));

@@ -53,8 +53,8 @@ public class DefaultEmptyFieldChecker implements IEmptyFieldChecker {
 
   @Override
   public boolean isEmptyNumber(NumberProperty property) {
-    return (property.getValue().toString().equals("0") || property.getValue().toString().equals(
-        "0.0"));
+    return (property.getValue().toString().equals("0")
+        || property.getValue().toString().equals("0.0"));
   }
 
   @Override

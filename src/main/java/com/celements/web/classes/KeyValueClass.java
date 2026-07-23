@@ -18,14 +18,14 @@ public class KeyValueClass extends AbstractClassDefinition implements CelementsC
   public static final String CLASS_DEF_HINT = SPACE_NAME + "." + DOC_NAME;
   public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 
-  public static final ClassField<String> FIELD_LABEL = new StringField.Builder(
-      CLASS_REF, "label").build();
+  public static final ClassField<String> FIELD_LABEL = new StringField.Builder(CLASS_REF, "label")
+      .build();
 
-  public static final ClassField<String> FIELD_KEY = new StringField.Builder(
-      CLASS_REF, "key").build();
+  public static final ClassField<String> FIELD_KEY = new StringField.Builder(CLASS_REF, "key")
+      .build();
 
-  public static final ClassField<String> FIELD_VALUE = new StringField.Builder(
-      CLASS_REF, "value").build();
+  public static final ClassField<String> FIELD_VALUE = new StringField.Builder(CLASS_REF, "value")
+      .build();
 
   public KeyValueClass() {
     super(CLASS_REF);

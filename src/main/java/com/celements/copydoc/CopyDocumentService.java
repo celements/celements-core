@@ -146,8 +146,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
     List<BaseObject> srcObjs = getXObjects(srcDoc, xObjFilter);
     List<BaseObject> trgObjs = new ArrayList<>(getXObjects(trgDoc, xObjFilter));
     hasChanged |= createOrUpdateObjects(trgDoc, srcObjs, trgObjs, set);
-    hasChanged |= (set && modelAccess.removeXObjects(trgDoc, trgObjs)) || (!set
-        && !trgObjs.isEmpty());
+    hasChanged |= (set && modelAccess.removeXObjects(trgDoc, trgObjs))
+        || (!set && !trgObjs.isEmpty());
     return hasChanged;
   }
 

@@ -35,8 +35,7 @@ public class ObjectComparator implements Comparator<Object> {
   }
 
   private boolean isAssignable(Object o1, Object o2) {
-    return (o1 != null) && (o2 != null)
-        && (o1.getClass().isAssignableFrom(o2.getClass())
-            || o2.getClass().isAssignableFrom(o1.getClass()));
+    return (o1 != null) && (o2 != null) && (o1.getClass().isAssignableFrom(o2.getClass())
+        || o2.getClass().isAssignableFrom(o1.getClass()));
   }
 }

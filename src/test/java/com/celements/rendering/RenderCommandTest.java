@@ -76,8 +76,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     cellDockApiMock = createDefaultMock(Document.class);
     velocityContext.put("celldoc", cellDockApiMock);
     context.put("vcontext", velocityContext);
-    currentDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "Content",
-        "MyPage"));
+    currentDoc = new XWikiDocument(
+        new DocumentReference(context.getDatabase(), "Content", "MyPage"));
     context.setDoc(currentDoc);
     renderCmd = new RenderCommand();
     mockPageTypeService = registerComponentMock(IPageTypeRole.class);
@@ -95,12 +95,13 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(xwiki.Param(isA(String.class), eq("0"))).andReturn("0").anyTimes();
     expect(xwiki.Param(isA(String.class), eq("1"))).andReturn("1").anyTimes();
     expect(xwiki.Param(eq("xwiki.render.cache.capacity"))).andReturn(null).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("macros_languages"), eq("velocity,groovy"), same(
-        context))).andReturn("velocity,groovy").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("macros_velocity"), eq("XWiki.VelocityMacros"), same(
-        context))).andReturn("XWiki.VelocityMacros").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("macros_groovy"), eq("XWiki.GroovyMacros"), same(
-        context))).andReturn("XWiki.GroovyMacros").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("macros_languages"), eq("velocity,groovy"), same(context)))
+        .andReturn("velocity,groovy").anyTimes();
+    expect(
+        xwiki.getXWikiPreference(eq("macros_velocity"), eq("XWiki.VelocityMacros"), same(context)))
+        .andReturn("XWiki.VelocityMacros").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("macros_groovy"), eq("XWiki.GroovyMacros"), same(context)))
+        .andReturn("XWiki.GroovyMacros").anyTimes();
     expect(xwiki.getMacroList(same(context))).andReturn("").anyTimes();
     CacheFactory cacheFactory = createMock(CacheFactory.class);
     expect(xwiki.getCacheFactory()).andReturn(cacheFactory);
@@ -112,10 +113,10 @@ public class RenderCommandTest extends AbstractComponentTest {
     assertSame("Expecting singleton.", renderCmd.getRenderingEngine(),
         renderCmd.getRenderingEngine());
     List<String> rendererNames = renderCmd.getRenderingEngine().getRendererNames();
-    assertTrue("expecting that velocity renderer is activated by default", rendererNames.contains(
-        "velocity"));
-    assertTrue("expecting that groovy renderer is activated by default", rendererNames.contains(
-        "groovy"));
+    assertTrue("expecting that velocity renderer is activated by default",
+        rendererNames.contains("velocity"));
+    assertTrue("expecting that groovy renderer is activated by default",
+        rendererNames.contains("groovy"));
     assertEquals("expecting only groovy and velocity renderer by default", 2, rendererNames.size());
     verifyDefault();
   }
@@ -133,8 +134,8 @@ public class RenderCommandTest extends AbstractComponentTest {
   @Test
   public void testGetRenderTemplatePath_NoCellType() throws Exception {
     String cellDocFN = "xwikidb:MyLayout.Cell12";
-    XWikiDocument cellDoc = new XWikiDocument(new DocumentReference(
-        context.getDatabase(), "MyLayout", "Cell12"));
+    XWikiDocument cellDoc = new XWikiDocument(
+        new DocumentReference(context.getDatabase(), "MyLayout", "Cell12"));
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.absent());
 
@@ -151,8 +152,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn("").anyTimes();
     expect(ptMock.getName()).andReturn("CelementsCell").anyTimes();
-    XWikiDocument cellDoc = new XWikiDocument(new DocumentReference(
-        context.getDatabase(), "MyLayout", "Cell12"));
+    XWikiDocument cellDoc = new XWikiDocument(
+        new DocumentReference(context.getDatabase(), "MyLayout", "Cell12"));
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     replayDefault();
@@ -168,8 +169,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(null).anyTimes();
     expect(ptMock.getName()).andReturn("CelementsCell").anyTimes();
-    XWikiDocument cellDoc = new XWikiDocument(new DocumentReference(
-        context.getDatabase(), "MyLayout", "Cell12"));
+    XWikiDocument cellDoc = new XWikiDocument(
+        new DocumentReference(context.getDatabase(), "MyLayout", "Cell12"));
     expect(mockPageTypeResolver.resolvePageTypeReference(same(cellDoc)))
         .andReturn(Optional.of(ptRefMock));
     replayDefault();
@@ -179,8 +180,8 @@ public class RenderCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetTranslatedContent() throws Exception {
-    XWikiDocument templateDoc = new XWikiDocument(new DocumentReference(
-        context.getDatabase(), "MySpace", "myDoc"));
+    XWikiDocument templateDoc = new XWikiDocument(
+        new DocumentReference(context.getDatabase(), "MySpace", "myDoc"));
     templateDoc.setDefaultLanguage("de");
     String expectedContent = "do something and velocity macro...\n";
     String transContent = "{pre}\n" + expectedContent + "{/pre}";
@@ -194,14 +195,14 @@ public class RenderCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetTranslatedContent_wikiRenderer() throws Exception {
-    XWikiDocument templateDoc = new XWikiDocument(new DocumentReference(
-        context.getDatabase(), "MySpace", "myDoc"));
+    XWikiDocument templateDoc = new XWikiDocument(
+        new DocumentReference(context.getDatabase(), "MySpace", "myDoc"));
     templateDoc.setDefaultLanguage("fr");
     String expectedContent = "do something and velocity macro...\n";
     String transContent = "{pre}\n" + expectedContent + "{/pre}";
     templateDoc.setContent(transContent);
-    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy",
-        "xwiki"));
+    expect(renderingEngineMock.getRendererNames())
+        .andReturn(Arrays.asList("velocity", "groovy", "xwiki"));
     replayDefault();
     assertEquals("expected removing pre-tags", "{pre}\n" + expectedContent + "{/pre}",
         renderCmd.getTranslatedContent(templateDoc, "fr"));
@@ -214,17 +215,16 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content", "myPage");
     XWikiDocument myDoc = new XWikiDocument(myDocRef);
     myDoc.setDefaultLanguage("de");
-    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc)))
-        .andReturn(Optional.absent());
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc))).andReturn(Optional.absent());
     expect(modelAccessMock.getOrCreateDocument(eq(myDocRef))).andReturn(myDoc);
     expect(modelAccessMock.getDocumentOpt(eq(myDocRef))).andReturn(java.util.Optional.of(myDoc));
     String expectedContent = "expected Content $doc.fullName";
     myDoc.setContent(expectedContent);
-    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc), same(
-        context))).andReturn(expectedRenderedContent);
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc),
+        same(context))).andReturn(expectedRenderedContent);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:Content.myPage"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Content.myPage"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsDocument(myDocRef, "view"));
     verifyDefault();
@@ -236,21 +236,20 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content", "myPage");
     XWikiDocument myDoc = new XWikiDocument(myDocRef);
     myDoc.setDefaultLanguage("de");
-    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc)))
-        .andReturn(Optional.absent());
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc))).andReturn(Optional.absent());
     expect(modelAccessMock.getOrCreateDocument(eq(myDocRef))).andReturn(myDoc);
     expect(modelAccessMock.getDocumentOpt(eq(myDocRef))).andReturn(java.util.Optional.of(myDoc));
     String expectedContent = "expected Content $doc.fullName";
     myDoc.setContent(expectedContent);
-    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc), same(
-        context))).andAnswer(() -> {
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc),
+        same(context))).andAnswer(() -> {
           assertEquals("expecting celldoc to be set to the rendered cell document.", myDocRef,
               ((Document) velocityContext.get("celldoc")).getDocumentReference());
           return expectedRenderedContent;
         });
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:Content.myPage"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Content.myPage"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsDocument(myDocRef, "view"));
     verifyDefault();
@@ -268,11 +267,11 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(modelAccessMock.getDocumentOpt(eq(myDocRef))).andReturn(java.util.Optional.of(myDoc));
     String expectedContent = "expected Content $doc.fullName";
     myDoc.setContent(expectedContent);
-    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc), same(
-        context))).andReturn(expectedRenderedContent);
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc),
+        same(context))).andReturn(expectedRenderedContent);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:Content.myPage"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Content.myPage"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsDocument(myDoc, "view"));
     verifyDefault();
@@ -289,11 +288,11 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(modelAccessMock.getDocumentOpt(eq(myDocRef))).andReturn(java.util.Optional.of(myDoc));
     String expectedContent = "expected Content $doc.fullName";
     myDoc.setContent(expectedContent);
-    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc), same(
-        context))).andReturn(expectedRenderedContent);
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc),
+        same(context))).andReturn(expectedRenderedContent);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:Content.myPage"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Content.myPage"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsDocument(myDoc, "view"));
     verifyDefault();
@@ -310,12 +309,12 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(modelAccessMock.getOrCreateDocument(eq(myDocRef))).andReturn(myDoc).anyTimes();
     String expectedContent = "expected Content $doc.fullName";
     myDoc.setContent(expectedContent);
-    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc), same(
-        context))).andReturn("Topic Content.MyPage does not exist").anyTimes();
-    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
-        "groovy")).anyTimes();
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:Content.myPage"), same(context))).andReturn(false).once();
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc),
+        same(context))).andReturn("Topic Content.MyPage does not exist").anyTimes();
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"))
+        .anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Content.myPage"), same(context))).andReturn(false).once();
     replayDefault();
     assertEquals("expecting empty because no access rights to template", "",
         renderCmd.renderCelementsDocument(myDoc, "de", "view"));
@@ -337,17 +336,17 @@ public class RenderCommandTest extends AbstractComponentTest {
     String expectedRenderedContent = "expected rendered content of Content.MyPage";
     expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc),
         notSameVcontext(context))).andReturn(expectedRenderedContent);
-    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
-        "groovy")).anyTimes();
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:Content.myPage"), same(context))).andReturn(true).once();
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"))
+        .anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Content.myPage"), same(context))).andReturn(true).once();
     VelocityContext expectedVContext = (VelocityContext) context.get("vcontext");
     replayDefault();
     assertNotNull(expectedVContext);
     assertNotNull(getExecutionContext().getProperty("velocityContext"));
     assertSame(expectedVContext, getExecutionContext().getProperty("velocityContext"));
-    assertEquals(expectedRenderedContent, renderCmd.renderCelementsDocumentPreserveVelocityContext(
-        myDocRef, "de", "view"));
+    assertEquals(expectedRenderedContent,
+        renderCmd.renderCelementsDocumentPreserveVelocityContext(myDocRef, "de", "view"));
     assertSame(expectedVContext, context.get("vcontext"));
     assertSame(expectedVContext, getExecutionContext().getProperty("velocityContext"));
     verifyDefault();
@@ -387,8 +386,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(renderingEngineMock.renderText(eq(expectedContent), same(templDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(elementFullName));
     verifyDefault();
@@ -410,8 +409,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(modelAccessMock.getOrCreateDocument(eq(elementDocRef))).andReturn(cellDoc);
     DocumentReference renderTemplateDocRef = new DocumentReference("celements2web", "Templates",
         "CellTypeView");
-    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
-        "celements2web:Templates.CellTypeView");
+    expect(ptMock.getRenderTemplateForRenderMode(eq("view")))
+        .andReturn("celements2web:Templates.CellTypeView");
     XWikiDocument templDoc = new XWikiDocument(renderTemplateDocRef);
     templDoc.setDefaultLanguage("de");
     expect(modelAccessMock.getDocumentOpt(eq(renderTemplateDocRef)))
@@ -423,8 +422,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(renderingEngineMock.renderText(eq(expectedContent), same(templDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(elementDocRef));
     verifyDefault();
@@ -446,8 +445,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     String renderTemplateFN = "celements2web:Templates.CellTypeView";
     DocumentReference renderTemplateDocRef = new DocumentReference("celements2web", "Templates",
         "CellTypeView");
-    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
-        renderTemplateFN).anyTimes();
+    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(renderTemplateFN)
+        .anyTimes();
     XWikiDocument templDoc = new XWikiDocument(renderTemplateDocRef);
     templDoc.setDefaultLanguage("de");
     expect(modelAccessMock.getDocumentOpt(eq(renderTemplateDocRef)))
@@ -459,8 +458,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(renderingEngineMock.renderText(eq(expectedContent), same(templDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(elementFullName));
     verifyDefault();
@@ -480,8 +479,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     String renderTemplateFN = "celements2web:Templates.CellTypeView";
     DocumentReference renderTemplateDocRef = new DocumentReference("celements2web", "Templates",
         "CellTypeView");
-    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
-        renderTemplateFN).anyTimes();
+    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(renderTemplateFN)
+        .anyTimes();
     XWikiDocument templDoc = new XWikiDocument(renderTemplateDocRef);
     templDoc.setDefaultLanguage("de");
     expect(modelAccessMock.getDocumentOpt(eq(renderTemplateDocRef)))
@@ -493,8 +492,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(renderingEngineMock.renderText(eq(expectedContent), same(templDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(elementDocRef));
     verifyDefault();
@@ -519,11 +518,11 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(modelAccessMock.getOrCreateDocument(eq(elementDocRef))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
-    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
-        renderTemplatePath).anyTimes();
+    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(renderTemplatePath)
+        .anyTimes();
     String templatePath_lang = "celTemplates/CellTypeView_de.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
-        new IOException());
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andThrow(new IOException());
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     String expectedContent = "Expected Template Content Content.MyPage";
@@ -531,8 +530,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     String expectedRenderedContent = "Expected Template Content Content.MyPage";
     expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(elementFullName));
     verifyDefault();
@@ -555,11 +554,11 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(modelAccessMock.getOrCreateDocument(eq(elementDocRef))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
-    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
-        renderTemplatePath).anyTimes();
+    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(renderTemplatePath)
+        .anyTimes();
     String templatePath_lang = "celTemplates/CellTypeView_de.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
-        new IOException());
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andThrow(new IOException());
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     String expectedContent = "Expected Template Content Content.MyPage";
@@ -567,8 +566,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     String expectedRenderedContent = "Expected Template Content Content.MyPage";
     expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(elementDocRef));
     verifyDefault();
@@ -591,18 +590,18 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(modelAccessMock.getOrCreateDocument(eq(elementDocRef))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
-    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
-        renderTemplatePath).anyTimes();
+    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(renderTemplatePath)
+        .anyTimes();
     String templatePath_lang = "celTemplates/CellTypeView_de.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     String expectedContent = "Expected Template Content Content.MyPage";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andReturn(
-        expectedContent);
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andReturn(expectedContent);
     String expectedRenderedContent = "Expected Template Content Content.MyPage";
     expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(elementDocRef));
     verifyDefault();
@@ -622,17 +621,17 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(modelAccessMock.getOrCreateDocument(eq(elementDocRef))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
-    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
-        renderTemplatePath).anyTimes();
+    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(renderTemplatePath)
+        .anyTimes();
     String templatePath_lang = "celTemplates/CellTypeView_de.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
-        new IOException());
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andThrow(new IOException());
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(
-        new IOException()).anyTimes();
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(new IOException())
+        .anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals("", renderCmd.renderCelementsCell(elementFullName));
     verifyDefault();
@@ -650,17 +649,17 @@ public class RenderCommandTest extends AbstractComponentTest {
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))).andReturn(ptMock);
     expect(modelAccessMock.getOrCreateDocument(eq(elementDocRef))).andReturn(cellDoc);
     String renderTemplatePath = ":Templates.CellTypeView";
-    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
-        renderTemplatePath).anyTimes();
+    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(renderTemplatePath)
+        .anyTimes();
     String templatePath_lang = "celTemplates/CellTypeView_de.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
-        new IOException());
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andThrow(new IOException());
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(
-        new IOException()).anyTimes();
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(new IOException())
+        .anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
     assertEquals("", renderCmd.renderCelementsCell(elementDocRef));
     verifyDefault();
@@ -668,10 +667,10 @@ public class RenderCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetTemplatePathOnDisk() {
-    assertEquals("/templates/celTemplates/CellPageContentView.vm", renderCmd.getTemplatePathOnDisk(
-        ":Templates.CellPageContentView"));
-    assertEquals("/templates/celTemplates/CellPageContentView.vm", renderCmd.getTemplatePathOnDisk(
-        ":CellPageContentView"));
+    assertEquals("/templates/celTemplates/CellPageContentView.vm",
+        renderCmd.getTemplatePathOnDisk(":Templates.CellPageContentView"));
+    assertEquals("/templates/celTemplates/CellPageContentView.vm",
+        renderCmd.getTemplatePathOnDisk(":CellPageContentView"));
   }
 
   @Test
@@ -679,8 +678,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     String renderTemplatePath = ":Templates.CellTypeView";
     String templatePath = "celTemplates/CellTypeView.vm";
     String expectedContent = "Expected Template Content Content.MyPage";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andReturn(
-        expectedContent).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andReturn(expectedContent)
+        .once();
     String expectedRenderedContent = "Expected Template Content Content.MyPage";
     expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
@@ -694,14 +693,14 @@ public class RenderCommandTest extends AbstractComponentTest {
     String renderTemplatePath = ":Templates.CellTypeView";
     String templatePath_lang = "celTemplates/CellTypeView_de.vm";
     String expectedContent = "Expected Template Content Content.MyPage";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andReturn(
-        expectedContent).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andReturn(expectedContent).once();
     String expectedRenderedContent = "Expected Template Content Content.MyPage";
     expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
     replayDefault();
-    assertEquals(expectedRenderedContent, renderCmd.renderTemplatePath(
-        renderTemplatePath, "de", ""));
+    assertEquals(expectedRenderedContent,
+        renderCmd.renderTemplatePath(renderTemplatePath, "de", ""));
     verifyDefault();
   }
 
@@ -709,18 +708,18 @@ public class RenderCommandTest extends AbstractComponentTest {
   public void test_renderTemplatePath_langNotFound_deflang() throws Exception {
     String renderTemplatePath = ":Templates.CellTypeView";
     String templatePath_lang = "celTemplates/CellTypeView_de.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
-        new IOException()).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andThrow(new IOException()).once();
     String templatePath_deflang = "celTemplates/CellTypeView_en.vm";
     String expectedContent = "Expected Template Content Content.MyPage";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_deflang))).andReturn(
-        expectedContent).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_deflang)))
+        .andReturn(expectedContent).once();
     String expectedRenderedContent = "Expected Template Content Content.MyPage";
     expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
     replayDefault();
-    assertEquals(expectedRenderedContent, renderCmd.renderTemplatePath(renderTemplatePath, "de",
-        "en"));
+    assertEquals(expectedRenderedContent,
+        renderCmd.renderTemplatePath(renderTemplatePath, "de", "en"));
     verifyDefault();
   }
 
@@ -728,21 +727,21 @@ public class RenderCommandTest extends AbstractComponentTest {
   public void test_renderTemplatePath_langNotFound_deflangNotFound() throws Exception {
     String renderTemplatePath = ":Templates.CellTypeView";
     String templatePath_lang = "celTemplates/CellTypeView_de.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
-        new IOException()).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andThrow(new IOException()).once();
     String templatePath_deflang = "celTemplates/CellTypeView_en.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_deflang))).andThrow(
-        new IOException()).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_deflang)))
+        .andThrow(new IOException()).once();
     String templatePath = "celTemplates/CellTypeView.vm";
     String expectedContent = "Expected Template Content Content.MyPage";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andReturn(
-        expectedContent).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andReturn(expectedContent)
+        .once();
     String expectedRenderedContent = "Expected Template Content Content.MyPage";
     expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
     replayDefault();
-    assertEquals(expectedRenderedContent, renderCmd.renderTemplatePath(renderTemplatePath, "de",
-        "en"));
+    assertEquals(expectedRenderedContent,
+        renderCmd.renderTemplatePath(renderTemplatePath, "de", "en"));
     verifyDefault();
   }
 
@@ -751,14 +750,14 @@ public class RenderCommandTest extends AbstractComponentTest {
       throws Exception {
     String renderTemplatePath = ":Templates.CellTypeView";
     String templatePath_lang = "celTemplates/CellTypeView_de.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
-        new IOException()).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andThrow(new IOException()).once();
     String templatePath_deflang = "celTemplates/CellTypeView_en.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_deflang))).andThrow(
-        new IOException()).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_deflang)))
+        .andThrow(new IOException()).once();
     String templatePath = "celTemplates/CellTypeView.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(
-        new IOException()).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(new IOException())
+        .once();
     replayDefault();
     assertEquals("", renderCmd.renderTemplatePath(renderTemplatePath, "de", "en"));
     verifyDefault();
@@ -773,18 +772,18 @@ public class RenderCommandTest extends AbstractComponentTest {
   public void test_renderTemplatePath_deflang_equals_lang_notFound() throws Exception {
     String renderTemplatePath = ":Templates.CellTypeView";
     String templatePath_lang = "celTemplates/CellTypeView_en.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
-        new IOException()).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang)))
+        .andThrow(new IOException()).once();
     String expectedContent = "Expected Template Content Content.MyPage";
     String templatePath = "celTemplates/CellTypeView.vm";
-    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andReturn(
-        expectedContent).once();
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andReturn(expectedContent)
+        .once();
     String expectedRenderedContent = "Expected Template Content Content.MyPage";
     expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc), same(currentDoc),
         same(context))).andReturn(expectedRenderedContent);
     replayDefault();
-    assertEquals(expectedRenderedContent, renderCmd.renderTemplatePath(renderTemplatePath, "en",
-        "en"));
+    assertEquals(expectedRenderedContent,
+        renderCmd.renderTemplatePath(renderTemplatePath, "en", "en"));
     verifyDefault();
   }
 
@@ -798,8 +797,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     String contentEN = "english script $test";
     cellDoc.setContent(contentEN);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc), same(currentDoc), same(
-        context))).andReturn(expectedRenderedContent);
+    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc), same(currentDoc),
+        same(context))).andReturn(expectedRenderedContent);
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderDocument(cellDoc, null, "en"));
     verifyDefault();
@@ -818,8 +817,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference includeDocRef = new DocumentReference(context.getDatabase(), "Includeing",
         "TheIncludingDocumentName");
     XWikiDocument includeDoc = new XWikiDocument(includeDocRef);
-    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc), same(includeDoc), same(
-        context))).andReturn(expectedRenderedContent);
+    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc), same(includeDoc),
+        same(context))).andReturn(expectedRenderedContent);
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderDocument(cellDoc, includeDoc, "en"));
     verifyDefault();
@@ -835,8 +834,8 @@ public class RenderCommandTest extends AbstractComponentTest {
     String contentEN = "english script $test";
     cellDoc.setContent(contentEN);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"));
-    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc), same(currentDoc), same(
-        context))).andReturn(expectedRenderedContent);
+    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc), same(currentDoc),
+        same(context))).andReturn(expectedRenderedContent);
     expect(modelAccessMock.getOrCreateDocument(elementDocRef)).andReturn(cellDoc).atLeastOnce();
     replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderDocument(elementDocRef, "en"));
@@ -856,13 +855,13 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference includeDocRef = new DocumentReference(context.getDatabase(), "Includeing",
         "TheIncludingDocumentName");
     XWikiDocument includeDoc = new XWikiDocument(includeDocRef);
-    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc), same(includeDoc), same(
-        context))).andReturn(expectedRenderedContent);
+    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc), same(includeDoc),
+        same(context))).andReturn(expectedRenderedContent);
     expect(modelAccessMock.getOrCreateDocument(elementDocRef)).andReturn(cellDoc).atLeastOnce();
     expect(modelAccessMock.getOrCreateDocument(includeDocRef)).andReturn(includeDoc).atLeastOnce();
     replayDefault();
-    assertEquals(expectedRenderedContent, renderCmd.renderDocument(elementDocRef, includeDocRef,
-        "en"));
+    assertEquals(expectedRenderedContent,
+        renderCmd.renderDocument(elementDocRef, includeDocRef, "en"));
     verifyDefault();
   }
 
@@ -872,17 +871,17 @@ public class RenderCommandTest extends AbstractComponentTest {
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content", "myPage");
     XWikiDocument myDoc = new XWikiDocument(myDocRef);
     myDoc.setDefaultLanguage("de");
-    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc)))
-        .andReturn(Optional.absent()).anyTimes();
+    expect(mockPageTypeResolver.resolvePageTypeReference(same(myDoc))).andReturn(Optional.absent())
+        .anyTimes();
     expect(modelAccessMock.getOrCreateDocument(eq(myDocRef))).andReturn(myDoc).anyTimes();
     String expectedContent = "expected Content $doc.fullName";
     myDoc.setContent(expectedContent);
-    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc), same(
-        context))).andReturn("Topic Content.MyPage does not exist").anyTimes();
-    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
-        "groovy")).anyTimes();
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
-        "xwikidb:Content.myPage"), same(context))).andReturn(true).anyTimes();
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc), same(currentDoc),
+        same(context))).andReturn("Topic Content.MyPage does not exist").anyTimes();
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"))
+        .anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Content.myPage"), same(context))).andReturn(true).anyTimes();
     context.remove("vcontext");
     replayDefault();
     assertEquals("expecting empty because velocity context is null.", "",
@@ -911,8 +910,8 @@ public class RenderCommandTest extends AbstractComponentTest {
       public boolean matches(Object argument) {
         if (argument instanceof XWikiContext) {
           XWikiContext theContext = (XWikiContext) argument;
-          VelocityContext execVcontext = (VelocityContext) getExecutionContext().getProperty(
-              "velocityContext");
+          VelocityContext execVcontext = (VelocityContext) getExecutionContext()
+              .getProperty("velocityContext");
           if (theContext != null) {
             VelocityContext vContext = (VelocityContext) theContext.get("vcontext");
             return (initVcontext != vContext) && (vContext == execVcontext);

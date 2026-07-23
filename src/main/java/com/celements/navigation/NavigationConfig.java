@@ -240,8 +240,8 @@ public final class NavigationConfig {
     String thePresentationTypeHint = presentationTypeHint.or("default");
     try {
       LOGGER.info("setPresentationType to [{}].", thePresentationTypeHint);
-      return Optional.of(Utils.getComponent(ComponentManager.class).lookup(
-          IPresentationTypeRole.class, thePresentationTypeHint));
+      return Optional.of(Utils.getComponent(ComponentManager.class)
+          .lookup(IPresentationTypeRole.class, thePresentationTypeHint));
     } catch (ComponentLookupException failedToLoadException) {
       LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint [{}].",
           thePresentationTypeHint, failedToLoadException);

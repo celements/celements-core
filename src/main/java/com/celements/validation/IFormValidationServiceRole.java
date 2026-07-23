@@ -53,8 +53,7 @@ public interface IFormValidationServiceRole {
    * @return map [KEY = request field-name / VALUE = map [KEY = validation type / VALUE =
    *         set of validation messages (dictionary keys possible)]]
    */
-  Map<String, Map<ValidationType, Set<String>>> validateMap(
-      Map<String, String[]> requestMap);
+  Map<String, Map<ValidationType, Set<String>>> validateMap(Map<String, String[]> requestMap);
 
   /**
    * validateField validates the given class name, field name and value for all
@@ -66,7 +65,6 @@ public interface IFormValidationServiceRole {
    * @return map [KEY = validation type / VALUE = set of validation messages (dictionary
    *         keys possible)]]
    */
-  Map<ValidationType, Set<String>> validateField(String className, String fieldName,
-      String value);
+  Map<ValidationType, Set<String>> validateField(String className, String fieldName, String value);
 
 }

@@ -122,13 +122,12 @@ public abstract class AbstractRenderStrategy implements IRenderStrategy {
       LOGGER.trace("getContextualiser: cell [{}]", node.getDocumentReference());
       Optional<String> scopeKey = getRenderScopeKey(node.getDocumentReference());
       scopeKey.map(key -> key + EXEC_CTX_KEY_DOC_SUFFIX)
-          .map(LogUtils.<String, Object>logF(execution.getContext()::getProperty)
-              .debug(LOGGER).msg("getContextualiser"))
-          .flatMap(doc -> tryCast(doc, XWikiDocument.class))
-          .ifPresent(contextualiser::withDoc);
+          .map(LogUtils.<String, Object>logF(execution.getContext()::getProperty).debug(LOGGER)
+              .msg("getContextualiser"))
+          .flatMap(doc -> tryCast(doc, XWikiDocument.class)).ifPresent(contextualiser::withDoc);
       scopeKey.map(key -> key + EXEC_CTX_KEY_OBJ_NB_SUFFIX)
-          .map(LogUtils.<String, Object>logF(execution.getContext()::getProperty)
-              .debug(LOGGER).msg("getContextualiser"))
+          .map(LogUtils.<String, Object>logF(execution.getContext()::getProperty).debug(LOGGER)
+              .msg("getContextualiser"))
           .ifPresent(nb -> contextualiser.withExecContext(EXEC_CTX_KEY_OBJ_NB, nb));
     }
     return contextualiser;
@@ -136,10 +135,8 @@ public abstract class AbstractRenderStrategy implements IRenderStrategy {
 
   private Optional<String> getRenderScopeKey(DocumentReference cellDocRef) {
     return XWikiObjectFetcher.on(modelAccess.getOrCreateDocument(cellDocRef))
-        .filter(KeyValueClass.FIELD_KEY, "cell-render-scope")
-        .fetchField(KeyValueClass.FIELD_VALUE)
-        .stream().findFirst()
-        .map(scope -> EXEC_CTX_KEY + "." + scope);
+        .filter(KeyValueClass.FIELD_KEY, "cell-render-scope").fetchField(KeyValueClass.FIELD_VALUE)
+        .stream().findFirst().map(scope -> EXEC_CTX_KEY + "." + scope);
   }
 
   @Override
@@ -153,13 +150,12 @@ public abstract class AbstractRenderStrategy implements IRenderStrategy {
     DocumentReference cellDocRef = node.getDocumentReference();
     LOGGER.debug("startRenderCell: cellDocRef [{}]", cellDocRef);
     collectCellAttributes(cellDocRef, attrBuilder);
-    getCellTypeConfig(cellDocRef).ifPresent(cellTypeConfig -> cellTypeConfig
-        .collectAttributes(attrBuilder, cellDocRef));
+    getCellTypeConfig(cellDocRef)
+        .ifPresent(cellTypeConfig -> cellTypeConfig.collectAttributes(attrBuilder, cellDocRef));
     cellWriter.openLevel(getTagName(cellDocRef).orElse(null), attrBuilder.build());
   }
 
-  private void collectCellAttributes(DocumentReference cellDocRef,
-      AttributeBuilder attrBuilder) {
+  private void collectCellAttributes(DocumentReference cellDocRef, AttributeBuilder attrBuilder) {
     try {
       XWikiDocument cellDoc = modelAccess.getDocument(cellDocRef);
       XWikiObjectFetcher fetcher = XWikiObjectFetcher.on(cellDoc).filter(CellClass.CLASS_REF);
@@ -197,10 +193,8 @@ public abstract class AbstractRenderStrategy implements IRenderStrategy {
         .orElseGet(() -> "cell:" + modelUtils.serializeRef(cellDocRef, COMPACT).replace(":", ".."))
         + Stream.of(EXEC_CTX_KEY_OBJ_NB, EXEC_CTX_KEY_GLOBAL_OBJ_NB)
             .map(execution.getContext()::getProperty)
-            .map(val -> Ints.tryParse(Objects.toString(val)))
-            .filter(Objects::nonNull)
-            .map(nb -> "_" + nb)
-            .findFirst().orElse("");
+            .map(val -> Ints.tryParse(Objects.toString(val))).filter(Objects::nonNull)
+            .map(nb -> "_" + nb).findFirst().orElse("");
     Set<String> ids = execution.getContext().computeIfAbsent(EXEC_CTX_KEY + ".ids", HashSet::new);
     if (ids.contains(id)) {
       LOGGER.warn("collectId - cell id [{}] generated multiple times for [{}]", id, cellDocRef);

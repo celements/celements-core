@@ -13,10 +13,10 @@ public class ETwitterCardTypeTest {
 
   @Test
   public void testGetTwitterCardType() {
-    assertEquals(ETwitterCardType.SUMMARY, ETwitterCardType.getTwitterCardType(
-        FIELDS_SUMMARY).get());
-    assertEquals(ETwitterCardType.SUMMARY_LARGE_IMAGE, ETwitterCardType.getTwitterCardType(
-        FIELDS_SUMMARY_LARGE_IMAGE).get());
+    assertEquals(ETwitterCardType.SUMMARY,
+        ETwitterCardType.getTwitterCardType(FIELDS_SUMMARY).get());
+    assertEquals(ETwitterCardType.SUMMARY_LARGE_IMAGE,
+        ETwitterCardType.getTwitterCardType(FIELDS_SUMMARY_LARGE_IMAGE).get());
     assertEquals(ETwitterCardType.PLAYER, ETwitterCardType.getTwitterCardType(FIELDS_PLAYER).get());
     assertEquals(ETwitterCardType.APP, ETwitterCardType.getTwitterCardType(FIELDS_APP).get());
   }

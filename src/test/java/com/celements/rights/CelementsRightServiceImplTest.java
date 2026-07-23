@@ -42,22 +42,22 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     expect(xwiki.getGroupService(same(getContext()))).andReturn(gs).anyTimes();
     Collection<DocumentReference> groupsList = new ArrayList<>();
     groupsList.add(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup"));
-    expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
-        "XWiki", "user")), eq(0), eq(0), same(getContext()))).andReturn(groupsList).anyTimes();
+    expect(gs.getAllGroupsReferencesForMember(
+        eq(new DocumentReference(getContext().getDatabase(), "XWiki", "user")), eq(0), eq(0),
+        same(getContext()))).andReturn(groupsList).anyTimes();
     Collection<DocumentReference> emptyGroupsList = Collections.emptyList();
-    expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
-        "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))).andReturn(
-            emptyGroupsList)
-        .anyTimes();
+    expect(gs.getAllGroupsReferencesForMember(
+        eq(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup")), eq(0),
+        eq(0), same(getContext()))).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
-        "TestSpace", "TestDoc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "TestSpace", "TestDoc"));
     getContext().setDoc(doc);
-    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), same(
-        getContext()))).andReturn("0").anyTimes();
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"),
+        same(getContext()))).andReturn("0").anyTimes();
     BaseObject rightObj = new BaseObject();
-    rightObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
-        "XWikiRights"));
+    rightObj.setXClassReference(
+        new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiRights"));
     rightObj.setStringValue("users", "XWiki.user");
     rightObj.setStringValue("levels", "view,edit");
     rightObj.setIntValue("allow", 1);
@@ -68,28 +68,28 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCheckRight_publishActive_defaultNoObject() throws XWikiRightNotFoundException,
-      XWikiException {
+  public void testCheckRight_publishActive_defaultNoObject()
+      throws XWikiRightNotFoundException, XWikiException {
     XWikiGroupService gs = createMock(XWikiGroupService.class);
     expect(xwiki.getGroupService(same(getContext()))).andReturn(gs).anyTimes();
     Collection<DocumentReference> groupsList = new ArrayList<>();
     groupsList.add(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup"));
-    expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
-        "XWiki", "user")), eq(0), eq(0), same(getContext()))).andReturn(groupsList).anyTimes();
+    expect(gs.getAllGroupsReferencesForMember(
+        eq(new DocumentReference(getContext().getDatabase(), "XWiki", "user")), eq(0), eq(0),
+        same(getContext()))).andReturn(groupsList).anyTimes();
     Collection<DocumentReference> emptyGroupsList = Collections.emptyList();
-    expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
-        "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))).andReturn(
-            emptyGroupsList)
-        .anyTimes();
+    expect(gs.getAllGroupsReferencesForMember(
+        eq(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup")), eq(0),
+        eq(0), same(getContext()))).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), same(
-        getContext()))).andReturn("1").anyTimes();
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
-        "TestSpace", "TestDoc"));
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"),
+        same(getContext()))).andReturn("1").anyTimes();
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "TestSpace", "TestDoc"));
     getContext().setDoc(doc);
     BaseObject rightObj = new BaseObject();
-    rightObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
-        "XWikiRights"));
+    rightObj.setXClassReference(
+        new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiRights"));
     rightObj.setStringValue("users", "XWiki.user");
     rightObj.setStringValue("levels", "view");
     rightObj.setIntValue("allow", 1);
@@ -100,28 +100,28 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testCheckRight_publishActive_unpublished() throws XWikiRightNotFoundException,
-      XWikiException {
+  public void testCheckRight_publishActive_unpublished()
+      throws XWikiRightNotFoundException, XWikiException {
     XWikiGroupService gs = createMock(XWikiGroupService.class);
     expect(xwiki.getGroupService(same(getContext()))).andReturn(gs).anyTimes();
     Collection<DocumentReference> groupsList = new ArrayList<>();
     groupsList.add(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup"));
-    expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
-        "XWiki", "user")), eq(0), eq(0), same(getContext()))).andReturn(groupsList).anyTimes();
+    expect(gs.getAllGroupsReferencesForMember(
+        eq(new DocumentReference(getContext().getDatabase(), "XWiki", "user")), eq(0), eq(0),
+        same(getContext()))).andReturn(groupsList).anyTimes();
     Collection<DocumentReference> emptyGroupsList = Collections.emptyList();
-    expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
-        "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))).andReturn(
-            emptyGroupsList)
-        .anyTimes();
+    expect(gs.getAllGroupsReferencesForMember(
+        eq(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup")), eq(0),
+        eq(0), same(getContext()))).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), same(
-        getContext()))).andReturn("1").anyTimes();
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
-        "TestSpace", "TestDoc"));
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"),
+        same(getContext()))).andReturn("1").anyTimes();
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "TestSpace", "TestDoc"));
     getContext().setDoc(doc);
     BaseObject rightObj = new BaseObject();
-    rightObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
-        "XWikiRights"));
+    rightObj.setXClassReference(
+        new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiRights"));
     rightObj.setStringValue("users", "XWiki.user");
     rightObj.setStringValue("levels", "view");
     rightObj.setIntValue("allow", 1);
@@ -133,34 +133,34 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     obj.setXClassReference(getPublicationClassReference());
     doc.addXObject(obj);
     replay(gs, xwiki);
-    assertFalse(rightService.checkRight("XWiki.user", doc, "view", true, true, false,
-        getContext()));
+    assertFalse(
+        rightService.checkRight("XWiki.user", doc, "view", true, true, false, getContext()));
     verify(gs, xwiki);
   }
 
   @Test
-  public void testCheckRight_publishActive_published() throws XWikiRightNotFoundException,
-      XWikiException {
+  public void testCheckRight_publishActive_published()
+      throws XWikiRightNotFoundException, XWikiException {
     XWikiGroupService gs = createMock(XWikiGroupService.class);
     expect(xwiki.getGroupService(same(getContext()))).andReturn(gs).anyTimes();
     Collection<DocumentReference> groupsList = new ArrayList<>();
     groupsList.add(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup"));
-    expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
-        "XWiki", "user")), eq(0), eq(0), same(getContext()))).andReturn(groupsList).anyTimes();
+    expect(gs.getAllGroupsReferencesForMember(
+        eq(new DocumentReference(getContext().getDatabase(), "XWiki", "user")), eq(0), eq(0),
+        same(getContext()))).andReturn(groupsList).anyTimes();
     Collection<DocumentReference> emptyGroupsList = Collections.emptyList();
-    expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
-        "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))).andReturn(
-            emptyGroupsList)
-        .anyTimes();
+    expect(gs.getAllGroupsReferencesForMember(
+        eq(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup")), eq(0),
+        eq(0), same(getContext()))).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), same(
-        getContext()))).andReturn("1").anyTimes();
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
-        "TestSpace", "TestDoc"));
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"),
+        same(getContext()))).andReturn("1").anyTimes();
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "TestSpace", "TestDoc"));
     getContext().setDoc(doc);
     BaseObject rightObj = new BaseObject();
-    rightObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
-        "XWikiRights"));
+    rightObj.setXClassReference(
+        new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiRights"));
     rightObj.setStringValue("users", "XWiki.user");
     rightObj.setStringValue("levels", "view");
     rightObj.setIntValue("allow", 1);

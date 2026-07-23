@@ -69,9 +69,8 @@ public class DivWriterTest {
     String idname = "newId";
     String cssClasses = "classes";
     String cssStyles = "width:100px;\nheight:10px;\n";
-    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME,
-        new DefaultAttributeBuilder().addId(idname).addCssClasses(
-            cssClasses).addStyles(cssStyles).build());
+    divWriter.openLevel(DivWriter.DEFAULT_TAGNAME, new DefaultAttributeBuilder().addId(idname)
+        .addCssClasses(cssClasses).addStyles(cssStyles).build());
     String returnedString = divWriter.getAsString();
     assertTrue("Must start with '<div ' but got '" + returnedString + "'",
         returnedString.startsWith("<div "));
@@ -108,15 +107,14 @@ public class DivWriterTest {
     String idname = "newId";
     String cssClasses = "classes";
     divWriter.openLevel(DivWriter.DEFAULT_TAGNAME,
-        new DefaultAttributeBuilder().addId(idname).addCssClasses(cssClasses)
-            .build());
+        new DefaultAttributeBuilder().addId(idname).addCssClasses(cssClasses).build());
     assertTrue("Must start with '<div '", divWriter.getAsString().startsWith("<div "));
     assertTrue("Must end with '>'", divWriter.getAsString().endsWith(">"));
     String cssClassExpected = " class=\"" + cssClasses + "\"";
-    assertTrue("Must contain '" + cssClassExpected + "'", divWriter.getAsString().contains(
-        cssClassExpected));
-    assertFalse("Must not contain any style values.", divWriter.getAsString().contains(
-        " style=\""));
+    assertTrue("Must contain '" + cssClassExpected + "'",
+        divWriter.getAsString().contains(cssClassExpected));
+    assertFalse("Must not contain any style values.",
+        divWriter.getAsString().contains(" style=\""));
   }
 
   @Test
@@ -152,10 +150,10 @@ public class DivWriterTest {
 
   @Test
   public void test_openLevel_Attributes() {
-    DefaultCellAttribute.Builder attrBuilder = new DefaultCellAttribute.Builder().attrName(
-        "testName").addValue("testValue");
-    DefaultCellAttribute.Builder attrBuilder2 = new DefaultCellAttribute.Builder().attrName(
-        "testName2").addValue("testValue2");
+    DefaultCellAttribute.Builder attrBuilder = new DefaultCellAttribute.Builder()
+        .attrName("testName").addValue("testValue");
+    DefaultCellAttribute.Builder attrBuilder2 = new DefaultCellAttribute.Builder()
+        .attrName("testName2").addValue("testValue2");
     List<CellAttribute> attributes = Arrays.asList((CellAttribute) attrBuilder.build(),
         (CellAttribute) attrBuilder2.build());
     divWriter.openLevel(DivWriter.DEFAULT_TAGNAME, attributes);
@@ -171,8 +169,8 @@ public class DivWriterTest {
 
   @Test
   public void test_openLevel_quotes() {
-    DefaultCellAttribute.Builder attrBuilder = new DefaultCellAttribute.Builder().attrName(
-        "testName").addValue("test. : -äöü\"Value");
+    DefaultCellAttribute.Builder attrBuilder = new DefaultCellAttribute.Builder()
+        .attrName("testName").addValue("test. : -äöü\"Value");
     List<CellAttribute> attributes = Arrays.asList((CellAttribute) attrBuilder.build());
     divWriter.openLevel(DivWriter.DEFAULT_TAGNAME, attributes);
     String returnedString = divWriter.getAsString();

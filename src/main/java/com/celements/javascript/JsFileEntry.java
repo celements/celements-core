@@ -97,9 +97,11 @@ public final class JsFileEntry extends ObjectBean {
 
   public boolean isModule() {
     var filepath = getFilePathOnly();
-    return filepath.endsWith(".mjs")
-        || filepath.endsWith(".mts")
-        || filepath.endsWith(".ts"); // are transpiled to mjs
+    return filepath.endsWith(".mjs") || isTranspiledToMjs(filepath);
+  }
+
+  private static boolean isTranspiledToMjs(String filepath) {
+    return filepath.endsWith(".mts") || filepath.endsWith(".ts");
   }
 
   @Override
@@ -115,8 +117,8 @@ public final class JsFileEntry extends ObjectBean {
 
   @Override
   public String toString() {
-    return "JsFileEntry [jsFileUrl=" + jsFileUrl + ", loadMode=" + loadMode
-        + ", isRteContent=" + isRteContent + ", " + super.toString() + "]";
+    return "JsFileEntry [jsFileUrl=" + jsFileUrl + ", loadMode=" + loadMode + ", isRteContent="
+        + isRteContent + ", " + super.toString() + "]";
   }
 
 }

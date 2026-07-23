@@ -89,9 +89,9 @@ public class CSSBaseObject extends CSS {
 
   @Override
   public boolean isContentCSS() {
-    if ((obj != null) && ((obj.getIntValue("is_rte_content") == 1) || obj.getStringValue(
-        "cssname").endsWith("-content.css") || obj.getStringValue("cssname").endsWith(
-            "_content.css"))) {
+    if ((obj != null) && ((obj.getIntValue("is_rte_content") == 1)
+        || obj.getStringValue("cssname").endsWith("-content.css")
+        || obj.getStringValue("cssname").endsWith("_content.css"))) {
       return true;
     } else {
       return false;
@@ -102,8 +102,8 @@ public class CSSBaseObject extends CSS {
   public Attachment getAttachment() {
     if (isAttachment()) {
       String cssName = getCssBasePath();
-      DocumentReference addDocRef = getWebUtilsService().resolveDocumentReference(
-          attURLcmd.getPageFullName(cssName));
+      DocumentReference addDocRef = getWebUtilsService()
+          .resolveDocumentReference(attURLcmd.getPageFullName(cssName));
       LOGGER.debug("getAttachment for [" + cssName + "].");
       try {
         XWikiDocument attDoc = context.getWiki().getDocument(addDocRef, context);

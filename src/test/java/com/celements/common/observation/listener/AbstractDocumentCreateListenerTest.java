@@ -57,8 +57,7 @@ public class AbstractDocumentCreateListenerTest extends AbstractComponentTest {
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
     listener.injectRemoteObservationManagerContext(
         remoteObsManContextMock = createDefaultMock(RemoteObservationManagerContext.class));
-    listener.injectObservationManager(obsManagerMock = createDefaultMock(
-        ObservationManager.class));
+    listener.injectObservationManager(obsManagerMock = createDefaultMock(ObservationManager.class));
     listener.configSrc = Utils.getComponent(ConfigurationSource.class);
 
     creatingEventMock = createDefaultMock(Event.class);
@@ -72,10 +71,10 @@ public class AbstractDocumentCreateListenerTest extends AbstractComponentTest {
       eventClasses.add(theEvent.getClass());
     }
     assertEquals(2, eventClasses.size());
-    assertTrue("Expecting registration for DocumentCreatingEvent", eventClasses.contains(
-        DocumentCreatingEvent.class));
-    assertTrue("Expecting registration for DocumentCreatedEvent events", eventClasses.contains(
-        DocumentCreatedEvent.class));
+    assertTrue("Expecting registration for DocumentCreatingEvent",
+        eventClasses.contains(DocumentCreatingEvent.class));
+    assertTrue("Expecting registration for DocumentCreatedEvent events",
+        eventClasses.contains(DocumentCreatedEvent.class));
   }
 
   @Test

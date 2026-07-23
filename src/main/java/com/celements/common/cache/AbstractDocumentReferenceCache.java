@@ -98,8 +98,8 @@ public abstract class AbstractDocumentReferenceCache<K> implements IDocumentRefe
     return cache.get(wikiRef);
   }
 
-  private Map<K, Set<DocumentReference>> loadCache(WikiReference wikiRef) throws QueryException,
-      XWikiException {
+  private Map<K, Set<DocumentReference>> loadCache(WikiReference wikiRef)
+      throws QueryException, XWikiException {
     getLogger().debug("loadCache: start for wiki '{}'", wikiRef);
     Map<K, Set<DocumentReference>> cache = new HashMap<>();
     for (DocumentReference docRef : executeXWQL(wikiRef)) {

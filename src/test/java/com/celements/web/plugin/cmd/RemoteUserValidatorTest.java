@@ -63,8 +63,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     xWikiAuthServiceMock = createDefaultMock(XWikiAuthService.class);
     expect(getWikiMock().getAuthService()).andReturn(xWikiAuthServiceMock).anyTimes();
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
-    expect(getWikiMock().getXWikiPreference(eq("auth_active_check"), anyObject(
-        XWikiContext.class))).andReturn("1").anyTimes();
+    expect(getWikiMock().getXWikiPreference(eq("auth_active_check"), anyObject(XWikiContext.class)))
+        .andReturn("1").anyTimes();
   }
 
   @Test
@@ -76,8 +76,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     expect(httpRequest.getRemoteHost()).andReturn("  ");
 
     replayDefault();
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.isValidUserJSON("",
-        "", "", null, context));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}",
+        cmd.isValidUserJSON("", "", "", null, context));
     verifyDefault();
   }
 
@@ -110,8 +110,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     User userMock = createUserMock("XWiki.7sh2lya35");
     expect(userServiceMock.getUserForLoginField("blabla@mail.com"))
         .andReturn(Optional.of(userMock));
-    expect(xWikiAuthServiceMock.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(
-        context))).andReturn(null).once();
+    expect(xWikiAuthServiceMock.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context)))
+        .andReturn(null).once();
 
     replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
@@ -139,8 +139,8 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
-    assertEquals("{\"access\" : \"false\", \"error\" : \"user_not_in_group\"}", cmd.isValidUserJSON(
-        "blabla@mail.com", "pwd", "grp", null, context));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"user_not_in_group\"}",
+        cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null, context));
     verifyDefault();
   }
 
@@ -185,10 +185,10 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
-    assertEquals("{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", "
-        + "\"group_membership\" : {}}",
-        cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null,
-            context));
+    assertEquals(
+        "{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", "
+            + "\"group_membership\" : {}}",
+        cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null, context));
     verifyDefault();
   }
 
@@ -280,10 +280,10 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
 
   @Test
   public void test_getErrorJSON() {
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getErrorJSON(
-        "access_denied"));
-    assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_group\"}", cmd.getErrorJSON(
-        "wrong_group"));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}",
+        cmd.getErrorJSON("access_denied"));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_group\"}",
+        cmd.getErrorJSON("wrong_group"));
   }
 
   @Test
@@ -291,10 +291,10 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     User userMock = createUserMock("XWiki.7sh2lya35");
 
     replayDefault();
-    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
-        + "\"group_membership\" : {}}",
-        cmd.getResultJSON(userMock, "user@synventis.com", null,
-            context));
+    assertEquals(
+        "{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
+            + "\"group_membership\" : {}}",
+        cmd.getResultJSON(userMock, "user@synventis.com", null, context));
     verifyDefault();
   }
 
@@ -308,8 +308,9 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
     expectInGroup(xUserMock, returnGroups.get(1), false);
 
     replayDefault();
-    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
-        + "\"group_membership\" : {\"TestGroup1\" : \"true\", \"TestGroup2\" : \"false\"}}",
+    assertEquals(
+        "{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
+            + "\"group_membership\" : {\"TestGroup1\" : \"true\", \"TestGroup2\" : \"false\"}}",
         cmd.getResultJSON(userMock, "user@synventis.com", returnGroups, context));
     verifyDefault();
   }
@@ -452,15 +453,17 @@ public class RemoteUserValidatorTest extends AbstractComponentTest {
   private Principal expectAuth(String username, String password) throws XWikiException {
     Principal principal = createDefaultMock(Principal.class);
     expect(principal.getName()).andReturn(username).anyTimes();
-    expect(xWikiAuthServiceMock.authenticate(eq(username), eq(password), same(context))).andReturn(
-        principal).once();
+    expect(xWikiAuthServiceMock.authenticate(eq(username), eq(password), same(context)))
+        .andReturn(principal).once();
     return principal;
   }
 
   private User createUserMock(String username) {
     User userMock = createDefaultMock(User.class);
-    expect(userMock.getDocRef()).andReturn(Utils.getComponent(ModelUtils.class).resolveRef(username,
-        DocumentReference.class)).anyTimes();
+    expect(userMock.getDocRef())
+        .andReturn(
+            Utils.getComponent(ModelUtils.class).resolveRef(username, DocumentReference.class))
+        .anyTimes();
     return userMock;
   }
 

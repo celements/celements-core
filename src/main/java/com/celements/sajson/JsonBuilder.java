@@ -41,11 +41,8 @@ import com.google.common.collect.ImmutableMap;
 public class JsonBuilder {
 
   private static final Map<Pattern, String> JSON_REPLACEMENTS = ImmutableMap.of(
-      Pattern.compile("\\\\"), "\\\\\\\\",
-      Pattern.compile("\""), "\\\\\"",
-      Pattern.compile("\n"), "\\\\n",
-      Pattern.compile("\r"), "\\\\r",
-      Pattern.compile("\t"), "\\\\t");
+      Pattern.compile("\\\\"), "\\\\\\\\", Pattern.compile("\""), "\\\\\"", Pattern.compile("\n"),
+      "\\\\n", Pattern.compile("\r"), "\\\\r", Pattern.compile("\t"), "\\\\t");
 
   private final Deque<ECommand> commandStack;
   private final StringBuilder json;
@@ -140,8 +137,8 @@ public class JsonBuilder {
   }
 
   public void openProperty(String key) {
-    checkState(commandStack.peek() == DICTIONARY_COMMAND, format("cannot open property on {0}",
-        commandStack.peek()));
+    checkState(commandStack.peek() == DICTIONARY_COMMAND,
+        format("cannot open property on {0}", commandStack.peek()));
     commandStack.push(PROPERTY_COMMAND);
     addOpeningPart(toJsonString(key) + " : ");
     onFirstElement = true;
@@ -198,9 +195,7 @@ public class JsonBuilder {
   }
 
   private boolean applyJsonReplacements(Object value) {
-    return (value != null)
-        && !(value instanceof Boolean)
-        && !(value instanceof Number)
+    return (value != null) && !(value instanceof Boolean) && !(value instanceof Number)
         && !(value instanceof JsonBuilder);
   }
 

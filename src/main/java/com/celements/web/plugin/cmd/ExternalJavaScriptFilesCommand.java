@@ -99,15 +99,10 @@ public class ExternalJavaScriptFilesCommand {
   private boolean collectedAll = false;
 
   @Inject
-  public ExternalJavaScriptFilesCommand(
-      LayoutServiceRole layoutService,
-      IPageTypeResolverRole pageTypeResolver,
-      IModelAccessFacade modelAccess,
-      ModelContext modelContext,
-      XObjectPageTypeUtilsRole objectPageTypeUtils,
-      IWebUtilsService webUtilsService,
-      AttachmentURLCommand attUrlCommand,
-      CssCommand cssCommand,
+  public ExternalJavaScriptFilesCommand(LayoutServiceRole layoutService,
+      IPageTypeResolverRole pageTypeResolver, IModelAccessFacade modelAccess,
+      ModelContext modelContext, XObjectPageTypeUtilsRole objectPageTypeUtils,
+      IWebUtilsService webUtilsService, AttachmentURLCommand attUrlCommand, CssCommand cssCommand,
       FrontendResourceResolver frontendResolver,
       @Named(XObjectBeanConverter.NAME) BeanClassDefConverter<BaseObject, JsFileEntry> converter,
       @Named(JavaScriptExternalFilesClass.CLASS_DEF_HINT) ClassDefinition jsExtClassDef) {
@@ -134,10 +129,8 @@ public class ExternalJavaScriptFilesCommand {
    */
   @Deprecated
   public String addLazyExtJSfile(@NotEmpty String jsFile) {
-    return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
-        .setLazyLoad(true)
-        .build());
+    return getLazyLoadTag(
+        new ExtJsFileParameter.Builder().setJsFile(jsFile).setLazyLoad(true).build());
   }
 
   /**
@@ -145,11 +138,8 @@ public class ExternalJavaScriptFilesCommand {
    */
   @Deprecated
   public String addLazyExtJSfile(@NotEmpty String jsFile, @Nullable String action) {
-    return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
-        .setAction(action)
-        .setLazyLoad(true)
-        .build());
+    return getLazyLoadTag(new ExtJsFileParameter.Builder().setJsFile(jsFile).setAction(action)
+        .setLazyLoad(true).build());
   }
 
   /**
@@ -158,12 +148,8 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   public String addLazyExtJSfile(@NotEmpty String jsFile, @Nullable String action,
       @Nullable String params) {
-    return getLazyLoadTag(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
-        .setAction(action)
-        .setQueryString(params)
-        .setLazyLoad(true)
-        .build());
+    return getLazyLoadTag(new ExtJsFileParameter.Builder().setJsFile(jsFile).setAction(action)
+        .setQueryString(params).setLazyLoad(true).build());
   }
 
   /**
@@ -172,9 +158,7 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   @NotNull
   public String addExtJSfileOnce(@NotEmpty String jsFile) {
-    return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
-        .build());
+    return addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(jsFile).build());
   }
 
   /**
@@ -183,10 +167,8 @@ public class ExternalJavaScriptFilesCommand {
   @Deprecated
   @NotNull
   public String addExtJSfileOnce(@NotEmpty String jsFile, @Nullable String action) {
-    return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
-        .setAction(action)
-        .build());
+    return addExtJSfileOnce(
+        new ExtJsFileParameter.Builder().setJsFile(jsFile).setAction(action).build());
   }
 
   /**
@@ -196,11 +178,8 @@ public class ExternalJavaScriptFilesCommand {
   @NotNull
   public String addExtJSfileOnce(@NotEmpty String jsFile, @Nullable String action,
       @Nullable String params) {
-    return addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(jsFile)
-        .setAction(action)
-        .setQueryString(params)
-        .build());
+    return addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(jsFile).setAction(action)
+        .setQueryString(params).build());
   }
 
   /**
@@ -219,16 +198,14 @@ public class ExternalJavaScriptFilesCommand {
 
   @NotEmpty
   public String getLazyLoadTag(@NotNull ExtJsFileParameter extJsFileParams) {
-    return "<cel-lazy-load-js src=\"" + generateUrl(extJsFileParams).orElse("")
-        + "\" loadMode=\"" + extJsFileParams.getLoadMode() + "\"></cel-lazy-load-js>";
+    return "<cel-lazy-load-js src=\"" + generateUrl(extJsFileParams).orElse("") + "\" loadMode=\""
+        + extJsFileParams.getLoadMode() + "\"></cel-lazy-load-js>";
   }
 
   @NotNull
   private Optional<String> generateUrl(@NotNull ExtJsFileParameter extJsFileParams) {
-    return attUrlCommand.getAttachmentURL(
-        extJsFileParams.getJsFile(),
-        extJsFileParams.getAction().orElse(null),
-        extJsFileParams.getQueryString().orElse(null))
+    return attUrlCommand.getAttachmentURL(extJsFileParams.getJsFile(),
+        extJsFileParams.getAction().orElse(null), extJsFileParams.getQueryString().orElse(null))
         .map(UriComponents::toUriString);
   }
 
@@ -280,10 +257,8 @@ public class ExternalJavaScriptFilesCommand {
 
   private String resolveCssIncludes(String jsFile) {
     return frontendResolver.get(jsFile.trim()).stream()
-        .flatMap(resource -> resource.cssPaths().stream())
-        .map(attUrlCommand::getDiskFileUrl)
-        .map(this::getCssLink)
-        .collect(joining());
+        .flatMap(resource -> resource.cssPaths().stream()).map(attUrlCommand::getDiskFileUrl)
+        .map(this::getCssLink).collect(joining());
   }
 
   private void includeFrontendCss(String jsFile) {
@@ -312,16 +287,13 @@ public class ExternalJavaScriptFilesCommand {
   String getExtStringForJsFile(JsFileEntry jsFile) {
     var loadMode = Optional.ofNullable(jsFile.getLoadMode())
         .filter(mode -> (mode == ASYNC) || ((mode == DEFER) && !jsFile.isModule()));
-    return "<script "
-        + loadMode.map(mode -> mode.toString().toLowerCase() + " ").orElse("")
-        + "type=\"" + (jsFile.isModule() ? "module" : "text/javascript")
-        + "\" src=\"" + StringEscapeUtils.escapeHtml(jsFile.getFilepath())
-        + "\"></script>";
+    return "<script " + loadMode.map(mode -> mode.toString().toLowerCase() + " ").orElse("")
+        + "type=\"" + (jsFile.isModule() ? "module" : "text/javascript") + "\" src=\""
+        + StringEscapeUtils.escapeHtml(jsFile.getFilepath()) + "\"></script>";
   }
 
   public List<JsFileEntry> getAllRteContentJsFiles() {
-    return getExtJsFileStream()
-        .filter(fs -> fs.isRteContent() != JsIsRteContent.NO)
+    return getExtJsFileStream().filter(fs -> fs.isRteContent() != JsIsRteContent.NO)
         .collect(Collectors.toList());
   }
 
@@ -347,21 +319,18 @@ public class ExternalJavaScriptFilesCommand {
 
   private StringBuilder generateJsImportString() {
     final StringBuilder jsIncludesBuilder = new StringBuilder();
-    StreamEx.of(getExtJsFileStream()
-        .filter(fs -> fs.isRteContent() != JsIsRteContent.ONLY)
-        .map(this::getExtStringForJsFile))
+    StreamEx
+        .of(getExtJsFileStream().filter(fs -> fs.isRteContent() != JsIsRteContent.ONLY)
+            .map(this::getExtStringForJsFile))
         .append(extJSnotFoundSet.stream().map(this::buildNotFoundWarning))
         .forEach(tag -> jsIncludesBuilder.append(tag).append("\n"));
     return jsIncludesBuilder;
   }
 
   private Stream<DocumentReference> streamDocRefs2CollectJsExtFileObj() {
-    return StreamEx.of(getSkinDocRef())
-        .append(getXWikiPreferencesDocRef())
-        .append(getCurrentSpacePreferencesDocRef())
-        .append(getCurrentPageTypeDocRef())
-        .append(getLayoutPropDocRef())
-        .append(getCurrentDocRef());
+    return StreamEx.of(getSkinDocRef()).append(getXWikiPreferencesDocRef())
+        .append(getCurrentSpacePreferencesDocRef()).append(getCurrentPageTypeDocRef())
+        .append(getLayoutPropDocRef()).append(getCurrentDocRef());
   }
 
   private Stream<DocumentReference> getCurrentDocRef() {
@@ -373,19 +342,18 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   private @NotNull DocumentReference getCurrentPageTypeDocRef() {
-    return objectPageTypeUtils.getDocRefForPageType(
-        pageTypeResolver.resolvePageTypeRefForCurrentDoc());
+    return objectPageTypeUtils
+        .getDocRefForPageType(pageTypeResolver.resolvePageTypeRefForCurrentDoc());
   }
 
   private Stream<DocumentReference> getCurrentSpacePreferencesDocRef() {
-    return StreamEx.of(modelContext.getCurrentSpaceRef().toJavaUtil()
-        .map(spaceRef -> RefBuilder.from(spaceRef).doc("WebPreferences").build(
-            DocumentReference.class)));
+    return StreamEx.of(modelContext.getCurrentSpaceRef().toJavaUtil().map(spaceRef -> RefBuilder
+        .from(spaceRef).doc("WebPreferences").build(DocumentReference.class)));
   }
 
   private @NotNull DocumentReference getXWikiPreferencesDocRef() {
-    return RefBuilder.from(modelContext.getWikiRef()).space("XWiki")
-        .doc("XWikiPreferences").build(DocumentReference.class);
+    return RefBuilder.from(modelContext.getWikiRef()).space("XWiki").doc("XWikiPreferences")
+        .build(DocumentReference.class);
   }
 
   private Stream<DocumentReference> getSkinDocRef() {
@@ -415,14 +383,9 @@ public class ExternalJavaScriptFilesCommand {
     checkNotNull(docRef);
     try {
       XWikiObjectFetcher.on(modelAccess.getDocument(docRef))
-          .filter(JavaScriptExternalFilesClass.CLASS_REF)
-          .stream()
-          .map(jsFileEntryConverter)
-          .filter(JsFileEntry::isValid)
-          .forEachOrdered(jsFile -> addExtJSfileOnce(
-              new ExtJsFileParameter.Builder()
-                  .setJsFileEntry(jsFile)
-                  .build()));
+          .filter(JavaScriptExternalFilesClass.CLASS_REF).stream().map(jsFileEntryConverter)
+          .filter(JsFileEntry::isValid).forEachOrdered(jsFile -> addExtJSfileOnce(
+              new ExtJsFileParameter.Builder().setJsFileEntry(jsFile).build()));
     } catch (DocumentNotExistsException nExExp) {
       LOGGER.info("addAllExtJSfilesFromDocRef skipping [{}] because: not exist.", docRef);
     }

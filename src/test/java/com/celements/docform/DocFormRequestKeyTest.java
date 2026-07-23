@@ -46,8 +46,7 @@ public class DocFormRequestKeyTest {
   }
 
   private List<DocFormRequestKey> getAllKeyCombinations() {
-    return ImmutableList.of(
-        createDocFieldKey("key", getDocRef("A"), "A"),
+    return ImmutableList.of(createDocFieldKey("key", getDocRef("A"), "A"),
         createDocFieldKey("key", getDocRef("A"), "B"),
         createDocFieldKey("key", getDocRef("B"), "A"),
         createDocFieldKey("key", getDocRef("B"), "B"),
@@ -86,8 +85,7 @@ public class DocFormRequestKeyTest {
   }
 
   private List<DocFormRequestKey> getSortedKeys() {
-    return ImmutableList.of(
-        createObjFieldKey("key", getDocRef("A"), getClassRef("A"), 0, "A"),
+    return ImmutableList.of(createObjFieldKey("key", getDocRef("A"), getClassRef("A"), 0, "A"),
         createObjFieldKey("key", getDocRef("A"), getClassRef("A"), 0, "B"),
         createObjRemoveKey("ky", getDocRef("A"), getClassRef("A"), 0),
         createObjFieldKey("key", getDocRef("A"), getClassRef("A"), 1, "A"),

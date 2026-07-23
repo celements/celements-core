@@ -85,15 +85,13 @@ public class DivWriter extends AbstractWriter {
 
   @Override
   public boolean hasLevelContent() {
-    return hasLevelContentOptional()
-        .orElse(out.length() > 0);
+    return hasLevelContentOptional().orElse(out.length() > 0);
   }
 
   @Override
   public DivWriter appendContent(@Nullable String content) {
     final String con = Objects.toString(content, "").trim();
-    if (!con.isEmpty() && !getOpenLevels().findFirst()
-        .map(VOID_ELEMENTS::contains).orElse(false)) {
+    if (!con.isEmpty() && !getOpenLevels().findFirst().map(VOID_ELEMENTS::contains).orElse(false)) {
       getCurrentLevel().ifPresent(e -> e.setValue(true));
       out.append(con);
     }

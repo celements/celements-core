@@ -164,10 +164,10 @@ public class MetaTagTest extends AbstractComponentTest {
 
   private BeanClassDefConverter<BaseObject, MetaTag> createMetaTagConverter() {
     @SuppressWarnings("unchecked")
-    BeanClassDefConverter<BaseObject, MetaTag> converter = Utils.getComponent(
-        BeanClassDefConverter.class, XObjectBeanConverter.NAME);
-    converter.initialize(Utils.getComponent(CelementsClassDefinition.class,
-        MetaTagClass.CLASS_DEF_HINT));
+    BeanClassDefConverter<BaseObject, MetaTag> converter = Utils
+        .getComponent(BeanClassDefConverter.class, XObjectBeanConverter.NAME);
+    converter.initialize(
+        Utils.getComponent(CelementsClassDefinition.class, MetaTagClass.CLASS_DEF_HINT));
     converter.initialize(new ReflectiveInstanceSupplier<>(MetaTag.class));
     return converter;
   }

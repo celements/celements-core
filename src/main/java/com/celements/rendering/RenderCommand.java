@@ -100,8 +100,8 @@ public class RenderCommand {
    */
   @Deprecated
   public String renderCelementsCell(String elementFullName) throws XWikiException {
-    XWikiDocument cellDoc = getModelAccess().getOrCreateDocument(getModelUtils()
-        .resolveRef(elementFullName, DocumentReference.class));
+    XWikiDocument cellDoc = getModelAccess()
+        .getOrCreateDocument(getModelUtils().resolveRef(elementFullName, DocumentReference.class));
     return renderCelementsDocument(cellDoc, "view");
   }
 
@@ -113,8 +113,7 @@ public class RenderCommand {
   public String renderCelementsDocumentPreserveVelocityContext(DocumentReference elementDocRef,
       String lang, String renderMode) throws XWikiException {
     VelocityContext vContext = (VelocityContext) getVeloCtx().clone();
-    return new Contextualiser()
-        .withXWikiContext("vcontext", vContext)
+    return new Contextualiser().withXWikiContext("vcontext", vContext)
         .withExecContext("velocityContext", vContext)
         .execute(rethrow(() -> renderCelementsDocument(elementDocRef, lang, renderMode)));
   }
@@ -134,14 +133,12 @@ public class RenderCommand {
       throws XWikiException {
     LOGGER.debug("renderCelementsDocument: cellDoc [{}] lang [{}] renderMode [{}].",
         cellDoc.getDocumentReference(), lang, renderMode);
-    String cellDocFN = getModelUtils().serializeRef(
-        cellDoc.getDocumentReference());
+    String cellDocFN = getModelUtils().serializeRef(cellDoc.getDocumentReference());
     if ((getContext() != null) && (getContext().get("vcontext") != null)
         && getContext().getWiki().getRightService().hasAccessLevel(renderMode,
             getContext().getUser(), cellDocFN, getContext())) {
       String template = getRenderTemplatePath(cellDoc, renderMode);
-      return new Contextualiser()
-          .withVeloContext("celldoc", cellDoc.newDocument(getContext()))
+      return new Contextualiser().withVeloContext("celldoc", cellDoc.newDocument(getContext()))
           .execute(rethrow(() -> renderTemplatePath(cellDoc, template, lang, "")));
     } else {
       if ((getContext() == null) || (getContext().get("vcontext") == null)) {
@@ -157,8 +154,8 @@ public class RenderCommand {
     return renderTemplatePath(getContext().getDoc(), renderTemplatePath, lang, defLang);
   }
 
-  public String renderTemplatePath(XWikiDocument cellDoc, String renderTemplatePath,
-      String lang, String defLang) throws XWikiException {
+  public String renderTemplatePath(XWikiDocument cellDoc, String renderTemplatePath, String lang,
+      String defLang) throws XWikiException {
     String renderedContent = "";
     String templateContent;
     Optional<XWikiDocument> templateDoc = getTemplateDoc(renderTemplatePath);
@@ -183,8 +180,8 @@ public class RenderCommand {
 
   private Optional<XWikiDocument> getTemplateDoc(String renderTemplatePath) {
     if (!renderTemplatePath.startsWith(":")) {
-      return getModelAccess().getDocumentOpt(getModelUtils().resolveRef(
-          renderTemplatePath, DocumentReference.class));
+      return getModelAccess()
+          .getDocumentOpt(getModelUtils().resolveRef(renderTemplatePath, DocumentReference.class));
     }
     return Optional.empty();
   }
@@ -304,13 +301,12 @@ public class RenderCommand {
 
   String getRenderTemplatePath(XWikiDocument cellDoc, String renderMode) {
     String cellDocFN = getModelUtils().serializeRef(cellDoc.getDocumentReference());
-    return Optional.ofNullable(getPageTypeResolver()
-        .resolvePageTypeReference(cellDoc).toJavaUtil()
-        .orElse(defaultPageTypeRef))
+    return Optional
+        .ofNullable(getPageTypeResolver().resolvePageTypeReference(cellDoc).toJavaUtil()
+            .orElse(defaultPageTypeRef))
         .map(getPageTypeService()::getPageTypeConfigForPageTypeRef)
         .map(cellType -> cellType.getRenderTemplateForRenderMode(renderMode))
-        .filter(not(String::isEmpty))
-        .orElse(cellDocFN);
+        .filter(not(String::isEmpty)).orElse(cellDocFN);
   }
 
   private VelocityContext getVeloCtx() {

@@ -162,8 +162,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     }
     if ((vcontext != null) && (getContext().getWiki() != null)) {
       if (!vcontext.containsKey(getVelocityName())) {
-        vcontext.put(getVelocityName(), getContext().getWiki().getPluginApi(getVelocityName(),
-            getContext()));
+        vcontext.put(getVelocityName(),
+            getContext().getWiki().getPluginApi(getVelocityName(), getContext()));
       }
       if (!vcontext.containsKey("default_language")) {
         vcontext.put("default_language", webUtilsService.getDefaultLanguage());
@@ -187,10 +187,10 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       }
       if (!vcontext.containsKey("skin_doc") && (baseRef != null)) {
         try {
-          DocumentReference skinDocRef = modelUtils.resolveRef(getContext().getWiki().getSkin(
-              getContext()), DocumentReference.class, baseRef);
-          Document skinDoc = getContext().getWiki().getDocument(skinDocRef,
-              getContext()).newDocument(getContext());
+          DocumentReference skinDocRef = modelUtils.resolveRef(
+              getContext().getWiki().getSkin(getContext()), DocumentReference.class, baseRef);
+          Document skinDoc = getContext().getWiki().getDocument(skinDocRef, getContext())
+              .newDocument(getContext());
           vcontext.put("skin_doc", skinDoc);
         } catch (XWikiException | IllegalArgumentException e) {
           LOGGER.info("Failed to get skin_doc", e);
@@ -217,8 +217,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
           XWikiDocument celementsSkinXWikiDoc = getCelementsSkinXWikiDoc(getContext());
           String celements2_baseurl = celementsSkinXWikiDoc.getURL("view", getContext());
           if (celements2_baseurl.indexOf("/", 8) > 0) {
-            vcontext.put("celements2_baseurl", celements2_baseurl.substring(0,
-                celements2_baseurl.indexOf("/", 8)));
+            vcontext.put("celements2_baseurl",
+                celements2_baseurl.substring(0, celements2_baseurl.indexOf("/", 8)));
           }
         }
       } catch (XWikiException exp) {
@@ -237,8 +237,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         vcontext.put("user", getContext().getUser());
       }
       if (!vcontext.containsKey("isContentEditor")) {
-        vcontext.put("isContentEditor", getContext().getWiki().getUser(getContext().getUser(),
-            getContext()).isUserInGroup("XWiki.ContentEditorsGroup"));
+        vcontext.put("isContentEditor",
+            getContext().getWiki().getUser(getContext().getUser(), getContext())
+                .isUserInGroup("XWiki.ContentEditorsGroup"));
       }
       if (!vcontext.containsKey("q")) {
         vcontext.put("q", "'");
@@ -259,8 +260,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     int tinyMCEwidth = -1;
     String tinyMCEwidthStr = "";
     if (getCelementsSkinDoc(context) != null) {
-      BaseObject pageTypeObj = new PageTypeCommand().getPageTypeObj(context.getDoc(),
-          context).getPageTypeProperties(context);
+      BaseObject pageTypeObj = new PageTypeCommand().getPageTypeObj(context.getDoc(), context)
+          .getPageTypeProperties(context);
       if (pageTypeObj != null) {
         tinyMCEwidth = pageTypeObj.getIntValue("rte_width", -1);
         tinyMCEwidthStr = Integer.toString(tinyMCEwidth);
@@ -316,8 +317,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   private XWikiDocument getCelementsSkinXWikiDoc(XWikiContext context) throws XWikiException {
-    return context.getWiki().getDocument(new DocumentReference("celements2web", "XWiki",
-        "Celements2Skin"), context);
+    return context.getWiki()
+        .getDocument(new DocumentReference("celements2web", "XWiki", "Celements2Skin"), context);
   }
 
   @Override
@@ -367,17 +368,17 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   boolean showPanelByConfigName(XWikiContext context, String configName) {
     if (isPageShowPanelOverwrite(configName, context.getDoc())) {
       return (1 == getPagePanelObj(configName, context.getDoc()).getIntValue("show_panels"));
-    } else if ((getPageTypeDoc(context) != null) && isPageShowPanelOverwrite(configName,
-        getPageTypeDoc(context))) {
-      boolean showPanels = (1 == getPagePanelObj(configName, getPageTypeDoc(context)).getIntValue(
-          "show_panels"));
+    } else if ((getPageTypeDoc(context) != null)
+        && isPageShowPanelOverwrite(configName, getPageTypeDoc(context))) {
+      boolean showPanels = (1 == getPagePanelObj(configName, getPageTypeDoc(context))
+          .getIntValue("show_panels"));
       LOGGER.debug("using pagetype for panels " + configName + " -> " + showPanels);
       return showPanels;
     } else if (isSpaceOverwrite(context)) {
       boolean showPanels = "1".equals(context.getWiki().getSpacePreference(configName,
           getSpaceOverwrite(context), "0", context));
-      LOGGER.debug("using spaceover webPrefs for panels " + configName + "," + getSpaceOverwrite(
-          context) + " -> " + showPanels);
+      LOGGER.debug("using spaceover webPrefs for panels " + configName + ","
+          + getSpaceOverwrite(context) + " -> " + showPanels);
       return showPanels;
     } else if (isGlobalPref(context)) {
       boolean showPanels = ("1".equals(context.getWiki().getXWikiPreference(configName, context)));
@@ -398,8 +399,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         try {
           DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
               "PageTypes", pTRefForCurrDoc.getConfigName());
-          XWikiDocument pageTypeDoc = new PageType(pageTypeDocRef).getTemplateDocument(
-              getContext());
+          XWikiDocument pageTypeDoc = new PageType(pageTypeDocRef)
+              .getTemplateDocument(getContext());
           LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc);
           return pageTypeDoc;
         } catch (XWikiException exp) {
@@ -423,8 +424,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
   private boolean isPageShowPanelOverwrite(String configName, XWikiDocument theDoc) {
     try {
-      return ((getPagePanelObj(configName, theDoc) != null) && (((BaseProperty) getPagePanelObj(
-          configName, theDoc).get("show_panels")).getValue() != null));
+      return ((getPagePanelObj(configName, theDoc) != null)
+          && (((BaseProperty) getPagePanelObj(configName, theDoc).get("show_panels"))
+              .getValue() != null));
     } catch (XWikiException exp) {
       LOGGER.error("", exp);
       return false;
@@ -451,8 +453,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       panelsString = context.getWiki().getXWikiPreference(configName, context);
     } else if (isPagePanelsOverwrite(configName, context.getDoc())) {
       panelsString = getPagePanelObj(configName, context.getDoc()).getStringValue("panels");
-    } else if ((getPageTypeDoc(context) != null) && isPagePanelsOverwrite(configName,
-        getPageTypeDoc(context))) {
+    } else if ((getPageTypeDoc(context) != null)
+        && isPagePanelsOverwrite(configName, getPageTypeDoc(context))) {
       panelsString = getPagePanelObj(configName, getPageTypeDoc(context)).getStringValue("panels");
     } else if (isSpaceOverwrite(context)) {
       panelsString = context.getWiki().getSpacePreference(configName, getSpaceOverwrite(context),
@@ -470,8 +472,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   private boolean isPagePanelsOverwrite(String configName, XWikiDocument theDoc) {
-    return ((getPagePanelObj(configName, theDoc) != null) && (!"".equals(getPagePanelObj(configName,
-        theDoc).getStringValue("panels"))));
+    return ((getPagePanelObj(configName, theDoc) != null)
+        && (!"".equals(getPagePanelObj(configName, theDoc).getStringValue("panels"))));
   }
 
   private String getSpaceOverwrite(XWikiContext context) {
@@ -483,10 +485,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
   private boolean isGlobalPref(XWikiContext context) {
     if ((context.getDoc() != null) && (context.getRequest() != null)) {
-      return new DocumentReference(context.getDatabase(), "XWiki", "XWikiPreferences").equals(
-          context.getDoc().getDocumentReference())
-          || "globaladmin".equals(context.getRequest().get(
-              "editor"));
+      return new DocumentReference(context.getDatabase(), "XWiki", "XWikiPreferences")
+          .equals(context.getDoc().getDocumentReference())
+          || "globaladmin".equals(context.getRequest().get("editor"));
     }
     return false;
   }
@@ -516,8 +517,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     // If the wiki is non multilingual then the language is the default
     // language.
     if (!context.getWiki().isMultiLingual(context)) {
-      LOGGER.debug("getLanguagePreference: isMultiLingual [" + context.getWiki().isMultiLingual(
-          context) + "] defaultLanguage [" + webUtilsService.getDefaultLanguage() + "].");
+      LOGGER.debug(
+          "getLanguagePreference: isMultiLingual [" + context.getWiki().isMultiLingual(context)
+              + "] defaultLanguage [" + webUtilsService.getDefaultLanguage() + "].");
       return webUtilsService.getDefaultLanguage();
     }
 
@@ -597,10 +599,10 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     // If the client didn't specify some languages, skip this phase
     if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
       List<String> acceptedLanguages = getAcceptedLanguages(getContext().getRequest());
-      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: getAcceptedLanguages "
-          + acceptedLanguages);
-      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: forceSupported " + xwiki.Param(
-          "xwiki.language.forceSupported", "0"));
+      LOGGER.debug(
+          "getLanguageFromAcceptedHeaderLanguages: getAcceptedLanguages " + acceptedLanguages);
+      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: forceSupported "
+          + xwiki.Param("xwiki.language.forceSupported", "0"));
       // We can force one of the configured languages to be accepted
       if (xwiki.Param("xwiki.language.forceSupported", "0").equals("1")) {
         List<String> available = webUtilsService.getAllowedLanguages();
@@ -609,8 +611,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         // Filter only configured languages
         acceptedLanguages.retainAll(available);
       }
-      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: acceptedLanguages after "
-          + acceptedLanguages);
+      LOGGER.debug(
+          "getLanguageFromAcceptedHeaderLanguages: acceptedLanguages after " + acceptedLanguages);
       if (acceptedLanguages.size() > 0) {
         // Use the "most-preferred" language, as requested by the client.
         language = acceptedLanguages.get(0);
@@ -632,11 +634,11 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     String language = null;
     String userFN = getContext().getUser();
     XWikiDocument userdoc = null;
-    userdoc = getContext().getWiki().getDocument(modelUtils.resolveRef(userFN,
-        DocumentReference.class), getContext());
+    userdoc = getContext().getWiki()
+        .getDocument(modelUtils.resolveRef(userFN, DocumentReference.class), getContext());
     if (userdoc != null) {
-      language = Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers",
-          "default_language"));
+      language = Util
+          .normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
     }
     return language;
   }
@@ -644,8 +646,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private String getLanguageFromCookie() {
     // First we get the language from the cookie
     // !!! getUserPreferenceFromCookie throws NPE if request is NULL !!!
-    return Util.normalizeLanguage(getContext().getWiki().getUserPreferenceFromCookie("language",
-        getContext()));
+    return Util.normalizeLanguage(
+        getContext().getWiki().getUserPreferenceFromCookie("language", getContext()));
   }
 
   /**
@@ -682,8 +684,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   boolean isInvalidLanguageOrDefault(String language) {
-    return language.equals("default") || (isSuppressInvalid()
-        && !webUtilsService.getAllowedLanguages().contains(language));
+    return language.equals("default")
+        || (isSuppressInvalid() && !webUtilsService.getAllowedLanguages().contains(language));
   }
 
   private boolean isSuppressInvalid() {

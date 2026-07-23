@@ -36,8 +36,8 @@ public class MetaTagClass extends AbstractClassDefinition implements CelementsCl
   public static final String CLASS_DEF_HINT = SPACE_NAME + "." + DOC_NAME;
   public static final ClassReference CLASS_REF = new ClassReference(SPACE_NAME, DOC_NAME);
 
-  public static final ClassField<String> FIELD_KEY = new StringField.Builder(CLASS_DEF_HINT,
-      "key").size(30).build();
+  public static final ClassField<String> FIELD_KEY = new StringField.Builder(CLASS_DEF_HINT, "key")
+      .size(30).build();
 
   public static final ClassField<String> FIELD_VALUE = new LargeStringField.Builder(CLASS_DEF_HINT,
       "value").rows(15).size(80).build();

@@ -41,8 +41,8 @@ public class PageTypeClassConfig implements IPageTypeClassConfig {
 
   @Override
   public DocumentReference getPageTypePropertiesClassRef(WikiReference wikiRef) {
-    return new DocumentReference(PAGE_TYPE_PROPERTIES_CLASS_DOC, new SpaceReference(
-        PAGE_TYPE_PROPERTIES_CLASS_SPACE, wikiRef));
+    return new DocumentReference(PAGE_TYPE_PROPERTIES_CLASS_DOC,
+        new SpaceReference(PAGE_TYPE_PROPERTIES_CLASS_SPACE, wikiRef));
   }
 
   @Override
@@ -52,8 +52,8 @@ public class PageTypeClassConfig implements IPageTypeClassConfig {
 
   @Override
   public DocumentReference getPageTypeClassRef(WikiReference wikiRef) {
-    return new DocumentReference(PAGE_TYPE_CLASS_DOC, new SpaceReference(PAGE_TYPE_CLASS_SPACE,
-        wikiRef));
+    return new DocumentReference(PAGE_TYPE_CLASS_DOC,
+        new SpaceReference(PAGE_TYPE_CLASS_SPACE, wikiRef));
   }
 
 }

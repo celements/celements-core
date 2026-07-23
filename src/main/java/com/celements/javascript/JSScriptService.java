@@ -38,8 +38,7 @@ public class JSScriptService implements ScriptService {
 
   public List<String> getRteContentJsFiles() {
     return getExtJavaScriptFileCmd().getAllRteContentJsFiles().stream()
-        .map(JsFileEntry::getFilepath)
-        .collect(Collectors.toList());
+        .map(JsFileEntry::getFilepath).collect(Collectors.toList());
   }
 
   /**
@@ -93,14 +92,13 @@ public class JSScriptService implements ScriptService {
   }
 
   public ExtJsFileParameter.Builder createDefaultExtJSParam() {
-    return createExtJSParam()
-        .setAction("file")
+    return createExtJSParam().setAction("file")
         .setLoadMode(isJSDeferActive() ? JsLoadMode.DEFER : null);
   }
 
   private boolean isJSDeferActive() {
-    return 1 == xwiki.get().orElseThrow().getXWikiPreferenceAsInt(
-        "cel_activate_jsdefer", 0, getContext());
+    return 1 == xwiki.get().orElseThrow().getXWikiPreferenceAsInt("cel_activate_jsdefer", 0,
+        getContext());
   }
 
   public String includeExtJsFile(@Nullable ExtJsFileParameter.Builder extJsFileParams) {
@@ -168,8 +166,8 @@ public class JSScriptService implements ScriptService {
 
   private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
     if (getContext().get(JAVA_SCRIPT_FILES_COMMAND_KEY) == null) {
-      getContext().put(JAVA_SCRIPT_FILES_COMMAND_KEY, getSpringContext()
-          .getBean(ExternalJavaScriptFilesCommand.class));
+      getContext().put(JAVA_SCRIPT_FILES_COMMAND_KEY,
+          getSpringContext().getBean(ExternalJavaScriptFilesCommand.class));
     }
     return (ExternalJavaScriptFilesCommand) getContext().get(JAVA_SCRIPT_FILES_COMMAND_KEY);
   }

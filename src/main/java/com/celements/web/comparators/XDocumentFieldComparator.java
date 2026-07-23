@@ -29,9 +29,7 @@ public class XDocumentFieldComparator implements Comparator<XWikiDocument> {
   private final Comparator<XWikiDocument> comparator;
 
   public XDocumentFieldComparator(@NotNull Stream<SortField> sorts) {
-    this.comparator = sorts
-        .map(SortField::asDocComparator)
-        .reduce((c1, c2) -> c1.thenComparing(c2))
+    this.comparator = sorts.map(SortField::asDocComparator).reduce((c1, c2) -> c1.thenComparing(c2))
         .orElseGet(() -> Comparator.comparing(doc -> 0));
   }
 
@@ -63,8 +61,8 @@ public class XDocumentFieldComparator implements Comparator<XWikiDocument> {
     }
 
     public Comparator<XWikiDocument> asDocComparator() {
-      Comparator<XWikiDocument> cmp = Comparator.comparing(doc -> fetcher(doc)
-          .streamNullable().collect(toList()), COMPARATOR);
+      Comparator<XWikiDocument> cmp = Comparator
+          .comparing(doc -> fetcher(doc).streamNullable().collect(toList()), COMPARATOR);
       return asc ? cmp : cmp.reversed();
     }
 

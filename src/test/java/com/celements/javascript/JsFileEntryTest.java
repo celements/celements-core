@@ -31,8 +31,8 @@ public class JsFileEntryTest extends AbstractComponentTest {
 
   private BeanClassDefConverter<BaseObject, JsFileEntry> jsFileEntryConverter() {
     @SuppressWarnings("unchecked")
-    BeanClassDefConverter<BaseObject, JsFileEntry> converter = Utils.getComponent(
-        BeanClassDefConverter.class, XObjectBeanConverter.NAME);
+    BeanClassDefConverter<BaseObject, JsFileEntry> converter = Utils
+        .getComponent(BeanClassDefConverter.class, XObjectBeanConverter.NAME);
     converter.initialize(Utils.getComponent(CelementsClassDefinition.class,
         JavaScriptExternalFilesClass.CLASS_DEF_HINT));
     converter.initialize(new ReflectiveInstanceSupplier<>(JsFileEntry.class));
@@ -202,15 +202,14 @@ public class JsFileEntryTest extends AbstractComponentTest {
     jsFileEntry.setLoadMode(loadMode);
     DocumentReference docRef = new DocumentReference("wikiName", "space", "classname");
     jsFileEntry.setDocumentReference(docRef);
-    assertTrue(jsFileEntry.toString().startsWith("JsFileEntry [jsFileUrl=" + fileUrl
-        + ", loadMode=" + loadMode + ", "));
+    assertTrue(jsFileEntry.toString()
+        .startsWith("JsFileEntry [jsFileUrl=" + fileUrl + ", loadMode=" + loadMode + ", "));
   }
 
   @Test
   public void test_JsExtFileObj_bean() {
     DocumentReference docRef = new DocumentReference("wikiName", "space", "document");
-    jsFileEntry.addFilepath("/space/doc/attachment.mjs")
-        .addLoadMode(JsLoadMode.ASYNC);
+    jsFileEntry.addFilepath("/space/doc/attachment.mjs").addLoadMode(JsLoadMode.ASYNC);
     BaseObject jsExtFileObj = new BaseObject();
     jsExtFileObj.setXClassReference(getJavaScriptExternalFilesClassRef());
     jsExtFileObj.setDocumentReference(docRef);

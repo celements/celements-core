@@ -37,8 +37,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("MenuNameMappingCelements2_8")
 public class MenuNameMappingCelements2_8 extends AbstractCelementsHibernateMigrator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      MenuNameMappingCelements2_8.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MenuNameMappingCelements2_8.class);
 
   @Override
   public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
@@ -49,15 +48,15 @@ public class MenuNameMappingCelements2_8 extends AbstractCelementsHibernateMigra
         + " where o.className = 'Celements2.MenuName' and o.id = s.id"
         + " and s.name = 'menu_name'";
     List<Object> result = context.getWiki().search(hql, context);
-    LOGGER.info("found [" + ((result != null) ? result.size() : result)
-        + "] documents to migrate.");
+    LOGGER
+        .info("found [" + ((result != null) ? result.size() : result) + "] documents to migrate.");
     for (Object fullName : result) {
       XWikiDocument doc = context.getWiki().getDocument(fullName.toString(), context);
       // we do not want a new history entry. Thus we cancel MetaData and Content Dirty flags
       doc.setMetaDataDirty(false);
       doc.setContentDirty(false);
-      LOGGER.debug("migrating MenuName on [" + doc.getFullName() + "] "
-          + doc.isMetaDataDirty() + ", " + doc.isContentDirty());
+      LOGGER.debug("migrating MenuName on [" + doc.getFullName() + "] " + doc.isMetaDataDirty()
+          + ", " + doc.isContentDirty());
       // save directly over store method to prevent observation manager executing events.
       context.getWiki().getStore().saveXWikiDoc(doc, context);
     }

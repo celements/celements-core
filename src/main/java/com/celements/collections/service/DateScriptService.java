@@ -76,8 +76,7 @@ public class DateScriptService implements ScriptService {
 
   public ZonedDateTime atZone(Date date, ZoneId zone) {
     return guard(date).map(Date::toInstant)
-        .map(instant -> instant.atZone(guard(zone).orElseGet(this::getZone)))
-        .orElse(null);
+        .map(instant -> instant.atZone(guard(zone).orElseGet(this::getZone))).orElse(null);
   }
 
   public LocalDate getLocalDate(int year, int month, int dayOfMonth) {
@@ -100,8 +99,7 @@ public class DateScriptService implements ScriptService {
   public ChronoUnit getChronoUnit(String unit) {
     String name = Strings.nullToEmpty(unit).toUpperCase();
     return Enums.getIfPresent(ChronoUnit.class, name)
-        .or(() -> Enums.getIfPresent(ChronoUnit.class, name + "S")
-            .orNull());
+        .or(() -> Enums.getIfPresent(ChronoUnit.class, name + "S").orNull());
   }
 
   public Date toDate(Temporal temporal) {
@@ -120,11 +118,9 @@ public class DateScriptService implements ScriptService {
 
   public String format(String pattern, Temporal temporal, Locale locale) {
     try {
-      return guard(temporal)
-          .map(guard(pattern)
-              .map(p -> DateFormat.formatter(p, guard(locale).orElseGet(Locale::getDefault)))
-              .orElseGet(() -> (t -> null)))
-          .orElse(null);
+      return guard(temporal).map(guard(pattern)
+          .map(p -> DateFormat.formatter(p, guard(locale).orElseGet(Locale::getDefault)))
+          .orElseGet(() -> (t -> null))).orElse(null);
     } catch (DateTimeException exc) {
       LOGGER.info("format - failed for [{}] with pattern [{}] and locale [{}]", temporal, pattern,
           locale, exc);

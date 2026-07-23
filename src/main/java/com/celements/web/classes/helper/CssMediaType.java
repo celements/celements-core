@@ -26,8 +26,7 @@ public enum CssMediaType {
   BRAILLE("braille"),
   EMBOSSED("embossed"),
   HANDHELD("handheld"),
-  PRINT(
-      "print"),
+  PRINT("print"),
   PROJECTION("projection"),
   SCREEN("screen"),
   TTY("tty"),

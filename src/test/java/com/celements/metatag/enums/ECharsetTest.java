@@ -19,10 +19,10 @@ public class ECharsetTest {
 
   @Test
   public void testGetCharset() {
-    assertTrue(ECharset.getCharset(FIELDS_UTF8).equals(ECharset.UTF8) || ECharset.getCharset(
-        FIELDS_UTF8).get().equals(ECharset.DEFAULT));
-    assertTrue(ECharset.getCharset(FIELDS_LATIN1).equals(ECharset.LATIN1) || ECharset.getCharset(
-        FIELDS_LATIN1).get().equals(ECharset.ISO8859_1));
+    assertTrue(ECharset.getCharset(FIELDS_UTF8).equals(ECharset.UTF8)
+        || ECharset.getCharset(FIELDS_UTF8).get().equals(ECharset.DEFAULT));
+    assertTrue(ECharset.getCharset(FIELDS_LATIN1).equals(ECharset.LATIN1)
+        || ECharset.getCharset(FIELDS_LATIN1).get().equals(ECharset.ISO8859_1));
     assertEquals(ECharset.USASCII, ECharset.getCharset(FIELDS_USASCII).get());
   }
 

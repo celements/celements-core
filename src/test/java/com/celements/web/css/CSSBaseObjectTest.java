@@ -102,8 +102,8 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
     CSSBaseObject cssFile = new CSSBaseObject(bo, context);
     AttachmentURLCommand attURLcmd = createDefaultMock(AttachmentURLCommand.class);
     cssFile.testInjectAttURLcmd(attURLcmd);
-    expect(attURLcmd.getAttachmentURL(eq(context.getDatabase() + ":" + attLink), same(
-        context))).andReturn(url).once();
+    expect(attURLcmd.getAttachmentURL(eq(context.getDatabase() + ":" + attLink), same(context)))
+        .andReturn(url).once();
     replayDefault();
     assertEquals(url, cssFile.getCSS(context));
     verifyDefault();
@@ -178,8 +178,8 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
     XWikiRightService rightSerivce = createDefaultMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightSerivce);
     String fullName = getContext().getDatabase() + ":XWiki.XWikiPreferences";
-    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq(fullName), same(
-        getContext()))).andReturn(true);
+    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq(fullName),
+        same(getContext()))).andReturn(true);
     replayDefault();
     assertNotNull("attachment must not be null", cssFile.getAttachment());
     verifyDefault();
@@ -228,8 +228,8 @@ public class CSSBaseObjectTest extends AbstractComponentTest {
     XWikiRightService rightSerivce = createDefaultMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightSerivce);
     String fullName = "celements2web:XWiki.XWikiPreferences";
-    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq(fullName), same(
-        getContext()))).andReturn(true);
+    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq(fullName),
+        same(getContext()))).andReturn(true);
     replayDefault();
     assertNotNull("attachment must not be null", cssFile.getAttachment());
     verifyDefault();

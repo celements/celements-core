@@ -42,14 +42,14 @@ public class GetMappedMenuItemsForParentCommand {
 
   public final static String CELEMENTS_MAPPED_MENU_ITEMS_KEY = "com.celements.web.utils.GetMappedMenuItemsForParendCmd";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      GetMappedMenuItemsForParentCommand.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(GetMappedMenuItemsForParentCommand.class);
 
   private boolean isActive;
 
   private XWikiContext getContext() {
-    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext()
+        .getProperty("xwikicontext");
   }
 
   public void setIsActive(boolean isActive) {

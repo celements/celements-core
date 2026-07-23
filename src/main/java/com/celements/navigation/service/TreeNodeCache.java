@@ -86,8 +86,8 @@ public class TreeNodeCache implements ITreeNodeCache {
     if ((context.get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null)
         && (context.get(
             GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) instanceof GetMappedMenuItemsForParentCommand)) {
-      return (GetMappedMenuItemsForParentCommand) context.get(
-          GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY);
+      return (GetMappedMenuItemsForParentCommand) context
+          .get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY);
     }
     GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();
     cmd.setIsActive(false);

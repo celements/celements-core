@@ -31,28 +31,26 @@ public class DocFormRequestKey implements Comparable<DocFormRequestKey> {
   private final boolean remove;
   private final String fieldName;
 
-  public static DocFormRequestKey createDocFieldKey(String key,
-      DocumentReference docRef, String fieldName) {
+  public static DocFormRequestKey createDocFieldKey(String key, DocumentReference docRef,
+      String fieldName) {
     checkArgument(emptyToNull(fieldName) != null, key);
     return new DocFormRequestKey(key, Type.DOC_FIELD, docRef, null, 0, false, fieldName);
   }
 
-  public static DocFormRequestKey createObjFieldKey(String key,
-      DocumentReference docRef, ClassReference classRef, Integer objNb, String fieldName) {
+  public static DocFormRequestKey createObjFieldKey(String key, DocumentReference docRef,
+      ClassReference classRef, Integer objNb, String fieldName) {
     checkArgument(classRef != null, key);
     checkArgument(objNb != null, key);
     checkArgument(emptyToNull(fieldName) != null, key);
-    return new DocFormRequestKey(key, Type.OBJ_FIELD, docRef, classRef, objNb,
-        false, fieldName);
+    return new DocFormRequestKey(key, Type.OBJ_FIELD, docRef, classRef, objNb, false, fieldName);
   }
 
-  public static DocFormRequestKey createObjRemoveKey(String key,
-      DocumentReference docRef, ClassReference classRef, Integer objNb) {
+  public static DocFormRequestKey createObjRemoveKey(String key, DocumentReference docRef,
+      ClassReference classRef, Integer objNb) {
     checkArgument(classRef != null, key);
     checkArgument(objNb != null, key);
     checkArgument(objNb >= 0, key);
-    return new DocFormRequestKey(key, Type.OBJ_REMOVE, docRef, classRef,
-        objNb, true, null);
+    return new DocFormRequestKey(key, Type.OBJ_REMOVE, docRef, classRef, objNb, true, null);
   }
 
   private DocFormRequestKey(String key, Type type, DocumentReference docRef,
@@ -110,8 +108,7 @@ public class DocFormRequestKey implements Comparable<DocFormRequestKey> {
     } else if (obj instanceof DocFormRequestKey) {
       DocFormRequestKey that = (DocFormRequestKey) obj;
       return Objects.equals(this.docRef, that.docRef)
-          && Objects.equals(this.classRef, that.classRef)
-          && Objects.equals(this.objNb, that.objNb)
+          && Objects.equals(this.classRef, that.classRef) && Objects.equals(this.objNb, that.objNb)
           && Objects.equals(this.remove, that.remove)
           && Objects.equals(this.fieldName, that.fieldName);
     }
@@ -128,8 +125,7 @@ public class DocFormRequestKey implements Comparable<DocFormRequestKey> {
         // positive numbers first sorted asc, then negativ desc
         .compare(this.objNb, that.objNb, new ObjNbComparator())
         // remove come last
-        .compareFalseFirst(this.remove, that.remove)
-        .compare(this.fieldName, that.fieldName)
+        .compareFalseFirst(this.remove, that.remove).compare(this.fieldName, that.fieldName)
         .result();
   }
 
@@ -154,9 +150,9 @@ public class DocFormRequestKey implements Comparable<DocFormRequestKey> {
 
   @Override
   public String toString() {
-    return "DocFormRequestKey [keyString=" + keyString + ", type=" + type
-        + ", docRef=" + docRef + ", classRef=" + classRef + ", objNb=" + objNb
-        + ", remove=" + remove + ", fieldName=" + fieldName + "]";
+    return "DocFormRequestKey [keyString=" + keyString + ", type=" + type + ", docRef=" + docRef
+        + ", classRef=" + classRef + ", objNb=" + objNb + ", remove=" + remove + ", fieldName="
+        + fieldName + "]";
   }
 
 }

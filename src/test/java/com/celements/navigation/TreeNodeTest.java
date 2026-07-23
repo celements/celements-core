@@ -47,9 +47,9 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void test_ConstructorParentSpaceRef_partName_null() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1,
-        (String) null);
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"),
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, (String) null);
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     assertEquals("", treeNodeTest.getPartName());
@@ -58,8 +58,9 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void test_ConstructorParentSpaceRef_partName_empty() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, "");
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"),
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, "");
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     assertEquals("", treeNodeTest.getPartName());
@@ -70,8 +71,9 @@ public class TreeNodeTest extends AbstractComponentTest {
   public void test_ConstructorParentSpaceRef_strategy() {
     PartNameGetter partNameGetterMock = createDefaultMock(PartNameGetter.class);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
-    TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
-        context.getDatabase())), 1, partNameGetterMock);
+    TreeNode treeNodeTest = new TreeNode(docRef2,
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1,
+        partNameGetterMock);
     expect(partNameGetterMock.getPartName(eq(docRef2))).andReturn("mainPart").once();
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
@@ -84,8 +86,9 @@ public class TreeNodeTest extends AbstractComponentTest {
   public void test_ConstructorParentSpaceRef_strategy_null() {
     PartNameGetter partNameGetterMock = createDefaultMock(PartNameGetter.class);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
-    TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
-        context.getDatabase())), 1, partNameGetterMock);
+    TreeNode treeNodeTest = new TreeNode(docRef2,
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1,
+        partNameGetterMock);
     expect(partNameGetterMock.getPartName(eq(docRef2))).andReturn((String) null).once();
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
@@ -98,10 +101,11 @@ public class TreeNodeTest extends AbstractComponentTest {
   public void test_ConstructorParentSpaceRef_strategy_lazy() {
     PartNameGetter partNameGetterMock = createDefaultMock(PartNameGetter.class);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
-    TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
-        context.getDatabase())), 1, partNameGetterMock);
-    expect(partNameGetterMock.getPartName(eq(docRef2))).andThrow(new RuntimeException(
-        "partNameGetter must be called lazily for"
+    TreeNode treeNodeTest = new TreeNode(docRef2,
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1,
+        partNameGetterMock);
+    expect(partNameGetterMock.getPartName(eq(docRef2)))
+        .andThrow(new RuntimeException("partNameGetter must be called lazily for"
             + " NotMappedMenuItems for performance reasons."))
         .anyTimes();
     replayDefault();
@@ -111,9 +115,9 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void test_ConstructorParentSpaceRef_partName() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1,
-        "mainNav");
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"),
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, "mainNav");
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     assertEquals("mainNav", treeNodeTest.getPartName());
@@ -122,8 +126,8 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void testEquals() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), null, 1);
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"), null, 1);
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     verifyDefault();
@@ -131,10 +135,10 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void testEquals_position_notSameInteger() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), null, new Integer(1));
-    TreeNode treeNodeTest2 = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), null, new Integer(1));
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"), null, new Integer(1));
+    TreeNode treeNodeTest2 = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"), null, new Integer(1));
     replayDefault();
     assertTrue(treeNodeTest2.equals(treeNodeTest));
     verifyDefault();
@@ -149,8 +153,8 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void testHash() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), null, 1);
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"), null, 1);
     replayDefault();
     assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
     verifyDefault();
@@ -158,10 +162,10 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void testHash_null_position() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), null, null);
-    TreeNode treeNodeTest2 = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), null, null);
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"), null, null);
+    TreeNode treeNodeTest2 = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"), null, null);
     replayDefault();
     assertEquals(treeNodeTest.hashCode(), treeNodeTest2.hashCode());
     verifyDefault();
@@ -169,8 +173,9 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void testEquals_parentSpaceRefConstructor() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, "");
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"),
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, "");
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     verifyDefault();
@@ -178,8 +183,9 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void testHash_parentSpaceRefConstructor() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, "");
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"),
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, "");
     replayDefault();
     assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
     verifyDefault();
@@ -187,10 +193,10 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void testGetParentRef_spaceRef() {
-    SpaceReference parentSpaceRef = new SpaceReference("MySpace", new WikiReference(
-        context.getDatabase()));
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), parentSpaceRef, 1, "");
+    SpaceReference parentSpaceRef = new SpaceReference("MySpace",
+        new WikiReference(context.getDatabase()));
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"), parentSpaceRef, 1, "");
     replayDefault();
     assertEquals(parentSpaceRef, treeNodeTest.getParentRef());
     verifyDefault();
@@ -200,8 +206,8 @@ public class TreeNodeTest extends AbstractComponentTest {
   public void testGetParentRef_docRef() {
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), "myParentPage",
         "MySpace");
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), parentDocRef, 1);
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"), parentDocRef, 1);
     replayDefault();
     assertEquals(parentDocRef, treeNodeTest.getParentRef());
     verifyDefault();
@@ -209,9 +215,9 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void testEquals_parentSpaceRefConstructorWithPartName() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1,
-        "mainNav");
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"),
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, "mainNav");
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     verifyDefault();
@@ -219,9 +225,9 @@ public class TreeNodeTest extends AbstractComponentTest {
 
   @Test
   public void testHash_parentSpaceRefConstructorWithPartName() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1,
-        "mainNav");
+    TreeNode treeNodeTest = new TreeNode(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"),
+        new SpaceReference("MySpace", new WikiReference(context.getDatabase())), 1, "mainNav");
     replayDefault();
     assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
     verifyDefault();

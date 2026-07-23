@@ -43,12 +43,8 @@ public class XObjectEventConverter extends AbstractLocalEventListener<XWikiDocum
 
   @Override
   public List<Event> getEvents() {
-    return Arrays.<Event>asList(
-        new DocumentCreatingEvent(),
-        new DocumentUpdatingEvent(),
-        new DocumentDeletingEvent(),
-        new DocumentCreatedEvent(),
-        new DocumentUpdatedEvent(),
+    return Arrays.<Event>asList(new DocumentCreatingEvent(), new DocumentUpdatingEvent(),
+        new DocumentDeletingEvent(), new DocumentCreatedEvent(), new DocumentUpdatedEvent(),
         new DocumentDeletedEvent());
   }
 

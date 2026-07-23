@@ -176,8 +176,8 @@ public class NavigationCacheTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "nav1");
 
     expectXWQL(wikiRef, Arrays.asList(docRef));
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andThrow(
-        new XWikiException()).once();
+    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andThrow(new XWikiException())
+        .once();
 
     replayDefault();
     try {
@@ -228,8 +228,8 @@ public class NavigationCacheTest extends AbstractComponentTest {
   private void expectMenuSpace(DocumentReference docRef, String space, int nb) throws Exception {
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject obj = new BaseObject();
-    obj.setXClassReference(Utils.getComponent(
-        INavigationClassConfig.class).getNavigationConfigClassRef(docRef.getWikiReference()));
+    obj.setXClassReference(Utils.getComponent(INavigationClassConfig.class)
+        .getNavigationConfigClassRef(docRef.getWikiReference()));
     obj.setStringValue(INavigationClassConfig.MENU_SPACE_FIELD, space);
     doc.setXObject(nb, obj);
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(doc).once();

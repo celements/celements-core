@@ -50,8 +50,8 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(docRef)).andReturn(doc);
 
     replayDefault();
-    Map<String, Set<DocumentReference>> responseMap = docFormService
-        .updateAndSaveDocFromMap(docRef, requestMap);
+    Map<String, Set<DocumentReference>> responseMap = docFormService.updateAndSaveDocFromMap(docRef,
+        requestMap);
     verifyDefault();
 
     assertEquals(responseMap.toString(), ImmutableSet.of(docRef),
@@ -70,8 +70,8 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
     getMock(IModelAccessFacade.class).saveDocument(doc, "updateAndSaveDocFormRequest");
 
     replayDefault();
-    Map<String, Set<DocumentReference>> responseMap = docFormService
-        .updateAndSaveDocFromMap(docRef, requestMap);
+    Map<String, Set<DocumentReference>> responseMap = docFormService.updateAndSaveDocFromMap(docRef,
+        requestMap);
     verifyDefault();
 
     assertEquals(responseMap.toString(), ImmutableSet.of(docRef),
@@ -90,8 +90,8 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
     expect(getMock(IModelAccessFacade.class).getOrCreateDocument(docRef)).andReturn(doc);
 
     replayDefault();
-    Map<String, Set<DocumentReference>> responseMap = docFormService
-        .updateAndSaveDocFromMap(docRef, requestMap);
+    Map<String, Set<DocumentReference>> responseMap = docFormService.updateAndSaveDocFromMap(docRef,
+        requestMap);
     verifyDefault();
 
     assertEquals(responseMap.toString(), ImmutableSet.of(docRef),
@@ -111,8 +111,8 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
     expectLastCall().andThrow(new DocumentSaveException(docRef));
 
     replayDefault();
-    Map<String, Set<DocumentReference>> responseMap = docFormService
-        .updateAndSaveDocFromMap(docRef, requestMap);
+    Map<String, Set<DocumentReference>> responseMap = docFormService.updateAndSaveDocFromMap(docRef,
+        requestMap);
     verifyDefault();
 
     assertEquals(responseMap.toString(), ImmutableSet.of(docRef),
@@ -129,8 +129,8 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
   @Test
   public void test_hasEditOnAllDocs_notExists_noCreate() throws Exception {
     getContext().setRequest(createDefaultMock(XWikiRequest.class));
-    DocFormRequestParam param = new DocFormRequestParam(
-        createDocFieldKey("key", docRef, "field"), "");
+    DocFormRequestParam param = new DocFormRequestParam(createDocFieldKey("key", docRef, "field"),
+        "");
 
     expect(getMock(IModelAccessFacade.class).exists(docRef)).andReturn(false);
     expect(getContext().getRequest().get("createIfNotExists")).andReturn("false");
@@ -143,8 +143,8 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
   @Test
   public void test_hasEditOnAllDocs_notExists() throws Exception {
     getContext().setRequest(createDefaultMock(XWikiRequest.class));
-    DocFormRequestParam param = new DocFormRequestParam(
-        createDocFieldKey("key", docRef, "field"), "");
+    DocFormRequestParam param = new DocFormRequestParam(createDocFieldKey("key", docRef, "field"),
+        "");
 
     expect(getMock(IModelAccessFacade.class).exists(docRef)).andReturn(false);
     expect(getContext().getRequest().get("createIfNotExists")).andReturn("true");
@@ -157,8 +157,8 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
 
   @Test
   public void test_hasEditOnAllDocs_noAccess() throws Exception {
-    DocFormRequestParam param = new DocFormRequestParam(
-        createDocFieldKey("key", docRef, "field"), "");
+    DocFormRequestParam param = new DocFormRequestParam(createDocFieldKey("key", docRef, "field"),
+        "");
 
     expect(getMock(IModelAccessFacade.class).exists(docRef)).andReturn(true);
     expect(getMock(IRightsAccessFacadeRole.class).hasAccessLevel(docRef, EDIT)).andReturn(false);
@@ -171,12 +171,12 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
   @Test
   public void test_hasEditOnAllDocs_many_allTrue() throws Exception {
     List<DocFormRequestParam> params = ImmutableList.of(
-        new DocFormRequestParam(createDocFieldKey("key",
-            new DocumentReference("db", "space", "doc1"), "field1"), ""),
-        new DocFormRequestParam(createDocFieldKey("key",
-            new DocumentReference("db", "space", "doc2"), "field2"), ""),
-        new DocFormRequestParam(createDocFieldKey("key",
-            new DocumentReference("db", "space", "doc3"), "field3"), ""));
+        new DocFormRequestParam(
+            createDocFieldKey("key", new DocumentReference("db", "space", "doc1"), "field1"), ""),
+        new DocFormRequestParam(
+            createDocFieldKey("key", new DocumentReference("db", "space", "doc2"), "field2"), ""),
+        new DocFormRequestParam(
+            createDocFieldKey("key", new DocumentReference("db", "space", "doc3"), "field3"), ""));
 
     params.stream().map(DocFormRequestParam::getDocRef).forEach(docRef -> {
       expect(getMock(IModelAccessFacade.class).exists(docRef)).andReturn(true);
@@ -191,12 +191,12 @@ public class DocFormScriptServiceTest extends AbstractComponentTest {
   @Test
   public void test_hasEditOnAllDocs_many_oneFalse() throws Exception {
     List<DocFormRequestParam> params = ImmutableList.of(
-        new DocFormRequestParam(createDocFieldKey("key",
-            new DocumentReference("db", "space", "doc1"), "field1"), ""),
-        new DocFormRequestParam(createDocFieldKey("key",
-            new DocumentReference("db", "space", "doc2"), "field2"), ""),
-        new DocFormRequestParam(createDocFieldKey("key",
-            new DocumentReference("db", "space", "doc3"), "field3"), ""));
+        new DocFormRequestParam(
+            createDocFieldKey("key", new DocumentReference("db", "space", "doc1"), "field1"), ""),
+        new DocFormRequestParam(
+            createDocFieldKey("key", new DocumentReference("db", "space", "doc2"), "field2"), ""),
+        new DocFormRequestParam(
+            createDocFieldKey("key", new DocumentReference("db", "space", "doc3"), "field3"), ""));
 
     expect(getMock(IModelAccessFacade.class).exists(params.get(0).getDocRef())).andReturn(true);
     expect(getMock(IRightsAccessFacadeRole.class).hasAccessLevel(params.get(0).getDocRef(), EDIT))

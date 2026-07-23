@@ -40,8 +40,8 @@ public class DocumentChangesListener implements EventListener {
     if ((source != null) && (source instanceof XWikiDocument)) {
       XWikiDocument doc = (XWikiDocument) source;
       DocumentReference docRef = doc.getDocumentReference();
-      ((LastChangedService) lastChangedSrv).invalidateCacheForSpaceRef(
-          docRef.getLastSpaceReference());
+      ((LastChangedService) lastChangedSrv)
+          .invalidateCacheForSpaceRef(docRef.getLastSpaceReference());
     } else {
       LOGGER.error("onEvent failed docref '{}'", source);
     }

@@ -16,10 +16,10 @@ public class EReferrerTest {
   public void testGetReferrer() {
     assertEquals(EReferrer.NO_REFFERER, EReferrer.getReferrer(FIELDS_NO_REFFERER).get());
     assertEquals(EReferrer.ORIGIN, EReferrer.getReferrer(FIELDS_ORIGIN).get());
-    assertEquals(EReferrer.NO_REFERRER_WHEN_DOWNGRADE, EReferrer.getReferrer(
-        FIELDS_NO_REFERRER_WHEN_DOWNGRADE).get());
-    assertEquals(EReferrer.ORIGIN_WHEN_CROSSORIGIN, EReferrer.getReferrer(
-        FIELDS_ORIGIN_WHEN_CROSSORIGIN).get());
+    assertEquals(EReferrer.NO_REFERRER_WHEN_DOWNGRADE,
+        EReferrer.getReferrer(FIELDS_NO_REFERRER_WHEN_DOWNGRADE).get());
+    assertEquals(EReferrer.ORIGIN_WHEN_CROSSORIGIN,
+        EReferrer.getReferrer(FIELDS_ORIGIN_WHEN_CROSSORIGIN).get());
     assertEquals(EReferrer.UNSAVE_URL, EReferrer.getReferrer(FIELDS_UNSAVE_URL).get());
   }
 

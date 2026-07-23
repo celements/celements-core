@@ -70,8 +70,8 @@ public class PageTypeReferenceTest {
     List<String> ret = pageTypeRef2.getCategories();
     assertThrows("category list must not be modifiable throught getCategories output",
         UnsupportedOperationException.class, () -> ret.add("cat2"));
-    assertEquals("category list must not be modifiable throught getCategories output",
-        ret, pageTypeRef2.getCategories());
+    assertEquals("category list must not be modifiable throught getCategories output", ret,
+        pageTypeRef2.getCategories());
   }
 
   @Test

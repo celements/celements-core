@@ -30,8 +30,8 @@ public class ETwitterTest {
     assertEquals(ETwitter.TWITTER_SITE_ID, ETwitter.getTwitter(FIELDS_TWITTER_SITE_ID).get());
     assertEquals(ETwitter.TWITTER_CREATOR, ETwitter.getTwitter(FIELDS_TWITTER_CREATOR).get());
     assertEquals(ETwitter.TWITTER_CREATOR_ID, ETwitter.getTwitter(FIELDS_TWITTER_CREATOR_ID).get());
-    assertEquals(ETwitter.TWITTER_DESCRIPTION, ETwitter.getTwitter(
-        FIELDS_TWITTER_DESCRIPTION).get());
+    assertEquals(ETwitter.TWITTER_DESCRIPTION,
+        ETwitter.getTwitter(FIELDS_TWITTER_DESCRIPTION).get());
     assertEquals(ETwitter.TWITTER_TITLE, ETwitter.getTwitter(FIELDS_TWITTER_TITLE).get());
     assertEquals(ETwitter.TWITTER_IMAGE, ETwitter.getTwitter(FIELDS_TWITTER_IMAGE).get());
     assertEquals(ETwitter.TWITTER_IMAGE_ALT, ETwitter.getTwitter(FIELDS_TWITTER_IMAGE_ALT).get());

@@ -27,11 +27,11 @@ public class MobileLoggingScriptService implements ScriptService {
   }
 
   public String dimensionAndAgentLog(String message) {
-    LOGGER.info("dimensionAndAgentLog: mobileDim [" + getContext().getRequest().getParameter(
-        "mobileDim") + "], userAgent [" + getContext().getRequest().getParameter("userAgent")
-        + "], isOrientationLandscape [" + getContext().getRequest().getParameter(
-            "isOrientationLandscape")
-        + "], message [" + message + "]");
+    LOGGER.info("dimensionAndAgentLog: mobileDim ["
+        + getContext().getRequest().getParameter("mobileDim") + "], userAgent ["
+        + getContext().getRequest().getParameter("userAgent") + "], isOrientationLandscape ["
+        + getContext().getRequest().getParameter("isOrientationLandscape") + "], message ["
+        + message + "]");
     Builder jsonBuilder = new Builder();
     jsonBuilder.openDictionary();
     jsonBuilder.addStringProperty("message", "OK");

@@ -53,10 +53,8 @@ public class XWikiXWikiRights extends AbstractMandatoryDocument {
 
   @Override
   protected DocumentReference getDocRef() {
-    return new RefBuilder().with(modelContext.getWikiRef())
-        .space(XWikiConstant.XWIKI_SPACE)
-        .doc(XWikiConstant.XWIKI_PREF_DOC_NAME)
-        .build(DocumentReference.class);
+    return new RefBuilder().with(modelContext.getWikiRef()).space(XWikiConstant.XWIKI_SPACE)
+        .doc(XWikiConstant.XWIKI_PREF_DOC_NAME).build(DocumentReference.class);
   }
 
   @Override
@@ -85,13 +83,11 @@ public class XWikiXWikiRights extends AbstractMandatoryDocument {
 
   protected boolean checkGlobalRightObj(XWikiDocument doc, String group,
       List<EAccessLevel> levels) {
-    var editor = XWikiObjectEditor.on(doc)
-        .filter(XWikiGlobalRightsClass.CLASS_REF)
+    var editor = XWikiObjectEditor.on(doc).filter(XWikiGlobalRightsClass.CLASS_REF)
         .filter(XWikiGlobalRightsClass.FIELD_GROUPS, List.of(group))
         .filter(XWikiGlobalRightsClass.FIELD_ALLOW, true);
     if (!editor.fetch().exists()) {
-      editor.filter(XWikiGlobalRightsClass.FIELD_LEVELS, levels)
-          .createFirstIfNotExists();
+      editor.filter(XWikiGlobalRightsClass.FIELD_LEVELS, levels).createFirstIfNotExists();
       return true;
     }
     return false;

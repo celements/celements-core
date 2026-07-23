@@ -45,9 +45,9 @@ public class CelementsRightsCommand {
             boolean validGroups = isValidGroups(right);
             boolean validUsers = isValidUsers(right);
             boolean validLevels = isValidLevels(right);
-            LOGGER.debug("isCelementsRights: for doc [" + fullName + "], objNr ["
-                + right.getNumber() + "] results: " + validGroups + ", " + validUsers + ", "
-                + validLevels);
+            LOGGER
+                .debug("isCelementsRights: for doc [" + fullName + "], objNr [" + right.getNumber()
+                    + "] results: " + validGroups + ", " + validUsers + ", " + validLevels);
             if ((!validGroups || !validUsers || !validLevels)) {
               return false;
             }
@@ -62,16 +62,18 @@ public class CelementsRightsCommand {
   }
 
   boolean isValidGroups(BaseObject right) {
-    return ((getPropertyList(right, "groups").size() == 0) || ((getPropertyList(right,
-        "groups").size() == 1) && (getPropertyList(right, "users").size() == 0)));
+    return ((getPropertyList(right, "groups").size() == 0)
+        || ((getPropertyList(right, "groups").size() == 1)
+            && (getPropertyList(right, "users").size() == 0)));
   }
 
   boolean isValidUsers(BaseObject right) {
     if (getPropertyList(right, "users").size() == 0) {
       return true;
     }
-    if ((getPropertyList(right, "users").size() == 1) && "XWiki.XWikiGuest".equals(getPropertyList(
-        right, "users").get(0)) && (getPropertyList(right, "groups").size() == 0)) {
+    if ((getPropertyList(right, "users").size() == 1)
+        && "XWiki.XWikiGuest".equals(getPropertyList(right, "users").get(0))
+        && (getPropertyList(right, "groups").size() == 0)) {
       return true;
     }
     return false;
@@ -89,8 +91,8 @@ public class CelementsRightsCommand {
   }
 
   private List<String> getPropertyList(BaseObject right, String key) {
-    LOGGER.trace("getPropertyList: key [" + key + "] value [" + right.getLargeStringValue(key)
-        + "] ");
+    LOGGER.trace(
+        "getPropertyList: key [" + key + "] value [" + right.getLargeStringValue(key) + "] ");
     if ((right.getLargeStringValue(key) == null) || "".equals(right.getLargeStringValue(key))) {
       return Collections.emptyList();
     }

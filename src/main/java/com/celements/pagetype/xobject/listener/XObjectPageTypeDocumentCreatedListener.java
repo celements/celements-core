@@ -43,8 +43,8 @@ public class XObjectPageTypeDocumentCreatedListener extends AbstractXObjectPageT
 
   public static final String NAME = "XObjectPageTypeDocumentCreatedListener";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      XObjectPageTypeDocumentCreatedListener.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(XObjectPageTypeDocumentCreatedListener.class);
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;

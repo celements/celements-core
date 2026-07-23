@@ -37,9 +37,9 @@ public class FormObjStorageCommand {
   public BaseObject newObject(XWikiDocument storageDoc, String className, XWikiContext context) {
     Vector<BaseObject> objects = storageDoc.getObjects(className);
     if ((objects != null) && (objects.size() > _MAX_OBJ_ON_DOC)) {
-      LOGGER.warn("PERFORMANCE WARNING! There are more than " + _MAX_OBJ_ON_DOC
-          + " objects of the class [" + className + "] on storageDoc [" + storageDoc.getFullName()
-          + "].");
+      LOGGER.warn(
+          "PERFORMANCE WARNING! There are more than " + _MAX_OBJ_ON_DOC + " objects of the class ["
+              + className + "] on storageDoc [" + storageDoc.getFullName() + "].");
     }
     try {
       return storageDoc.newObject(className, context);

@@ -163,8 +163,8 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
   }
 
   boolean checkPageType(XWikiDocument fileBaseTag1Doc) throws XWikiException {
-    DocumentReference pageTypeClassRef = getPageTypeClasses().getPageTypeClassRef(
-        getContext().getDatabase());
+    DocumentReference pageTypeClassRef = getPageTypeClasses()
+        .getPageTypeClassRef(getContext().getDatabase());
     BaseObject pageTypeObj = fileBaseTag1Doc.getXObject(pageTypeClassRef, false, getContext());
     if (pageTypeObj == null) {
       pageTypeObj = fileBaseTag1Doc.newXObject(pageTypeClassRef, getContext());

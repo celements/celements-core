@@ -85,8 +85,8 @@ public class RenderingEngineTest extends AbstractComponentTest {
 
   @Test
   public void test_renderLayout_notRender() {
-    SpaceReference spaceReference = new SpaceReference("MySkin", new WikiReference(
-        context.getDatabase()));
+    SpaceReference spaceReference = new SpaceReference("MySkin",
+        new WikiReference(context.getDatabase()));
     renderStrategyMock.startRendering();
     renderStrategyMock.endRendering();
     expect(renderStrategyMock.isRenderSubCells(eq(spaceReference))).andReturn(false).once();
@@ -97,16 +97,16 @@ public class RenderingEngineTest extends AbstractComponentTest {
 
   @Test
   public void test_renderLayout_isRendering() {
-    SpaceReference masterPageLayoutRef = new SpaceReference("MasterPageLayout", new WikiReference(
-        context.getDatabase()));
+    SpaceReference masterPageLayoutRef = new SpaceReference("MasterPageLayout",
+        new WikiReference(context.getDatabase()));
     renderStrategyMock.startRendering();
     renderStrategyMock.endRendering();
     expect(renderStrategyMock.isRenderSubCells(eq(masterPageLayoutRef))).andReturn(true).once();
     String menuPart = "mainPart";
     expect(renderStrategyMock.getMenuPart((TreeNode) isNull())).andReturn(menuPart);
     List<TreeNode> subCellList = new ArrayList<>();
-    expect(mockTreeNodeService.getSubNodesForParent(eq(masterPageLayoutRef), eq(
-        menuPart))).andReturn(subCellList);
+    expect(mockTreeNodeService.getSubNodesForParent(eq(masterPageLayoutRef), eq(menuPart)))
+        .andReturn(subCellList);
     expect(renderStrategyMock.isRenderCell((TreeNode) isNull())).andReturn(false).once();
     replayDefault();
     renderingEngine.renderLayout(masterPageLayoutRef);
@@ -115,8 +115,8 @@ public class RenderingEngineTest extends AbstractComponentTest {
 
   @Test
   public void test_renderLayout_otherDB() {
-    SpaceReference layoutRef = new SpaceReference("MasterPageLayout", new WikiReference(
-        "celements2web"));
+    SpaceReference layoutRef = new SpaceReference("MasterPageLayout",
+        new WikiReference("celements2web"));
     renderStrategyMock.startRendering();
     renderStrategyMock.endRendering();
     expect(renderStrategyMock.isRenderSubCells(eq(layoutRef))).andReturn(true).once();
@@ -147,8 +147,7 @@ public class RenderingEngineTest extends AbstractComponentTest {
     TreeNode node = new TreeNode(docRef, parentDocRef, 0);
     renderStrategyMock.startRendering();
     renderStrategyMock.endRendering();
-    expect(renderStrategyMock
-        .isRenderSubCells(eq(node.getDocumentReference()))).andReturn(false)
+    expect(renderStrategyMock.isRenderSubCells(eq(node.getDocumentReference()))).andReturn(false)
         .once();
     replayDefault();
     renderingEngine.renderLayoutPartial(node);
@@ -189,8 +188,8 @@ public class RenderingEngineTest extends AbstractComponentTest {
     String menuPart = "mainPart";
     expect(renderStrategyMock.getMenuPart(eq(node))).andReturn(menuPart);
     List<TreeNode> subCellList = new ArrayList<>();
-    expect(mockTreeNodeService.getSubNodesForParent(eq(docRef), eq(menuPart))).andReturn(
-        subCellList);
+    expect(mockTreeNodeService.getSubNodesForParent(eq(docRef), eq(menuPart)))
+        .andReturn(subCellList);
     expect(renderStrategyMock.isRenderCell(eq(node))).andReturn(true);
     renderStrategyMock.renderEmptyChildren(eq(node));
     replayDefault();
@@ -207,20 +206,20 @@ public class RenderingEngineTest extends AbstractComponentTest {
     String menuPart = "mainPart";
     expect(renderStrategyMock.getMenuPart(eq(cellNode))).andReturn(menuPart).once();
     List<TreeNode> subCellList = new ArrayList<>();
-    TreeNode subCell1 = new TreeNode(new DocumentReference(context.getDatabase(), menuSpace,
-        "subCell1"), null, 1);
+    TreeNode subCell1 = new TreeNode(
+        new DocumentReference(context.getDatabase(), menuSpace, "subCell1"), null, 1);
     subCellList.add(subCell1);
-    TreeNode subCell2 = new TreeNode(new DocumentReference(context.getDatabase(), menuSpace,
-        "subCell2"), null, 2);
+    TreeNode subCell2 = new TreeNode(
+        new DocumentReference(context.getDatabase(), menuSpace, "subCell2"), null, 2);
     subCellList.add(subCell2);
-    TreeNode subCell3 = new TreeNode(new DocumentReference(context.getDatabase(), menuSpace,
-        "subCell3"), null, 3);
+    TreeNode subCell3 = new TreeNode(
+        new DocumentReference(context.getDatabase(), menuSpace, "subCell3"), null, 3);
     subCellList.add(subCell3);
-    TreeNode subCell4 = new TreeNode(new DocumentReference(context.getDatabase(), menuSpace,
-        "subCell4"), null, 4);
+    TreeNode subCell4 = new TreeNode(
+        new DocumentReference(context.getDatabase(), menuSpace, "subCell4"), null, 4);
     subCellList.add(subCell4);
-    expect(mockTreeNodeService.getSubNodesForParent(eq(cellRef), eq(menuPart))).andReturn(
-        subCellList);
+    expect(mockTreeNodeService.getSubNodesForParent(eq(cellRef), eq(menuPart)))
+        .andReturn(subCellList);
     renderStrategyMock.startRenderChildren(eq(cellRef));
     renderStrategyMock.endRenderChildren(eq(cellRef));
     expect(renderStrategyMock.isRenderCell(same(subCell1))).andReturn(true).once();
