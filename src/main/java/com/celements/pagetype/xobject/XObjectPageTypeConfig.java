@@ -76,8 +76,8 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
       LOGGER.debug("getCategories for [" + getName() + "] empty List found returning" + " [\"\"].");
       return Arrays.asList("");
     } else {
-      LOGGER.debug("getCategories for [" + getName() + "] returning [" + Arrays.deepToString(
-          categories.toArray()) + "]");
+      LOGGER.debug("getCategories for [" + getName() + "] returning ["
+          + Arrays.deepToString(categories.toArray()) + "]");
       return categories;
     }
   }
@@ -106,8 +106,8 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
     try {
       return pageType.getRenderTemplate(renderMode, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get render template for pageType [" + pageType.getConfigName(
-          getContext()) + "] and renderMode [" + renderMode + "].", exp);
+      LOGGER.error("Failed to get render template for pageType ["
+          + pageType.getConfigName(getContext()) + "] and renderMode [" + renderMode + "].", exp);
     }
     return null;
   }
@@ -125,8 +125,8 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
   public boolean isUnconnectedParent() {
     BaseObject pageTypePropertiesObj = pageType.getPageTypeProperties(getContext());
     if (pageTypePropertiesObj != null) {
-      return (pageTypePropertiesObj.getIntValue(
-          IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT, 0) > 0);
+      return (pageTypePropertiesObj
+          .getIntValue(IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT, 0) > 0);
     }
     return false;
   }
@@ -135,8 +135,8 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
   public boolean useInlineEditorMode() {
     BaseObject pageTypePropertiesObj = pageType.getPageTypeProperties(getContext());
     if (pageTypePropertiesObj != null) {
-      return (pageTypePropertiesObj.getIntValue(
-          IPageTypeClassConfig.PAGETYPE_PROP_INLINE_EDITOR_MODE, 0) > 0);
+      return (pageTypePropertiesObj
+          .getIntValue(IPageTypeClassConfig.PAGETYPE_PROP_INLINE_EDITOR_MODE, 0) > 0);
     }
     return false;
   }
@@ -145,8 +145,8 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
   public Optional<String> defaultTagName() {
     BaseObject pageTypePropertiesObj = pageType.getPageTypeProperties(getContext());
     if (pageTypePropertiesObj != null) {
-      return Optional.fromNullable(Strings.emptyToNull(pageTypePropertiesObj.getStringValue(
-          IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME)));
+      return Optional.fromNullable(Strings.emptyToNull(
+          pageTypePropertiesObj.getStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME)));
     }
     return Optional.absent();
   }

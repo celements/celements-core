@@ -81,8 +81,7 @@ public class ContextMenuBuilder {
     }
 
     @Override
-    public void readPropertyKey(String key) {
-    }
+    public void readPropertyKey(String key) {}
 
     @Override
     public void stringEvent(String value) {
@@ -133,10 +132,11 @@ public class ContextMenuBuilder {
   private FluentIterable<BaseObject> getCMObjects(String className) {
     FluentIterable<BaseObject> objs = FluentIterable.of();
     RefBuilder refBuilder = new RefBuilder().doc(className).space("CelementsContextMenu");
-    objs = objs.append(getObjectFetcher(refBuilder.wiki("celements2web").build(
-        DocumentReference.class)).iter());
-    objs = objs.append(getObjectFetcher(refBuilder.with(getContext().getWikiRef()).build(
-        DocumentReference.class)).iter());
+    objs = objs.append(
+        getObjectFetcher(refBuilder.wiki("celements2web").build(DocumentReference.class)).iter());
+    objs = objs.append(
+        getObjectFetcher(refBuilder.with(getContext().getWikiRef()).build(DocumentReference.class))
+            .iter());
     return objs;
   }
 
@@ -182,8 +182,8 @@ public class ContextMenuBuilder {
   }
 
   private XWikiObjectFetcher getObjectFetcher(DocumentReference docRef) {
-    return XWikiObjectFetcher.on(getModelAccess().getOrCreateDocument(docRef)).filter(
-        OldCoreClasses.getContextMenuItemClassRef());
+    return XWikiObjectFetcher.on(getModelAccess().getOrCreateDocument(docRef))
+        .filter(OldCoreClasses.getContextMenuItemClassRef());
   }
 
   private IModelAccessFacade getModelAccess() {

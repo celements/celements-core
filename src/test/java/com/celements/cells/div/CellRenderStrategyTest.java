@@ -118,8 +118,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   @Test
   public void test_isRenderSubCells() {
     assertFalse(renderer.isRenderSubCells(null));
-    SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
-        context.getDatabase()));
+    SpaceReference layoutSpaceRef = new SpaceReference("TestLayout",
+        new WikiReference(context.getDatabase()));
     assertTrue(renderer.isRenderSubCells(layoutSpaceRef));
   }
 
@@ -242,8 +242,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
 
   @Test
   public void test_startRenderCell_id_repetitiveCell() throws Exception {
-    getBeanFactory().getBean(Execution.class).getContext()
-        .setProperty(EXEC_CTX_KEY_REPETITIVE, true);
+    getBeanFactory().getBean(Execution.class).getContext().setProperty(EXEC_CTX_KEY_REPETITIVE,
+        true);
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     TreeNode node = new TreeNode(cellRef, null, 0);
     expectNewDoc(cellRef);
@@ -310,8 +310,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     typeConfig.collectAttributes(isA(AttributeBuilder.class), eq(cellRef));
     expect(getMock(VelocityService.class).evaluateVelocityText("custom velocity x"))
         .andReturn("custom_evaluated_x");
-    expect(getMock(VelocityService.class).evaluateVelocityText("custom velocity y"))
-        .andReturn("");
+    expect(getMock(VelocityService.class).evaluateVelocityText("custom velocity y")).andReturn("");
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyDefault();
@@ -329,8 +328,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     TreeNode cellNode = new TreeNode(cellRef, null, 0);
     String cellContentExpected = "Cell test content Skin.MasterCell";
-    expect(mockctRendererCmd.renderCelementsCell(eq(cellRef))).andReturn(
-        cellContentExpected).once();
+    expect(mockctRendererCmd.renderCelementsCell(eq(cellRef))).andReturn(cellContentExpected)
+        .once();
     // ASSERT
     expect(outWriterMock.appendContent(eq(cellContentExpected))).andReturn(outWriterMock);
     replayDefault();
@@ -365,8 +364,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   private BaseObject addObj(XWikiDocument doc, ClassReference classRef) {
     BaseObject cellObj = new BaseObject();
     cellObj.setDocumentReference(doc.getDocumentReference());
-    cellObj.setXClassReference(classRef.getDocRef(
-        doc.getDocumentReference().getWikiReference()));
+    cellObj.setXClassReference(classRef.getDocRef(doc.getDocumentReference().getWikiReference()));
     doc.addXObject(cellObj);
     return cellObj;
   }
@@ -394,8 +392,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
       assertEquals("wrong id attribute", idname, attrMap.get("id").getValue().orElse(""));
     }
     assertTrue("cell-ref attribute not found", attrMap.containsKey("data-cell-ref"));
-    assertEquals("wrong cell-ref attribute", cellFN,
-        attrMap.get("data-cell-ref").getValue().get());
+    assertEquals("wrong cell-ref attribute", cellFN, attrMap.get("data-cell-ref").getValue().get());
     assertTrue("cssClass attribute not found", attrMap.containsKey("class"));
     assertEquals("wrong cssClass attribute", ("cel_cell " + cssClasses).trim(),
         attrMap.get("class").getValue().get());

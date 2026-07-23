@@ -188,8 +188,8 @@ public class FileAction extends SkinAction {
   private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
       throws XWikiException, IOException {
     if (_Logger.isDebugEnabled()) {
-      _Logger.debug("Rendering file '" + filename + "' within the '" + doc.getFullName()
-          + "' document");
+      _Logger.debug(
+          "Rendering file '" + filename + "' within the '" + doc.getFullName() + "' document");
     }
     try {
       if (doc.isNew()) {
@@ -197,8 +197,9 @@ public class FileAction extends SkinAction {
           _Logger.debug(doc.getName() + " is not a document");
         }
       } else {
-        return renderFileFromObjectField(filename, doc, context) || renderFileFromAttachment(
-            filename, doc, context) || (SKINS_DIRECTORY.equals(doc.getSpace())
+        return renderFileFromObjectField(filename, doc, context)
+            || renderFileFromAttachment(filename, doc, context)
+            || (SKINS_DIRECTORY.equals(doc.getSpace())
                 && renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()), context));
       }
     } catch (IOException e) {

@@ -29,22 +29,17 @@ public class TestRequestHandler extends AbstractEventHandler<ERequestLiteral> {
   /**
    * @param requestLiteralTest
    */
-  public TestRequestHandler() {
-  }
+  public TestRequestHandler() {}
 
   @Override
-  public void closeEvent(ERequestLiteral literal) {
-  }
+  public void closeEvent(ERequestLiteral literal) {}
 
   @Override
-  public void openEvent(ERequestLiteral literal) {
-  }
+  public void openEvent(ERequestLiteral literal) {}
 
   @Override
-  public void readPropertyKey(String key) {
-  }
+  public void readPropertyKey(String key) {}
 
   @Override
-  public void stringEvent(String value) {
-  }
+  public void stringEvent(String value) {}
 }

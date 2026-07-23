@@ -53,10 +53,8 @@ public class SaveEventFilter<I extends Serializable> implements EventFilter, Ser
 
   @Override
   public boolean equals(Object obj) {
-    return tryCast(obj, SaveEventFilter.class)
-        .map(other -> (this.operation == other.operation)
-            && Objects.equals(this.identity, other.identity))
-        .orElse(false);
+    return tryCast(obj, SaveEventFilter.class).map(other -> (this.operation == other.operation)
+        && Objects.equals(this.identity, other.identity)).orElse(false);
   }
 
   @Override

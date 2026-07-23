@@ -51,16 +51,16 @@ public class DocHeaderTitleCommand {
     try {
       XWikiDocument theDoc = getContext().getWiki().getDocument(docRef, getContext());
       XWikiDocument theTDoc = theDoc.getTranslatedDocument(getContext());
-      BaseObject docTitelObj = theDoc.getXObject(getWebUtils().resolveDocumentReference(
-          "Content.Title"));
+      BaseObject docTitelObj = theDoc
+          .getXObject(getWebUtils().resolveDocumentReference("Content.Title"));
       if ((theTDoc.getTitle() != null) && !"".equals(theTDoc.getTitle())) {
         docHeaderTitle = theTDoc.getTitle();
       } else if ((theDoc.getTitle() != null) && !"".equals(theDoc.getTitle())) {
         docHeaderTitle = theDoc.getTitle();
       } else if ((docTitelObj != null) && (docTitelObj.getStringValue("title") != null)
           && (!"".equals(docTitelObj.getStringValue("title")))) {
-        docHeaderTitle = getContext().getWiki().getRenderingEngine().renderText(
-            docTitelObj.getStringValue("title"), theDoc, getContext());
+        docHeaderTitle = getContext().getWiki().getRenderingEngine()
+            .renderText(docTitelObj.getStringValue("title"), theDoc, getContext());
       } else {
         docHeaderTitle = menuNameCmd.getMultilingualMenuNameOnly(
             docRef.getLastSpaceReference().getName() + "." + docRef.getName(),
@@ -68,8 +68,8 @@ public class DocHeaderTitleCommand {
       }
       if (!"".equals(getContext().getWiki().getSpacePreference("title",
           docRef.getLastSpaceReference().getName(), "", getContext()))) {
-        docHeaderTitle = docHeaderTitle + getContext().getWiki()
-            .parseContent(getContext().getWiki().getSpacePreference("title",
+        docHeaderTitle = docHeaderTitle
+            + getContext().getWiki().parseContent(getContext().getWiki().getSpacePreference("title",
                 docRef.getLastSpaceReference().getName(), "", getContext()), getContext());
       }
     } catch (Exception exp) {

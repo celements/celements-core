@@ -48,13 +48,14 @@ public class RenameCommand {
         if (renameDoc(fullname, newDocName, true, context)) {
           renamedPages.add(docName);
         } else {
-          LOGGER.error("renameSpace: Failed to rename Document [" + fullname + "] to ["
-              + newDocName + "].");
+          LOGGER.error(
+              "renameSpace: Failed to rename Document [" + fullname + "] to [" + newDocName + "].");
         }
       }
     } catch (XWikiException exp) {
-      LOGGER.error("renameSpace: Failed to rename Space [" + spaceName + "] to [" + newSpaceName
-          + "].", exp);
+      LOGGER.error(
+          "renameSpace: Failed to rename Space [" + spaceName + "] to [" + newSpaceName + "].",
+          exp);
     }
     return renamedPages;
   }
@@ -65,15 +66,16 @@ public class RenameCommand {
 
   boolean renameDoc(String fullname, String newDocName, boolean flushMenuCacheExternal,
       XWikiContext context) {
-    if (context.getWiki().exists(fullname, context) && !context.getWiki().exists(newDocName,
-        context)) {
+    if (context.getWiki().exists(fullname, context)
+        && !context.getWiki().exists(newDocName, context)) {
       try {
         XWikiDocument thePage = context.getWiki().getDocument(fullname, context);
         thePage.rename(newDocName, context);
         return true;
       } catch (XWikiException exp) {
-        LOGGER.error("renameDoc: Failed to rename Document [" + fullname + "] to [" + newDocName
-            + "].", exp);
+        LOGGER.error(
+            "renameDoc: Failed to rename Document [" + fullname + "] to [" + newDocName + "].",
+            exp);
       }
     }
     LOGGER.warn("renameDoc: Failed to rename Document [" + fullname + " ; "

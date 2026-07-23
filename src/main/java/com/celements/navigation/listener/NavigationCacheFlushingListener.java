@@ -21,8 +21,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component(NavigationCache.NAME)
 public class NavigationCacheFlushingListener implements EventListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      NavigationCacheFlushingListener.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(NavigationCacheFlushingListener.class);
 
   @Requirement(NavigationCache.NAME)
   IDocumentReferenceCache<String> navCache;

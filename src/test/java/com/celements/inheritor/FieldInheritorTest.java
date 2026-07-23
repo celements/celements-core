@@ -122,8 +122,8 @@ public class FieldInheritorTest extends AbstractComponentTest {
       @Override
       public XObjectIterator createIterator() {
         XObjectIterator iterator = new XObjectIterator(_context);
-        iterator.setClassName(_testClassRef.getLastSpaceReference().getName() + "."
-            + _testClassRef.getName());
+        iterator.setClassName(
+            _testClassRef.getLastSpaceReference().getName() + "." + _testClassRef.getName());
         iterator.setDocList(docList);
         return iterator;
       }

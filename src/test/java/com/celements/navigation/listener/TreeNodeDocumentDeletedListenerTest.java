@@ -69,8 +69,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractComponentTest {
 
   @Test
   public void testGetEvents() {
-    List<String> expectedEventClassList = Arrays.asList(
-        new DocumentDeletedEvent().getClass().getName());
+    List<String> expectedEventClassList = Arrays
+        .asList(new DocumentDeletedEvent().getClass().getName());
     replayDefault();
     List<Event> actualEventList = eventListener.getEvents();
     assertEquals(expectedEventClassList.size(), actualEventList.size());
@@ -168,8 +168,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractComponentTest {
     XWikiDocument origDoc = new XWikiDocument(treeNodeDocRef);
     sourceDoc.setOriginalDocument(origDoc);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(new NavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(new NavigationClasses().getMenuItemClassRef(context.getDatabase()));
     origDoc.addXObject(menuItemObj);
     RemoteObservationManagerContext remoteObsManagerCtx = createDefaultMock(
         RemoteObservationManagerContext.class);

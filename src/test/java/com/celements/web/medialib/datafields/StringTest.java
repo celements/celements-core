@@ -25,8 +25,7 @@ import org.junit.Test;
 public class StringTest {
 
   @Before
-  public void prepareTest() throws Exception {
-  }
+  public void prepareTest() throws Exception {}
 
   @Test
   public void testGetColumnId() {

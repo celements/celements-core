@@ -37,8 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("XObjectPageTypeCacheListener")
 public class XObjectPageTypeCacheListener implements EventListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      XObjectPageTypeCacheListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(XObjectPageTypeCacheListener.class);
 
   @Requirement
   IXObjectPageTypeCacheRole pageTypeCache;

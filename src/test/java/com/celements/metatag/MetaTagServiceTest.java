@@ -42,8 +42,9 @@ public class MetaTagServiceTest extends AbstractComponentTest {
     String keywords = "test,junit,keyword";
     metaTag.addMetaTagToCollector(new MetaTag(ENameStandard.KEYWORDS, keywords));
     metaTag.addMetaTagToCollector(new MetaTag(ETwitterCardType.SUMMARY));
-    assertEquals("<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
-        + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
+    assertEquals(
+        "<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
+            + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
         metaTag.displayCollectedMetaTags());
   }
 
@@ -52,8 +53,9 @@ public class MetaTagServiceTest extends AbstractComponentTest {
     String keywords = "test,junit,keyword";
     metaTag.addMetaTagToCollector(new MetaTag(ENameStandard.KEYWORDS, keywords));
     metaTag.addMetaTagToCollector(new MetaTag(ETwitterCardType.SUMMARY));
-    assertEquals("<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
-        + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
+    assertEquals(
+        "<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
+            + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
         metaTag.displayCollectedMetaTags());
     assertEquals("", metaTag.displayCollectedMetaTags());
     metaTag.addMetaTagToCollector(new MetaTag(ECharset.UTF8));
@@ -63,33 +65,36 @@ public class MetaTagServiceTest extends AbstractComponentTest {
   @Test
   public void testCollectHeaderTags() throws Exception {
     String keywords = "test,junit,keyword";
-    List<MetaTag> tags = Arrays.asList(new MetaTag(ENameStandard.KEYWORDS, keywords), new MetaTag(
-        ETwitterCardType.SUMMARY));
+    List<MetaTag> tags = Arrays.asList(new MetaTag(ENameStandard.KEYWORDS, keywords),
+        new MetaTag(ETwitterCardType.SUMMARY));
     expect(headerTag.getHeaderMetaTags()).andReturn(tags);
-    expect(getWikiMock().exists((DocumentReference) anyObject(), same(getContext()))).andReturn(
-        false).anyTimes();
-    expect(modelAccess.getOrCreateDocument((DocumentReference) anyObject())).andReturn(
-        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Any", "Any")))
+    expect(getWikiMock().exists((DocumentReference) anyObject(), same(getContext())))
+        .andReturn(false).anyTimes();
+    expect(modelAccess.getOrCreateDocument((DocumentReference) anyObject()))
+        .andReturn(
+            new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Any", "Any")))
         .anyTimes();
     replayDefault();
     metaTag.collectHeaderTags();
     verifyDefault();
-    assertEquals("<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
-        + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
+    assertEquals(
+        "<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
+            + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
         metaTag.displayCollectedMetaTags());
   }
 
   @Test
   public void testCollectBodyTags() {
     String keywords = "test,junit,keyword";
-    List<MetaTag> tags = Arrays.asList(new MetaTag(ENameStandard.KEYWORDS, keywords), new MetaTag(
-        ETwitterCardType.SUMMARY));
+    List<MetaTag> tags = Arrays.asList(new MetaTag(ENameStandard.KEYWORDS, keywords),
+        new MetaTag(ETwitterCardType.SUMMARY));
     expect(headerTag.getBodyMetaTags()).andReturn(tags);
     replayDefault();
     metaTag.collectBodyTags();
     verifyDefault();
-    assertEquals("<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
-        + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
+    assertEquals(
+        "<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
+            + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
         metaTag.displayCollectedMetaTags());
   }
 

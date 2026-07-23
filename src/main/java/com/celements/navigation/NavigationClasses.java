@@ -180,8 +180,8 @@ public class NavigationClasses extends AbstractClassCollection {
         "integer");
     needsUpdate |= bclass.addNumberField(SHOW_INACTIVE_TO_LEVEL_FIELD,
         "Always Show Inactive To Level", 30, "integer");
-    needsUpdate |= bclass.addTextField(MENU_SPACE_FIELD, "Menu Space Name (leave empty"
-        + " for current space)", 30);
+    needsUpdate |= bclass.addTextField(MENU_SPACE_FIELD,
+        "Menu Space Name (leave empty" + " for current space)", 30);
     needsUpdate |= bclass.addTextField(MENU_PART_FIELD, "Menu Part Name", 30);
     needsUpdate |= bclass.addTextField(CM_CSS_CLASS_FIELD,
         "Context Menu CSS Class Name (empty for default)", 30);
@@ -191,8 +191,8 @@ public class NavigationClasses extends AbstractClassCollection {
         "Navigation Layout Type (empty for html list)", 30);
     needsUpdate |= bclass.addTextField(PRESENTATION_TYPE_FIELD,
         "Navigation Presentation Type (empty for menu name links)", 30);
-    needsUpdate |= bclass.addNumberField(INavigationClassConfig.ITEMS_PER_PAGE, "Number"
-        + " of items showed per page when using pageing", 30, "integer");
+    needsUpdate |= bclass.addNumberField(INavigationClassConfig.ITEMS_PER_PAGE,
+        "Number" + " of items showed per page when using pageing", 30, "integer");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -250,8 +250,9 @@ public class NavigationClasses extends AbstractClassCollection {
     try {
       doc = xwiki.getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + INavigationClassConfig.MAPPED_MENU_ITEM_CLASS
-          + " class document.", exp);
+      LOGGER.error(
+          "Failed to get " + INavigationClassConfig.MAPPED_MENU_ITEM_CLASS + " class document.",
+          exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }

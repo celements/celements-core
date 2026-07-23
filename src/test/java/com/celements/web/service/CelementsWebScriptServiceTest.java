@@ -41,8 +41,8 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
   public void testDeleteMenuItem() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
-    expect(mockRightService.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), eq(
-        "mySpace.myDocument"), same(context))).andReturn(false).once();
+    expect(mockRightService.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"),
+        eq("mySpace.myDocument"), same(context))).andReturn(false).once();
     replayDefault();
     assertFalse("expecting false because of no edit rights", celWebService.deleteMenuItem(docRef));
     verifyDefault();
@@ -70,8 +70,8 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
   @Test
   public void testGetHumanReadableSize_PartSize_de_country_CH() {
     context.setLanguage("de");
-    String formatted = celWebService.getHumanReadableSize(1055563210, false,
-        celWebService.getLocal("de", "ch"))
+    String formatted = celWebService
+        .getHumanReadableSize(1055563210, false, celWebService.getLocal("de", "ch"))
         .replace('\'', '’'); // older java versions used different apostrophe
     assertEquals("de-ch", "1’006.7 MiB", formatted);
     assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210, true, "fr"));
@@ -101,14 +101,13 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    expect(mockRequest.getParameter(eq("xpage"))).andReturn(
-        IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn(IAppScriptService.APP_SCRIPT_XPAGE)
+        .anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
     expect(appScriptServiceMock.isAppScriptRequest()).andReturn(true).anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
-        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
-            "Content.login")
-        .anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context)))
+        .andReturn("Content.login").anyTimes();
     replayDefault(mockRequest);
     assertTrue(celWebService.isAppScriptRequest());
     verifyDefault(mockRequest);
@@ -121,8 +120,8 @@ public class CelementsWebScriptServiceTest extends AbstractComponentTest {
 
     expect(appScriptServiceMock.isAppScriptRequest()).andReturn(true).once();
     expect(appScriptServiceMock.getScriptNameFromURL()).andReturn(scriptName).once();
-    expect(appScriptServiceMock.getAppScriptURL(eq(scriptName), eq(queryString))).andReturn(
-        "theURL").once();
+    expect(appScriptServiceMock.getAppScriptURL(eq(scriptName), eq(queryString)))
+        .andReturn("theURL").once();
 
     replayDefault();
     assertEquals("theURL", celWebService.getCurrentPageURL(queryString));

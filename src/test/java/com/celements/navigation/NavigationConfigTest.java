@@ -231,8 +231,8 @@ public class NavigationConfigTest extends AbstractComponentTest {
   @Test
   public void testGetNodeSpaceRef() {
     String spaceName = "MySpace";
-    SpaceReference nodeSpaceRef = new SpaceReference(spaceName, new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef = new SpaceReference(spaceName,
+        new WikiReference(getContext().getDatabase()));
     navBuilder.nodeSpaceRef(nodeSpaceRef);
     NavigationConfig navConfig = navBuilder.build();
     Optional<SpaceReference> firstReturnNodeSpace = navConfig.getNodeSpaceRef();
@@ -386,22 +386,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();
@@ -439,22 +434,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();
@@ -493,22 +483,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();
@@ -547,22 +532,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();
@@ -601,22 +581,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();
@@ -655,22 +630,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();
@@ -700,8 +670,8 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_nodeSpaceRef() throws Exception {
-    SpaceReference nodeSpaceRef = new SpaceReference("NavConfigSpace1", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef = new SpaceReference("NavConfigSpace1",
+        new WikiReference(getContext().getDatabase()));
     navBuilder.nodeSpaceRef(nodeSpaceRef);
     NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
@@ -710,22 +680,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();
@@ -764,22 +729,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();
@@ -817,22 +777,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();
@@ -871,22 +826,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint);
     replayDefault();
@@ -925,22 +875,17 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer showInactiveToLevel2 = 55;
     String menuPart2 = "menuPart2";
     String dataType2 = "dataType2";
-    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2",
+        new WikiReference(getContext().getDatabase()));
     String layoutType2 = "navConfig2LayoutType";
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(
-        configName2).fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(
-            toHierarchyLevel2)
-        .showInactiveToLevel(showInactiveToLevel2).menuPart(
-            menuPart2)
-        .dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
-            layoutType2)
-        .nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(
-            presentationTypeHint2)
-        .cmCssClass(cmCssClass2).build();
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2)
+        .fromHierarchyLevel(fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2)
+        .showInactiveToLevel(showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2)
+        .nodeSpaceRef(nodeSpaceRef2).layoutType(layoutType2).nrOfItemsPerPage(itemsPerPage2)
+        .presentationTypeHint(presentationTypeHint2).cmCssClass(cmCssClass2).build();
     IPresentationTypeRole componentInstance = registerComponentMock(IPresentationTypeRole.class,
         presentationTypeHint2);
     replayDefault();

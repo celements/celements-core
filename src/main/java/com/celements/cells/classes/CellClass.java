@@ -55,7 +55,7 @@ public class CellClass extends AbstractClassDefinition
 
   public static final ClassField<String> FIELD_EVENT_DATA_ATTR = new LargeStringField.Builder(
       CLASS_REF, "event_data_attr").rows(20).size(15).prettyName("celEventJS data attribute")
-          .build();
+      .build();
 
   public CellClass() {
     super(CLASS_REF);

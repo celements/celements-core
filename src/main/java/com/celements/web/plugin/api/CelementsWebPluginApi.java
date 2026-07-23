@@ -310,8 +310,8 @@ public class CelementsWebPluginApi extends Api {
    **/
   @Deprecated
   public boolean isEmptyRTEDocument(String fullName) {
-    return getEmptyCheckScriptService().isEmptyRTEDocument(
-        getWebUtilsService().resolveDocumentReference(fullName));
+    return getEmptyCheckScriptService()
+        .isEmptyRTEDocument(getWebUtilsService().resolveDocumentReference(fullName));
   }
 
   /**
@@ -402,8 +402,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getNextTitledPageFullName(String space, String title) {
-    return getWebUtilsService().getRefLocalSerializer().serialize(getNextTitledPageDocRef(space,
-        title));
+    return getWebUtilsService().getRefLocalSerializer()
+        .serialize(getNextTitledPageDocRef(space, title));
   }
 
   /**
@@ -577,8 +577,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String navReorderSave(String fullName, String structureJSON) {
-    return getTreeNodeScriptService().navReorderSave(getWebUtilsService().resolveDocumentReference(
-        fullName), structureJSON);
+    return getTreeNodeScriptService()
+        .navReorderSave(getWebUtilsService().resolveDocumentReference(fullName), structureJSON);
   }
 
   /**
@@ -605,8 +605,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String renderCelementsDocument(String elementFullName, String renderMode) {
-    return getScriptService().renderCelementsDocument(getWebUtilsService().resolveDocumentReference(
-        elementFullName), renderMode);
+    return getScriptService().renderCelementsDocument(
+        getWebUtilsService().resolveDocumentReference(elementFullName), renderMode);
   }
 
   /**
@@ -714,8 +714,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public boolean isCelementsRights(String fullName) {
-    return getScriptService().isCelementsRights(getWebUtilsService().resolveDocumentReference(
-        fullName));
+    return getScriptService()
+        .isCelementsRights(getWebUtilsService().resolveDocumentReference(fullName));
   }
 
   /**
@@ -819,8 +819,8 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public boolean useImageAnimations() {
     String defaultValue = context.getWiki().Param("celements.celImageAnimation", "0");
-    return "1".equals(context.getWiki().getSpacePreference("celImageAnimation", defaultValue,
-        context));
+    return "1"
+        .equals(context.getWiki().getSpacePreference("celImageAnimation", defaultValue, context));
   }
 
   /**

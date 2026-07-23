@@ -95,9 +95,8 @@ public class RenderingEngine implements IRenderingEngine {
     if (renderStrategy.isRenderCell(node)) {
       renderStrategy.getContextualiser(node).execute(() -> {
         renderStrategy.startRenderCell(node, isFirstItem, isLastItem);
-        renderSubCells(node, Optional.ofNullable(node)
-            .map(TreeNode::getDocumentReference)
-            .orElse(null));
+        renderSubCells(node,
+            Optional.ofNullable(node).map(TreeNode::getDocumentReference).orElse(null));
         renderStrategy.endRenderCell(node, isFirstItem, isLastItem);
       });
     }
@@ -107,8 +106,8 @@ public class RenderingEngine implements IRenderingEngine {
     if (renderStrategy.isRenderSubCells(parentRef)) {
       List<TreeNode> children = treeNodeService.getSubNodesForParent(parentRef,
           renderStrategy.getMenuPart(parentNode));
-      LOGGER.debug("internal_renderSubCells: for parent [{}] render [{}] children [{}].",
-          parentRef, children.size(), children);
+      LOGGER.debug("internal_renderSubCells: for parent [{}] render [{}] children [{}].", parentRef,
+          children.size(), children);
       if (!children.isEmpty()) {
         renderStrategy.startRenderChildren(parentRef);
         boolean isFirstItem = true;

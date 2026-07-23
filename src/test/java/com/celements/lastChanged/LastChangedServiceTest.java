@@ -90,8 +90,8 @@ public class LastChangedServiceTest extends AbstractComponentTest {
   @Test
   public void testInternal_getLastChangeDate_nullLangResponse() throws Exception {
     String mySpaceName = "mySpace";
-    SpaceReference spaceRef = new SpaceReference(mySpaceName, new WikiReference(
-        context.getDatabase()));
+    SpaceReference spaceRef = new SpaceReference(mySpaceName,
+        new WikiReference(context.getDatabase()));
     Query mockQuery = createDefaultMock(Query.class);
     expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(mockQuery).once();
     expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery).once();

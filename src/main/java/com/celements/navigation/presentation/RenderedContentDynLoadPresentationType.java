@@ -52,13 +52,9 @@ public class RenderedContentDynLoadPresentationType extends RenderedContentPrese
   }
 
   private @NotNull String getPassThroughParams() {
-    return mContext.request()
-        .map(r -> r.getParameterMap().entrySet())
-        .orElse(Set.of())
-        .stream()
+    return mContext.request().map(r -> r.getParameterMap().entrySet()).orElse(Set.of()).stream()
         .filter(entry1 -> !keyBlackList.contains(entry1.getKey()))
-        .flatMap(entry -> List.of(entry.getValue()).stream()
-            .map(v -> entry.getKey() + "=" + v))
+        .flatMap(entry -> List.of(entry.getValue()).stream().map(v -> entry.getKey() + "=" + v))
         .collect(() -> new StringJoiner("&", "&", "").setEmptyValue(""), StringJoiner::add,
             StringJoiner::merge)
         .toString();

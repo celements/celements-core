@@ -95,8 +95,8 @@ public class ParseObjStoreCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetObjStoreOptionsMap_mixedCheckboxesAndRadio() {
-    Map<String, String> map = cmd.getObjStoreOptionsMap("member:Isch bin!;10;20;;0;;3"
-        + "\nHi\nthen\n\n  \n", context);
+    Map<String, String> map = cmd
+        .getObjStoreOptionsMap("member:Isch bin!;10;20;;0;;3" + "\nHi\nthen\n\n  \n", context);
     assertTrue(map.containsKey("member:3"));
     assertTrue(map.containsValue("Isch bin!"));
     assertTrue(map.containsKey("Hi"));

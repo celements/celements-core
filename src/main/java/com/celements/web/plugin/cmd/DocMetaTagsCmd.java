@@ -38,8 +38,8 @@ public class DocMetaTagsCmd {
     if (metaTagsLangMap.get(defaultLanguage) != null) {
       // get default language meta keys
       metaTags.putAll(metaTagsLangMap.get(defaultLanguage));
-      if ((defaultLanguage != null) && !defaultLanguage.equals(language) && (metaTagsLangMap.get(
-          language) != null)) {
+      if ((defaultLanguage != null) && !defaultLanguage.equals(language)
+          && (metaTagsLangMap.get(language) != null)) {
         // overwrite translated keys
         metaTags.putAll(metaTagsLangMap.get(language));
       }

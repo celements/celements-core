@@ -64,8 +64,8 @@ public class GetCellDocumentTest extends AbstractComponentTest {
     paramList.add("field");
     paramList.add("value");
     expect(xwiki.getStore()).andReturn(store).anyTimes();
-    expect(store.searchDocuments((String) anyObject(), eq(paramList), same(context))).andReturn(
-        docList).once();
+    expect(store.searchDocuments((String) anyObject(), eq(paramList), same(context)))
+        .andReturn(docList).once();
     XWikiDocument lDoc = new XWikiDocument("Space", "Name");
     expect(plc.getLayoutPropDoc()).andReturn(lDoc).once();
     replay(plc, store, xwiki);
@@ -86,8 +86,8 @@ public class GetCellDocumentTest extends AbstractComponentTest {
     paramList.add("field");
     paramList.add("value");
     expect(xwiki.getStore()).andReturn(store).anyTimes();
-    expect(store.searchDocuments((String) anyObject(), eq(paramList), same(context))).andReturn(
-        docList).once();
+    expect(store.searchDocuments((String) anyObject(), eq(paramList), same(context)))
+        .andReturn(docList).once();
     replay(store, xwiki);
     XWikiDocument result = cmd.getCellDoc("Space", "Class.Name", "field", "value", context);
     verify(store, xwiki);

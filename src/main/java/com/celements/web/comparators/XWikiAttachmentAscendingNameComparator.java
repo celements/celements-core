@@ -8,8 +8,8 @@ public class XWikiAttachmentAscendingNameComparator implements Comparator<XWikiA
 
   @Override
   public int compare(XWikiAttachment attachmentOne, XWikiAttachment attachmentTwo) {
-    return attachmentOne.getFilename().toLowerCase().replace('_', '-').compareTo(
-        attachmentTwo.getFilename().toLowerCase().replace('_', '-'));
+    return attachmentOne.getFilename().toLowerCase().replace('_', '-')
+        .compareTo(attachmentTwo.getFilename().toLowerCase().replace('_', '-'));
   }
 
 }

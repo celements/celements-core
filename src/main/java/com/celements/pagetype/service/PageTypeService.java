@@ -79,19 +79,21 @@ public class PageTypeService implements IPageTypeRole {
       synchronized (typeNameToCatCache) {
         if (typeNameToCatCache.isEmpty()) {
           for (IPageTypeCategoryRole typeCategory : pageTypeCategoryList) {
-            IPageTypeCategoryRole beforeRegCat = typeNameToCatCache.putIfAbsent(
-                typeCategory.getTypeName(), typeCategory);
+            IPageTypeCategoryRole beforeRegCat = typeNameToCatCache
+                .putIfAbsent(typeCategory.getTypeName(), typeCategory);
             if (beforeRegCat != null) {
-              LOGGER.warn("Page type category collision on category name '{}' the colliding"
-                  + " category '{}' is shadowed by '{}'.", typeCategory.getTypeName(),
-                  typeCategory.getClass(), beforeRegCat.getClass());
+              LOGGER.warn(
+                  "Page type category collision on category name '{}' the colliding"
+                      + " category '{}' is shadowed by '{}'.",
+                  typeCategory.getTypeName(), typeCategory.getClass(), beforeRegCat.getClass());
             }
             for (String deprecateName : typeCategory.getAllTypeNames()) {
               beforeRegCat = typeNameToCatCacheDeprecated.putIfAbsent(deprecateName, typeCategory);
               if (beforeRegCat != null) {
-                LOGGER.warn("Page type category collision on deprecated category name '{}' the "
-                    + "colliding category '{}' is shadowed by '{}'.", deprecateName,
-                    typeCategory.getClass(), beforeRegCat.getClass());
+                LOGGER.warn(
+                    "Page type category collision on deprecated category name '{}' the "
+                        + "colliding category '{}' is shadowed by '{}'.",
+                    deprecateName, typeCategory.getClass(), beforeRegCat.getClass());
               }
             }
           }
@@ -165,8 +167,8 @@ public class PageTypeService implements IPageTypeRole {
     for (PageTypeReference pageTypeRef : getPageTypeRefsForCategories(catList, onlyVisible)) {
       pageTypeConfigNameList.add(pageTypeRef.getConfigName());
     }
-    LOGGER.debug("getPageTypesConfigNamesForCategories: return " + Arrays.deepToString(
-        pageTypeConfigNameList.toArray()));
+    LOGGER.debug("getPageTypesConfigNamesForCategories: return "
+        + Arrays.deepToString(pageTypeConfigNameList.toArray()));
     return pageTypeConfigNameList;
   }
 
@@ -180,9 +182,9 @@ public class PageTypeService implements IPageTypeRole {
           visiblePTSet.add(pageTypeRef);
         }
       }
-      LOGGER.debug("getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(
-          catList.toArray()) + "] and onlyVisible [" + onlyVisible + "] return "
-          + Arrays.deepToString(visiblePTSet.toArray()));
+      LOGGER.debug("getPageTypeRefsForCategories: for catList ["
+          + Arrays.deepToString(catList.toArray()) + "] and onlyVisible [" + onlyVisible
+          + "] return " + Arrays.deepToString(visiblePTSet.toArray()));
       return new ArrayList<>(visiblePTSet);
     } else {
       return new ArrayList<>(getPageTypeRefsForCategories(catList));
@@ -231,8 +233,9 @@ public class PageTypeService implements IPageTypeRole {
         }
       }
     }
-    LOGGER.debug("getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(
-        catList.toArray()) + "] return " + Arrays.deepToString(filteredPTset.toArray()));
+    LOGGER.debug(
+        "getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(catList.toArray())
+            + "] return " + Arrays.deepToString(filteredPTset.toArray()));
     return filteredPTset;
   }
 
@@ -242,8 +245,8 @@ public class PageTypeService implements IPageTypeRole {
     checkNotNull(ref);
     try {
       BaseObject obj = modelAccess.getOrCreateXObject(doc, pageTypeClassConf.getPageTypeClassRef());
-      boolean hasChanged = !ref.getConfigName().equals(modelAccess.getProperty(obj,
-          IPageTypeClassConfig.PAGE_TYPE_FIELD));
+      boolean hasChanged = !ref.getConfigName()
+          .equals(modelAccess.getProperty(obj, IPageTypeClassConfig.PAGE_TYPE_FIELD));
       if (hasChanged) {
         modelAccess.setProperty(obj, IPageTypeClassConfig.PAGE_TYPE_FIELD, ref.getConfigName());
       }

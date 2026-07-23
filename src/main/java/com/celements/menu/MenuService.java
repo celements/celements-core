@@ -74,8 +74,8 @@ public class MenuService implements IMenuService {
     ArrayList<BaseObject> resultList = new ArrayList<>();
     resultList.addAll(menuHeadersMap.values());
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("getMenuHeaders_internal returning: " + Arrays.deepToString(
-          resultList.toArray()));
+      LOGGER
+          .trace("getMenuHeaders_internal returning: " + Arrays.deepToString(resultList.toArray()));
     }
     LOGGER.debug("getMenuHeaders_internal end");
     return resultList;
@@ -152,8 +152,8 @@ public class MenuService implements IMenuService {
     ArrayList<BaseObject> resultList = new ArrayList<>();
     resultList.addAll(menuItemsMap.values());
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("getSubMenuItems_internal returning: " + Arrays.deepToString(
-          resultList.toArray()));
+      LOGGER.trace(
+          "getSubMenuItems_internal returning: " + Arrays.deepToString(resultList.toArray()));
     }
     LOGGER.debug("getSubMenuItems_internal end");
     return resultList;
@@ -161,8 +161,8 @@ public class MenuService implements IMenuService {
 
   private void addMenuItems(TreeMap<Integer, BaseObject> menuItemsMap, Integer headerId) {
     try {
-      List<Object[]> result = queryManager.createQuery(getSubItemsXWQL(), Query.XWQL).bindValue(
-          "headerId", headerId).execute();
+      List<Object[]> result = queryManager.createQuery(getSubItemsXWQL(), Query.XWQL)
+          .bindValue("headerId", headerId).execute();
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace("addMenuItems received for " + getContext().getDatabase() + ": "
             + Arrays.deepToString(result.toArray()));

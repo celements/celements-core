@@ -120,8 +120,7 @@ public class DocFormCommand implements IDocForm {
 
   public DocFormCommand() {
     responseMap = new EnumMap<>(ResponseState.class);
-    Stream.of(ResponseState.values())
-        .forEach(state -> responseMap.put(state, new HashSet<>()));
+    Stream.of(ResponseState.values()).forEach(state -> responseMap.put(state, new HashSet<>()));
     changedObjects = new HashMap<>();
     defaultDocRef = Optional.empty();
     isCreateAllowed = false;
@@ -157,13 +156,10 @@ public class DocFormCommand implements IDocForm {
       // apply template for request document
       changedDocs.add(xdoc);
     }
-    requestParams.stream()
-        .filter(param -> param.getDocRef().equals(docRef))
-        .map(param -> updateDocFromParam(xdoc, tdoc, param))
-        .filter(Objects::nonNull)
+    requestParams.stream().filter(param -> param.getDocRef().equals(docRef))
+        .map(param -> updateDocFromParam(xdoc, tdoc, param)).filter(Objects::nonNull)
         .forEach(changedDocs::add);
-    changedDocs.stream()
-        .forEach(this::trySaveDoc);
+    changedDocs.stream().forEach(this::trySaveDoc);
     // TODO [CELDEV-900] release lock on docRef
   }
 
@@ -207,19 +203,17 @@ public class DocFormCommand implements IDocForm {
 
   private XWikiDocument setDocField(XWikiDocument tdoc, DocFormRequestParam param) {
     DocFormRequestKey key = param.getKey();
-    Predicate<ClassField<String>> setter = field -> xDocFieldAccessor.set(
-        tdoc, field, param.getValuesAsString());
+    Predicate<ClassField<String>> setter = field -> xDocFieldAccessor.set(tdoc, field,
+        param.getValuesAsString());
     return xDocClassDef.getField(key.getFieldName(), String.class)
         .filter(log(setter).debug(LOGGER).msg(() -> format("setDocField - [{0}]", param)))
-        .map(field -> tdoc)
-        .orElse(null);
+        .map(field -> tdoc).orElse(null);
   }
 
   private XWikiDocument setObjField(XWikiDocument xdoc, DocFormRequestParam param) {
     DocFormRequestKey key = param.getKey();
     int actualObjNb = getChangedObjects().getOrDefault(key.getObjHash(), key.getObjNb());
-    XWikiObjectEditor editor = XWikiObjectEditor.on(xdoc)
-        .filter(key.getClassRef())
+    XWikiObjectEditor editor = XWikiObjectEditor.on(xdoc).filter(key.getClassRef())
         .filter(actualObjNb);
     if ((key.getObjNb() >= 0) && !editor.fetch().exists()) {
       // XXX [CELDEV-901] disable object creation from non-negative numbers
@@ -256,8 +250,7 @@ public class DocFormCommand implements IDocForm {
   }
 
   private XWikiDocument removeObj(XWikiDocument xdoc, DocFormRequestKey key) {
-    XWikiObjectEditor editor = XWikiObjectEditor.on(xdoc)
-        .filter(key.getClassRef())
+    XWikiObjectEditor editor = XWikiObjectEditor.on(xdoc).filter(key.getClassRef())
         .filter(key.getObjNb());
     if (!editor.delete().isEmpty()) {
       LOGGER.debug("removeObj: removed obj for [{}]", key);
@@ -280,12 +273,12 @@ public class DocFormCommand implements IDocForm {
     } else {
       try {
         modelAccess.saveDocument(doc, "updateAndSaveDocFormRequest");
-        LOGGER.info("saved doc [{}], lang [{}]",
-            serialize(doc.getDocumentReference()), doc.getLanguage());
+        LOGGER.info("saved doc [{}], lang [{}]", serialize(doc.getDocumentReference()),
+            doc.getLanguage());
         state = ResponseState.successful;
       } catch (DocumentSaveException dse) {
-        LOGGER.error("failed saving [{}], lang [{}]",
-            serialize(doc.getDocumentReference()), doc.getLanguage(), dse);
+        LOGGER.error("failed saving [{}], lang [{}]", serialize(doc.getDocumentReference()),
+            doc.getLanguage(), dse);
         state = ResponseState.failed;
       }
     }
@@ -295,13 +288,14 @@ public class DocFormCommand implements IDocForm {
   @Override
   public Map<ResponseState, Set<DocumentReference>> getResponseMap(
       List<DocFormRequestParam> requestParams) {
-    Stream.concat(defaultDocRef.map(Stream::of).orElseGet(Stream::empty),
-        requestParams.stream().map(DocFormRequestParam::getDocRef))
+    Stream
+        .concat(defaultDocRef.map(Stream::of).orElseGet(Stream::empty),
+            requestParams.stream().map(DocFormRequestParam::getDocRef))
         .filter(not(responseMap.get(ResponseState.successful)::contains))
         .filter(not(responseMap.get(ResponseState.failed)::contains))
         .forEach(responseMap.get(ResponseState.unchanged)::add);
-    return responseMap.entrySet().stream().collect(toImmutableMap(Entry::getKey,
-        entry -> ImmutableSet.copyOf(entry.getValue())));
+    return responseMap.entrySet().stream()
+        .collect(toImmutableMap(Entry::getKey, entry -> ImmutableSet.copyOf(entry.getValue())));
   }
 
   private XWikiDocument getTranslatedDoc(XWikiDocument xdoc) {
@@ -309,8 +303,8 @@ public class DocFormCommand implements IDocForm {
     try {
       XWikiDocument tdoc = getAddTranslationCommand().getTranslatedDoc(xdoc, lang);
       LOGGER.debug("getTranslatedDoc - [{}], [{}]: lang [{}], defaultLang [{}], isSameAsMain [{}]",
-          serialize(xdoc.getDocumentReference()), lang,
-          tdoc.getLanguage(), tdoc.getDefaultLanguage(), xdoc == tdoc);
+          serialize(xdoc.getDocumentReference()), lang, tdoc.getLanguage(),
+          tdoc.getDefaultLanguage(), xdoc == tdoc);
       return tdoc;
     } catch (XWikiException xwe) {
       LOGGER.warn("getTranslatedDoc: failed for [{}]", serialize(xdoc.getDocumentReference()), xwe);
@@ -328,8 +322,7 @@ public class DocFormCommand implements IDocForm {
   AddTranslationCommand addTranslationCmd;
 
   private AddTranslationCommand getAddTranslationCommand() {
-    return Optional.ofNullable(addTranslationCmd)
-        .orElseGet(AddTranslationCommand::new);
+    return Optional.ofNullable(addTranslationCmd).orElseGet(AddTranslationCommand::new);
   }
 
 }

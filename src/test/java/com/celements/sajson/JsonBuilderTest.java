@@ -51,8 +51,8 @@ public class JsonBuilderTest {
     builder.openProperty("k");
     JsonBuilder clone = new JsonBuilder(builder);
     assertNotSame(builder.getCommandStack(), clone.getCommandStack());
-    assertEquals(new ArrayList<>(builder.getCommandStack()), new ArrayList<>(
-        clone.getCommandStack()));
+    assertEquals(new ArrayList<>(builder.getCommandStack()),
+        new ArrayList<>(clone.getCommandStack()));
     assertEquals(builder.getJSONWithoutCheck(), clone.getJSONWithoutCheck());
     assertEquals(builder.isOnFirstElement(), clone.isOnFirstElement());
 
@@ -94,9 +94,9 @@ public class JsonBuilderTest {
   @Test
   public void test_openDictionary() {
     builder.openDictionary();
-    assertEquals("Expecting after openDictionary topmost element on stack"
-        + " must be openDictionary.", ECommand.DICTIONARY_COMMAND,
-        builder.getCommandStack().peek());
+    assertEquals(
+        "Expecting after openDictionary topmost element on stack" + " must be openDictionary.",
+        ECommand.DICTIONARY_COMMAND, builder.getCommandStack().peek());
     assertTrue("openArray must add '{' to the json expression.",
         builder.getJSONWithoutCheck().endsWith("{"));
     assertFalse("openArray may not add ',' to the json expression.",
@@ -108,9 +108,9 @@ public class JsonBuilderTest {
   public void test_openDictionary_notFirstElement() {
     builder.setOnFirstElement(false);
     builder.openDictionary();
-    assertEquals("Expecting after openDictionary topmost element on stack"
-        + " must be openDictionary.", ECommand.DICTIONARY_COMMAND,
-        builder.getCommandStack().peek());
+    assertEquals(
+        "Expecting after openDictionary topmost element on stack" + " must be openDictionary.",
+        ECommand.DICTIONARY_COMMAND, builder.getCommandStack().peek());
     assertTrue("openArray must add ', {' to the json expression.",
         builder.getJSONWithoutCheck().endsWith(", {"));
     assertTrue("After openDictionary firstElement must be true.", builder.isOnFirstElement());
@@ -137,8 +137,9 @@ public class JsonBuilderTest {
     assertEquals("Expecting after openProperty topmost element on stack" + " must be openProperty.",
         ECommand.PROPERTY_COMMAND, builder.getCommandStack().peek());
     String unfinishedJson = builder.getJSONWithoutCheck();
-    assertTrue("openProperty must add a leading ',' and the key with"
-        + " a colon-separator to the json expression. '" + unfinishedJson + "'",
+    assertTrue(
+        "openProperty must add a leading ',' and the key with"
+            + " a colon-separator to the json expression. '" + unfinishedJson + "'",
         unfinishedJson.endsWith(", \"key\" : "));
     assertTrue("After openProperty firstElement must be true.", builder.isOnFirstElement());
   }
@@ -352,8 +353,8 @@ public class JsonBuilderTest {
 
   @Test
   public void test_toJsonString_EscapeQuotes() {
-    assertEquals("String must be capselled in Quotes.", "\"aasdf38z6 ljb\"", builder.toJsonString(
-        "aasdf38z6 ljb"));
+    assertEquals("String must be capselled in Quotes.", "\"aasdf38z6 ljb\"",
+        builder.toJsonString("aasdf38z6 ljb"));
     assertEquals("Double Quotes must be escaped.", "\"a\\\"b\"", builder.toJsonString("a\"b"));
   }
 
@@ -371,8 +372,8 @@ public class JsonBuilderTest {
 
   @Test
   public void test_toJsonString_EscapeTabs() {
-    assertEquals("Tabs must be escaped with \\t.", "\"aasdf38z6\\t ljb\"", builder.toJsonString(
-        "aasdf38z6\t ljb"));
+    assertEquals("Tabs must be escaped with \\t.", "\"aasdf38z6\\t ljb\"",
+        builder.toJsonString("aasdf38z6\t ljb"));
   }
 
   @Test
@@ -503,8 +504,9 @@ public class JsonBuilderTest {
   public void test_addValue_long() {
     builder.addValue(234098763455237134L);
     String unfinishedJSON = builder.getJSONWithoutCheck();
-    assertTrue("addValue must add '234098763455237134L' to the json expression. '" + unfinishedJSON
-        + "'", unfinishedJSON.endsWith("234098763455237134"));
+    assertTrue(
+        "addValue must add '234098763455237134L' to the json expression. '" + unfinishedJSON + "'",
+        unfinishedJSON.endsWith("234098763455237134"));
     assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 

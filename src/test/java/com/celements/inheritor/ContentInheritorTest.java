@@ -94,8 +94,8 @@ public class ContentInheritorTest extends AbstractComponentTest {
     translatedDoc1.setTitle(title_de);
     XWikiDocument testDoc1 = createDefaultMock(XWikiDocument.class);
     expect(testDoc1.isNew()).andReturn(false).anyTimes();
-    expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
-        translatedDoc1).anyTimes();
+    expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(translatedDoc1)
+        .anyTimes();
     expect(testDoc1.getDefaultLanguage()).andReturn("en").anyTimes();
     expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(testDoc1)
         .anyTimes();
@@ -135,8 +135,8 @@ public class ContentInheritorTest extends AbstractComponentTest {
     translatedDoc1.setContent(content_de);
     XWikiDocument testDoc1 = createDefaultMock(XWikiDocument.class);
     expect(testDoc1.isNew()).andReturn(false).anyTimes();
-    expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
-        translatedDoc1).anyTimes();
+    expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(translatedDoc1)
+        .anyTimes();
     expect(testDoc1.getDefaultLanguage()).andReturn("en").anyTimes();
     expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(testDoc1)
         .anyTimes();
@@ -144,8 +144,8 @@ public class ContentInheritorTest extends AbstractComponentTest {
     contentInheritor.setIteratorFactory(iteratorFactory);
     contentInheritor.setLanguage("de");
     replayDefault();
-    assertEquals("Expecting german content.", content_de, contentInheritor.getTranslatedContent(
-        context));
+    assertEquals("Expecting german content.", content_de,
+        contentInheritor.getTranslatedContent(context));
     verifyDefault();
   }
 

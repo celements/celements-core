@@ -34,8 +34,8 @@ public class EmptyCheckService implements IEmptyCheckRole {
 
   @Override
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
-    DocumentReference nonEmptyChildRef = new NextNonEmptyChildrenCommand().getNextNonEmptyChildren(
-        documentRef);
+    DocumentReference nonEmptyChildRef = new NextNonEmptyChildrenCommand()
+        .getNextNonEmptyChildren(documentRef);
     if (nonEmptyChildRef != null) {
       return nonEmptyChildRef;
     }

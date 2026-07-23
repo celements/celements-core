@@ -21,8 +21,8 @@ public interface ICelFTPClient {
 
   public List<String> listFileNames() throws IOException, FTPConnectionClosedException;
 
-  public boolean connectAndLogin(String host, String userName, String password) throws IOException,
-      UnknownHostException, FTPConnectionClosedException;
+  public boolean connectAndLogin(String host, String userName, String password)
+      throws IOException, UnknownHostException, FTPConnectionClosedException;
 
   public boolean connectAndLogin(String host, Integer port, String userName, String password)
       throws IOException, UnknownHostException, FTPConnectionClosedException;
@@ -242,11 +242,11 @@ public interface ICelFTPClient {
 
   public boolean getAutodetectUTF8();
 
-  public boolean downloadFile(String serverFile, String localFile) throws IOException,
-      FTPConnectionClosedException;
+  public boolean downloadFile(String serverFile, String localFile)
+      throws IOException, FTPConnectionClosedException;
 
-  public boolean uploadFile(String localFile, String serverFile) throws IOException,
-      FTPConnectionClosedException;
+  public boolean uploadFile(String localFile, String serverFile)
+      throws IOException, FTPConnectionClosedException;
 
   public List<String> listSubdirNames() throws IOException, FTPConnectionClosedException;
 

@@ -13,7 +13,9 @@ import org.xwiki.model.reference.DocumentReference;
 public interface IDocForm {
 
   public enum ResponseState {
-    successful, failed, unchanged;
+    successful,
+    failed,
+    unchanged;
   }
 
   IDocForm initialize(DocumentReference defaultDocRef, boolean isCreateAllowed);

@@ -74,23 +74,18 @@ public class CSSEngine implements ICSSEngine {
     } else if (vcontext.containsKey(field)) {
       cssList = (List<CSS>) vcontext.get(field);
     } else {
-      cssList = Stream.ofNullable(baseCSSList).flatMap(List::stream)
-          .filter(Objects::nonNull)
-          .<CSS>map(CSSBaseObject::new)
-          .collect(toList());
+      cssList = Stream.ofNullable(baseCSSList).flatMap(List::stream).filter(Objects::nonNull)
+          .<CSS>map(CSSBaseObject::new).collect(toList());
     }
-    Splitter.on(" ").trimResults().omitEmptyStrings()
-        .splitToStream(requireNonNullElse(css, ""))
-        .flatMap(this::collectCssPaths)
-        .forEach(cssList::add);
+    Splitter.on(" ").trimResults().omitEmptyStrings().splitToStream(requireNonNullElse(css, ""))
+        .flatMap(this::collectCssPaths).forEach(cssList::add);
     vcontext.put(field, cssList);
     return cssList;
   }
 
   private Stream<CSS> collectCssPaths(String path) {
     if (resolver.isFrontendSource(path)) {
-      return resolver.get(path).stream()
-          .flatMap(resource -> resource.cssPaths().stream())
+      return resolver.get(path).stream().flatMap(resource -> resource.cssPaths().stream())
           .map(CSSFrontendResource::new);
     } else {
       return Stream.of(new CSSString(path));

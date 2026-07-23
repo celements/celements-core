@@ -40,8 +40,8 @@ public class ResetProgrammingRightsCommand {
         context.setDatabase("celements2web");
         Session sess = getNewHibSession(context);
         Transaction transaction = sess.beginTransaction();
-        Query query = sess.createQuery("update com.xpn.xwiki.doc.XWikiDocument"
-            + " set contentAuthor = :username");
+        Query query = sess.createQuery(
+            "update com.xpn.xwiki.doc.XWikiDocument" + " set contentAuthor = :username");
         query.setParameter("username", context.getUser());
         result = query.executeUpdate();
         LOGGER.info("updated [{}] documents. Set to content author [{}] in database [{}].", result,

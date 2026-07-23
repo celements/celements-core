@@ -65,8 +65,8 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
 
   @Test
   public void testGetEvents() {
-    List<String> expectedEventClassList = Arrays.asList(
-        new DocumentUpdatedEvent().getClass().getName());
+    List<String> expectedEventClassList = Arrays
+        .asList(new DocumentUpdatedEvent().getClass().getName());
     replayDefault();
     List<Event> actualEventList = eventListener.getEvents();
     assertEquals(expectedEventClassList.size(), actualEventList.size());
@@ -84,8 +84,8 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     document.addXObject(menuItemObj);
     replayDefault();
     assertTrue(eventListener.isMenuItemAdded(document, origDoc));
@@ -99,8 +99,8 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemOrigObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     origDoc.addXObject(menuItemOrigObj);
     replayDefault();
     assertFalse(eventListener.isMenuItemAdded(document, origDoc));
@@ -114,12 +114,12 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     document.addXObject(menuItemObj);
     BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemOrigObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     origDoc.addXObject(menuItemOrigObj);
     replayDefault();
     assertFalse(eventListener.isMenuItemAdded(document, origDoc));
@@ -144,8 +144,8 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     document.addXObject(menuItemObj);
     replayDefault();
     assertFalse(eventListener.isMenuItemDeleted(document, origDoc));
@@ -159,8 +159,8 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemOrigObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     origDoc.addXObject(menuItemOrigObj);
     replayDefault();
     assertTrue(eventListener.isMenuItemDeleted(document, origDoc));
@@ -174,12 +174,12 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     document.addXObject(menuItemObj);
     BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemOrigObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     origDoc.addXObject(menuItemOrigObj);
     replayDefault();
     assertFalse(eventListener.isMenuItemDeleted(document, origDoc));
@@ -215,8 +215,8 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemOrigObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     origDoc.addXObject(menuItemOrigObj);
     replayDefault();
     assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
@@ -230,8 +230,8 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     document.addXObject(menuItemObj);
     replayDefault();
     assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
@@ -245,13 +245,13 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemOrigObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     menuItemOrigObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
     origDoc.addXObject(menuItemOrigObj);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 1);
     document.addXObject(menuItemObj);
     replayDefault();
@@ -266,13 +266,13 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemOrigObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     menuItemOrigObj.setStringValue(NavigationClasses.MENU_PART_FIELD, "");
     origDoc.addXObject(menuItemOrigObj);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     menuItemObj.setStringValue(NavigationClasses.MENU_PART_FIELD, "mainNav");
     document.addXObject(menuItemObj);
     replayDefault();
@@ -293,13 +293,13 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
         "TestSpace", "TestOrigParentPage");
     origDoc.setParentReference((EntityReference) origParentReference);
     BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemOrigObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     menuItemOrigObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
     origDoc.addXObject(menuItemOrigObj);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
     document.addXObject(menuItemObj);
     replayDefault();
@@ -337,13 +337,13 @@ public class TreeNodeDocumentUpdatedListenerTest extends AbstractComponentTest {
         "TestSpace", "TestParentPage");
     origDoc.setParentReference((EntityReference) origParentReference);
     BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemOrigObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     menuItemOrigObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
     origDoc.addXObject(menuItemOrigObj);
     BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
+    menuItemObj
+        .setXClassReference(getNavigationClasses().getMenuItemClassRef(context.getDatabase()));
     menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
     document.addXObject(menuItemObj);
     replayDefault();

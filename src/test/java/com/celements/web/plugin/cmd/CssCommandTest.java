@@ -25,9 +25,7 @@ public class CssCommandTest extends AbstractComponentTest {
 
   @Before
   public void setUp_CssCommandTest() throws Exception {
-    registerComponentMocks(
-        FrontendResourceResolver.class,
-        IModelAccessFacade.class,
+    registerComponentMocks(FrontendResourceResolver.class, IModelAccessFacade.class,
         LayoutServiceRole.class);
   }
 
@@ -54,8 +52,8 @@ public class CssCommandTest extends AbstractComponentTest {
   @Test
   public void test_includeApplicationDefaultCSS_registerMockComponent_oneElem() throws Exception {
     ICssExtensionRole testCssExtMock = registerComponentMock(ICssExtensionRole.class, "testCssExt");
-    expect(testCssExtMock.getCssList()).andReturn(Arrays.<CSS>asList(new CSSString(
-        ":celRes/test.css", getContext()))).once();
+    expect(testCssExtMock.getCssList())
+        .andReturn(Arrays.<CSS>asList(new CSSString(":celRes/test.css", getContext()))).once();
     cssCommand = getBeanFactory().getBean(CssCommand.class);
     replayDefault();
     List<CSS> cssList = cssCommand.includeApplicationDefaultCSS();

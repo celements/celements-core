@@ -149,14 +149,13 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   PageTypeReference getDefaultPageTypeReference() {
-    return pageTypeService.getPageTypeReference(RichTextPageType.NAME).toJavaUtil()
-        .orElseThrow();
+    return pageTypeService.getPageTypeReference(RichTextPageType.NAME).toJavaUtil().orElseThrow();
   }
 
   @Override
   public Optional<PageTypeReference> resolvePageTypeReference(XWikiDocument doc) {
-    return pageTypeService.getPageTypeReference(getPageTypeFetcher(doc).fetchField(
-        PageTypeClass.FIELD_PAGE_TYPE).first().or(""));
+    return pageTypeService.getPageTypeReference(
+        getPageTypeFetcher(doc).fetchField(PageTypeClass.FIELD_PAGE_TYPE).first().or(""));
   }
 
   @Override
@@ -183,8 +182,8 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
     if (useTemplateDoc(doc)) {
       doc = webUtilsService.getWikiTemplateDoc();
     }
-    XWikiObjectFetcher fetcher = XWikiObjectFetcher.on((doc.getTranslation() == 0) ? doc
-        : new XWikiDocument(doc.getDocumentReference()))
+    XWikiObjectFetcher fetcher = XWikiObjectFetcher
+        .on((doc.getTranslation() == 0) ? doc : new XWikiDocument(doc.getDocumentReference()))
         .filter(pageTypeClassDef);
     if (LOGGER.isTraceEnabled() && fetcher.exists()) {
       LOGGER.trace("getPageTypeFetcher - for [{}] with object [{}] details: {}", doc,
@@ -196,8 +195,8 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   private boolean useTemplateDoc(XWikiDocument doc) {
-    return doc.isNew() && (context.getDoc() != null) && doc.getDocumentReference().equals(
-        context.getDoc().getDocumentReference())
+    return doc.isNew() && (context.getDoc() != null)
+        && doc.getDocumentReference().equals(context.getDoc().getDocumentReference())
         && (webUtilsService.getWikiTemplateDocRef() != null);
   }
 

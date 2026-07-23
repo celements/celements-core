@@ -50,11 +50,11 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     document = createDefaultMock(XWikiDocument.class);
     cellDocRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
     cellDoc = new XWikiDocument(cellDocRef);
-    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(cellDocRef)))
-        .andReturn(cellDoc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(cellDocRef))).andReturn(cellDoc)
+        .anyTimes();
     pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
-    defaultValueProviderDesc = getComponentManager().getComponentDescriptor(
-        EntityReferenceValueProvider.class, "default");
+    defaultValueProviderDesc = getComponentManager()
+        .getComponentDescriptor(EntityReferenceValueProvider.class, "default");
     savedDefaultValueProviderService = Utils.getComponent(EntityReferenceValueProvider.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     defValueProviderMock = createDefaultMock(EntityReferenceValueProvider.class);
@@ -71,17 +71,18 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
   @Test
   public void test_getPageDepCellConfigClassDocRef() {
     replayDefault();
-    assertEquals(new DocumentReference(context.getDatabase(),
-        PageDependentDocumentReferenceCommand.PAGE_DEP_CELL_CONFIG_CLASS_SPACE,
-        PageDependentDocumentReferenceCommand.PAGE_DEP_CELL_CONFIG_CLASS_DOC),
+    assertEquals(
+        new DocumentReference(context.getDatabase(),
+            PageDependentDocumentReferenceCommand.PAGE_DEP_CELL_CONFIG_CLASS_SPACE,
+            PageDependentDocumentReferenceCommand.PAGE_DEP_CELL_CONFIG_CLASS_DOC),
         pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
     verifyDefault();
   }
 
   @Test
   public void test_getCurrentLayoutRef() {
-    SpaceReference expectedLayoutRef = new SpaceReference("MyLayout", new WikiReference(
-        context.getDatabase()));
+    SpaceReference expectedLayoutRef = new SpaceReference("MyLayout",
+        new WikiReference(context.getDatabase()));
     expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(expectedLayoutRef).once();
     replayDefault();
     assertEquals(expectedLayoutRef, pageDepDocRefCmd.getCurrentLayoutRef());
@@ -90,8 +91,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
 
   @Test
   public void test_getCurrentLayoutRef_injectLayout() {
-    SpaceReference expectedLayoutRef = new SpaceReference("MyLayout", new WikiReference(
-        context.getDatabase()));
+    SpaceReference expectedLayoutRef = new SpaceReference("MyLayout",
+        new WikiReference(context.getDatabase()));
     pageDepDocRefCmd.setCurrentLayoutRef(expectedLayoutRef);
     replayDefault();
     assertEquals(expectedLayoutRef, pageDepDocRefCmd.getCurrentLayoutRef());
@@ -103,11 +104,11 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     DocumentReference currentDocRef = createDefaultMock(DocumentReference.class);
     List<SpaceReference> emptySpaceRefList = Collections.emptyList();
     expect(currentDocRef.getSpaceReferences()).andReturn(emptySpaceRefList);
-    expect(defValueProviderMock.getDefaultValue(eq(EntityType.SPACE))).andReturn(
-        "myDefaultSpace").once();
+    expect(defValueProviderMock.getDefaultValue(eq(EntityType.SPACE))).andReturn("myDefaultSpace")
+        .once();
     replayDefault();
-    assertEquals("myDefaultSpace", pageDepDocRefCmd.getCurrentDocumentSpaceRef(
-        currentDocRef).getName());
+    assertEquals("myDefaultSpace",
+        pageDepDocRefCmd.getCurrentDocumentSpaceRef(currentDocRef).getName());
     verifyDefault();
   }
 
@@ -171,8 +172,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myDocument");
     replayDefault();
-    assertEquals("Content", pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef,
-        cellDocRef).getName());
+    assertEquals("Content",
+        pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef, cellDocRef).getName());
     verifyDefault();
   }
 
@@ -181,8 +182,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     replayDefault();
-    assertEquals("mySpace", pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef,
-        cellDocRef).getName());
+    assertEquals("mySpace",
+        pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef, cellDocRef).getName());
     verifyDefault();
   }
 
@@ -192,8 +193,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myDocument");
     replayDefault();
-    assertEquals("Content", pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef,
-        cellDocRef).getName());
+    assertEquals("Content",
+        pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef, cellDocRef).getName());
     verifyDefault();
   }
 
@@ -203,8 +204,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "MySpace",
         "myDocument");
     replayDefault();
-    assertEquals("MySpace", pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef,
-        cellDocRef).getName());
+    assertEquals("MySpace",
+        pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef, cellDocRef).getName());
     verifyDefault();
   }
 
@@ -214,8 +215,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myDocument");
     replayDefault();
-    assertEquals("Content_myDepSpace", pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef,
-        cellDocRef).getName());
+    assertEquals("Content_myDepSpace",
+        pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef, cellDocRef).getName());
     verifyDefault();
   }
 
@@ -225,8 +226,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     replayDefault();
-    assertEquals("mySpace_myDepSpace", pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef,
-        cellDocRef).getName());
+    assertEquals("mySpace_myDepSpace",
+        pageDepDocRefCmd.getDependentDocumentSpaceRef(currentDocRef, cellDocRef).getName());
     verifyDefault();
   }
 
@@ -256,8 +257,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
     replayDefault();
-    assertEquals(expectedDocRef, pageDepDocRefCmd.getDocumentReference(expectedDocRef, cellDocRef,
-        false));
+    assertEquals(expectedDocRef,
+        pageDepDocRefCmd.getDocumentReference(expectedDocRef, cellDocRef, false));
     verifyDefault();
   }
 
@@ -269,8 +270,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
         "mySpace_myDepSpace", "myDocument");
     replayDefault();
-    assertEquals(expectedDocRef, pageDepDocRefCmd.getDocumentReference(currentDocRef, cellDocRef,
-        false));
+    assertEquals(expectedDocRef,
+        pageDepDocRefCmd.getDocumentReference(currentDocRef, cellDocRef, false));
     verifyDefault();
   }
 
@@ -322,8 +323,8 @@ public class PageDependentDocumentReferenceCommandTest extends AbstractComponent
     XWikiDocument expectedDoc = createDefaultMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq(expectedDocRef), same(context))).andReturn(expectedDoc).once();
     XWikiDocument expectedTransDoc = new XWikiDocument(expectedDocRef);
-    expect(expectedDoc.getTranslatedDocument(eq(contextLang), same(context))).andReturn(
-        expectedTransDoc).once();
+    expect(expectedDoc.getTranslatedDocument(eq(contextLang), same(context)))
+        .andReturn(expectedTransDoc).once();
     replayDefault();
     assertEquals(expectedTransDoc, pageDepDocRefCmd.getTranslatedDocument(document, cellDocRef));
     verifyDefault();

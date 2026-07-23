@@ -41,15 +41,14 @@ public class XWikiPreferencesClassActivationListener implements EventListener {
 
   public static final String NAME = "celements.classes.XWikiPreferencesClassActivationListener";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      XWikiPreferencesClassActivationListener.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(XWikiPreferencesClassActivationListener.class);
 
   private final IClassesCompositorComponent classesCompositor;
   private final Execution execution;
 
   @Inject
-  public XWikiPreferencesClassActivationListener(
-      IClassesCompositorComponent classesCompositor,
+  public XWikiPreferencesClassActivationListener(IClassesCompositorComponent classesCompositor,
       Execution execution) {
     this.classesCompositor = classesCompositor;
     this.execution = execution;

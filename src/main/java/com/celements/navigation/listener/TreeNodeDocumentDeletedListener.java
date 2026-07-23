@@ -41,10 +41,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("TreeNodeDocumentDeletedListener")
-public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentListener implements
-    EventListener {
+public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentListener
+    implements EventListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TreeNodeDocumentDeletedListener.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(TreeNodeDocumentDeletedListener.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -82,8 +83,8 @@ public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentLis
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + document.getDocumentReference() + "].");
-      BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-          getContext().getDatabase()));
+      BaseObject menuItemObj = document
+          .getXObject(getNavClasses().getMenuItemClassRef(getContext().getDatabase()));
       if (menuItemObj != null) {
         LOGGER.debug("TreeNodeDocumentDeletedListener checkMenuItemDiffs deleted from "
             + document.getDocumentReference() + "]");

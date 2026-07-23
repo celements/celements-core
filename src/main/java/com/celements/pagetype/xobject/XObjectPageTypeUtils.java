@@ -40,8 +40,8 @@ public class XObjectPageTypeUtils implements XObjectPageTypeUtilsRole {
   @Override
   @NotNull
   public DocumentReference getDocRefForPageType(@NotNull String configName) {
-    DocumentReference pageTypeDocRef = new DocumentReference(configName, new SpaceReference(
-        DEFAULT_PAGE_TYPES_SPACE, webUtilsService.getWikiRef()));
+    DocumentReference pageTypeDocRef = new DocumentReference(configName,
+        new SpaceReference(DEFAULT_PAGE_TYPES_SPACE, webUtilsService.getWikiRef()));
     return pageTypeDocRef;
   }
 

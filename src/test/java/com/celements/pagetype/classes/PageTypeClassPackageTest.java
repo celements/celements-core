@@ -48,10 +48,10 @@ public class PageTypeClassPackageTest extends AbstractComponentTest {
   @Test
   public void getClassDefinitionsTest() {
     assertEquals(2, pageTypeClassPackage.getClassDefinitions().size());
-    assertTrue(pageTypeClassPackage.getClassDefinitions().contains(Utils.getComponent(
-        ClassDefinition.class, PageTypeClass.CLASS_DEF_HINT)));
-    assertTrue(pageTypeClassPackage.getClassDefinitions().contains(Utils.getComponent(
-        ClassDefinition.class, PageTypePropertiesClass.CLASS_DEF_HINT)));
+    assertTrue(pageTypeClassPackage.getClassDefinitions()
+        .contains(Utils.getComponent(ClassDefinition.class, PageTypeClass.CLASS_DEF_HINT)));
+    assertTrue(pageTypeClassPackage.getClassDefinitions().contains(
+        Utils.getComponent(ClassDefinition.class, PageTypePropertiesClass.CLASS_DEF_HINT)));
   }
 
 }

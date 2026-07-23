@@ -52,16 +52,10 @@ public class AppScriptService implements IAppScriptService {
   private final ConfigurationSource xwikiConfigSource;
 
   @Inject
-  public AppScriptService(
-      IEmptyCheckRole emptyCheck,
-      Execution execution,
-      EntityReferenceValueProvider defaultEntityReferenceValueProvider,
-      XWikiProvider wikiProvider,
-      IModelAccessFacade modelAccess,
-      ModelUtils modelUtils,
-      ModelContext mContext,
-      UrlService urlService,
-      @Named(XWikiConfigSource.NAME) ConfigurationSource xwikiConfigSource) {
+  public AppScriptService(IEmptyCheckRole emptyCheck, Execution execution,
+      EntityReferenceValueProvider defaultEntityReferenceValueProvider, XWikiProvider wikiProvider,
+      IModelAccessFacade modelAccess, ModelUtils modelUtils, ModelContext mContext,
+      UrlService urlService, @Named(XWikiConfigSource.NAME) ConfigurationSource xwikiConfigSource) {
     this.emptyCheck = emptyCheck;
     this.execution = execution;
     this.defaultEntityReferenceValueProvider = defaultEntityReferenceValueProvider;
@@ -140,8 +134,7 @@ public class AppScriptService implements IAppScriptService {
   @Override
   public Optional<DocumentReference> getAppRecursiveScriptDocRef(String scriptName) {
     return findAppScriptRecursivly(scriptName,
-        sn -> hasLocalAppRecursiveScript(sn)
-            || hasCentralAppRecursiveScript(sn),
+        sn -> hasLocalAppRecursiveScript(sn) || hasCentralAppRecursiveScript(sn),
         sn -> sn.lastIndexOf("/") > 0).flatMap(scriptNameFound -> {
           if (hasLocalAppRecursiveScript(scriptNameFound)) {
             return getLocalAppRecursiveScriptDocRef(scriptNameFound);
@@ -197,27 +190,25 @@ public class AppScriptService implements IAppScriptService {
 
   @Override
   public Optional<String> getAppRecursiveScript(String scriptName) {
-    return findAppScriptRecursivly(scriptName,
-        sn -> isAppScriptAvailable(sn + "++"),
-        sn -> sn.lastIndexOf("/") > 0)
-        .map(sNT -> sNT + "++")
+    return findAppScriptRecursivly(scriptName, sn -> isAppScriptAvailable(sn + "++"),
+        sn -> sn.lastIndexOf("/") > 0).map(sNT -> sNT + "++")
         .filter(sNT -> !Strings.isNullOrEmpty(sNT) && isAppScriptAvailable(sNT));
   }
 
   @Override
   public Optional<String> getAppRecursiveSetupScript(String scriptName) {
-    return getAppRecursiveScript(scriptName)
-        .filter(script -> script.endsWith("++"))
+    return getAppRecursiveScript(scriptName).filter(script -> script.endsWith("++"))
         .map(script -> script.substring(0, script.length() - 2) + "_setup++")
         .filter(this::isAppScriptAvailable);
   }
 
-  private Optional<String> findAppScriptRecursivly(String scriptName,
-      Predicate<String> hasFound, Predicate<String> hasMore) {
+  private Optional<String> findAppScriptRecursivly(String scriptName, Predicate<String> hasFound,
+      Predicate<String> hasMore) {
     String scriptNameTest = scriptName;
     do {
       scriptNameTest = reduceOneDirectory(scriptNameTest);
-    } while (scriptNameTest != null && !hasFound.test(scriptNameTest) && hasMore.test(scriptNameTest));
+    } while (scriptNameTest != null && !hasFound.test(scriptNameTest)
+        && hasMore.test(scriptNameTest));
     if (scriptNameTest != null && hasFound.test(scriptNameTest)) {
       return Optional.of(scriptNameTest);
     }
@@ -248,8 +239,8 @@ public class AppScriptService implements IAppScriptService {
     queryString = "xpage=" + IAppScriptService.APP_SCRIPT_XPAGE + "&s=" + scriptName + queryString;
     if (scriptName.split("/").length <= 2) {
       return urlService.getURL(
-          modelUtils.resolveRef(scriptName.replace("/", "."), DocumentReference.class),
-          "view", queryString);
+          modelUtils.resolveRef(scriptName.replace("/", "."), DocumentReference.class), "view",
+          queryString);
     } else {
       return Util.escapeURL("/app/" + scriptName + "?" + queryString);
     }
@@ -318,8 +309,7 @@ public class AppScriptService implements IAppScriptService {
 
   private boolean isAppScriptSpaceRequest() {
     return "view".equals(getContext().getAction())
-        && mContext.getDocRef().orElseThrow().getSpaceReferences().contains(
-            getCurrentSpaceRef());
+        && mContext.getDocRef().orElseThrow().getSpaceReferences().contains(getCurrentSpaceRef());
   }
 
   private SpaceReference getCurrentSpaceRef() {
@@ -340,8 +330,8 @@ public class AppScriptService implements IAppScriptService {
       if (path.startsWith(getContext().getAction())) {
         path = path.replaceAll("^" + getContext().getAction() + "/+", "");
       }
-      path = path.replaceFirst("^" + defaultEntityReferenceValueProvider.getDefaultValue(
-          EntityType.SPACE) + "/", "");
+      path = path.replaceFirst(
+          "^" + defaultEntityReferenceValueProvider.getDefaultValue(EntityType.SPACE) + "/", "");
       if ("".equals(path)) {
         path = defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT);
       } else if (path.endsWith("/")) {

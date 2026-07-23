@@ -121,8 +121,8 @@ public class MultilingualMenuNameCommandTest extends AbstractComponentTest {
     currentDoc.setObject(MultilingualMenuNameCommand.CELEMENTS_MENU_NAME, 0, menuNameObj);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     replayDefault();
-    assertEquals("title=\"Tool tip for test\"", menuNameCmd.addToolTip(currentDoc.getFullName(),
-        "de", context));
+    assertEquals("title=\"Tool tip for test\"",
+        menuNameCmd.addToolTip(currentDoc.getFullName(), "de", context));
     verifyDefault();
   }
 

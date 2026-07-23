@@ -62,8 +62,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
     listener.injectRemoteObservationManagerContext(
         remoteObsManContextMock = createDefaultMock(RemoteObservationManagerContext.class));
-    listener.injectObservationManager(obsManagerMock = createDefaultMock(
-        ObservationManager.class));
+    listener.injectObservationManager(obsManagerMock = createDefaultMock(ObservationManager.class));
     listener.configSrc = Utils.getComponent(ConfigurationSource.class);
 
     deletingEventMock = createDefaultMock(Event.class);
@@ -77,10 +76,10 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
       eventClasses.add(theEvent.getClass());
     }
     assertEquals(2, eventClasses.size());
-    assertTrue("Expecting registration for DocumentDeletingEvent", eventClasses.contains(
-        DocumentDeletingEvent.class));
-    assertTrue("Expecting registration for DocumentDeletedEvent events", eventClasses.contains(
-        DocumentDeletedEvent.class));
+    assertTrue("Expecting registration for DocumentDeletingEvent",
+        eventClasses.contains(DocumentDeletingEvent.class));
+    assertTrue("Expecting registration for DocumentDeletedEvent events",
+        eventClasses.contains(DocumentDeletedEvent.class));
   }
 
   @Test

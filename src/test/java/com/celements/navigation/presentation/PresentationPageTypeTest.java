@@ -70,16 +70,16 @@ public class PresentationPageTypeTest extends AbstractComponentTest {
   @Test
   public void test_getViewTemplateName() {
     replayDefault();
-    assertEquals(PresentationPageType.VIEW_TEMPLATE_NAME, presentationPageType
-        .getViewTemplateName());
+    assertEquals(PresentationPageType.VIEW_TEMPLATE_NAME,
+        presentationPageType.getViewTemplateName());
     verifyDefault();
   }
 
   @Test
   public void test_getEditTemplateName() {
     replayDefault();
-    assertEquals(PresentationPageType.EDIT_TEMPLATE_NAME, presentationPageType
-        .getEditTemplateName());
+    assertEquals(PresentationPageType.EDIT_TEMPLATE_NAME,
+        presentationPageType.getEditTemplateName());
     verifyDefault();
   }
 

@@ -37,8 +37,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component("default")
 @Singleton
-public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
-    IDefaultEmptyDocStrategyRole {
+public class DefaultEmptyDocStrategy
+    implements IEmptyDocStrategyRole, IDefaultEmptyDocStrategyRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultEmptyDocStrategy.class);
 
@@ -79,8 +79,8 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
   @Override
   public boolean isEmptyRTEDocumentTranslated(DocumentReference docRef) {
     try {
-      return isEmptyRTEDocument(getContext().getWiki().getDocument(docRef,
-          getContext()).getTranslatedDocument(getContext().getLanguage(), getContext()));
+      return isEmptyRTEDocument(getContext().getWiki().getDocument(docRef, getContext())
+          .getTranslatedDocument(getContext().getLanguage(), getContext()));
     } catch (XWikiException exp) {
       LOGGER.error("isEmptyRTEDocumentTranslated failed getting document. ", exp);
     }
@@ -95,8 +95,8 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
   @Override
   public boolean isEmptyRTEString(String rteContent) {
     checkNotNull(rteContent);
-    return "".equals(rteContent.replaceAll(
-        "(<p>)?(<span.*?>)?(\\s*(&nbsp;|<br\\s*/>))*\\s*(</span>)?(</p>)?", "").trim());
+    return "".equals(rteContent
+        .replaceAll("(<p>)?(<span.*?>)?(\\s*(&nbsp;|<br\\s*/>))*\\s*(</span>)?(</p>)?", "").trim());
   }
 
   @Override
@@ -112,8 +112,8 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
   @Override
   public boolean isEmptyDocumentTranslated(DocumentReference docRef) {
     try {
-      return isEmptyDocument(getContext().getWiki().getDocument(docRef,
-          getContext()).getTranslatedDocument(getContext().getLanguage(), getContext()));
+      return isEmptyDocument(getContext().getWiki().getDocument(docRef, getContext())
+          .getTranslatedDocument(getContext().getLanguage(), getContext()));
     } catch (XWikiException exp) {
       LOGGER.error("isEmptyDocumentTranslated failed getting document", exp);
     }

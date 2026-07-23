@@ -98,17 +98,19 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
     boolean isLastItem = false;
     boolean isLeaf = true;
     String expectedNodeContent = "expected rendered content for node";
-    expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view"))).andReturn(
-        expectedNodeContent);
-    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
-        "id=\"N3:Content:Content.MyPage\"").once();
-    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
-        isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
-            + " first cel_nav_isLeaf RichText\"").once();
+    expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view")))
+        .andReturn(expectedNodeContent);
+    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn("id=\"N3:Content:Content.MyPage\"")
+        .once();
+    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem),
+        eq(isLeaf), eq(1)))
+        .andReturn("class=\"cel_cm_navigation_menuitem" + " first cel_nav_isLeaf RichText\"")
+        .once();
     replayDefault();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
-    assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
-        + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
+    assertEquals(
+        "<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
+            + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
         outStream.toString());
     verifyDefault();
   }

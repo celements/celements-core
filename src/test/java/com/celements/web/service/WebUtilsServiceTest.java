@@ -67,8 +67,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testGetParentForLevel_1() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
-        true))).andReturn(Collections.<DocumentReference>emptyList()).once();
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(true)))
+        .andReturn(Collections.<DocumentReference>emptyList()).once();
 
     replayDefault();
     context.setDoc(doc);
@@ -82,8 +82,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
-        true))).andReturn(Arrays.asList(docRef, parentRef)).once();
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(true)))
+        .andReturn(Arrays.asList(docRef, parentRef)).once();
     replayDefault();
     context.setDoc(doc);
     assertEquals(parentRef, webUtilsService.getParentForLevel(2));
@@ -96,8 +96,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
-        true))).andReturn(Arrays.asList(docRef, parentRef)).once();
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(true)))
+        .andReturn(Arrays.asList(docRef, parentRef)).once();
     replayDefault();
     context.setDoc(doc);
     assertEquals(docRef, webUtilsService.getParentForLevel(3));
@@ -110,8 +110,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     XWikiDocument doc = new XWikiDocument(docRef);
-    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
-        true))).andReturn(Arrays.asList(docRef, parentRef)).times(3);
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(true)))
+        .andReturn(Arrays.asList(docRef, parentRef)).times(3);
     replayDefault();
     context.setDoc(doc);
     assertNull(webUtilsService.getParentForLevel(4));
@@ -128,8 +128,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     List<DocumentReference> docParentsList = Arrays.asList(parentRef);
-    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
-        includeDoc))).andReturn(docParentsList).once();
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef),
+        eq(includeDoc))).andReturn(docParentsList).once();
     replayDefault();
     assertSame(docParentsList, webUtilsService.getDocumentParentsList(docRef, includeDoc));
     verifyDefault();
@@ -143,8 +143,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     List<DocumentReference> docParentsList = Arrays.asList(parentRef);
-    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef), eq(
-        includeDoc))).andReturn(docParentsList).once();
+    expect(getMock(IDocumentParentsListerRole.class).getDocumentParentsList(eq(docRef),
+        eq(includeDoc))).andReturn(docParentsList).once();
     replayDefault();
     assertSame(docParentsList, webUtilsService.getDocumentParentsList(docRef, includeDoc));
     verifyDefault();
@@ -179,8 +179,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     XWikiDocument doc = createMock(XWikiDocument.class);
 
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
-    expect(doc.getTranslatedDocument(same(context))).andReturn(new XWikiDocument(
-        transDocRef)).once();
+    expect(doc.getTranslatedDocument(same(context))).andReturn(new XWikiDocument(transDocRef))
+        .once();
 
     replayDefault(doc);
     assertNull(webUtilsService.getDocSection("(?=<table)", docRef, 1));
@@ -199,8 +199,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
     XWikiRenderingEngine mockRenderer = createMock(XWikiRenderingEngine.class);
     expect(xwiki.getRenderingEngine()).andReturn(mockRenderer).atLeastOnce();
-    expect(mockRenderer.renderText(eq("{pre}abc{/pre}"), eq(context.getDoc()), same(
-        context))).andReturn("abc").atLeastOnce();
+    expect(mockRenderer.renderText(eq("{pre}abc{/pre}"), eq(context.getDoc()), same(context)))
+        .andReturn("abc").atLeastOnce();
 
     replayDefault(doc, mockRenderer);
     assertEquals("abc", webUtilsService.getDocSection("(?=<table)", docRef, 1));
@@ -259,8 +259,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
     XWikiRenderingEngine mockRenderer = createMock(XWikiRenderingEngine.class);
     expect(xwiki.getRenderingEngine()).andReturn(mockRenderer).atLeastOnce();
-    expect(mockRenderer.renderText(eq("{pre}<table>abc</table>{/pre}"), eq(context.getDoc()), same(
-        context))).andReturn("<table>abc</table>").atLeastOnce();
+    expect(mockRenderer.renderText(eq("{pre}<table>abc</table>{/pre}"), eq(context.getDoc()),
+        same(context))).andReturn("<table>abc</table>").atLeastOnce();
 
     replayDefault(doc, mockRenderer);
     assertEquals("<table>abc</table>", webUtilsService.getDocSection("(?=<table)", docRef, 3));
@@ -553,8 +553,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testResolveRelativeEntityReference() {
-    EntityReference relativeEntityRef = webUtilsService.resolveRelativeEntityReference(
-        "MySpace.ParentDoc", EntityType.DOCUMENT);
+    EntityReference relativeEntityRef = webUtilsService
+        .resolveRelativeEntityReference("MySpace.ParentDoc", EntityType.DOCUMENT);
     assertEquals(EntityReference.class, relativeEntityRef.getClass());
     assertNull(relativeEntityRef.extractReference(EntityType.WIKI));
     assertEquals("ParentDoc", relativeEntityRef.getName());
@@ -573,8 +573,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testResolveSpaceReference() {
     WikiReference wikiRef = new WikiReference("db");
     SpaceReference spaceRef = new SpaceReference("mySpace", wikiRef);
-    SpaceReference ret = webUtilsService.resolveSpaceReference(
-        webUtilsService.getRefDefaultSerializer().serialize(spaceRef));
+    SpaceReference ret = webUtilsService
+        .resolveSpaceReference(webUtilsService.getRefDefaultSerializer().serialize(spaceRef));
     assertEquals(spaceRef, ret);
   }
 
@@ -583,8 +583,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     WikiReference wikiRef = new WikiReference("db");
     SpaceReference spaceRef = new SpaceReference("mySpace", wikiRef);
     DocumentReference docRef = new DocumentReference("myDoc", spaceRef);
-    DocumentReference ret = webUtilsService.resolveDocumentReference(
-        webUtilsService.getRefDefaultSerializer().serialize(docRef));
+    DocumentReference ret = webUtilsService
+        .resolveDocumentReference(webUtilsService.getRefDefaultSerializer().serialize(docRef));
     assertEquals(docRef, ret);
   }
 
@@ -594,8 +594,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     SpaceReference spaceRef = new SpaceReference("mySpace", wikiRef);
     DocumentReference docRef = new DocumentReference("myDoc", spaceRef);
     AttachmentReference attRef = new AttachmentReference("myFile", docRef);
-    AttachmentReference ret = webUtilsService.resolveAttachmentReference(
-        webUtilsService.getRefDefaultSerializer().serialize(attRef));
+    AttachmentReference ret = webUtilsService
+        .resolveAttachmentReference(webUtilsService.getRefDefaultSerializer().serialize(attRef));
     assertEquals(attRef, ret);
   }
 
@@ -689,8 +689,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testSplitStringByLength() {
-    String[] splitedStr = webUtilsService.splitStringByLength(
-        "Market Leader. Business Grammar and Usage, Band 1", 35);
+    String[] splitedStr = webUtilsService
+        .splitStringByLength("Market Leader. Business Grammar and Usage, Band 1", 35);
     assertEquals("Market Leader. Business Grammar and", splitedStr[0]);
     assertEquals(" Usage, Band 1", splitedStr[1]);
   }
@@ -751,8 +751,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @Test
   public void testGetWikiRef_attRef() {
     String wikiName = "mytestwiki";
-    AttachmentReference attRef = new AttachmentReference("myFile.jpg", new DocumentReference(
-        wikiName, "mySpaceName", "myDocName"));
+    AttachmentReference attRef = new AttachmentReference("myFile.jpg",
+        new DocumentReference(wikiName, "mySpaceName", "myDocName"));
     replayDefault();
     assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(attRef));
     verifyDefault();
@@ -835,8 +835,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     XWikiDocument currentDoc = new XWikiDocument(curDocRef);
     context.setDoc(currentDoc);
     expect(xwiki.getXWikiPreference(eq("languages"), same(context))).andReturn("fr,it").anyTimes();
-    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(
-        context))).andReturn("de,en").once();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context)))
+        .andReturn("de,en").once();
     replayDefault();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
@@ -850,8 +850,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     XWikiDocument currentDoc = new XWikiDocument(curDocRef);
     context.setDoc(currentDoc);
     expect(xwiki.getXWikiPreference(eq("languages"), same(context))).andReturn("fr,it").anyTimes();
-    expect(xwiki.getSpacePreference(eq("languages"), eq("testSpace"), eq(""), same(
-        context))).andReturn("de,en").once();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("testSpace"), eq(""), same(context)))
+        .andReturn("de,en").once();
     replayDefault();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
@@ -864,11 +864,11 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference curDocRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     XWikiDocument currentDoc = new XWikiDocument(curDocRef);
     context.setDoc(currentDoc);
-    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(
-        context))).andReturn("").once();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context)))
+        .andReturn("").once();
     expect(xwiki.getXWikiPreference(eq("language"), same(context))).andReturn("fr it").anyTimes();
-    expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(
-        context))).andReturn("de en").once();
+    expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(context)))
+        .andReturn("de en").once();
     replayDefault();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
@@ -881,11 +881,11 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference curDocRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     XWikiDocument currentDoc = new XWikiDocument(curDocRef);
     context.setDoc(currentDoc);
-    expect(xwiki.getSpacePreference(eq("languages"), eq("testSpace"), eq(""), same(
-        context))).andReturn("").once();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("testSpace"), eq(""), same(context)))
+        .andReturn("").once();
     expect(xwiki.getXWikiPreference(eq("language"), same(context))).andReturn("fr it").anyTimes();
-    expect(xwiki.getSpacePreference(eq("language"), eq("testSpace"), eq(""), same(
-        context))).andReturn("de en").once();
+    expect(xwiki.getSpacePreference(eq("language"), eq("testSpace"), eq(""), same(context)))
+        .andReturn("de en").once();
     replayDefault();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
@@ -895,8 +895,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetParentSpace() {
-    expect(xwiki.getSpacePreference(eq("parent"), same(context))).andReturn(
-        "parentSpaceName").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("parent"), same(context))).andReturn("parentSpaceName")
+        .atLeastOnce();
     replayDefault();
     assertEquals("parentSpaceName", webUtilsService.getParentSpace());
     verifyDefault();
@@ -904,8 +904,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetParentSpace_spaceName() {
-    expect(xwiki.getSpacePreference(eq("parent"), eq("mySpace"), eq(""), same(context))).andReturn(
-        "parentSpaceName").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("parent"), eq("mySpace"), eq(""), same(context)))
+        .andReturn("parentSpaceName").atLeastOnce();
     replayDefault();
     assertEquals("parentSpaceName", webUtilsService.getParentSpace("mySpace"));
     verifyDefault();
@@ -974,8 +974,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         "myView");
     expect(modelAccessMock.exists(centralTemplateRef)).andReturn(true);
     replayDefault();
-    assertEquals("celements2web:Templates.myView", webUtilsService.getInheritedTemplatedPath(
-        localTemplateRef));
+    assertEquals("celements2web:Templates.myView",
+        webUtilsService.getInheritedTemplatedPath(localTemplateRef));
     verifyDefault();
   }
 
@@ -985,8 +985,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         "myView");
     expect(modelAccessMock.exists(centralTemplateRef)).andReturn(true);
     replayDefault();
-    assertEquals("celements2web:Templates.myView", webUtilsService.getInheritedTemplatedPath(
-        centralTemplateRef));
+    assertEquals("celements2web:Templates.myView",
+        webUtilsService.getInheritedTemplatedPath(centralTemplateRef));
     verifyDefault();
   }
 
@@ -996,8 +996,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         "myView");
     expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
     replayDefault();
-    assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
-        centralTemplateRef));
+    assertEquals(":Templates.myView",
+        webUtilsService.getInheritedTemplatedPath(centralTemplateRef));
     verifyDefault();
   }
 
@@ -1020,21 +1020,21 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         "myView");
     expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
     replayDefault();
-    assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
-        centralTemplateRef));
+    assertEquals(":Templates.myView",
+        webUtilsService.getInheritedTemplatedPath(centralTemplateRef));
     verifyDefault();
   }
 
   @Test
   public void testGetTemplatePathOnDisk_Template() {
-    assertEquals("/templates/celTemplates/myScript.vm", webUtilsService.getTemplatePathOnDisk(
-        ":Templates.myScript"));
+    assertEquals("/templates/celTemplates/myScript.vm",
+        webUtilsService.getTemplatePathOnDisk(":Templates.myScript"));
   }
 
   @Test
   public void testGetTemplatePathOnDisk_Ajax() {
-    assertEquals("/templates/celAjax/myScript.vm", webUtilsService.getTemplatePathOnDisk(
-        ":Ajax.myScript"));
+    assertEquals("/templates/celAjax/myScript.vm",
+        webUtilsService.getTemplatePathOnDisk(":Ajax.myScript"));
   }
 
   @Test
@@ -1048,17 +1048,16 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         .andReturn(Optional.of(localTemplateDoc));
     String localScriptText = "my expected local script";
     localTemplateDoc.setContent(localScriptText);
-    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
-        XWikiRenderingEngine.class);
-    expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
-        "groovy")).anyTimes();
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(XWikiRenderingEngine.class);
+    expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"))
+        .anyTimes();
     String expectedRenderedText = "my expected rendered local script";
     expect(mockRenderingEngine.renderText(eq(localScriptText), same(localTemplateDoc),
         (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
     replayDefault();
     webUtilsService.injectedRenderingEngine = mockRenderingEngine;
-    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(localTemplateRef,
-        "de"));
+    assertEquals(expectedRenderedText,
+        webUtilsService.renderInheritableDocument(localTemplateRef, "de"));
     verifyDefault();
   }
 
@@ -1076,25 +1075,23 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         .andReturn(Optional.of(centralTemplateDoc));
     String centralScriptText = "my expected central script";
     centralTemplateDoc.setContent(centralScriptText);
-    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
-        XWikiRenderingEngine.class);
-    expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
-        "groovy")).anyTimes();
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(XWikiRenderingEngine.class);
+    expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity", "groovy"))
+        .anyTimes();
     String expectedRenderedText = "my expected rendered central script";
     expect(mockRenderingEngine.renderText(eq(centralScriptText), same(centralTemplateDoc),
         (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
     replayDefault();
     webUtilsService.injectedRenderingEngine = mockRenderingEngine;
-    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(localTemplateRef,
-        "en"));
+    assertEquals(expectedRenderedText,
+        webUtilsService.renderInheritableDocument(localTemplateRef, "en"));
     verifyDefault();
   }
 
   @Test
   public void testRenderInheritableDocument_disk_langSpecific_no_local_no_central()
       throws Exception {
-    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
-        XWikiRenderingEngine.class);
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(XWikiRenderingEngine.class);
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
     expect(modelAccessMock.exists(localTemplateRef)).andReturn(false);
@@ -1102,66 +1099,64 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         "myView");
     expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
     String diskScriptText = "my expected disk script fr";
-    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andReturn(
-        diskScriptText).once();
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm")))
+        .andReturn(diskScriptText).once();
     String expectedRenderedText = "my expected rendered disk script";
     expect(mockRenderingEngine.renderText(eq(diskScriptText), (XWikiDocument) isNull(),
         (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
     replayDefault();
     webUtilsService.injectedRenderingEngine = mockRenderingEngine;
     // TODO check for language doc on disc
-    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(localTemplateRef,
-        "fr"));
+    assertEquals(expectedRenderedText,
+        webUtilsService.renderInheritableDocument(localTemplateRef, "fr"));
     verifyDefault();
   }
 
   @Test
   public void testRenderInheritableDocument_disk_noLang_no_local_no_central() throws Exception {
-    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
-        XWikiRenderingEngine.class);
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(XWikiRenderingEngine.class);
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
     expect(modelAccessMock.exists(localTemplateRef)).andReturn(false);
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
     expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
-    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andThrow(
-        new IOException()).once();
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm")))
+        .andThrow(new IOException()).once();
     String diskScriptText = "my expected disk script";
-    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView.vm"))).andReturn(
-        diskScriptText).once();
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView.vm")))
+        .andReturn(diskScriptText).once();
     String expectedRenderedText = "my expected rendered disk script";
     expect(mockRenderingEngine.renderText(eq(diskScriptText), (XWikiDocument) isNull(),
         (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
     replayDefault();
     webUtilsService.injectedRenderingEngine = mockRenderingEngine;
-    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(localTemplateRef,
-        "fr"));
+    assertEquals(expectedRenderedText,
+        webUtilsService.renderInheritableDocument(localTemplateRef, "fr"));
     verifyDefault();
   }
 
   @Test
   public void testRenderInheritableDocument_disk_defLang_no_local_no_central() throws Exception {
-    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(
-        XWikiRenderingEngine.class);
+    XWikiRenderingEngine mockRenderingEngine = createDefaultMock(XWikiRenderingEngine.class);
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(), "Templates",
         "myView");
     expect(modelAccessMock.exists(localTemplateRef)).andReturn(false);
     DocumentReference centralTemplateRef = new DocumentReference("celements2web", "Templates",
         "myView");
     expect(modelAccessMock.exists(centralTemplateRef)).andReturn(false);
-    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andThrow(
-        new IOException()).once();
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm")))
+        .andThrow(new IOException()).once();
     String diskScriptText = "my expected disk script";
-    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_en.vm"))).andReturn(
-        diskScriptText).once();
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_en.vm")))
+        .andReturn(diskScriptText).once();
     String expectedRenderedText = "my expected rendered disk script";
     expect(mockRenderingEngine.renderText(eq(diskScriptText), (XWikiDocument) isNull(),
         (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
     replayDefault();
     webUtilsService.injectedRenderingEngine = mockRenderingEngine;
-    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(localTemplateRef,
-        "fr", "en"));
+    assertEquals(expectedRenderedText,
+        webUtilsService.renderInheritableDocument(localTemplateRef, "fr", "en"));
     verifyDefault();
   }
 
@@ -1193,8 +1188,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     List<Attachment> attachments = new ArrayList<>();
     attachments.add(new Attachment(null, null, getContext()));
     attachments.add(new Attachment(null, null, getContext()));
-    expect(xwiki.exists(eq(webUtilsService.resolveDocumentReference("Tag.T")), same(
-        getContext()))).andReturn(false).once();
+    expect(xwiki.exists(eq(webUtilsService.resolveDocumentReference("Tag.T")), same(getContext())))
+        .andReturn(false).once();
     replayDefault();
     List<Attachment> atts = webUtilsService.filterAttachmentsByTag(attachments, "Tag.T");
     verifyDefault();
@@ -1235,19 +1230,22 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     expect(tagDoc.clone()).andReturn(tagDoc).anyTimes();
     expect(xwiki.getDocument(eq(tagRef), same(getContext()))).andReturn(tagDoc).once();
     expect(tagDoc.getXObjectSize(eq(tagClassRef))).andReturn(3);
-    expect(tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/abc.jpg"), eq(
-        false))).andReturn(new BaseObject()).once();
-    expect(tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/bcd.jpg"), eq(
-        false))).andReturn(null).once();
-    expect(tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/cde.jpg"), eq(
-        false))).andReturn(new BaseObject()).once();
+    expect(
+        tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/abc.jpg"), eq(false)))
+        .andReturn(new BaseObject()).once();
+    expect(
+        tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/bcd.jpg"), eq(false)))
+        .andReturn(null).once();
+    expect(
+        tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/cde.jpg"), eq(false)))
+        .andReturn(new BaseObject()).once();
     List<Attachment> attachments = new ArrayList<>();
-    attachments.add(new Attachment(theDoc.newDocument(getContext()), new XWikiAttachment(theDoc,
-        "abc.jpg"), getContext()));
-    attachments.add(new Attachment(theDoc.newDocument(getContext()), new XWikiAttachment(theDoc,
-        "bcd.jpg"), getContext()));
-    attachments.add(new Attachment(theDoc.newDocument(getContext()), new XWikiAttachment(theDoc,
-        "cde.jpg"), getContext()));
+    attachments.add(new Attachment(theDoc.newDocument(getContext()),
+        new XWikiAttachment(theDoc, "abc.jpg"), getContext()));
+    attachments.add(new Attachment(theDoc.newDocument(getContext()),
+        new XWikiAttachment(theDoc, "bcd.jpg"), getContext()));
+    attachments.add(new Attachment(theDoc.newDocument(getContext()),
+        new XWikiAttachment(theDoc, "cde.jpg"), getContext()));
     replayDefault(tagDoc);
     List<Attachment> atts = webUtilsService.filterAttachmentsByTag(attachments, tagName);
     verifyDefault(tagDoc);
@@ -1363,8 +1361,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testResolveEntityTypeForFullName_wiki() {
     String fullName = "myWiki";
     assertSame(EntityType.WIKI, webUtilsService.resolveEntityTypeForFullName(fullName));
-    assertSame(EntityType.WIKI, webUtilsService.resolveEntityTypeForFullName(fullName,
-        EntityType.WIKI));
+    assertSame(EntityType.WIKI,
+        webUtilsService.resolveEntityTypeForFullName(fullName, EntityType.WIKI));
   }
 
   @Test
@@ -1376,8 +1374,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @Test
   public void testResolveEntityTypeForFullName_space_local() {
     String fullName = "mySpace";
-    assertSame(EntityType.SPACE, webUtilsService.resolveEntityTypeForFullName(fullName,
-        EntityType.SPACE));
+    assertSame(EntityType.SPACE,
+        webUtilsService.resolveEntityTypeForFullName(fullName, EntityType.SPACE));
   }
 
   @Test
@@ -1611,8 +1609,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference webPrefDocRef = new DocumentReference("WebPreferences", spaceRef);
 
     expect(modelAccessMock.exists(webPrefDocRef)).andReturn(true);
-    expect(modelAccessMock.getOrCreateDocument(webPrefDocRef)).andReturn(new XWikiDocument(
-        webPrefDocRef));
+    expect(modelAccessMock.getOrCreateDocument(webPrefDocRef))
+        .andReturn(new XWikiDocument(webPrefDocRef));
 
     assertEquals("xwikidb", getContext().getDatabase());
     assertNull(getContext().getDoc());

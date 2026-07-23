@@ -66,8 +66,8 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     bclass.setXClassReference(classRef);
     needsUpdate |= bclass.addDateField(PUBLISH_DATE_FIELD, "Publish Date (dd.MM.yyyy HH:mm)",
         "dd.MM.yyyy HH:mm", 0);
-    needsUpdate |= bclass.addDateField(UNPUBLISH_DATE_FIELD, "Unpublish Date (dd.MM.yyyy "
-        + "HH:mm)", "dd.MM.yyyy HH:mm", 0);
+    needsUpdate |= bclass.addDateField(UNPUBLISH_DATE_FIELD,
+        "Unpublish Date (dd.MM.yyyy " + "HH:mm)", "dd.MM.yyyy HH:mm", 0);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;

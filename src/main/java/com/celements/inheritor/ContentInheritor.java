@@ -37,8 +37,7 @@ public class ContentInheritor {
   private IEmptyDocumentChecker _emptyDocumentChecker;
   private String _language;
 
-  public ContentInheritor() {
-  }
+  public ContentInheritor() {}
 
   public void setIteratorFactory(IIteratorFactory<DocumentIterator> iteratorFactory) {
     _iteratorFactory = iteratorFactory;
@@ -154,8 +153,8 @@ public class ContentInheritor {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext()
+        .getProperty("xwikicontext");
   }
 
 }

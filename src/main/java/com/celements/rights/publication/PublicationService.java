@@ -113,9 +113,9 @@ public class PublicationService implements IPublicationServiceRole {
   }
 
   DocumentReference getPublicationClassReference(EntityReference entityRef) {
-    return ((DocumentDetailsClasses) documentDetailsClasses).getDocumentPublicationClassRef(
-        References.extractRef(entityRef, WikiReference.class).or(
-            modelContext.getWikiRef()).getName());
+    return ((DocumentDetailsClasses) documentDetailsClasses)
+        .getDocumentPublicationClassRef(References.extractRef(entityRef, WikiReference.class)
+            .or(modelContext.getWikiRef()).getName());
   }
 
   @Override

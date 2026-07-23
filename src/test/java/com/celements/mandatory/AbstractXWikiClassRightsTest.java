@@ -49,8 +49,7 @@ public class AbstractXWikiClassRightsTest extends AbstractComponentTest {
     assertTrue(xwikiClassRights.checkRightsObject(classDoc));
     verifyDefault();
 
-    List<BaseObject> rightsObj = XWikiObjectFetcher.on(classDoc)
-        .filter(XWikiRightsClass.CLASS_REF)
+    List<BaseObject> rightsObj = XWikiObjectFetcher.on(classDoc).filter(XWikiRightsClass.CLASS_REF)
         .list();
     assertEquals(1, rightsObj.size());
     assertEquals("XWikiAllGroup", getValue(rightsObj.get(0), XWikiRightsClass.FIELD_GROUPS).get(0));
@@ -76,8 +75,7 @@ public class AbstractXWikiClassRightsTest extends AbstractComponentTest {
     assertFalse(xwikiClassRights.checkRightsObject(classDoc));
     verifyDefault();
 
-    List<BaseObject> rightsObj = XWikiObjectFetcher.on(classDoc)
-        .filter(XWikiRightsClass.CLASS_REF)
+    List<BaseObject> rightsObj = XWikiObjectFetcher.on(classDoc).filter(XWikiRightsClass.CLASS_REF)
         .list();
     assertEquals(1, rightsObj.size());
   }

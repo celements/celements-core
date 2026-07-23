@@ -32,8 +32,8 @@ import org.xwiki.configuration.ConfigurationSource;
  * disk based on inheritance.
  */
 @Component
-public class DefaultTemplatePathTransformationConfiguration implements
-    TemplatePathTransformationConfiguration, Initializable {
+public class DefaultTemplatePathTransformationConfiguration
+    implements TemplatePathTransformationConfiguration, Initializable {
 
   /**
    * Prefix for configuration keys for the Icon transformation module.

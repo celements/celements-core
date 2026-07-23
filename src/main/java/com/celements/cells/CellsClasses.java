@@ -221,10 +221,10 @@ public class CellsClasses extends AbstractClassCollection {
     doc = modelAccess.getOrCreateDocument(translationBoxCellConfigClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setXClassReference(translationBoxCellConfigClassRef);
-    needsUpdate |= bclass.addTextField("page_exceptions", "Page Exceptions (FullNames"
-        + " comma separated)", 30);
-    needsUpdate |= bclass.addTextField("pagetype_exceptions", "Page Type Exceptions"
-        + " (FullNames comma separated)", 30);
+    needsUpdate |= bclass.addTextField("page_exceptions",
+        "Page Exceptions (FullNames" + " comma separated)", 30);
+    needsUpdate |= bclass.addTextField("pagetype_exceptions",
+        "Page Type Exceptions" + " (FullNames comma separated)", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
   }

@@ -109,16 +109,16 @@ public class XClassRegexRule implements IRequestValidationRule, IFieldValidation
       }
       LOGGER.warn("invalid class/field key '{}'", className + "." + fieldName);
     }
-    LOGGER.trace("Returning validation map for field '{}' and value '{}': {}", className + "."
-        + fieldName, value, ret);
+    LOGGER.trace("Returning validation map for field '{}' and value '{}': {}",
+        className + "." + fieldName, value, ret);
     return ret;
   }
 
   private PropertyClass getBaseClassProperty(String className, String fieldName) {
     PropertyClass propertyClass = null;
     try {
-      BaseClass bclass = getContext().getWiki().getDocument(webUtils.resolveDocumentReference(
-          className), getContext()).getXClass();
+      BaseClass bclass = getContext().getWiki()
+          .getDocument(webUtils.resolveDocumentReference(className), getContext()).getXClass();
       if (bclass != null) {
         propertyClass = (PropertyClass) bclass.getField(fieldName);
       }

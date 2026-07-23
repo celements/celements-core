@@ -95,8 +95,8 @@ public class PageTypeTest extends AbstractComponentTest {
     // No PageType Object prepared -> Default PageType is RichText
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(true);
     XWikiDocument templateDoc = new XWikiDocument();
-    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(
-        templateDoc).anyTimes();
+    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(templateDoc)
+        .anyTimes();
     // missing page_type_properties object may not lead to NPE
     // this is the tests focus.
     expect(request.get(eq("template"))).andReturn("").anyTimes();
@@ -113,8 +113,8 @@ public class PageTypeTest extends AbstractComponentTest {
     // No PageType Object prepared -> Default PageType is RichText
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(true);
     XWikiDocument templateDoc = new XWikiDocument();
-    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(
-        templateDoc).anyTimes();
+    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(templateDoc)
+        .anyTimes();
     // missing page_type_properties object may not lead to NPE
     // this is the tests focus.
     expect(request.get(eq("template"))).andReturn("").anyTimes();
@@ -166,8 +166,8 @@ public class PageTypeTest extends AbstractComponentTest {
     // missing page_type_properties object may not lead to NPE
     // this is the tests focus.
     expect(mockWiki.exists(eq(ptViewTemplate), eq(context))).andReturn(false).anyTimes();
-    expect(mockWiki.exists(eq("celements2web:" + ptViewTemplate), eq(context))).andReturn(
-        true).anyTimes();
+    expect(mockWiki.exists(eq("celements2web:" + ptViewTemplate), eq(context))).andReturn(true)
+        .anyTimes();
     expect(request.get(eq("template"))).andReturn("").anyTimes();
     replayAll();
     String templName = pageType.getRenderTemplateForRenderMode("view", context);
@@ -194,8 +194,8 @@ public class PageTypeTest extends AbstractComponentTest {
     // missing page_type_properties object may not lead to NPE
     // this is the tests focus.
     expect(mockWiki.exists(eq(ptViewTemplate), eq(context))).andReturn(false).anyTimes();
-    expect(mockWiki.exists(eq("celements2web:" + ptViewTemplate), eq(context))).andReturn(
-        false).anyTimes();
+    expect(mockWiki.exists(eq("celements2web:" + ptViewTemplate), eq(context))).andReturn(false)
+        .anyTimes();
     expect(request.get(eq("template"))).andReturn("").anyTimes();
     replayAll();
     String templName = pageType.getRenderTemplateForRenderMode("view", context);
@@ -263,8 +263,8 @@ public class PageTypeTest extends AbstractComponentTest {
     // No PageType Object prepared -> Default PageType is RichText
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(true);
     XWikiDocument templateDoc = new XWikiDocument();
-    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(
-        templateDoc).anyTimes();
+    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(templateDoc)
+        .anyTimes();
     // missing page_type_properties object may not lead to NPE
     // this is the tests focus.
     expect(request.get(eq("template"))).andReturn("").anyTimes();
@@ -284,8 +284,8 @@ public class PageTypeTest extends AbstractComponentTest {
     doc.setObject(PageTypeCommand.PAGE_TYPE_CLASSNAME, 0, pageTypeObj);
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(true).anyTimes();
     XWikiDocument testPageTypeDoc = new XWikiDocument();
-    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(
-        testPageTypeDoc).anyTimes();
+    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(testPageTypeDoc)
+        .anyTimes();
     BaseObject paeTypePropObj = new BaseObject();
     paeTypePropObj.setStringValue("category", "myCat");
     testPageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, paeTypePropObj);
@@ -302,8 +302,8 @@ public class PageTypeTest extends AbstractComponentTest {
     // No PageType Object prepared -> Default PageType is RichText
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(true).anyTimes();
     XWikiDocument templateDoc = new XWikiDocument();
-    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(
-        templateDoc).anyTimes();
+    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(templateDoc)
+        .anyTimes();
     // missing page_type_properties object may not lead to NPE
     // this is the tests focus.
     expect(request.get(eq("template"))).andReturn("").anyTimes();
@@ -322,8 +322,8 @@ public class PageTypeTest extends AbstractComponentTest {
     doc.setObject(PageTypeCommand.PAGE_TYPE_CLASSNAME, 0, pageTypeObj);
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(true).anyTimes();
     XWikiDocument testPageTypeDoc = new XWikiDocument();
-    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(
-        testPageTypeDoc).anyTimes();
+    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(testPageTypeDoc)
+        .anyTimes();
     BaseObject paeTypePropObj = new BaseObject();
     paeTypePropObj.setStringValue("category", "myCat");
     testPageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, paeTypePropObj);
@@ -343,8 +343,8 @@ public class PageTypeTest extends AbstractComponentTest {
     doc.setObject(PageTypeCommand.PAGE_TYPE_CLASSNAME, 0, pageTypeObj);
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(true).anyTimes();
     XWikiDocument testPageTypeDoc = new XWikiDocument();
-    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(
-        testPageTypeDoc).anyTimes();
+    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(testPageTypeDoc)
+        .anyTimes();
     BaseObject paeTypePropObj = new BaseObject();
     paeTypePropObj.setStringValue("category", "myCat,secondCat");
     testPageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, paeTypePropObj);
@@ -364,8 +364,8 @@ public class PageTypeTest extends AbstractComponentTest {
     doc.setObject(PageTypeCommand.PAGE_TYPE_CLASSNAME, 0, pageTypeObj);
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(true).anyTimes();
     XWikiDocument testPageTypeDoc = new XWikiDocument();
-    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(
-        testPageTypeDoc).anyTimes();
+    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(testPageTypeDoc)
+        .anyTimes();
     BaseObject paeTypePropObj = new BaseObject();
     paeTypePropObj.setStringValue("type_name", "myPrettyTypeName");
     testPageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, paeTypePropObj);
@@ -385,8 +385,8 @@ public class PageTypeTest extends AbstractComponentTest {
     doc.setObject(PageTypeCommand.PAGE_TYPE_CLASSNAME, 0, pageTypeObj);
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(true).anyTimes();
     XWikiDocument testPageTypeDoc = new XWikiDocument();
-    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(
-        testPageTypeDoc).anyTimes();
+    expect(mockWiki.getDocument(eq(TEST_PAGE_TYPE_FN), eq(context))).andReturn(testPageTypeDoc)
+        .anyTimes();
     expect(request.get(eq("template"))).andReturn("").anyTimes();
     replayAll();
     assertEquals("", pageType.getPrettyName(context));
@@ -398,8 +398,8 @@ public class PageTypeTest extends AbstractComponentTest {
     expect(mockWiki.exists(eq(TEST_PAGE_TYPE_FN), same(context))).andReturn(false);
     DocumentReference testPageTypeCentralDocRef = new DocumentReference("celements2web",
         TEST_PAGE_TYPE_SPACE, TEST_PAGE_TYPE_DOC);
-    expect(mockWiki.getDocument(eq("celements2web:" + TEST_PAGE_TYPE_FN), same(context))).andReturn(
-        new XWikiDocument(testPageTypeCentralDocRef));
+    expect(mockWiki.getDocument(eq("celements2web:" + TEST_PAGE_TYPE_FN), same(context)))
+        .andReturn(new XWikiDocument(testPageTypeCentralDocRef));
     replayAll();
     assertFalse(pageType.hasPageTitle(context));
     verifyAll();

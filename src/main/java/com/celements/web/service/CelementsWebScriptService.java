@@ -127,22 +127,14 @@ public class CelementsWebScriptService implements ScriptService {
   private final ConfigurationSource xwikiPropertiesSource;
 
   @Inject
-  public CelementsWebScriptService(
-      QueryManager queryManager,
-      IAppScriptService appScriptService,
-      IWebUtilsService webUtilsService,
-      ConfigurationSource configSource,
-      ITreeNodeCache treeNodeCacheService,
-      ITreeNodeService treeNodeService,
+  public CelementsWebScriptService(QueryManager queryManager, IAppScriptService appScriptService,
+      IWebUtilsService webUtilsService, ConfigurationSource configSource,
+      ITreeNodeCache treeNodeCacheService, ITreeNodeService treeNodeService,
       @Named("treeNode") ScriptService treeNodeScriptService,
-      IClassesCompositorComponent classesComp,
-      IMandatoryDocumentCompositorRole mandatoryDocComp,
-      @Named("deprecated") ScriptService deprecatedUsage,
-      ILastChangedRole lastChangedSrv,
-      LastStartupTimeStampRole lastStartupTimeStamp,
-      IRightsAccessFacadeRole rightsAccess,
-      ModelContext modelContext,
-      Execution execution,
+      IClassesCompositorComponent classesComp, IMandatoryDocumentCompositorRole mandatoryDocComp,
+      @Named("deprecated") ScriptService deprecatedUsage, ILastChangedRole lastChangedSrv,
+      LastStartupTimeStampRole lastStartupTimeStamp, IRightsAccessFacadeRole rightsAccess,
+      ModelContext modelContext, Execution execution,
       @Named("xwikiproperties") ConfigurationSource xwikiPropertiesSource) {
     this.queryManager = queryManager;
     this.appScriptService = appScriptService;
@@ -683,8 +675,8 @@ public class CelementsWebScriptService implements ScriptService {
             cal.add(Calendar.SECOND, seconds);
             boolean isAfterMinWaitDays = cal.before(Calendar.getInstance());
             if (isAfterMinWaitDays && delDoc.getDate().before(delBeforeDate)) {
-              XWikiDocument doc = getContext().getWiki().getDocument(
-                  webUtilsService.resolveDocumentReference(fullName), getContext());
+              XWikiDocument doc = getContext().getWiki()
+                  .getDocument(webUtilsService.resolveDocumentReference(fullName), getContext());
               getContext().getWiki().getRecycleBinStore().deleteFromRecycleBin(doc, delDoc.getId(),
                   getContext(), true);
               countDeleted++;
@@ -731,8 +723,8 @@ public class CelementsWebScriptService implements ScriptService {
       try {
         Session sess = getNewHibSession(getContext());
         Transaction transaction = sess.beginTransaction();
-        org.hibernate.Query query = sess.createSQLQuery("delete from xwikiattrecyclebin"
-            + " where XDA_DATE < :deleteBeforeDate");
+        org.hibernate.Query query = sess.createSQLQuery(
+            "delete from xwikiattrecyclebin" + " where XDA_DATE < :deleteBeforeDate");
         query.setParameter("deleteBeforeDate", delBeforeDate);
         result = query.executeUpdate();
         LOGGER.info("deleted [{}] attachments in database [{}].", result,
@@ -782,8 +774,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   public boolean addFileToFileBaseTag(DocumentReference fileDocRef, String fileName,
       DocumentReference tagDocRef) {
-    return addFileToFileBaseTag(fileDocRef.getLastSpaceReference().getName() + "."
-        + fileDocRef.getName(), fileName, tagDocRef);
+    return addFileToFileBaseTag(
+        fileDocRef.getLastSpaceReference().getName() + "." + fileDocRef.getName(), fileName,
+        tagDocRef);
   }
 
   public boolean addFileToFileBaseTag(String fileDocFullName, String fileName,
@@ -791,8 +784,8 @@ public class CelementsWebScriptService implements ScriptService {
     // FIXME not all tag documents have a page type: who cares? deprecated? migration?
     // DocumentReference pageTypeDocRef = webUtilsService.resolveDocumentReference(
     // "Celements2.PageType");
-    DocumentReference tagClassDocRef = webUtilsService.resolveDocumentReference(
-        "Classes.FilebaseTag");
+    DocumentReference tagClassDocRef = webUtilsService
+        .resolveDocumentReference("Classes.FilebaseTag");
     String tagValue = fileDocFullName + "/" + fileName;
     try {
       XWikiDocument tagDoc = getContext().getWiki().getDocument(tagDocRef, getContext());
@@ -1002,8 +995,8 @@ public class CelementsWebScriptService implements ScriptService {
 
   public String getEmailAdressForUser(String username) {
     if (hasProgrammingRights()) {
-      return getCelementsWebService().getEmailAdressForUser(
-          getWebUtilsService().resolveDocumentReference(username));
+      return getCelementsWebService()
+          .getEmailAdressForUser(getWebUtilsService().resolveDocumentReference(username));
     } else {
       return null;
     }
@@ -1034,8 +1027,8 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public boolean renameDoc(DocumentReference docRef, String newDocName) {
-    return new RenameCommand().renameDoc(getWebUtilsService().getRefDefaultSerializer().serialize(
-        docRef), newDocName, getContext());
+    return new RenameCommand().renameDoc(
+        getWebUtilsService().getRefDefaultSerializer().serialize(docRef), newDocName, getContext());
   }
 
   public List<String> getSupportedAdminLanguages() {

@@ -37,7 +37,8 @@ public enum SaveEventOperation {
    *         A) if an original and new entity (doc, object, ...) exists
    *         B) if the operation is before or after save.
    */
-  public static Optional<SaveEventOperation> from(boolean origExists, boolean newExists, boolean beforeSave) {
+  public static Optional<SaveEventOperation> from(boolean origExists, boolean newExists,
+      boolean beforeSave) {
     int val = ((newExists ? 0 : 1) << 1) | (origExists ? 0 : 1);
     if (val < 3) {
       return Optional.of(values()[val + (beforeSave ? 0 : 3)]);
@@ -48,7 +49,7 @@ public enum SaveEventOperation {
 
   public static SaveEventOperation from(Event event) {
     String eventName = checkNotNull(event).getClass().getSimpleName().toUpperCase();
-    return Arrays.stream(values()).filter(ops -> eventName.contains(ops.name()))
-        .findAny().orElseThrow(() -> new IllegalArgumentException("illegal save event: " + event));
+    return Arrays.stream(values()).filter(ops -> eventName.contains(ops.name())).findAny()
+        .orElseThrow(() -> new IllegalArgumentException("illegal save event: " + event));
   }
 }

@@ -70,8 +70,8 @@ public class XObjectPageTypeDocumentUpdatedListenerTest extends AbstractComponen
 
   @Test
   public void testGetEvents() {
-    List<String> expectedEventClassList = Arrays.asList(
-        new DocumentUpdatedEvent().getClass().getName());
+    List<String> expectedEventClassList = Arrays
+        .asList(new DocumentUpdatedEvent().getClass().getName());
     replayDefault();
     List<Event> actualEventList = eventListener.getEvents();
     assertEquals(expectedEventClassList.size(), actualEventList.size());
@@ -278,8 +278,8 @@ public class XObjectPageTypeDocumentUpdatedListenerTest extends AbstractComponen
   }
 
   private DocumentReference getPageTypePropertiesClassRef() {
-    return Utils.getComponent(IPageTypeClassConfig.class).getPageTypePropertiesClassRef(
-        new WikiReference(context.getDatabase()));
+    return Utils.getComponent(IPageTypeClassConfig.class)
+        .getPageTypePropertiesClassRef(new WikiReference(context.getDatabase()));
   }
 
   private XObjectPageTypeDocumentUpdatedListener getXObjPageTypeDocUpdatedListener() {

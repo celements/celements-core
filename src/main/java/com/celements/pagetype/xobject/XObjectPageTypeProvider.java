@@ -78,8 +78,8 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
     }
     count = count + 1;
     long startMillis = System.currentTimeMillis();
-    List<PageTypeReference> pageTypeList = xobjectPageTypeCache.getPageTypesRefsForWiki(
-        webUtilsService.getWikiRef());
+    List<PageTypeReference> pageTypeList = xobjectPageTypeCache
+        .getPageTypesRefsForWiki(webUtilsService.getWikiRef());
     getExecContext().setProperty(_CEL_XOBJ_GETALLPAGETYPES_COUNTER, count);
     if (LOGGER.isInfoEnabled()) {
       long endMillis = System.currentTimeMillis();

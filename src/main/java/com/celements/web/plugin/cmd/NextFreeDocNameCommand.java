@@ -40,8 +40,8 @@ public class NextFreeDocNameCommand {
    */
   @Deprecated
   public String getNextTitledPageFullName(String space, String title, XWikiContext context) {
-    DocumentReference docRef = getNextFreeDocService().getNextTitledPageDocRef(new SpaceReference(
-        space, new WikiReference(context.getDatabase())), title);
+    DocumentReference docRef = getNextFreeDocService().getNextTitledPageDocRef(
+        new SpaceReference(space, new WikiReference(context.getDatabase())), title);
     return getWebUtilsService().getRefLocalSerializer().serialize(docRef);
   }
 
@@ -52,8 +52,8 @@ public class NextFreeDocNameCommand {
   @Deprecated
   public DocumentReference getNextTitledPageDocRef(String space, String title,
       XWikiContext context) {
-    return getNextFreeDocService().getNextTitledPageDocRef(new SpaceReference(space,
-        new WikiReference(context.getDatabase())), title);
+    return getNextFreeDocService().getNextTitledPageDocRef(
+        new SpaceReference(space, new WikiReference(context.getDatabase())), title);
   }
 
   /**
@@ -62,8 +62,8 @@ public class NextFreeDocNameCommand {
    */
   @Deprecated
   public String getNextUntitledPageFullName(String space, XWikiContext context) {
-    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(new SpaceReference(
-        space, new WikiReference(context.getDatabase())));
+    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(
+        new SpaceReference(space, new WikiReference(context.getDatabase())));
     return getWebUtilsService().getRefLocalSerializer().serialize(docRef);
   }
 
@@ -73,8 +73,8 @@ public class NextFreeDocNameCommand {
    */
   @Deprecated
   public String getNextUntitledPageName(String space, XWikiContext context) {
-    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(new SpaceReference(
-        space, new WikiReference(context.getDatabase())));
+    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(
+        new SpaceReference(space, new WikiReference(context.getDatabase())));
     return docRef.getName();
   }
 

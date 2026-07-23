@@ -114,11 +114,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
 
   @Override
   public Map<String, String> getUniqueNameValueRequestMap() {
-    return EntryStream.of(context.request()
-        .map(XWikiRequest::getParameterMap)
-        .orElse(ImmutableMap.of()))
-        .mapValues(values -> Stream.of(values).findFirst().orElse(""))
-        .toMap();
+    return EntryStream
+        .of(context.request().map(XWikiRequest::getParameterMap).orElse(ImmutableMap.of()))
+        .mapValues(values -> Stream.of(values).findFirst().orElse("")).toMap();
   }
 
   @Override
@@ -133,8 +131,8 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   public boolean writeUTF8Response(String filename, String renderDocFullName) {
     boolean success = false;
     try {
-      XWikiDocument renderDoc = modelAccess.getDocument(modelUtils.resolveRef(renderDocFullName,
-          DocumentReference.class));
+      XWikiDocument renderDoc = modelAccess
+          .getDocument(modelUtils.resolveRef(renderDocFullName, DocumentReference.class));
       adjustResponseHeader(filename, context.getResponse().get());
       setResponseContent(renderDoc, context.getResponse().get());
       success = true;
@@ -150,8 +148,8 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   private void adjustResponseHeader(String filename, XWikiResponse response) {
     response.setContentType("text/plain");
     String ofilename = Util.encodeURI(filename, getXWikiContext()).replaceAll("\\+", " ");
-    response.addHeader("Content-disposition", "attachment; filename=\"" + ofilename
-        + "\"; charset='UTF-8'");
+    response.addHeader("Content-disposition",
+        "attachment; filename=\"" + ofilename + "\"; charset='UTF-8'");
   }
 
   private void setResponseContent(XWikiDocument renderDoc, XWikiResponse response)

@@ -77,8 +77,8 @@ public class CSSTest extends AbstractComponentTest {
     expect(cssMock.getCSS(same(context))).andReturn(url);
     expect(cssMock.getCssBasePath()).andReturn(basePath);
     replayDefault();
-    assertEquals("<!-- WARNING: css file not found: " + basePath + " -->\n", css.displayInclude(
-        context));
+    assertEquals("<!-- WARNING: css file not found: " + basePath + " -->\n",
+        css.displayInclude(context));
     verifyDefault();
   }
 

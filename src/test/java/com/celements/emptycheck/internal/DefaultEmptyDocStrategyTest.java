@@ -25,8 +25,8 @@ public class DefaultEmptyDocStrategyTest extends AbstractComponentTest {
   public void setUp_DefaultEmptyDocStrategyTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    defEmptyDocStrategy = (DefaultEmptyDocStrategy) Utils.getComponent(
-        IDefaultEmptyDocStrategyRole.class, "default");
+    defEmptyDocStrategy = (DefaultEmptyDocStrategy) Utils
+        .getComponent(IDefaultEmptyDocStrategyRole.class, "default");
   }
 
   @Test
@@ -83,8 +83,9 @@ public class DefaultEmptyDocStrategyTest extends AbstractComponentTest {
         defEmptyDocStrategy.isEmptyRTEString("&nbsp;"));
     assertTrue("Non breaking spaces in a paragraph should be treated as empty",
         defEmptyDocStrategy.isEmptyRTEString("<p>&nbsp;</p>"));
-    assertTrue("Non breaking spaces in a paragraph with white spaces"
-        + " should be treated as empty", defEmptyDocStrategy.isEmptyRTEString("<p>  &nbsp; </p>"));
+    assertTrue(
+        "Non breaking spaces in a paragraph with white spaces" + " should be treated as empty",
+        defEmptyDocStrategy.isEmptyRTEString("<p>  &nbsp; </p>"));
     assertFalse("Regular Text should not be treated as empty.",
         defEmptyDocStrategy.isEmptyRTEString("<p>adsf  &nbsp; </p>"));
   }
@@ -134,8 +135,8 @@ public class DefaultEmptyDocStrategyTest extends AbstractComponentTest {
   @Test
   public void testIsEmptyRTEDocumentDefault_Exception() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(
-        new XWikiException()).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException())
+        .atLeastOnce();
     replayDefault();
     assertTrue(defEmptyDocStrategy.isEmptyRTEDocumentDefault(docRef));
     verifyDefault();
@@ -173,8 +174,8 @@ public class DefaultEmptyDocStrategyTest extends AbstractComponentTest {
   public void testIsEmptyRTEDocumentTranslated_Exception() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(
-        new XWikiException()).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException())
+        .atLeastOnce();
     replayDefault();
     assertTrue(defEmptyDocStrategy.isEmptyRTEDocumentTranslated(docRef));
     verifyDefault();
@@ -247,8 +248,8 @@ public class DefaultEmptyDocStrategyTest extends AbstractComponentTest {
   @Test
   public void testIsEmptyDocumentDefault_Exception() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(
-        new XWikiException()).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException())
+        .atLeastOnce();
     replayDefault();
     assertTrue(defEmptyDocStrategy.isEmptyDocumentDefault(docRef));
     verifyDefault();
@@ -286,8 +287,8 @@ public class DefaultEmptyDocStrategyTest extends AbstractComponentTest {
   public void testIsEmptyDocumentTranslated_Exception() throws Exception {
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
-    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(
-        new XWikiException()).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException())
+        .atLeastOnce();
     replayDefault();
     assertTrue(defEmptyDocStrategy.isEmptyDocumentTranslated(docRef));
     verifyDefault();
@@ -404,9 +405,9 @@ public class DefaultEmptyDocStrategyTest extends AbstractComponentTest {
         defEmptyDocStrategy.isEmptyRTEDocument(getTestDoc("&nbsp;")));
     assertTrue("Non breaking spaces in a paragraph should be treated as empty",
         defEmptyDocStrategy.isEmptyRTEDocument(getTestDoc("<p>&nbsp;</p>")));
-    assertTrue("Non breaking spaces in a paragraph with white spaces"
-        + " should be treated as empty", defEmptyDocStrategy.isEmptyRTEDocument(getTestDoc(
-            "<p>  &nbsp; </p>")));
+    assertTrue(
+        "Non breaking spaces in a paragraph with white spaces" + " should be treated as empty",
+        defEmptyDocStrategy.isEmptyRTEDocument(getTestDoc("<p>  &nbsp; </p>")));
     assertFalse("Regular Text should not be treated as empty.",
         defEmptyDocStrategy.isEmptyRTEDocument(getTestDoc("<p>adsf  &nbsp; </p>")));
     verifyDefault();

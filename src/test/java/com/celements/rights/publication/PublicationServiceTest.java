@@ -28,15 +28,15 @@ public class PublicationServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetPublishObject_null() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
-        "Doc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "Space", "Doc"));
     assertNotNull(pubService.getPublishObjects(doc));
   }
 
   @Test
   public void testGetPublishObject_hasObj() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
-        "Doc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "Space", "Doc"));
     BaseObject obj = new BaseObject();
     obj.setXClassReference(pubService.getPublicationClassReference());
     doc.addXObject(obj);
@@ -45,8 +45,8 @@ public class PublicationServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetPublishObject_hasObjs() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
-        "Doc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "Space", "Doc"));
     BaseObject obj1 = new BaseObject();
     obj1.setXClassReference(pubService.getPublicationClassReference());
     doc.addXObject(obj1);
@@ -58,8 +58,8 @@ public class PublicationServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetPublishObject_nullObjs() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
-        "Doc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "Space", "Doc"));
     BaseObject obj = new BaseObject();
     obj.setXClassReference(pubService.getPublicationClassReference());
     doc.setXObject(3, obj);
@@ -69,15 +69,15 @@ public class PublicationServiceTest extends AbstractComponentTest {
   @Test
   public void testIsPublished_noLimits() {
     assertTrue("null document", pubService.isPublished(null));
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
-        "Doc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "Space", "Doc"));
     assertTrue("document without objects", pubService.isPublished(doc));
   }
 
   @Test
   public void testIsPublished_noLimits_umpublished() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
-        "Doc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "Space", "Doc"));
     BaseObject obj1 = new BaseObject();
     Calendar gc = Calendar.getInstance();
     gc.add(Calendar.HOUR, 1);
@@ -97,8 +97,8 @@ public class PublicationServiceTest extends AbstractComponentTest {
 
   @Test
   public void testIsPublished_noLimits_published() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
-        "Doc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "Space", "Doc"));
     BaseObject obj1 = new BaseObject();
     obj1.setXClassReference(pubService.getPublicationClassReference());
     BaseObject obj3 = new BaseObject();
@@ -125,8 +125,8 @@ public class PublicationServiceTest extends AbstractComponentTest {
   public void testIsPublishActive_docNull() {
     expect(getWikiMock().getSpacePreference(eq("publishdate_active"), same((String) null), eq("-1"),
         same(getContext()))).andReturn("-1").once();
-    expect(getWikiMock().getXWikiPreference(eq("publishdate_active"), eq(
-        "celements.publishdate.active"), eq("0"), same(getContext()))).andReturn("0").once();
+    expect(getWikiMock().getXWikiPreference(eq("publishdate_active"),
+        eq("celements.publishdate.active"), eq("0"), same(getContext()))).andReturn("0").once();
     replayDefault();
     assertEquals(false, pubService.isPublishActive());
     verifyDefault();
@@ -136,10 +136,10 @@ public class PublicationServiceTest extends AbstractComponentTest {
   public void testIsPublishActive_notSet() {
     expect(getWikiMock().getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"),
         same(getContext()))).andReturn("-1").once();
-    expect(getWikiMock().getXWikiPreference(eq("publishdate_active"), eq(
-        "celements.publishdate.active"), eq("0"), same(getContext()))).andReturn("0").once();
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
-        "TestSpace", "TestDoc"));
+    expect(getWikiMock().getXWikiPreference(eq("publishdate_active"),
+        eq("celements.publishdate.active"), eq("0"), same(getContext()))).andReturn("0").once();
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "TestSpace", "TestDoc"));
     getContext().setDoc(doc);
     replayDefault();
     assertEquals(false, pubService.isPublishActive());
@@ -150,8 +150,8 @@ public class PublicationServiceTest extends AbstractComponentTest {
   public void testIsPublishActive_false() {
     expect(getWikiMock().getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"),
         same(getContext()))).andReturn("0").once();
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
-        "TestSpace", "TestDoc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "TestSpace", "TestDoc"));
     getContext().setDoc(doc);
     replayDefault();
     assertEquals(false, pubService.isPublishActive());
@@ -162,8 +162,8 @@ public class PublicationServiceTest extends AbstractComponentTest {
   public void testIsPublishActive_true() {
     expect(getWikiMock().getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"),
         same(getContext()))).andReturn("1").once();
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
-        "TestSpace", "TestDoc"));
+    XWikiDocument doc = new XWikiDocument(
+        new DocumentReference(getContext().getDatabase(), "TestSpace", "TestDoc"));
     getContext().setDoc(doc);
     replayDefault();
     assertEquals(true, pubService.isPublishActive());
@@ -298,15 +298,15 @@ public class PublicationServiceTest extends AbstractComponentTest {
   @Test
   public void test_overridePubUnpub_PUBLISHED() {
     pubService.overridePubUnpub(EPubUnpub.PUBLISHED);
-    assertEquals(EPubUnpub.PUBLISHED, getExecutionContext().getProperty(
-        IPublicationServiceRole.OVERRIDE_PUB_CHECK));
+    assertEquals(EPubUnpub.PUBLISHED,
+        getExecutionContext().getProperty(IPublicationServiceRole.OVERRIDE_PUB_CHECK));
   }
 
   @Test
   public void test_overridePubUnpub_UNPUBLISHED() {
     pubService.overridePubUnpub(EPubUnpub.UNPUBLISHED);
-    assertEquals(EPubUnpub.UNPUBLISHED, getExecutionContext().getProperty(
-        IPublicationServiceRole.OVERRIDE_PUB_CHECK));
+    assertEquals(EPubUnpub.UNPUBLISHED,
+        getExecutionContext().getProperty(IPublicationServiceRole.OVERRIDE_PUB_CHECK));
   }
 
   private ExecutionContext getExecutionContext() {

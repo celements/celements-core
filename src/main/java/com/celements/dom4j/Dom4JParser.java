@@ -64,8 +64,8 @@ public class Dom4JParser<D extends Document> {
   }
 
   public D readDocument(String xml) throws IOException {
-    try (ByteArrayInputStream in = new ByteArrayInputStream(
-        xml.getBytes(outFormat.getEncoding()))) {
+    try (
+        ByteArrayInputStream in = new ByteArrayInputStream(xml.getBytes(outFormat.getEncoding()))) {
       SAXReader reader = new SAXReader(factory);
       reader.setEntityResolver(new DefaultEntityResolver());
       reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", disableDTDs);
@@ -87,11 +87,10 @@ public class Dom4JParser<D extends Document> {
     }
   }
 
-  public Optional<String> readAndExecute(String xml,
-      Function<D, Stream<? extends Node>> executable) throws IOException {
+  public Optional<String> readAndExecute(String xml, Function<D, Stream<? extends Node>> executable)
+      throws IOException {
     D document = readDocument(xml);
-    return Optional.of(writeXML(executable.apply(document)))
-        .filter(not(String::isEmpty));
+    return Optional.of(writeXML(executable.apply(document))).filter(not(String::isEmpty));
   }
 
 }

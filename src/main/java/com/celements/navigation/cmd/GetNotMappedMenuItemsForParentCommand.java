@@ -41,16 +41,16 @@ import com.xpn.xwiki.web.Utils;
 
 public class GetNotMappedMenuItemsForParentCommand {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      GetNotMappedMenuItemsForParentCommand.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(GetNotMappedMenuItemsForParentCommand.class);
 
   private final Map<String, Map<String, List<TreeNode>>> menuItems;
 
   private int queryCount = 0;
 
   private XWikiContext getContext() {
-    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext()
+        .getProperty("xwikicontext");
   }
 
   public GetNotMappedMenuItemsForParentCommand() {
@@ -133,8 +133,8 @@ public class GetNotMappedMenuItemsForParentCommand {
             LOGGER.warn("loadMenuForWiki: skip [{}] because of null value!! " + "'{}', '{}', '{}'",
                 fullName, wikiName, spaceName, fullName.split("\\.")[1]);
           } else {
-            DocumentReference docRef = new DocumentReference(wikiName, spaceName, fullName.split(
-                "\\.")[1]);
+            DocumentReference docRef = new DocumentReference(wikiName, spaceName,
+                fullName.split("\\.")[1]);
             TreeNode treeNode = new TreeNode(docRef, resolveParentRef(parentFN),
                 (Integer) docData[3], strategy);
             menu.add(treeNode);

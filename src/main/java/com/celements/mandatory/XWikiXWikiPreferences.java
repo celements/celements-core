@@ -66,10 +66,8 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   @Override
   protected DocumentReference getDocRef() {
-    return new RefBuilder().with(modelContext.getWikiRef())
-        .space(XWikiConstant.XWIKI_SPACE)
-        .doc(XWikiConstant.XWIKI_PREF_DOC_NAME)
-        .build(DocumentReference.class);
+    return new RefBuilder().with(modelContext.getWikiRef()).space(XWikiConstant.XWIKI_SPACE)
+        .doc(XWikiConstant.XWIKI_PREF_DOC_NAME).build(DocumentReference.class);
   }
 
   @Override
@@ -103,8 +101,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     if (isNullOrEmpty(wikiPrefDoc.getDefaultLanguage())) {
       wikiPrefDoc.setDefaultLanguage(defaultLang);
     }
-    BaseObject prefsObj = XWikiObjectEditor.on(wikiPrefDoc)
-        .filter(new ClassReference(getDocRef()))
+    BaseObject prefsObj = XWikiObjectEditor.on(wikiPrefDoc).filter(new ClassReference(getDocRef()))
         .createFirstIfNotExists();
     boolean dirty = false;
     dirty |= additionalChecks.test(prefsObj);
@@ -125,8 +122,8 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     return checkWikiPreferences(wikiPrefDoc, (prefsObj) -> {
       boolean dirty = false;
       String documentBundles = prefsObj.getStringValue("documentBundles");
-      if (isNullOrEmpty(documentBundles) || !documentBundles.contains(
-          "celements2web:Celements2.Dictionary")) {
+      if (isNullOrEmpty(documentBundles)
+          || !documentBundles.contains("celements2web:Celements2.Dictionary")) {
         if (isNullOrEmpty(documentBundles)) {
           documentBundles = "celements2web:Celements2.Dictionary";
         } else {

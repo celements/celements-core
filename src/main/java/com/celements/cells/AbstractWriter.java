@@ -44,8 +44,7 @@ public abstract class AbstractWriter implements ICellWriter {
   }
 
   protected Optional<Boolean> hasLevelContentOptional() {
-    return getCurrentLevel()
-        .map(Entry::getValue);
+    return getCurrentLevel().map(Entry::getValue);
   }
 
   @Override

@@ -302,13 +302,13 @@ public class WebUtilsService implements IWebUtilsService {
     languages.addAll(Arrays.asList(spaceLanguages.split("[ ,]")));
     languages.remove("");
     if (languages.size() > 0) {
-      LOGGER.debug("getAllowedLanguages: returning [" + spaceLanguages + "] for space [" + spaceName
-          + "]");
+      LOGGER.debug(
+          "getAllowedLanguages: returning [" + spaceLanguages + "] for space [" + spaceName + "]");
       return languages;
     }
     LOGGER.warn("Deprecated usage of Preferences field 'language'." + " Instead use 'languages'.");
-    return Arrays.asList(getContext().getWiki().getSpacePreference("language", spaceName, "",
-        getContext()).split("[ ,]"));
+    return Arrays.asList(getContext().getWiki()
+        .getSpacePreference("language", spaceName, "", getContext()).split("[ ,]"));
   }
 
   @Override
@@ -326,10 +326,10 @@ public class WebUtilsService implements IWebUtilsService {
             + spaceRef.getName() + "]");
         return languages;
       }
-      LOGGER.warn("Deprecated usage of Preferences field 'language'."
-          + " Instead use 'languages'.");
-      return Arrays.asList(getContext().getWiki().getSpacePreference("language", spaceRef.getName(),
-          "", getContext()).split("[ ,]"));
+      LOGGER
+          .warn("Deprecated usage of Preferences field 'language'." + " Instead use 'languages'.");
+      return Arrays.asList(getContext().getWiki()
+          .getSpacePreference("language", spaceRef.getName(), "", getContext()).split("[ ,]"));
     } finally {
       getContext().setDatabase(curDB);
     }
@@ -348,8 +348,8 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public XWikiMessageTool getMessageTool(String adminLanguage) {
     if (adminLanguage != null) {
-      if ((getContext().getLanguage() != null) && getContext().getLanguage().equals(
-          adminLanguage)) {
+      if ((getContext().getLanguage() != null)
+          && getContext().getLanguage().equals(adminLanguage)) {
         return getContext().getMessageTool();
       } else {
         Locale locale = new Locale(adminLanguage);
@@ -630,8 +630,8 @@ public class WebUtilsService implements IWebUtilsService {
     List<Attachment> attachments = doc.getAttachmentList();
 
     try {
-      Comparator<Attachment> comparatorClass = (Comparator<Attachment>) Class.forName(
-          "com.celements.web.comparators." + comparator).newInstance();
+      Comparator<Attachment> comparatorClass = (Comparator<Attachment>) Class
+          .forName("com.celements.web.comparators." + comparator).newInstance();
       Collections.sort(attachments, comparatorClass);
     } catch (InstantiationException e) {
       LOGGER.error("getAttachmentListSorted failed.", e);
@@ -732,8 +732,8 @@ public class WebUtilsService implements IWebUtilsService {
       LOGGER.error("Could not get all documents in " + spaceName, xwe);
     }
     try {
-      Comparator<Attachment> comparatorClass = (Comparator<Attachment>) Class.forName(
-          "com.celements.web.comparators." + comparator).newInstance();
+      Comparator<Attachment> comparatorClass = (Comparator<Attachment>) Class
+          .forName("com.celements.web.comparators." + comparator).newInstance();
       Collections.sort(attachments, comparatorClass);
     } catch (InstantiationException e) {
       LOGGER.error("getAttachmentListSortedSpace failed.", e);
@@ -753,8 +753,8 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   List<Attachment> filterAttachmentsByTag(List<Attachment> attachments, String tagName) {
-    if ((tagName != null) && getContext().getWiki().exists(resolveDocumentReference(tagName),
-        getContext())) {
+    if ((tagName != null)
+        && getContext().getWiki().exists(resolveDocumentReference(tagName), getContext())) {
       XWikiDocument filterDoc = null;
       try {
         filterDoc = getContext().getWiki().getDocument(resolveDocumentReference(tagName),
@@ -808,8 +808,8 @@ public class WebUtilsService implements IWebUtilsService {
     if ((start <= 0) && ((nb <= 0) || (nb >= list.size()))) {
       countedAtts = list;
     } else if (start < list.size()) {
-      countedAtts = list.subList(Math.max(0, start), Math.min(Math.max(0, start) + Math.max(0, nb),
-          list.size()));
+      countedAtts = list.subList(Math.max(0, start),
+          Math.min(Math.max(0, start) + Math.max(0, nb), list.size()));
     }
     return countedAtts;
   }
@@ -862,8 +862,10 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("comment", xwikiDoc.getComment());
     docData.put("minorEdit", String.valueOf(xwikiDoc.isMinorEdit()));
     docData.put("syntaxId", xwikiDoc.getSyntax().toIdString());
-    docData.put("menuName", menuNameCmd.getMultilingualMenuName(modelUtils.serializeRef(
-        xwikiDoc.getDocumentReference()), getContext().getLanguage(), getContext()));
+    docData.put("menuName",
+        menuNameCmd.getMultilingualMenuName(
+            modelUtils.serializeRef(xwikiDoc.getDocumentReference()), getContext().getLanguage(),
+            getContext()));
     // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
 
     /**
@@ -902,16 +904,15 @@ public class WebUtilsService implements IWebUtilsService {
 
     if (bWithRendering) {
       try {
-        docData.put("renderedcontent", replaceInternalWithExternalLinks(xwikiDoc.getRenderedContent(
-            getContext()), host));
+        docData.put("renderedcontent",
+            replaceInternalWithExternalLinks(xwikiDoc.getRenderedContent(getContext()), host));
       } catch (XWikiException exp) {
         LOGGER.error("Exception with rendering content: ", exp);
       }
       try {
-        docData.put("celrenderedcontent", replaceInternalWithExternalLinks(
-            getCelementsRenderCmd().renderCelementsDocument(xwikiDoc.getDocumentReference(),
-                getContext().getLanguage(), "view"),
-            host));
+        docData.put("celrenderedcontent",
+            replaceInternalWithExternalLinks(getCelementsRenderCmd().renderCelementsDocument(
+                xwikiDoc.getDocumentReference(), getContext().getLanguage(), "view"), host));
       } catch (XWikiException exp) {
         LOGGER.error("Exception with rendering content: ", exp);
       }
@@ -934,10 +935,10 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   String replaceInternalWithExternalLinks(String content, String host) {
-    String result = content.replaceAll("src=\\\"(\\.\\./)*/?download/", "src=\"http://" + host
-        + "/download/");
-    result = result.replaceAll("href=\\\"(\\.\\./)*/?download/", "href=\"http://" + host
-        + "/download/");
+    String result = content.replaceAll("src=\\\"(\\.\\./)*/?download/",
+        "src=\"http://" + host + "/download/");
+    result = result.replaceAll("href=\\\"(\\.\\./)*/?download/",
+        "href=\"http://" + host + "/download/");
     result = result.replaceAll("href=\\\"(\\.\\./)*/?skin/", "href=\"http://" + host + "/skin/");
     result = result.replaceAll("href=\\\"(\\.\\./)*/?view/", "href=\"http://" + host + "/view/");
     result = result.replaceAll("href=\\\"(\\.\\./)*/?edit/", "href=\"http://" + host + "/edit/");
@@ -1240,12 +1241,12 @@ public class WebUtilsService implements IWebUtilsService {
     for (String docFN : docsFN) {
       try {
         LOGGER.info("getAttachmentsForDocs: processing doc " + docFN);
-        for (XWikiAttachment xwikiAttachment : getContext().getWiki().getDocument(
-            resolveDocumentReference(docFN), getContext()).getAttachmentList()) {
+        for (XWikiAttachment xwikiAttachment : getContext().getWiki()
+            .getDocument(resolveDocumentReference(docFN), getContext()).getAttachmentList()) {
           LOGGER.info("getAttachmentsForDocs: adding attachment " + xwikiAttachment.getFilename()
               + " to list.");
-          attachments.add(new Attachment(getContext().getWiki().getDocument(
-              resolveDocumentReference(docFN), getContext()).newDocument(getContext()),
+          attachments.add(new Attachment(getContext().getWiki()
+              .getDocument(resolveDocumentReference(docFN), getContext()).newDocument(getContext()),
               xwikiAttachment, getContext()));
         }
       } catch (XWikiException exp) {
@@ -1256,16 +1257,11 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public String getTranslatedDiscTemplateContent(String renderTemplatePath,
-      String language, String defaultLanguage) {
-    return StreamEx.of(language, defaultLanguage)
-        .mapPartial(MoreOptional::asNonBlank)
-        .append("")
-        .distinct()
-        .map(lang -> getTemplatePathOnDisk(renderTemplatePath, lang))
-        .mapPartial(this::loadResourceContent)
-        .findFirst()
-        .orElse("");
+  public String getTranslatedDiscTemplateContent(String renderTemplatePath, String language,
+      String defaultLanguage) {
+    return StreamEx.of(language, defaultLanguage).mapPartial(MoreOptional::asNonBlank).append("")
+        .distinct().map(lang -> getTemplatePathOnDisk(renderTemplatePath, lang))
+        .mapPartial(this::loadResourceContent).findFirst().orElse("");
   }
 
   private Optional<String> loadResourceContent(String templatePath) {
@@ -1306,11 +1302,11 @@ public class WebUtilsService implements IWebUtilsService {
         String textContent = new PlainTextCommand().convertToPlainText(htmlContent);
         sender.setTextContent(textContent);
         int successfulSend = sender.sendMail();
-        LOGGER.debug("sendCheckJobMail ended for [" + toAddr + "] email send [" + successfulSend
-            + "].");
+        LOGGER.debug(
+            "sendCheckJobMail ended for [" + toAddr + "] email send [" + successfulSend + "].");
       } else {
-        LOGGER.warn("No Email content found for [" + jobMailName + "] [" + emailTemplateDocRef
-            + "].");
+        LOGGER.warn(
+            "No Email content found for [" + jobMailName + "] [" + emailTemplateDocRef + "].");
       }
     } catch (XWikiException exp) {
       LOGGER.error("Failed to render email template document [" + emailTemplateDocRef + "].", exp);
@@ -1386,8 +1382,8 @@ public class WebUtilsService implements IWebUtilsService {
   public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef) {
     WikiReference wikiRef = getWikiRef(toRef);
     if (!docRef.getWikiReference().equals(wikiRef)) {
-      docRef = new DocumentReference(docRef.getName(), new SpaceReference(
-          docRef.getLastSpaceReference().getName(), wikiRef));
+      docRef = new DocumentReference(docRef.getName(),
+          new SpaceReference(docRef.getLastSpaceReference().getName(), wikiRef));
     }
     return docRef;
   }

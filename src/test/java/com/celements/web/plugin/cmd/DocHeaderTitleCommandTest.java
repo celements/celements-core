@@ -44,10 +44,10 @@ public class DocHeaderTitleCommandTest extends AbstractComponentTest {
     expect(doc.getXObject(eq(objRef))).andReturn(obj);
     MultilingualMenuNameCommand mmnc = createMock(MultilingualMenuNameCommand.class);
     command.menuNameCmd = mmnc;
-    expect(mmnc.getMultilingualMenuNameOnly(eq("Content.Home"), eq("de"), eq(false), same(
-        getContext()))).andReturn("Home");
-    expect(wiki.getSpacePreference(eq("title"), eq(docRef.getLastSpaceReference().getName()), eq(
-        ""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
+    expect(mmnc.getMultilingualMenuNameOnly(eq("Content.Home"), eq("de"), eq(false),
+        same(getContext()))).andReturn("Home");
+    expect(wiki.getSpacePreference(eq("title"), eq(docRef.getLastSpaceReference().getName()),
+        eq(""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
     expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))).andReturn(spacePrefTitle);
     replay(doc, mmnc, wiki);
     assertEquals(docRef.getName() + spacePrefTitle, command.getDocHeaderTitle(docRef));
@@ -69,10 +69,10 @@ public class DocHeaderTitleCommandTest extends AbstractComponentTest {
     expect(theDoc.getXObject(eq(objRef))).andReturn(obj);
     MultilingualMenuNameCommand mmnc = createMock(MultilingualMenuNameCommand.class);
     command.menuNameCmd = mmnc;
-    expect(mmnc.getMultilingualMenuNameOnly(eq("TheDocSpace.TheDoc"), eq("de"), eq(false), same(
-        getContext()))).andReturn("TheDoc");
-    expect(wiki.getSpacePreference(eq("title"), eq(theDocRef.getLastSpaceReference().getName()), eq(
-        ""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
+    expect(mmnc.getMultilingualMenuNameOnly(eq("TheDocSpace.TheDoc"), eq("de"), eq(false),
+        same(getContext()))).andReturn("TheDoc");
+    expect(wiki.getSpacePreference(eq("title"), eq(theDocRef.getLastSpaceReference().getName()),
+        eq(""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
     expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))).andReturn(spacePrefTitle);
     replay(doc, mmnc, theDoc, wiki);
     assertEquals(theDocRef.getName() + " - TheDocSpace", command.getDocHeaderTitle(theDocRef));
@@ -92,14 +92,14 @@ public class DocHeaderTitleCommandTest extends AbstractComponentTest {
     expect(doc.getXObject(eq(objRef))).andReturn(obj);
     MultilingualMenuNameCommand mmnc = createMock(MultilingualMenuNameCommand.class);
     command.menuNameCmd = mmnc;
-    expect(mmnc.getMultilingualMenuNameOnly(eq("Content.Home"), eq("de"), eq(false), same(
-        getContext()))).andReturn("Home");
-    expect(wiki.getSpacePreference(eq("title"), eq(docRef.getLastSpaceReference().getName()), eq(
-        ""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
+    expect(mmnc.getMultilingualMenuNameOnly(eq("Content.Home"), eq("de"), eq(false),
+        same(getContext()))).andReturn("Home");
+    expect(wiki.getSpacePreference(eq("title"), eq(docRef.getLastSpaceReference().getName()),
+        eq(""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
     expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))).andReturn(spacePrefTitle);
     replay(doc, mmnc, wiki);
-    assertEquals(docRef.getName() + spacePrefTitle, command.getDocHeaderTitle("Content.Home",
-        getContext()));
+    assertEquals(docRef.getName() + spacePrefTitle,
+        command.getDocHeaderTitle("Content.Home", getContext()));
     verify(doc, mmnc, wiki);
   }
 }

@@ -46,9 +46,9 @@ public class FrontendResourceResolverTest extends AbstractComponentTest {
             """) });
     replayDefault();
 
-    assertEquals(Optional.of(new FrontendResource(
-        "dist/vue-poc.BOsmCSyo.mjs",
-        Arrays.asList("dist/assets/vue-poc-ahBOTvOT.css", "dist/assets/shared.Df9z3kSS.css"))),
+    assertEquals(
+        Optional.of(new FrontendResource("dist/vue-poc.BOsmCSyo.mjs",
+            Arrays.asList("dist/assets/vue-poc-ahBOTvOT.css", "dist/assets/shared.Df9z3kSS.css"))),
         resolver.get().get(":frontend/progon/vue-poc/main.ts"));
 
     verifyDefault();
@@ -66,8 +66,9 @@ public class FrontendResourceResolverTest extends AbstractComponentTest {
             """) });
     replayDefault();
 
-    assertEquals(Optional.of(new FrontendResource("dist/eventview.Cq6C1_9z.mjs",
-        Collections.emptyList())), resolver.get().get(":frontend/progon/eventview/main.ts"));
+    assertEquals(
+        Optional.of(new FrontendResource("dist/eventview.Cq6C1_9z.mjs", Collections.emptyList())),
+        resolver.get().get(":frontend/progon/eventview/main.ts"));
 
     verifyDefault();
   }
@@ -100,8 +101,9 @@ public class FrontendResourceResolverTest extends AbstractComponentTest {
             """) });
     replayDefault();
 
-    assertEquals(Optional.of(new FrontendResource("dist/vue-poc.CPN5BtMj.mjs",
-        List.of("dist/assets/tailwind-5_VRq81v.css"))),
+    assertEquals(
+        Optional.of(new FrontendResource("dist/vue-poc.CPN5BtMj.mjs",
+            List.of("dist/assets/tailwind-5_VRq81v.css"))),
         resolver.get().get(":frontend/progon/vue-poc/main.ts"));
 
     verifyDefault();

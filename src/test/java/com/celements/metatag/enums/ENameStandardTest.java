@@ -21,8 +21,8 @@ public class ENameStandardTest {
 
   @Test
   public void testGetName() {
-    assertEquals(ENameStandard.APPLICATION_NAME, ENameStandard.getName(
-        FIELDS_APPLICATION_NAME).get());
+    assertEquals(ENameStandard.APPLICATION_NAME,
+        ENameStandard.getName(FIELDS_APPLICATION_NAME).get());
     assertEquals(ENameStandard.AUTHOR, ENameStandard.getName(FIELDS_AUTHOR).get());
     assertEquals(ENameStandard.DESCRIPTION, ENameStandard.getName(FIELDS_DESCRIPTION).get());
     assertEquals(ENameStandard.GENERATOR, ENameStandard.getName(FIELDS_GENERATOR).get());

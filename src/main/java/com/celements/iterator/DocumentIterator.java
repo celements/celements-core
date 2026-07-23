@@ -49,8 +49,7 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
   /**
    * Constructor
    */
-  public DocumentIterator() {
-  }
+  public DocumentIterator() {}
 
   /**
    * Constructor
@@ -60,8 +59,7 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
    * @deprecated instead use DocumentIterator()
    */
   @Deprecated
-  public DocumentIterator(XWikiContext context) {
-  }
+  public DocumentIterator(XWikiContext context) {}
 
   /**
    * Checks if iterator has a next object

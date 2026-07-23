@@ -20,8 +20,8 @@ public class TestXWikiClassRights extends AbstractXWikiClassRights {
 
   @Override
   protected DocumentReference getDocRef() {
-    return new RefBuilder().wiki(getWiki()).space(XWikiConstant.XWIKI_SPACE)
-        .doc("TestXWikiClass").build(DocumentReference.class);
+    return new RefBuilder().wiki(getWiki()).space(XWikiConstant.XWIKI_SPACE).doc("TestXWikiClass")
+        .build(DocumentReference.class);
   }
 
   @Override

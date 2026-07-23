@@ -56,10 +56,10 @@ public class DefaultNavigationFactoryTest extends AbstractComponentTest {
     pageTypeRef = new PageTypeReference(pageTypeDocRef.getName(),
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER, Collections.<String>emptyList());
     testDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyTestDoc");
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(testDocRef))).andReturn(
-        pageTypeRef).anyTimes();
-    expect(pageTypeResolverMock.getPageTypeRefForCurrentDoc()).andReturn(
-        defaultPageTypeRef).anyTimes();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(testDocRef)))
+        .andReturn(pageTypeRef).anyTimes();
+    expect(pageTypeResolverMock.getPageTypeRefForCurrentDoc()).andReturn(defaultPageTypeRef)
+        .anyTimes();
     defNavFactory = (DefaultNavigationFactory) Utils.getComponent(NavigationFactory.class);
     currDocRef = new DocumentReference(getContext().getDatabase(), "mySpace", "myCurDoc");
     curDoc = new XWikiDocument(currDocRef);
@@ -86,14 +86,14 @@ public class DefaultNavigationFactoryTest extends AbstractComponentTest {
   @Test
   public void testGetNavigationConfig_curDoc_true() {
     expect(javaNavFactoryMock.hasNavigationConfig(eq(defaultPageTypeRef))).andReturn(true);
-    expect(javaNavFactoryMock.getNavigationConfig(eq(defaultPageTypeRef))).andReturn(
-        NavigationConfig.DEFAULTS);
+    expect(javaNavFactoryMock.getNavigationConfig(eq(defaultPageTypeRef)))
+        .andReturn(NavigationConfig.DEFAULTS);
     expect(pageTypeNavFactoryMock.hasNavigationConfig(eq(currDocRef))).andReturn(true);
-    expect(pageTypeNavFactoryMock.getNavigationConfig(eq(currDocRef))).andReturn(
-        NavigationConfig.DEFAULTS);
+    expect(pageTypeNavFactoryMock.getNavigationConfig(eq(currDocRef)))
+        .andReturn(NavigationConfig.DEFAULTS);
     expect(xobjNavFactoryMock.hasNavigationConfig(eq(currDocRef))).andReturn(true);
-    expect(xobjNavFactoryMock.getNavigationConfig(eq(currDocRef))).andReturn(
-        NavigationConfig.DEFAULTS);
+    expect(xobjNavFactoryMock.getNavigationConfig(eq(currDocRef)))
+        .andReturn(NavigationConfig.DEFAULTS);
     replayDefault();
     assertNotNull(defNavFactory.getNavigationConfig(currDocRef));
     verifyDefault();
@@ -102,14 +102,14 @@ public class DefaultNavigationFactoryTest extends AbstractComponentTest {
   @Test
   public void testGetNavigationConfig_testDoc() {
     expect(javaNavFactoryMock.hasNavigationConfig(eq(pageTypeRef))).andReturn(true);
-    expect(javaNavFactoryMock.getNavigationConfig(eq(pageTypeRef))).andReturn(
-        NavigationConfig.DEFAULTS);
+    expect(javaNavFactoryMock.getNavigationConfig(eq(pageTypeRef)))
+        .andReturn(NavigationConfig.DEFAULTS);
     expect(pageTypeNavFactoryMock.hasNavigationConfig(eq(testDocRef))).andReturn(true);
-    expect(pageTypeNavFactoryMock.getNavigationConfig(eq(testDocRef))).andReturn(
-        NavigationConfig.DEFAULTS);
+    expect(pageTypeNavFactoryMock.getNavigationConfig(eq(testDocRef)))
+        .andReturn(NavigationConfig.DEFAULTS);
     expect(xobjNavFactoryMock.hasNavigationConfig(eq(testDocRef))).andReturn(true);
-    expect(xobjNavFactoryMock.getNavigationConfig(eq(testDocRef))).andReturn(
-        NavigationConfig.DEFAULTS);
+    expect(xobjNavFactoryMock.getNavigationConfig(eq(testDocRef)))
+        .andReturn(NavigationConfig.DEFAULTS);
     replayDefault();
     assertNotNull(defNavFactory.getNavigationConfig(testDocRef));
     verifyDefault();
@@ -137,8 +137,8 @@ public class DefaultNavigationFactoryTest extends AbstractComponentTest {
 
   @Test
   public void testHasNavigationConfig_curDoc_pageType() {
-    expect(javaNavFactoryMock.hasNavigationConfig(eq(defaultPageTypeRef))).andReturn(
-        false).anyTimes();
+    expect(javaNavFactoryMock.hasNavigationConfig(eq(defaultPageTypeRef))).andReturn(false)
+        .anyTimes();
     expect(pageTypeNavFactoryMock.hasNavigationConfig(eq(currDocRef))).andReturn(true);
     expect(xobjNavFactoryMock.hasNavigationConfig(eq(currDocRef))).andReturn(false).anyTimes();
     replayDefault();
@@ -148,8 +148,8 @@ public class DefaultNavigationFactoryTest extends AbstractComponentTest {
 
   @Test
   public void testHasNavigationConfig_curDoc_xobj() {
-    expect(javaNavFactoryMock.hasNavigationConfig(eq(defaultPageTypeRef))).andReturn(
-        false).anyTimes();
+    expect(javaNavFactoryMock.hasNavigationConfig(eq(defaultPageTypeRef))).andReturn(false)
+        .anyTimes();
     expect(pageTypeNavFactoryMock.hasNavigationConfig(eq(currDocRef))).andReturn(false).anyTimes();
     expect(xobjNavFactoryMock.hasNavigationConfig(eq(currDocRef))).andReturn(true);
     replayDefault();

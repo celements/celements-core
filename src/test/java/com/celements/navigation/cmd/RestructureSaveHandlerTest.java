@@ -77,9 +77,10 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     helpNav.setNodeSpace(new SpaceReference("MySpace", new WikiReference(context.getDatabase())));
     String menuItemName = "MySpace.MyDoc";
     String navUniqLiId = helpNav.getUniqueId(menuItemName);
-    assertEquals("getUniqueId in Navigation returns [" + navUniqLiId + "] which cannot be"
-        + " parsed correctly in extractDocFN.", menuItemName,
-        restrSaveCmd.extractDocFN(navUniqLiId));
+    assertEquals(
+        "getUniqueId in Navigation returns [" + navUniqLiId + "] which cannot be"
+            + " parsed correctly in extractDocFN.",
+        menuItemName, restrSaveCmd.extractDocFN(navUniqLiId));
   }
 
   @Test
@@ -250,10 +251,10 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
     assertEquals("expecting parent reset.", parentRef, xdoc.getParentReference());
-    assertTrue("expecting old parent in dirtyParents.", restrSaveCmd.getDirtyParents().contains(
-        oldParentRef));
-    assertTrue("expecting new parent in dirtyParents.", restrSaveCmd.getDirtyParents().contains(
-        parentRef));
+    assertTrue("expecting old parent in dirtyParents.",
+        restrSaveCmd.getDirtyParents().contains(oldParentRef));
+    assertTrue("expecting new parent in dirtyParents.",
+        restrSaveCmd.getDirtyParents().contains(parentRef));
     assertEquals(2, restrSaveCmd.getDirtyParents().size());
     verifyDefault();
   }
@@ -282,10 +283,10 @@ public class RestructureSaveHandlerTest extends AbstractComponentTest {
     assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
     assertEquals("expecting parent reset.", parentRef, xdoc.getParentReference());
     assertEquals("expecting position reset.", 0, menuItemObj.getIntValue("menu_position"));
-    assertTrue("expecting old parent in dirtyParents.", restrSaveCmd.getDirtyParents().contains(
-        oldParentRef));
-    assertTrue("expecting new parent in dirtyParents.", restrSaveCmd.getDirtyParents().contains(
-        parentRef));
+    assertTrue("expecting old parent in dirtyParents.",
+        restrSaveCmd.getDirtyParents().contains(oldParentRef));
+    assertTrue("expecting new parent in dirtyParents.",
+        restrSaveCmd.getDirtyParents().contains(parentRef));
     assertEquals(2, restrSaveCmd.getDirtyParents().size());
     verifyDefault();
   }

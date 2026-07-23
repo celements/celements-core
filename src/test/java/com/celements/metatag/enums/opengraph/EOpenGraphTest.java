@@ -31,24 +31,24 @@ public class EOpenGraphTest {
     assertEquals(EOpenGraph.OPENGRAPH_TYPE, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_TYPE).get());
     assertEquals(EOpenGraph.OPENGRAPH_IMAGE, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_IMAGE).get());
     assertEquals(EOpenGraph.OPENGRAPH_URL, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_URL).get());
-    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_AUDIO, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_AUDIO).get());
-    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_DESCRIPTION, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_DESCRIPTION).get());
-    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_DETERMINER, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_DETERMINER).get());
-    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_LOCALE, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_LOCALE).get());
-    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE).get());
-    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_SITENAME, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_SITENAME).get());
-    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_VIDEO, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_VIDEO).get());
-    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_IMAGE_WIDTH).get());
-    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_IMAGE_HEIGHT).get());
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_AUDIO,
+        EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_OPTIONAL_AUDIO).get());
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_DESCRIPTION,
+        EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_OPTIONAL_DESCRIPTION).get());
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_DETERMINER,
+        EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_OPTIONAL_DETERMINER).get());
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_LOCALE,
+        EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_OPTIONAL_LOCALE).get());
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE,
+        EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE).get());
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_SITENAME,
+        EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_OPTIONAL_SITENAME).get());
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_VIDEO,
+        EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_OPTIONAL_VIDEO).get());
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH,
+        EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_OPTIONAL_IMAGE_WIDTH).get());
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT,
+        EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_OPTIONAL_IMAGE_HEIGHT).get());
   }
 
   @Test

@@ -36,8 +36,8 @@ public abstract class AbstractEventHandler<T extends IGenericLiteral> implements
 
   @Override
   public void booleanEvent(boolean value) {
-    throw new IllegalArgumentException("received unsupported booleanEvent (value: [" + value
-        + "].");
+    throw new IllegalArgumentException(
+        "received unsupported booleanEvent (value: [" + value + "].");
   }
 
 }

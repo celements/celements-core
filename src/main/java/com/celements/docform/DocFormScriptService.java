@@ -59,8 +59,8 @@ public class DocFormScriptService implements ScriptService {
     return parseParams(context.getDocRef().orElse(null), getRequestParameterMap());
   }
 
-  public Map<String, Set<DocumentReference>> updateAndSaveDocFromMap(
-      DocumentReference docRef, Map<String, ?> map) {
+  public Map<String, Set<DocumentReference>> updateAndSaveDocFromMap(DocumentReference docRef,
+      Map<String, ?> map) {
     return updateAndSaveDoc(docRef, parseParams(docRef, map));
   }
 
@@ -80,8 +80,7 @@ public class DocFormScriptService implements ScriptService {
       if (hasEditOnAllDocs(requestParams)) {
         docForm.updateDocs(requestParams);
       }
-      return docForm.getResponseMap(requestParams)
-          .entrySet().stream()
+      return docForm.getResponseMap(requestParams).entrySet().stream()
           .collect(toImmutableMap(entry -> entry.getKey().name(), Entry::getValue));
     } catch (Exception exc) {
       LOGGER.error("updateAndSaveDocFromMap: failed for map [{}]", requestParams, exc);
@@ -98,14 +97,11 @@ public class DocFormScriptService implements ScriptService {
   }
 
   private Map<String, String[]> getRequestParameterMap() {
-    return context.request().map(XWikiRequest::getParameterMap)
-        .orElseGet(Collections::emptyMap);
+    return context.request().map(XWikiRequest::getParameterMap).orElseGet(Collections::emptyMap);
   }
 
   boolean hasEditOnAllDocs(List<DocFormRequestParam> requestParams) {
-    return requestParams.stream()
-        .map(DocFormRequestParam::getDocRef)
-        .distinct()
+    return requestParams.stream().map(DocFormRequestParam::getDocRef).distinct()
         .filter(docRef -> modelAccess.exists(docRef) || isCreateAllowed())
         .allMatch(docRef -> rightsAccess.hasAccessLevel(docRef, EAccessLevel.EDIT));
   }
@@ -115,9 +111,9 @@ public class DocFormScriptService implements ScriptService {
   }
 
   private IDocForm getDocFormCommand(DocumentReference docRef) {
-    return (IDocForm) getContext().computeIfAbsent(DOC_FORM_COMMAND_CTX_KEY + "_" +
-        modelUtils.serializeRef(docRef, ReferenceSerializationMode.GLOBAL),
-        key -> Utils.getComponent(IDocForm.class)
-            .initialize(docRef, isCreateAllowed()));
+    return (IDocForm) getContext().computeIfAbsent(
+        DOC_FORM_COMMAND_CTX_KEY + "_"
+            + modelUtils.serializeRef(docRef, ReferenceSerializationMode.GLOBAL),
+        key -> Utils.getComponent(IDocForm.class).initialize(docRef, isCreateAllowed()));
   }
 }

@@ -63,8 +63,8 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(docRef), same(getContext()))).andReturn(false);
     getContext().setWiki(xwiki);
     replayDefault(xwiki);
-    assertFalse("expecting true if translation successfully created", addTransCmd.addTranslation(
-        docRef, "fr"));
+    assertFalse("expecting true if translation successfully created",
+        addTransCmd.addTranslation(docRef, "fr"));
     verifyDefault(xwiki);
   }
 
@@ -78,8 +78,8 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(docRef), same(getContext()))).andReturn(false);
     getContext().setWiki(xwiki);
     replayDefault(xwiki);
-    assertFalse("expecting true if translation successfully created", addTransCmd.addTranslation(
-        fullName, "fr", getContext()));
+    assertFalse("expecting true if translation successfully created",
+        addTransCmd.addTranslation(fullName, "fr", getContext()));
     verifyDefault(xwiki);
   }
 
@@ -103,8 +103,8 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     expectLastCall();
     getContext().setWiki(xwiki);
     replayDefault(xwiki, mainDoc);
-    assertFalse("expecting false if no new translation was created", addTransCmd.addTranslation(
-        docRef, "fr"));
+    assertFalse("expecting false if no new translation was created",
+        addTransCmd.addTranslation(docRef, "fr"));
     verifyDefault(xwiki, mainDoc);
   }
 
@@ -130,8 +130,8 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     expectLastCall();
     getContext().setWiki(xwiki);
     replayDefault(xwiki, mainDoc);
-    assertFalse("expecting false if no new translation was created", addTransCmd.addTranslation(
-        fullName, "fr", getContext()));
+    assertFalse("expecting false if no new translation was created",
+        addTransCmd.addTranslation(fullName, "fr", getContext()));
     verifyDefault(xwiki, mainDoc);
   }
 
@@ -155,8 +155,8 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     xwiki.saveDocument(same(transDoc), same(getContext()));
     getContext().setWiki(xwiki);
     replayDefault(xwiki, mainDoc);
-    assertTrue("expecting true if translation successfully created", addTransCmd.addTranslation(
-        docRef, "fr"));
+    assertTrue("expecting true if translation successfully created",
+        addTransCmd.addTranslation(docRef, "fr"));
     assertEquals("expecting document language to be set.", "fr", transDoc.getLanguage());
     assertEquals("expecting document default language to be untouched", "default",
         transDoc.getDefaultLanguage());
@@ -188,8 +188,8 @@ public class AddTranslationCommandTest extends AbstractComponentTest {
     xwiki.saveDocument(same(transDoc), same(getContext()));
     getContext().setWiki(xwiki);
     replayDefault(xwiki, mainDoc);
-    assertTrue("expecting true if translation successfully created", addTransCmd.addTranslation(
-        fullName, "fr", getContext()));
+    assertTrue("expecting true if translation successfully created",
+        addTransCmd.addTranslation(fullName, "fr", getContext()));
     assertEquals("expecting document language to be set.", "fr", transDoc.getLanguage());
     assertEquals("expecting document default language to be untouched", "default",
         transDoc.getDefaultLanguage());

@@ -160,8 +160,8 @@ public class NavigationApi extends Api {
   }
 
   private DocumentReference getNavigationConfigClassRef(XWikiDocument doc) {
-    return getNavigationClasses().getNavigationConfigClassRef(getWebUtilsService().getWikiRef(
-        doc.getDocumentReference()).getName());
+    return getNavigationClasses().getNavigationConfigClassRef(
+        getWebUtilsService().getWikiRef(doc.getDocumentReference()).getName());
   }
 
   public void loadConfigByName(String configName) {
@@ -199,8 +199,8 @@ public class NavigationApi extends Api {
       XWikiDocument doc = context.getWiki().getDocument(configDocRef, context);
       BaseObject navConfigXobj = getNavigationConfigObject(doc, objNum);
       if (navConfigXobj != null) {
-        LOGGER.debug("loadConfig_internal: configName [" + navConfigXobj.getStringValue(
-            "menu_element_name") + "] , " + navConfigXobj);
+        LOGGER.debug("loadConfig_internal: configName ["
+            + navConfigXobj.getStringValue("menu_element_name") + "] , " + navConfigXobj);
         navigation.loadConfigFromObject(navConfigXobj);
       } else {
         LOGGER.warn("cannot load navigation config from doc [" + configDocRef + "],"

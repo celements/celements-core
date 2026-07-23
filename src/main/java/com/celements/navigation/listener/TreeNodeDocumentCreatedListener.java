@@ -41,10 +41,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("TreeNodeDocumentCreatedListener")
-public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentListener implements
-    EventListener {
+public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentListener
+    implements EventListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TreeNodeDocumentCreatedListener.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(TreeNodeDocumentCreatedListener.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -82,8 +83,8 @@ public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentLis
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + document.getDocumentReference() + "].");
-      BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-          getContext().getDatabase()));
+      BaseObject menuItemObj = document
+          .getXObject(getNavClasses().getMenuItemClassRef(getContext().getDatabase()));
       if (menuItemObj != null) {
         LOGGER.debug("TreeNodeDocumentCreatedListener checkMenuItemDiffs added to "
             + document.getDocumentReference() + "]");

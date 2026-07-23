@@ -27,8 +27,7 @@ public interface ICellsClassConfig {
   @Deprecated
   String CELEMENTS_CELL_CLASS_NAME = "CellClass";
   @Deprecated
-  String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
-      + CELEMENTS_CELL_CLASS_NAME;
+  String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "." + CELEMENTS_CELL_CLASS_NAME;
   @Deprecated
   String CELLCLASS_TAGNAME_FIELD = CellClass.FIELD_TAG_NAME.getName();
   @Deprecated

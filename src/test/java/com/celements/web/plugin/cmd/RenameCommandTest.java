@@ -149,22 +149,22 @@ public class RenameCommandTest extends AbstractComponentTest {
     String newSpaceName = "myNewSpace";
     String firstDocName = "myDoc1";
     XWikiDocument firstDoc = createDefaultMock(XWikiDocument.class);
-    expect(xwiki.exists(eq(spaceName + "." + firstDocName), same(context))).andReturn(
-        true).atLeastOnce();
-    expect(xwiki.getDocument(eq(spaceName + "." + firstDocName), same(context))).andReturn(
-        firstDoc).once();
-    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName), same(context))).andReturn(
-        false).atLeastOnce();
+    expect(xwiki.exists(eq(spaceName + "." + firstDocName), same(context))).andReturn(true)
+        .atLeastOnce();
+    expect(xwiki.getDocument(eq(spaceName + "." + firstDocName), same(context))).andReturn(firstDoc)
+        .once();
+    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName), same(context))).andReturn(false)
+        .atLeastOnce();
     firstDoc.rename(eq("myNewSpace.myDoc1"), same(context));
     expectLastCall().once();
     String firstDocName2 = "myDoc2";
     XWikiDocument secondDoc = createDefaultMock(XWikiDocument.class);
-    expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))).andReturn(
-        true).atLeastOnce();
-    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))).andReturn(
-        false).atLeastOnce();
-    expect(xwiki.getDocument(eq(spaceName + "." + firstDocName2), same(context))).andReturn(
-        secondDoc).once();
+    expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))).andReturn(true)
+        .atLeastOnce();
+    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))).andReturn(false)
+        .atLeastOnce();
+    expect(xwiki.getDocument(eq(spaceName + "." + firstDocName2), same(context)))
+        .andReturn(secondDoc).once();
     secondDoc.rename(eq("myNewSpace.myDoc2"), same(context));
     expectLastCall().once();
     List<String> docNames = Arrays.asList(firstDocName, firstDocName2);
@@ -181,20 +181,20 @@ public class RenameCommandTest extends AbstractComponentTest {
     String spaceName = "mySpace";
     String newSpaceName = "myNewSpace";
     String firstDocName = "myDoc1";
-    expect(xwiki.exists(eq(spaceName + "." + firstDocName), same(context))).andReturn(
-        true).atLeastOnce();
-    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName), same(context))).andReturn(
-        false).atLeastOnce();
-    expect(xwiki.getDocument(eq(spaceName + "." + firstDocName), same(context))).andThrow(
-        new XWikiException());
+    expect(xwiki.exists(eq(spaceName + "." + firstDocName), same(context))).andReturn(true)
+        .atLeastOnce();
+    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName), same(context))).andReturn(false)
+        .atLeastOnce();
+    expect(xwiki.getDocument(eq(spaceName + "." + firstDocName), same(context)))
+        .andThrow(new XWikiException());
     String firstDocName2 = "myDoc2";
     XWikiDocument secondDoc = createDefaultMock(XWikiDocument.class);
-    expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))).andReturn(
-        true).atLeastOnce();
-    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))).andReturn(
-        false).atLeastOnce();
-    expect(xwiki.getDocument(eq(spaceName + "." + firstDocName2), same(context))).andReturn(
-        secondDoc).once();
+    expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))).andReturn(true)
+        .atLeastOnce();
+    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))).andReturn(false)
+        .atLeastOnce();
+    expect(xwiki.getDocument(eq(spaceName + "." + firstDocName2), same(context)))
+        .andReturn(secondDoc).once();
     secondDoc.rename(eq("myNewSpace.myDoc2"), same(context));
     expectLastCall().once();
     List<String> docNames = Arrays.asList(firstDocName, firstDocName2);
@@ -222,15 +222,15 @@ public class RenameCommandTest extends AbstractComponentTest {
     String spaceName = "mySpace";
     String newSpaceName = "myNewSpace";
     String firstDocName = "myDoc1";
-    expect(xwiki.exists(eq(spaceName + "." + firstDocName), same(context))).andReturn(
-        true).atLeastOnce();
-    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName), same(context))).andReturn(
-        true).atLeastOnce();
+    expect(xwiki.exists(eq(spaceName + "." + firstDocName), same(context))).andReturn(true)
+        .atLeastOnce();
+    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName), same(context))).andReturn(true)
+        .atLeastOnce();
     String firstDocName2 = "myDoc2";
-    expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))).andReturn(
-        true).atLeastOnce();
-    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))).andReturn(
-        true).atLeastOnce();
+    expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))).andReturn(true)
+        .atLeastOnce();
+    expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))).andReturn(true)
+        .atLeastOnce();
     List<String> docNames = Arrays.asList(firstDocName, firstDocName2);
     expect(xwiki.getSpaceDocsName(eq(spaceName), same(context))).andReturn(docNames);
     replayDefault();

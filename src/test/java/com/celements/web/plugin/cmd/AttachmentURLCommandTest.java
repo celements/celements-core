@@ -54,33 +54,31 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   @Before
   public void setUp_AttachmentURLCommandTest() throws Exception {
-    registerComponentMocks(
-        IAttachmentServiceRole.class,
-        UrlService.class,
+    registerComponentMocks(IAttachmentServiceRole.class, UrlService.class,
         FrontendResourceResolver.class);
     context = getXContext();
     wiki = getMock(XWiki.class);
     attUrlCmd = new AttachmentURLCommand();
     mockURLFactory = createDefaultMock(XWikiURLFactory.class);
     context.setURLFactory(mockURLFactory);
-    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
-        "celements.attachmenturl.defaultaction"), eq("file"), same(context)))
-            .andReturn("file").anyTimes();
+    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"),
+        eq("celements.attachmenturl.defaultaction"), eq("file"), same(context))).andReturn("file")
+        .anyTimes();
   }
 
   @Test
   public void test_getAttachmentURL_fullURL() {
     replayDefault();
-    assertEquals("http://www.bla.com/bla.txt", attUrlCmd.getAttachmentURL(
-        "http://www.bla.com/bla.txt", context));
+    assertEquals("http://www.bla.com/bla.txt",
+        attUrlCmd.getAttachmentURL("http://www.bla.com/bla.txt", context));
     verifyDefault();
   }
 
   @Test
   public void test_getAttachmentURL_partURL() {
     replayDefault();
-    assertEquals("/xwiki/bin/download/A/B/bla.txt", attUrlCmd.getAttachmentURL(
-        "/xwiki/bin/download/A/B/bla.txt", context));
+    assertEquals("/xwiki/bin/download/A/B/bla.txt",
+        attUrlCmd.getAttachmentURL("/xwiki/bin/download/A/B/bla.txt", context));
     verifyDefault();
   }
 
@@ -95,8 +93,8 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     URL viewURL = new URL("http://localhost/mySpace/myDoc");
     expect(getMock(UrlService.class).getURL(myDocRef, "view")).andReturn(viewURL.getPath());
     replayDefault();
-    assertEquals("/mySpace/myDoc?xpage=bla&bli=blu", attUrlCmd.getAttachmentURL(
-        "?xpage=bla&bli=blu", context));
+    assertEquals("/mySpace/myDoc?xpage=bla&bli=blu",
+        attUrlCmd.getAttachmentURL("?xpage=bla&bli=blu", context));
     verifyDefault();
   }
 
@@ -110,8 +108,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     XWikiAttachment blaAtt = new XWikiAttachment();
     blaAtt.setFilename("bla.txt");
     expect(getMock(IAttachmentServiceRole.class)
-        .getAttachmentNameEqual(anyObject(AttachmentReference.class)))
-            .andReturn(blaAtt);
+        .getAttachmentNameEqual(anyObject(AttachmentReference.class))).andReturn(blaAtt);
     replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL("celements2web:A.B;bla.txt", context);
     verifyDefault();
@@ -127,8 +124,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     XWikiAttachment blaAtt = new XWikiAttachment();
     blaAtt.setFilename(attRef.getName());
     expect(getMock(IAttachmentServiceRole.class)
-        .getAttachmentNameEqual(anyObject(AttachmentReference.class)))
-            .andReturn(blaAtt);
+        .getAttachmentNameEqual(anyObject(AttachmentReference.class))).andReturn(blaAtt);
     replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL("A.B;bla.txt", context);
     verifyDefault();
@@ -141,7 +137,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
         new DocumentReference(context.getDatabase(), "A", "B"));
     expect(getMock(IAttachmentServiceRole.class)
         .getAttachmentNameEqual(anyObject(AttachmentReference.class)))
-            .andThrow(new AttachmentNotExistsException(attRef));
+        .andThrow(new AttachmentNotExistsException(attRef));
     replayDefault();
     assertNull(attUrlCmd.getAttachmentURL("A.B;bla.txt", context));
     verifyDefault();
@@ -152,10 +148,9 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     var input = ":celJS/bla.js";
     String resultURL = "/appname/skin/resources/celJS/bla.js";
     expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
-    expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
-        new Date());
-    expect(getMock(FrontendResourceResolver.class).get(eq(input)))
-        .andReturn(Optional.empty());
+    expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js")))
+        .andReturn(new Date());
+    expect(getMock(FrontendResourceResolver.class).get(eq(input))).andReturn(Optional.empty());
     replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL(input, context);
     String expectedURL = "/appname/file/resources/celJS/bla.js";
@@ -182,8 +177,8 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     String url = "http://www.bla.com/bla.mjs";
     String query = "version=1234";
     replayDefault();
-    assertEquals(url + "?" + query, attUrlCmd.getAttachmentURL(url, "file", query)
-        .get().toUriString());
+    assertEquals(url + "?" + query,
+        attUrlCmd.getAttachmentURL(url, "file", query).get().toUriString());
     verifyDefault();
   }
 
@@ -248,8 +243,8 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_getAttachmentURLPrefix() throws Exception {
-    expect(mockURLFactory.createResourceURL(eq(""), eq(true), same(context))).andReturn(new URL(
-        "http://test.fabian.dev:10080/skin/resources/"));
+    expect(mockURLFactory.createResourceURL(eq(""), eq(true), same(context)))
+        .andReturn(new URL("http://test.fabian.dev:10080/skin/resources/"));
     replayDefault();
     assertEquals("http://test.fabian.dev:10080/file/resources/",
         attUrlCmd.getAttachmentURLPrefix());

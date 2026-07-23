@@ -47,8 +47,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     cellDocRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
     cellDoc = new XWikiDocument(cellDocRef);
     cellDoc.setNew(false);
-    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(cellDocRef)))
-        .andReturn(cellDoc).anyTimes();
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(cellDocRef))).andReturn(cellDoc)
+        .anyTimes();
     pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
     webUtilsMock = createDefaultMock(IWebUtilsService.class);
     webUtilsServiceDesc = getComponentManager().getComponentDescriptor(IWebUtilsService.class,
@@ -102,8 +102,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDoc");
     List<String> expDepDocList = Arrays.asList("leftColumn_mySpace.MyDoc",
         "leftColumn_mySpace.MyParentDoc");
-    List<DocumentReference> docParentList = Arrays.asList(myDocRef, new DocumentReference(
-        context.getDatabase(), "mySpace", "MyParentDoc"));
+    List<DocumentReference> docParentList = Arrays.asList(myDocRef,
+        new DocumentReference(context.getDatabase(), "mySpace", "MyParentDoc"));
     expect(webUtilsMock.getDocumentParentsList(eq(myDocRef), eq(true))).andReturn(docParentList);
     replayDefault();
     List<String> depDocList = pageDepDocRefCmd.getDependentDocList(myDocRef, "leftColumn_mySpace");
@@ -126,13 +126,13 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     expect(webUtilsMock.resolveDocumentReference(eq(myDocFN))).andReturn(myDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(myDocRef))).andReturn(false).atLeastOnce();
     String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
-    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName))).andReturn(
-        expDepDocRef).atLeastOnce();
+    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName))).andReturn(expDepDocRef)
+        .atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(expDepDocRef))).andReturn(true)
         .atLeastOnce();
     XWikiDocument leftParentDoc = createDefaultMock(XWikiDocument.class);
-    expect(getMock(IModelAccessFacade.class).getDocument(eq(expDepDocRef)))
-        .andReturn(leftParentDoc).atLeastOnce();
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(expDepDocRef))).andReturn(leftParentDoc)
+        .atLeastOnce();
     expect(leftParentDoc.getContent()).andReturn("parent Content").atLeastOnce();
     expect(leftParentDoc.getDocumentReference()).andReturn(expDepDocRef).atLeastOnce();
     expect(leftParentDoc.getDefaultLanguage()).andReturn("en").anyTimes();
@@ -165,25 +165,25 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
     DocumentReference leftParentDocRef = new DocumentReference(context.getDatabase(),
         "mySpace_leftColumn", "MyParentDoc");
-    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName))).andReturn(
-        leftParentDocRef).atLeastOnce();
+    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName)))
+        .andReturn(leftParentDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(leftParentDocRef))).andReturn(false)
         .atLeastOnce();
     String mySpaceLeftColumnDefaultFN = context.getDatabase() + ":mySpace_leftColumn."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(expDepDocRef))).andReturn(
-        mySpaceLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN))).andReturn(
-        expDepDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(expDepDocRef)))
+        .andReturn(mySpaceLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN)))
+        .andReturn(expDepDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(expDepDocRef))).andReturn(false)
         .atLeastOnce();
     String wikiLeftColumnDefaultFN = context.getDatabase() + ":"
         + PageDependentDocumentReferenceCommand.PDC_WIKIDEFAULT_SPACE_NAME + "_leftColumn" + "."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef))).andReturn(
-        wikiLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN))).andReturn(
-        pdcWikiDefaultDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef)))
+        .andReturn(wikiLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN)))
+        .andReturn(pdcWikiDefaultDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(pdcWikiDefaultDocRef))).andReturn(false)
         .anyTimes();
     expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
@@ -217,16 +217,16 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
     DocumentReference leftParentDocRef = new DocumentReference(context.getDatabase(),
         "mySpace_leftColumn", "MyParentDoc");
-    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName))).andReturn(
-        leftParentDocRef).atLeastOnce();
+    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName)))
+        .andReturn(leftParentDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(leftParentDocRef))).andReturn(false)
         .atLeastOnce();
     String mySpaceLeftColumnDefaultFN = context.getDatabase() + ":mySpace_leftColumn."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(expDepDocRef))).andReturn(
-        mySpaceLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN))).andReturn(
-        expDepDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(expDepDocRef)))
+        .andReturn(mySpaceLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN)))
+        .andReturn(expDepDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(expDepDocRef))).andReturn(true)
         .atLeastOnce();
     XWikiDocument spaceDefaultDocument = new XWikiDocument(expDepDocRef);
@@ -238,8 +238,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     String wikiLeftColumnDefaultFN = context.getDatabase() + ":"
         + PageDependentDocumentReferenceCommand.PDC_WIKIDEFAULT_SPACE_NAME + "_leftColumn" + "."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef))).andReturn(
-        wikiLeftColumnDefaultFN);
+    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef)))
+        .andReturn(wikiLeftColumnDefaultFN);
     expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
     replayDefault();
     DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
@@ -271,25 +271,25 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
     DocumentReference leftParentDocRef = new DocumentReference(context.getDatabase(),
         "mySpace_leftColumn", "MyParentDoc");
-    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName))).andReturn(
-        leftParentDocRef).atLeastOnce();
+    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName)))
+        .andReturn(leftParentDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(leftParentDocRef))).andReturn(false)
         .atLeastOnce();
     String mySpaceLeftColumnDefaultFN = context.getDatabase() + ":mySpace_leftColumn."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(spaceDepDocRef))).andReturn(
-        mySpaceLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN))).andReturn(
-        spaceDepDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(spaceDepDocRef)))
+        .andReturn(mySpaceLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN)))
+        .andReturn(spaceDepDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(spaceDepDocRef))).andReturn(false)
         .atLeastOnce();
     String wikiLeftColumnDefaultFN = context.getDatabase() + ":"
         + PageDependentDocumentReferenceCommand.PDC_WIKIDEFAULT_SPACE_NAME + "_leftColumn" + "."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef))).andReturn(
-        wikiLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN))).andReturn(
-        pdcWikiDefaultDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef)))
+        .andReturn(wikiLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN)))
+        .andReturn(pdcWikiDefaultDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(pdcWikiDefaultDocRef))).andReturn(true)
         .atLeastOnce();
     XWikiDocument wikiDefaultDocument = new XWikiDocument(pdcWikiDefaultDocRef);
@@ -329,40 +329,40 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
     DocumentReference leftParentDocRef = new DocumentReference(context.getDatabase(),
         "mySpace_leftColumn", "MyParentDoc");
-    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName))).andReturn(
-        leftParentDocRef).atLeastOnce();
+    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName)))
+        .andReturn(leftParentDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(leftParentDocRef))).andReturn(false)
         .atLeastOnce();
     String mySpaceLeftColumnDefaultFN = context.getDatabase() + ":mySpace_leftColumn."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(spaceDepDocRef))).andReturn(
-        mySpaceLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN))).andReturn(
-        spaceDepDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(spaceDepDocRef)))
+        .andReturn(mySpaceLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN)))
+        .andReturn(spaceDepDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(spaceDepDocRef))).andReturn(false)
         .atLeastOnce();
     String wikiLeftColumnDefaultFN = context.getDatabase() + ":"
         + PageDependentDocumentReferenceCommand.PDC_WIKIDEFAULT_SPACE_NAME + "_leftColumn" + "."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef))).andReturn(
-        wikiLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN))).andReturn(
-        pdcWikiDefaultDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef)))
+        .andReturn(wikiLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN)))
+        .andReturn(pdcWikiDefaultDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(pdcWikiDefaultDocRef))).andReturn(false)
         .atLeastOnce();
     String layoutSpaceName = "myLayout";
     DocumentReference expectedLayoutDefaultRef = new DocumentReference(context.getDatabase(),
-        layoutSpaceName, "leftColumn-"
-            + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
-    SpaceReference layoutSpace = new SpaceReference(layoutSpaceName, new WikiReference(
-        context.getDatabase()));
+        layoutSpaceName,
+        "leftColumn-" + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
+    SpaceReference layoutSpace = new SpaceReference(layoutSpaceName,
+        new WikiReference(context.getDatabase()));
     expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(layoutSpace).atLeastOnce();
     String layoutDefaultFN = context.getDatabase() + ":" + layoutSpaceName + "." + "leftColumn-"
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(expectedLayoutDefaultRef))).andReturn(
-        layoutDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(layoutDefaultFN))).andReturn(
-        expectedLayoutDefaultRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(expectedLayoutDefaultRef)))
+        .andReturn(layoutDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(layoutDefaultFN)))
+        .andReturn(expectedLayoutDefaultRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(expectedLayoutDefaultRef))).andReturn(true)
         .atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
@@ -402,40 +402,40 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
     DocumentReference leftParentDocRef = new DocumentReference(context.getDatabase(),
         "mySpace_leftColumn", "MyParentDoc");
-    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName))).andReturn(
-        leftParentDocRef).atLeastOnce();
+    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName)))
+        .andReturn(leftParentDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(leftParentDocRef))).andReturn(false)
         .atLeastOnce();
     String mySpaceLeftColumnDefaultFN = context.getDatabase() + ":mySpace_leftColumn."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(spaceDepDocRef))).andReturn(
-        mySpaceLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN))).andReturn(
-        spaceDepDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(spaceDepDocRef)))
+        .andReturn(mySpaceLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN)))
+        .andReturn(spaceDepDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(spaceDepDocRef))).andReturn(false)
         .atLeastOnce();
     String wikiLeftColumnDefaultFN = context.getDatabase() + ":"
         + PageDependentDocumentReferenceCommand.PDC_WIKIDEFAULT_SPACE_NAME + "_leftColumn" + "."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef))).andReturn(
-        wikiLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN))).andReturn(
-        pdcWikiDefaultDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef)))
+        .andReturn(wikiLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN)))
+        .andReturn(pdcWikiDefaultDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(pdcWikiDefaultDocRef))).andReturn(false)
         .atLeastOnce();
     String overwriteLayoutSpaceName = "myOverwriteLayout";
     DocumentReference expectedLayoutDefaultRef = new DocumentReference(context.getDatabase(),
-        overwriteLayoutSpaceName, "leftColumn-"
-            + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
+        overwriteLayoutSpaceName,
+        "leftColumn-" + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
     SpaceReference overwriteLayoutRef = new SpaceReference(overwriteLayoutSpaceName,
         new WikiReference(context.getDatabase()));
     pageDepDocRefCmd.setCurrentLayoutRef(overwriteLayoutRef);
     String layoutDefaultFN = context.getDatabase() + ":" + overwriteLayoutSpaceName + "."
         + "leftColumn-" + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(expectedLayoutDefaultRef))).andReturn(
-        layoutDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(layoutDefaultFN))).andReturn(
-        expectedLayoutDefaultRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(expectedLayoutDefaultRef)))
+        .andReturn(layoutDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(layoutDefaultFN)))
+        .andReturn(expectedLayoutDefaultRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(expectedLayoutDefaultRef))).andReturn(true)
         .atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
@@ -474,41 +474,41 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
     DocumentReference leftParentDocRef = new DocumentReference(context.getDatabase(),
         "mySpace_leftColumn", "MyParentDoc");
-    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName))).andReturn(
-        leftParentDocRef).atLeastOnce();
+    expect(webUtilsMock.resolveDocumentReference(eq(leftParentFullName)))
+        .andReturn(leftParentDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(leftParentDocRef))).andReturn(false)
         .atLeastOnce();
     String mySpaceLeftColumnDefaultFN = context.getDatabase() + ":mySpace_leftColumn."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(spaceDepDocRef))).andReturn(
-        mySpaceLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN))).andReturn(
-        spaceDepDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(spaceDepDocRef)))
+        .andReturn(mySpaceLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(mySpaceLeftColumnDefaultFN)))
+        .andReturn(spaceDepDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(spaceDepDocRef))).andReturn(false)
         .atLeastOnce();
     String wikiLeftColumnDefaultFN = context.getDatabase() + ":"
         + PageDependentDocumentReferenceCommand.PDC_WIKIDEFAULT_SPACE_NAME + "_leftColumn" + "."
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef))).andReturn(
-        wikiLeftColumnDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN))).andReturn(
-        pdcWikiDefaultDocRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(pdcWikiDefaultDocRef)))
+        .andReturn(wikiLeftColumnDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(wikiLeftColumnDefaultFN)))
+        .andReturn(pdcWikiDefaultDocRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(pdcWikiDefaultDocRef))).andReturn(false)
         .atLeastOnce();
     String layoutSpaceName = "myLayout";
     String layoutDatabase = "layoutDb";
     DocumentReference expectedLayoutDefaultRef = new DocumentReference(layoutDatabase,
-        layoutSpaceName, "leftColumn-"
-            + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
-    SpaceReference layoutSpace = new SpaceReference(layoutSpaceName, new WikiReference(
-        layoutDatabase));
+        layoutSpaceName,
+        "leftColumn-" + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
+    SpaceReference layoutSpace = new SpaceReference(layoutSpaceName,
+        new WikiReference(layoutDatabase));
     expect(layoutService.getPageLayoutForCurrentDoc()).andReturn(layoutSpace).atLeastOnce();
     String layoutDefaultFN = layoutDatabase + ":" + layoutSpaceName + "." + "leftColumn-"
         + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refDefaultSerializerMock.serialize(eq(expectedLayoutDefaultRef))).andReturn(
-        layoutDefaultFN);
-    expect(webUtilsMock.resolveDocumentReference(eq(layoutDefaultFN))).andReturn(
-        expectedLayoutDefaultRef).atLeastOnce();
+    expect(refDefaultSerializerMock.serialize(eq(expectedLayoutDefaultRef)))
+        .andReturn(layoutDefaultFN);
+    expect(webUtilsMock.resolveDocumentReference(eq(layoutDefaultFN)))
+        .andReturn(expectedLayoutDefaultRef).atLeastOnce();
     expect(getMock(IModelAccessFacade.class).exists(eq(expectedLayoutDefaultRef))).andReturn(true)
         .atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);

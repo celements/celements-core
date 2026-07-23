@@ -32,7 +32,7 @@ public class AttachmentDescendingNameComparator implements Comparator<Attachment
    */
   @Override
   public int compare(Attachment attachmentOne, Attachment attachmentTwo) {
-    return -attachmentOne.getFilename().toLowerCase().replace('_', '-').compareTo(
-        attachmentTwo.getFilename().toLowerCase().replace('_', '-'));
+    return -attachmentOne.getFilename().toLowerCase().replace('_', '-')
+        .compareTo(attachmentTwo.getFilename().toLowerCase().replace('_', '-'));
   }
 }

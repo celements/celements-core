@@ -16,8 +16,8 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public abstract class AbstractDocumentListener extends
-    AbstractLocalEventListener<XWikiDocument, Object> {
+public abstract class AbstractDocumentListener
+    extends AbstractLocalEventListener<XWikiDocument, Object> {
 
   @Override
   protected void onEventInternal(Event event, XWikiDocument doc, Object data) {

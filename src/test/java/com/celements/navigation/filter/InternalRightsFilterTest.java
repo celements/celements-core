@@ -86,8 +86,8 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
     BaseObject baseObj = new BaseObject();
     baseObj.setDocumentReference(docRef);
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andReturn(false);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context))).andReturn(false);
     replayDefault();
     assertFalse(filter.includeMenuItem(baseObj, context));
     verifyDefault();
@@ -101,8 +101,8 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     BaseObject baseObj = new BaseObject();
     baseObj.setDocumentReference(docRef);
     filter.setMenuPart("");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context))).andReturn(true);
     replayDefault();
     assertTrue(filter.includeMenuItem(baseObj, context));
     verifyDefault();
@@ -117,8 +117,8 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     baseObj.setDocumentReference(docRef);
     baseObj.setStringValue("part_name", "anotherPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context))).andReturn(true);
     replayDefault();
     assertFalse(filter.includeMenuItem(baseObj, context));
     verifyDefault();
@@ -133,8 +133,8 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     baseObj.setDocumentReference(docRef);
     baseObj.setStringValue("part_name", "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context))).andReturn(true);
     replayDefault();
     assertTrue(filter.includeMenuItem(baseObj, context));
     verifyDefault();
@@ -149,8 +149,9 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     baseObj.setDocumentReference(docRef);
     baseObj.setStringValue("part_name", "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andThrow(new XWikiException());
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context)))
+        .andThrow(new XWikiException());
     replayDefault();
     assertFalse(filter.includeMenuItem(baseObj, context));
     verifyDefault();
@@ -161,8 +162,8 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     String docFullName = "MySpace.MyDoc";
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
         null, 0);
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andReturn(false);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context))).andReturn(false);
     replayDefault();
     assertFalse(filter.includeTreeNode(node, context));
     verifyDefault();
@@ -174,8 +175,8 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
         null, 0);
     filter.setMenuPart("");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context))).andReturn(true);
     replayDefault();
     assertTrue(filter.includeTreeNode(node, context));
     verifyDefault();
@@ -187,8 +188,8 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
         null, 0, "anotherPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context))).andReturn(true);
     replayDefault();
     assertFalse(filter.includeTreeNode(node, context));
     verifyDefault();
@@ -200,8 +201,8 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
         null, 0, "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context))).andReturn(true);
     replayDefault();
     assertTrue(filter.includeTreeNode(node, context));
     verifyDefault();
@@ -213,8 +214,9 @@ public class InternalRightsFilterTest extends AbstractComponentTest {
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
         null, 0, "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
-        + ":" + docFullName), same(context))).andThrow(new XWikiException());
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
+        eq(context.getDatabase() + ":" + docFullName), same(context)))
+        .andThrow(new XWikiException());
     replayDefault();
     assertFalse(filter.includeTreeNode(node, context));
     verifyDefault();

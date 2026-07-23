@@ -111,8 +111,8 @@ public class NextFreeDocService implements INextFreeDocRole {
     try {
       int offset = 0, limit = 8;
       List<Object> results;
-      while ((num == null) && ((results = getHighestNumQuery(baseDocRef, offset,
-          limit).execute()).size() > 0)) {
+      while ((num == null)
+          && ((results = getHighestNumQuery(baseDocRef, offset, limit).execute()).size() > 0)) {
         num = extractNumFromResults(baseDocRef.getName(), results);
         offset += results.size();
         limit *= 2;

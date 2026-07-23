@@ -60,15 +60,16 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     expect(xwiki.getRightService()).andReturn(rightServiceMock).anyTimes();
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    prepVeloContextService = (PrepareVelocityContextService) Utils.getComponent(
-        IPrepareVelocityContext.class);
+    prepVeloContextService = (PrepareVelocityContextService) Utils
+        .getComponent(IPrepareVelocityContext.class);
     skinDoc = createDefaultMock(XWikiDocument.class);
     expect(skinDoc.getFullName()).andReturn("XWiki.Celements2Skin").anyTimes();
-    expect(skinDoc.getDocumentReference()).andReturn(new DocumentReference(context.getDatabase(),
-        "XWiki", "Celements2Skin")).anyTimes();
+    expect(skinDoc.getDocumentReference())
+        .andReturn(new DocumentReference(context.getDatabase(), "XWiki", "Celements2Skin"))
+        .anyTimes();
     expect(skinDoc.newDocument(same(context))).andReturn(new Document(skinDoc, context)).anyTimes();
-    expect(xwiki.getDocument(eq("celements2web:XWiki.Celements2Skin"), same(context))).andReturn(
-        skinDoc).anyTimes();
+    expect(xwiki.getDocument(eq("celements2web:XWiki.Celements2Skin"), same(context)))
+        .andReturn(skinDoc).anyTimes();
     expect(xwiki.getDocument(eq(new DocumentReference("celements2web", "XWiki", "Celements2Skin")),
         same(context))).andReturn(skinDoc).anyTimes();
     ptServiceMock = createDefaultMock(IPageTypeRole.class);
@@ -108,29 +109,29 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     context.setDoc(null);
     expect(xwiki.isMultiLingual(same(context))).andReturn(false).atLeastOnce();
     expect(getMock(IWebUtilsService.class).getDefaultLanguage()).andReturn("en").atLeastOnce();
-    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(Arrays.asList("en",
-        "de")).atLeastOnce();
+    expect(getMock(IWebUtilsService.class).getAllowedLanguages())
+        .andReturn(Arrays.asList("en", "de")).atLeastOnce();
     expect(getMock(IWebUtilsService.class).isAdminUser()).andReturn(false).atLeastOnce();
     expect(getMock(IWebUtilsService.class).isSuperAdminUser()).andReturn(false).atLeastOnce();
     expect(getMock(IWebUtilsService.class).getAdminLanguage()).andReturn("en").atLeastOnce();
     expect(getMock(IWebUtilsService.class).getAdminMessageTool()).andReturn(null).atLeastOnce();
-    expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(
-        context))).andReturn(null).atLeastOnce();
-    expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context))).andReturn(new User(
-        context.getXWikiUser(), context)).atLeastOnce();
+    expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(context)))
+        .andReturn(null).atLeastOnce();
+    expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context)))
+        .andReturn(new User(context.getXWikiUser(), context)).atLeastOnce();
     // if context doc is null -> getPageTypeRefForCurrentDoc returns null
     expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(null).atLeastOnce();
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
-        new XWikiDocument()).atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn(
-        "123").anyTimes();
+    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context)))
+        .andReturn(new XWikiDocument()).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("123")
+        .anyTimes();
     expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(null).atLeastOnce();
     expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("432").anyTimes();
-    expect(xwiki.getSpacePreference(eq("showRightPanels"), same(context))).andReturn(
-        null).atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("showLeftPanels"), same(context))).andReturn(
-        null).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("showRightPanels"), same(context))).andReturn(null)
+        .atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("showLeftPanels"), same(context))).andReturn(null)
+        .atLeastOnce();
     replayDefault();
     // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     // set after calling replay
@@ -208,23 +209,23 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
     context.setRequest(requestMock);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))).andReturn(
-        "").atLeastOnce();
+    expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))).andReturn("")
+        .atLeastOnce();
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "myTestUser");
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(new XWikiDocument(
-        userDocRef)).atLeastOnce();
+    expect(xwiki.getDocument(eq(userDocRef), same(context)))
+        .andReturn(new XWikiDocument(userDocRef)).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.preferDefault"), eq("0"))).andReturn("0").atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("preferDefaultLanguage"), eq("0"), same(context))).andReturn(
-        "0").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("preferDefaultLanguage"), eq("0"), same(context)))
+        .andReturn("0").atLeastOnce();
     expect(requestMock.getParameter(eq("language"))).andReturn("").atLeastOnce();
     expect(requestMock.getHeader(eq("Accept-Language"))).andReturn("en,de").atLeastOnce();
-    Enumeration<Locale> testEnum = new Vector<>(Arrays.asList(new Locale("en"), new Locale(
-        "de"))).elements();
+    Enumeration<Locale> testEnum = new Vector<>(Arrays.asList(new Locale("en"), new Locale("de")))
+        .elements();
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1").atLeastOnce();
-    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(Arrays.asList("en",
-        "de", "fr")).atLeastOnce();
+    expect(getMock(IWebUtilsService.class).getAllowedLanguages())
+        .andReturn(Arrays.asList("en", "de", "fr")).atLeastOnce();
     replayDefault();
     // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     // set after calling replay
@@ -244,17 +245,17 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     context.setRequest(requestMock);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(getMock(IWebUtilsService.class).getDefaultLanguage()).andReturn("en").atLeastOnce();
-    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(Arrays.asList(
-        "en")).atLeastOnce();
-    expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))).andReturn(
-        "").atLeastOnce();
+    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(Arrays.asList("en"))
+        .atLeastOnce();
+    expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))).andReturn("")
+        .atLeastOnce();
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "myTestUser");
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(new XWikiDocument(
-        userDocRef)).atLeastOnce();
+    expect(xwiki.getDocument(eq(userDocRef), same(context)))
+        .andReturn(new XWikiDocument(userDocRef)).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.preferDefault"), eq("0"))).andReturn("0").atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("preferDefaultLanguage"), eq("0"), same(context))).andReturn(
-        "0").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("preferDefaultLanguage"), eq("0"), same(context)))
+        .andReturn("0").atLeastOnce();
     expect(requestMock.getParameter(eq("language"))).andReturn("").atLeastOnce();
     expect(requestMock.getHeader(eq("Accept-Language"))).andReturn("de").atLeastOnce();
     Enumeration<Locale> testEnum = new Vector<>(Arrays.asList(new Locale("de"))).elements();
@@ -278,22 +279,22 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     XWikiRequest requestMock = createDefaultMock(XWikiRequest.class);
     context.setRequest(requestMock);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))).andReturn(
-        "ru").atLeastOnce(); // test invalid language from cookie
+    expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))).andReturn("ru")
+        .atLeastOnce(); // test invalid language from cookie
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "myTestUser");
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(new XWikiDocument(
-        userDocRef)).atLeastOnce();
+    expect(xwiki.getDocument(eq(userDocRef), same(context)))
+        .andReturn(new XWikiDocument(userDocRef)).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.preferDefault"), eq("0"))).andReturn("0").atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("preferDefaultLanguage"), eq("0"), same(context))).andReturn(
-        "0").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("preferDefaultLanguage"), eq("0"), same(context)))
+        .andReturn("0").atLeastOnce();
     expect(requestMock.getParameter(eq("language"))).andReturn("").atLeastOnce();
     expect(requestMock.getHeader(eq("Accept-Language"))).andReturn("de").atLeastOnce();
     Enumeration<Locale> testEnum = new Vector<>(Arrays.asList(new Locale("de"))).elements();
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1").atLeastOnce();
-    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(Arrays.asList(
-        "en")).atLeastOnce();
+    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(Arrays.asList("en"))
+        .atLeastOnce();
     expect(getMock(IWebUtilsService.class).getDefaultLanguage()).andReturn("en").anyTimes();
     replayDefault();
     // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
@@ -315,14 +316,14 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     XWikiResponse responseMock = createDefaultMock(XWikiResponse.class);
     context.setResponse(responseMock);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"), eq(
-        "celements.language.suppressInvalid"), eq("0"), same(context))).andReturn(
-            "1").atLeastOnce();
+    expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
+        eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1")
+        .atLeastOnce();
     responseMock.addCookie(isA(Cookie.class));
     expectLastCall().once();
     expect(requestMock.getParameter(eq("language"))).andReturn("fr").atLeastOnce();
-    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(Arrays.asList("en",
-        "de", "fr")).atLeastOnce();
+    expect(getMock(IWebUtilsService.class).getAllowedLanguages())
+        .andReturn(Arrays.asList("en", "de", "fr")).atLeastOnce();
     replayDefault();
     // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     // set after calling replay
@@ -331,8 +332,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     vContext.put("language", "de");
     prepVeloContextService.fixLanguagePreference(vContext);
     ExecutionContext execContext = prepVeloContextService.execution.getContext();
-    Object addCookieBefore = execContext.getProperty(
-        IPrepareVelocityContext.ADD_LANGUAGE_COOKIE_DONE);
+    Object addCookieBefore = execContext
+        .getProperty(IPrepareVelocityContext.ADD_LANGUAGE_COOKIE_DONE);
     assertNotNull(addCookieBefore);
     assertTrue((Boolean) addCookieBefore);
     // check addCookie is only called once
@@ -350,11 +351,11 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
 
   @Test
   public void testIsInvalidLanguageOrDefault_yes() {
-    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(Arrays.asList("en",
-        "de")).atLeastOnce();
-    expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"), eq(
-        "celements.language.suppressInvalid"), eq("0"), same(context))).andReturn(
-            "1").atLeastOnce();
+    expect(getMock(IWebUtilsService.class).getAllowedLanguages())
+        .andReturn(Arrays.asList("en", "de")).atLeastOnce();
+    expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
+        eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1")
+        .atLeastOnce();
     replayDefault();
     assertFalse(prepVeloContextService.isInvalidLanguageOrDefault("en"));
     verifyDefault();
@@ -362,11 +363,11 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
 
   @Test
   public void testIsInvalidLanguageOrDefault_no() {
-    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(Arrays.asList("en",
-        "de")).atLeastOnce();
-    expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"), eq(
-        "celements.language.suppressInvalid"), eq("0"), same(context))).andReturn(
-            "1").atLeastOnce();
+    expect(getMock(IWebUtilsService.class).getAllowedLanguages())
+        .andReturn(Arrays.asList("en", "de")).atLeastOnce();
+    expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
+        eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1")
+        .atLeastOnce();
     replayDefault();
     assertTrue(prepVeloContextService.isInvalidLanguageOrDefault("fr"));
     verifyDefault();
@@ -374,9 +375,9 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
 
   @Test
   public void testIsInvalidLanguageOrDefault_no_noSuppress() {
-    expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"), eq(
-        "celements.language.suppressInvalid"), eq("0"), same(context))).andReturn(
-            "0").atLeastOnce();
+    expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
+        eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("0")
+        .atLeastOnce();
     replayDefault();
     assertFalse(prepVeloContextService.isInvalidLanguageOrDefault("fr"));
     verifyDefault();
@@ -386,41 +387,41 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testInitCelementsVelocity_checkNPEs_forEmptyVContext() throws XWikiException {
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(
-        context))).andReturn(null).anyTimes();
-    expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(
-        context))).andReturn("").anyTimes();
+    expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(context)))
+        .andReturn(null).anyTimes();
+    expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(context)))
+        .andReturn("").anyTimes();
     expect(getMock(IWebUtilsService.class).getDefaultLanguage()).andReturn("en").atLeastOnce();
-    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(
-        Collections.<String>emptyList()).anyTimes();
+    expect(getMock(IWebUtilsService.class).getAllowedLanguages())
+        .andReturn(Collections.<String>emptyList()).anyTimes();
     expect(getMock(IWebUtilsService.class).isAdminUser()).andReturn(false).atLeastOnce();
     expect(getMock(IWebUtilsService.class).isSuperAdminUser()).andReturn(false).atLeastOnce();
     expect(getMock(IWebUtilsService.class).getAdminLanguage()).andReturn("en").atLeastOnce();
     expect(getMock(IWebUtilsService.class).getAdminMessageTool()).andReturn(null).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("skin"), same(context))).andReturn("").anyTimes();
-    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))).andReturn(
-        "").anyTimes();
+    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))).andReturn("")
+        .anyTimes();
     expect(skinDoc.getURL(eq("view"), same(context))).andReturn("").anyTimes();
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
-        new XWikiDocument()).atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn(
-        "123").anyTimes();
+    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context)))
+        .andReturn(new XWikiDocument()).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("123")
+        .anyTimes();
     expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(null).atLeastOnce();
     expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("432").anyTimes();
     expect(xwiki.getSkin(same(context))).andReturn("celements2web:Skins.CellSkin").anyTimes();
     DocumentReference cellSkinDoc = new DocumentReference("celements2web", "Skins", "CellSkin");
-    expect(xwiki.getDocument(eq(cellSkinDoc), same(context))).andReturn(new XWikiDocument(
-        cellSkinDoc)).atLeastOnce();
-    expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context))).andReturn(new User(
-        context.getXWikiUser(), context)).atLeastOnce();
+    expect(xwiki.getDocument(eq(cellSkinDoc), same(context)))
+        .andReturn(new XWikiDocument(cellSkinDoc)).atLeastOnce();
+    expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context)))
+        .andReturn(new User(context.getXWikiUser(), context)).atLeastOnce();
     context.setWiki(xwiki);
     expect(rightServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.myTestUser"), eq("mySpace.myDoc"),
         same(context))).andReturn(false).anyTimes();
     expect(rightServiceMock.hasAdminRights(same(context))).andReturn(false).anyTimes();
     expect(xwiki.Param("celements.admin_language")).andReturn("").anyTimes();
-    PageTypeReference ptRef = new PageTypeReference("RichText", "testProvider", Arrays.asList(
-        "cat1"));
+    PageTypeReference ptRef = new PageTypeReference("RichText", "testProvider",
+        Arrays.asList("cat1"));
     expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(ptRef).atLeastOnce();
     replayDefault();
     // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
@@ -437,38 +438,38 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     assertNull(context.getURLFactory());
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(
-        context))).andReturn(null).anyTimes();
-    expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(
-        context))).andReturn("").anyTimes();
+    expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(context)))
+        .andReturn(null).anyTimes();
+    expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(context)))
+        .andReturn("").anyTimes();
     expect(getMock(IWebUtilsService.class).getDefaultLanguage()).andReturn("en").atLeastOnce();
-    expect(getMock(IWebUtilsService.class).getAllowedLanguages()).andReturn(
-        Collections.<String>emptyList()).anyTimes();
+    expect(getMock(IWebUtilsService.class).getAllowedLanguages())
+        .andReturn(Collections.<String>emptyList()).anyTimes();
     expect(getMock(IWebUtilsService.class).isAdminUser()).andReturn(false).atLeastOnce();
     expect(getMock(IWebUtilsService.class).isSuperAdminUser()).andReturn(false).atLeastOnce();
     expect(getMock(IWebUtilsService.class).getAdminLanguage()).andReturn("en").atLeastOnce();
     expect(getMock(IWebUtilsService.class).getAdminMessageTool()).andReturn(null).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("skin"), same(context))).andReturn("").anyTimes();
-    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn(
-        "123").anyTimes();
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("123")
+        .anyTimes();
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
-        new XWikiDocument()).atLeastOnce();
+    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context)))
+        .andReturn(new XWikiDocument()).atLeastOnce();
     expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(null).atLeastOnce();
     expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("432").anyTimes();
     expect(xwiki.getSkin(same(context))).andReturn("celements2web:Skins.CellSkin").anyTimes();
     DocumentReference cellSkinDoc = new DocumentReference("celements2web", "Skins", "CellSkin");
-    expect(xwiki.getDocument(eq(cellSkinDoc), same(context))).andReturn(new XWikiDocument(
-        cellSkinDoc)).atLeastOnce();
-    expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context))).andReturn(new User(
-        context.getXWikiUser(), context)).atLeastOnce();
+    expect(xwiki.getDocument(eq(cellSkinDoc), same(context)))
+        .andReturn(new XWikiDocument(cellSkinDoc)).atLeastOnce();
+    expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context)))
+        .andReturn(new User(context.getXWikiUser(), context)).atLeastOnce();
     context.setWiki(xwiki);
     expect(rightServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.myTestUser"), eq("mySpace.myDoc"),
         same(context))).andReturn(false).anyTimes();
     expect(rightServiceMock.hasAdminRights(same(context))).andReturn(false).anyTimes();
     expect(xwiki.Param("celements.admin_language")).andReturn("").anyTimes();
-    PageTypeReference ptRef = new PageTypeReference("RichText", "testProvider", Arrays.asList(
-        "cat1"));
+    PageTypeReference ptRef = new PageTypeReference("RichText", "testProvider",
+        Arrays.asList("cat1"));
     expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(ptRef).atLeastOnce();
     replayDefault();
     // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
@@ -483,10 +484,10 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testInitPanelsVelocity_checkNPEs_forEmptyVContext() {
     context.setDoc(null);
     context.put("vcontext", new VelocityContext());
-    expect(xwiki.getSpacePreference(eq("showRightPanels"), same(context))).andReturn(
-        null).atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("showLeftPanels"), same(context))).andReturn(
-        null).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("showRightPanels"), same(context))).andReturn(null)
+        .atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("showLeftPanels"), same(context))).andReturn(null)
+        .atLeastOnce();
     replayDefault();
     prepVeloContextService.initPanelsVelocity((VelocityContext) context.get("vcontext"));
     verifyDefault();
@@ -496,8 +497,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testGetRTEwidth_default() throws Exception {
     expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("");
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
-        new XWikiDocument()).atLeastOnce();
+    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context)))
+        .andReturn(new XWikiDocument()).atLeastOnce();
     replayDefault();
     assertEquals("453", prepVeloContextService.getRTEwidth(context));
     verifyDefault();
@@ -507,8 +508,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testGetRTEwidth_preferences() throws Exception {
     expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("500");
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
-        new XWikiDocument()).atLeastOnce();
+    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context)))
+        .andReturn(new XWikiDocument()).atLeastOnce();
     replayDefault();
     assertEquals("500", prepVeloContextService.getRTEwidth(context));
     verifyDefault();
@@ -518,10 +519,10 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
   public void testGetRTEwidth_pageType() throws Exception {
     XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
-    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn(
-        "500").anyTimes();
-    XWikiDocument theDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"));
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("500")
+        .anyTimes();
+    XWikiDocument theDoc = new XWikiDocument(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"));
     BaseObject pageTypeObj = new BaseObject();
     pageTypeObj.setStringValue("page_type", "SpecialRichText");
     DocumentReference pagTypeClassRef = new DocumentReference(context.getDatabase(), "Celements2",
@@ -532,11 +533,11 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     expect(request.get(eq("template"))).andReturn(null).anyTimes();
     DocumentReference specialPTRef = new DocumentReference(context.getDatabase(), "PageTypes",
         "SpecialRichText");
-    expect(xwiki.exists(eq("PageTypes.SpecialRichText"), same(context))).andReturn(
-        true).atLeastOnce();
+    expect(xwiki.exists(eq("PageTypes.SpecialRichText"), same(context))).andReturn(true)
+        .atLeastOnce();
     XWikiDocument pageTypeDoc = new XWikiDocument(specialPTRef);
-    expect(xwiki.getDocument(eq("PageTypes.SpecialRichText"), same(context))).andReturn(
-        pageTypeDoc).once();
+    expect(xwiki.getDocument(eq("PageTypes.SpecialRichText"), same(context))).andReturn(pageTypeDoc)
+        .once();
     BaseObject pageTypePropObj = new BaseObject();
     pageTypePropObj.setIntValue("rte_width", 700);
     DocumentReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
@@ -571,8 +572,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     XWikiRequest request = createDefaultMock(XWikiRequest.class);
     context.setRequest(request);
     expect(configSourceMock.getProperty(eq("editbox_height"))).andReturn("543").anyTimes();
-    XWikiDocument theDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "MySpace",
-        "myPage"));
+    XWikiDocument theDoc = new XWikiDocument(
+        new DocumentReference(context.getDatabase(), "MySpace", "myPage"));
     BaseObject pageTypeObj = new BaseObject();
     pageTypeObj.setStringValue("page_type", "SpecialRichText");
     DocumentReference pagTypeClassRef = new DocumentReference(context.getDatabase(), "Celements2",
@@ -588,8 +589,8 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     DocumentReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
         "Celements2", "PageTypeProperties");
     pageTypePropObj.setXClassReference(pageTypePropClassRef);
-    expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(
-        pageTypePropObj).atLeastOnce();
+    expect(ptResolverMock.getPageTypeObject(getContext().getDoc())).andReturn(pageTypePropObj)
+        .atLeastOnce();
     replayDefault();
     assertEquals("700", prepVeloContextService.getRTEheight());
     verifyDefault();
@@ -613,11 +614,11 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     rightPanelsConfigObj.setXClassReference(panelsConfigClassRef);
     rightPanelsConfigObj.setStringValue("config_name", "rightPanels");
     rightPanelsConfigObj.setIntValue("show_panels", 1);
-    rightPanelsConfigObj.setStringValue("panels", "Panels.VideoPlayerPanel,"
-        + "Panels.GalleryPanel,Panels.BgPosEditPanel");
+    rightPanelsConfigObj.setStringValue("panels",
+        "Panels.VideoPlayerPanel," + "Panels.GalleryPanel,Panels.BgPosEditPanel");
     ptConfigDoc.addXObject(rightPanelsConfigObj);
-    expect(xwiki.getDocument(eq("PageTypes.Movie"), same(context))).andReturn(
-        ptConfigDoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("PageTypes.Movie"), same(context))).andReturn(ptConfigDoc)
+        .atLeastOnce();
     replayDefault();
     assertEquals(expectedPanels, prepVeloContextService.getRightPanels());
     verifyDefault();
@@ -641,11 +642,11 @@ public class PrepareVelocityContextServiceTest extends AbstractComponentTest {
     leftPanelsConfigObj.setXClassReference(panelsConfigClassRef);
     leftPanelsConfigObj.setStringValue("config_name", "leftPanels");
     leftPanelsConfigObj.setIntValue("show_panels", 1);
-    leftPanelsConfigObj.setStringValue("panels", "Panels.VideoPlayerPanel,"
-        + "Panels.GalleryPanel,Panels.BgPosEditPanel");
+    leftPanelsConfigObj.setStringValue("panels",
+        "Panels.VideoPlayerPanel," + "Panels.GalleryPanel,Panels.BgPosEditPanel");
     ptConfigDoc.addXObject(leftPanelsConfigObj);
-    expect(xwiki.getDocument(eq("PageTypes.Movie"), same(context))).andReturn(
-        ptConfigDoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("PageTypes.Movie"), same(context))).andReturn(ptConfigDoc)
+        .atLeastOnce();
     replayDefault();
     assertEquals(expectedPanels, prepVeloContextService.getLeftPanels());
     verifyDefault();

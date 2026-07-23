@@ -55,8 +55,8 @@ public class XObjectPageTypeDocumentCreatedListenerTest extends AbstractComponen
 
   @Test
   public void testGetEvents() {
-    List<String> expectedEventClassList = Arrays.asList(
-        new DocumentCreatedEvent().getClass().getName());
+    List<String> expectedEventClassList = Arrays
+        .asList(new DocumentCreatedEvent().getClass().getName());
     replayDefault();
     List<Event> actualEventList = eventListener.getEvents();
     assertEquals(expectedEventClassList.size(), actualEventList.size());

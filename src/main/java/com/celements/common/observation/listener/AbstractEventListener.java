@@ -57,8 +57,8 @@ public abstract class AbstractEventListener<S, D> implements EventListener {
       try {
         this.observationManager = webUtilsService.lookup(ObservationManager.class);
       } catch (ComponentLookupException exc) {
-        throw new RuntimeException("Cound not retrieve an Observation Manager against "
-            + "the component manager", exc);
+        throw new RuntimeException(
+            "Cound not retrieve an Observation Manager against " + "the component manager", exc);
       }
     }
     return this.observationManager;
@@ -73,8 +73,8 @@ public abstract class AbstractEventListener<S, D> implements EventListener {
   }
 
   public synchronized boolean isDisabled() {
-    return disabled || ConfigSourceUtils.getStringListProperty(configSrc, CFG_SRC_KEY).contains(
-        getName());
+    return disabled
+        || ConfigSourceUtils.getStringListProperty(configSrc, CFG_SRC_KEY).contains(getName());
   }
 
   public synchronized void enable() {

@@ -80,8 +80,8 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef)
-        + KEY_DELIM + objNb + KEY_DELIM + fieldName;
+    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef) + KEY_DELIM + objNb
+        + KEY_DELIM + fieldName;
     DocFormRequestKey key = parser.parse(keyString).orElse(null);
     assertKey(key, keyString, docRef, classRef, objNb, false, fieldName);
   }
@@ -91,8 +91,7 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = serialize(classRef) + KEY_DELIM + objNb
-        + KEY_DELIM + fieldName;
+    String keyString = serialize(classRef) + KEY_DELIM + objNb + KEY_DELIM + fieldName;
     DocFormRequestKey key = parser.parse(keyString).orElse(null);
     assertKey(key, keyString, defaultDocRef, classRef, objNb, false, fieldName);
   }
@@ -103,8 +102,8 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef)
-        + KEY_DELIM + objNb + KEY_DELIM + fieldName;
+    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef) + KEY_DELIM + objNb
+        + KEY_DELIM + fieldName;
     DocFormRequestKey key = parser.parse(keyString).orElse(null);
     docRef = RefBuilder.from(docRef).wiki("xwikidb").build(DocumentReference.class);
     assertKey(key, keyString, docRef, classRef, objNb, false, fieldName);
@@ -115,8 +114,7 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf_asdf2";
-    String keyString = serialize(classRef) + KEY_DELIM + objNb
-        + KEY_DELIM + fieldName;
+    String keyString = serialize(classRef) + KEY_DELIM + objNb + KEY_DELIM + fieldName;
     DocFormRequestKey key = parser.parse(keyString).orElse(null);
     assertKey(key, keyString, defaultDocRef, classRef, objNb, false, fieldName);
   }
@@ -126,8 +124,7 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = -3;
     String fieldName = "asdf";
-    String keyString = serialize(classRef) + KEY_DELIM + objNb
-        + KEY_DELIM + fieldName;
+    String keyString = serialize(classRef) + KEY_DELIM + objNb + KEY_DELIM + fieldName;
     DocFormRequestKey key = parser.parse(keyString).orElse(null);
     assertKey(key, keyString, defaultDocRef, classRef, objNb, false, fieldName);
   }
@@ -164,8 +161,7 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
-    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef)
-        + KEY_DELIM + objNb;
+    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef) + KEY_DELIM + objNb;
     DocFormRequestKey key = parser.parse(keyString).orElse(null);
     fail("expecting DocFormRequestParseException, obj with positive nb must have field: " + key);
   }
@@ -183,8 +179,8 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     ClassReference classRef = new ClassReference("Classes", "Class");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = "SpaceDoc" + KEY_DELIM + serialize(classRef)
-        + KEY_DELIM + objNb + KEY_DELIM + fieldName;
+    String keyString = "SpaceDoc" + KEY_DELIM + serialize(classRef) + KEY_DELIM + objNb + KEY_DELIM
+        + fieldName;
     assertFalse(parser.parse(keyString).isPresent());
   }
 
@@ -193,8 +189,8 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     Integer objNb = 3;
     String fieldName = "asdf";
-    String keyString = serialize(docRef) + KEY_DELIM + "ClassesClass"
-        + KEY_DELIM + objNb + KEY_DELIM + fieldName;
+    String keyString = serialize(docRef) + KEY_DELIM + "ClassesClass" + KEY_DELIM + objNb
+        + KEY_DELIM + fieldName;
     assertFalse(parser.parse(keyString).isPresent());
   }
 
@@ -203,8 +199,8 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     ClassReference classRef = new ClassReference("Classes", "Class");
     String fieldName = "asdf";
-    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef)
-        + KEY_DELIM + "3a" + KEY_DELIM + fieldName;
+    String keyString = serialize(docRef) + KEY_DELIM + serialize(classRef) + KEY_DELIM + "3a"
+        + KEY_DELIM + fieldName;
     assertFalse(parser.parse(keyString).isPresent());
   }
 
@@ -228,8 +224,7 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
 
   @Test
   public void test_parse_skip_withDelims_two() throws Exception {
-    String keyString = "template" + KEY_DELIM + "other1"
-        + KEY_DELIM + "other2";
+    String keyString = "template" + KEY_DELIM + "other1" + KEY_DELIM + "other2";
     assertFalse(parser.parse(keyString).isPresent());
   }
 
@@ -259,27 +254,23 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     Integer objNb2 = 5;
     String fieldName2 = "asdf";
     String keyStringClass2 = serialize(classRef2) + KEY_DELIM + objNb2 + KEY_DELIM + fieldName2;
-    Map<String, ?> requestMap = ImmutableMap.<String, Object>builder()
-        .put(keyString2, "val2")
-        .put(keyStringRemove, "valRemove")
-        .put(keyString1, "val1")
-        .put(keyStringContent, "valContent")
-        .put(keyStringClass2, "val3")
-        .build();
+    Map<String, ?> requestMap = ImmutableMap.<String, Object>builder().put(keyString2, "val2")
+        .put(keyStringRemove, "valRemove").put(keyString1, "val1")
+        .put(keyStringContent, "valContent").put(keyStringClass2, "val3").build();
     List<DocFormRequestParam> params = parser.parseParameterMap(requestMap);
 
     assertEquals(5, params.size());
     Iterator<DocFormRequestParam> iter = params.iterator();
-    assertParam(iter.next(), keyString1, defaultDocRef,
-        classRef, objNb1, false, "asdf1", requestMap);
-    assertParam(iter.next(), keyString2, defaultDocRef,
-        classRef, objNb1, false, "asdf2", requestMap);
-    assertParam(iter.next(), keyStringRemove, defaultDocRef,
-        classRef, objNb1, true, "", requestMap);
-    assertParam(iter.next(), keyStringClass2, defaultDocRef,
-        classRef2, objNb2, false, fieldName2, requestMap);
-    assertParam(iter.next(), keyStringContent, defaultDocRef,
-        null, 0, false, keyStringContent, requestMap);
+    assertParam(iter.next(), keyString1, defaultDocRef, classRef, objNb1, false, "asdf1",
+        requestMap);
+    assertParam(iter.next(), keyString2, defaultDocRef, classRef, objNb1, false, "asdf2",
+        requestMap);
+    assertParam(iter.next(), keyStringRemove, defaultDocRef, classRef, objNb1, true, "",
+        requestMap);
+    assertParam(iter.next(), keyStringClass2, defaultDocRef, classRef2, objNb2, false, fieldName2,
+        requestMap);
+    assertParam(iter.next(), keyStringContent, defaultDocRef, null, 0, false, keyStringContent,
+        requestMap);
   }
 
   @Test
@@ -288,8 +279,8 @@ public class DocFormRequestKeyParserTest extends AbstractComponentTest {
     String docName = "2019-07-15";
     String docSpace = "TimeSheets-ebeutler10";
     String docFN = docSpace + "." + docName;
-    DocumentReference docRef = RefBuilder.create().wiki(getContext().getDatabase()).doc(
-        docName).space(docSpace).build(DocumentReference.class);
+    DocumentReference docRef = RefBuilder.create().wiki(getContext().getDatabase()).doc(docName)
+        .space(docSpace).build(DocumentReference.class);
     String classFN = "TimeSheetClasses.TimesheetDayClass";
     ClassReference classRef = new ClassReference("TimeSheetClasses", "TimesheetDayClass");
     String fieldName = "dailyComment";

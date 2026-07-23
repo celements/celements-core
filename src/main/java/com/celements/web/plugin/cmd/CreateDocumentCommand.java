@@ -76,8 +76,8 @@ public class CreateDocumentCommand {
       throws XWikiException {
     try {
       XWikiDocument doc = getModelAccess().createDocument(docRef);
-      PageTypeReference ptRef = getPageTypeService().getPageTypeRefByConfigName(Strings.nullToEmpty(
-          pageType));
+      PageTypeReference ptRef = getPageTypeService()
+          .getPageTypeRefByConfigName(Strings.nullToEmpty(pageType));
       String pageTypeStr = "";
       if (ptRef != null) {
         getPageTypeService().setPageType(doc, ptRef);

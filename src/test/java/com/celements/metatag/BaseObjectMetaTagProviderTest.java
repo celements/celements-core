@@ -53,8 +53,7 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
   public void testGetMetaTagsForDoc() {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Spc", "Doc");
     XWikiDocument doc = new XWikiDocument(docRef);
-    doc.addXObject(createMetaTagBaseObject(docRef, "keywords", "test,schluessel,wort", "de",
-        null));
+    doc.addXObject(createMetaTagBaseObject(docRef, "keywords", "test,schluessel,wort", "de", null));
     doc.addXObject(createMetaTagBaseObject(docRef, "keywords", "test,key,word", "en", null));
     replayDefault();
     List<MetaTag> tags = bomtProvider.getMetaTagsForDoc(doc);
@@ -103,8 +102,8 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
   @Test
   public void testApplyOverride_emptyList() {
     replayDefault();
-    assertFalse(Arrays.asList(new ArrayList<MetaTag>()).stream().map(bomtProvider
-        .applyOverride()).filter(Objects::nonNull).findFirst().get().findFirst().isPresent());
+    assertFalse(Arrays.asList(new ArrayList<MetaTag>()).stream().map(bomtProvider.applyOverride())
+        .filter(Objects::nonNull).findFirst().get().findFirst().isPresent());
     verifyDefault();
   }
 
@@ -195,15 +194,13 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
     tags.add(createMetaTag(key, tag2value2, "de", true));
     replayDefault();
     Optional<Stream<MetaTag>> resultTags = Arrays.asList(tags).stream()
-        .map(bomtProvider.applyOverride())
-        .filter(Objects::nonNull)
-        .findFirst();
+        .map(bomtProvider.applyOverride()).filter(Objects::nonNull).findFirst();
     verifyDefault();
     List<MetaTag> resultList = resultTags.get().collect(Collectors.toList());
     assertTrue(1 <= resultList.size());
     assertEquals(key, resultList.get(0).getKeyOpt().get());
-    assertEquals(tag1value1 + "," + tag1value2 + "," + tag2value1 + "," + tag2value2, resultList
-        .get(0).getValueOpt().get());
+    assertEquals(tag1value1 + "," + tag1value2 + "," + tag2value1 + "," + tag2value2,
+        resultList.get(0).getValueOpt().get());
   }
 
   @Test
@@ -226,16 +223,15 @@ public class BaseObjectMetaTagProviderTest extends AbstractComponentTest {
     verifyDefault();
     assertEquals(1, finalTags.size());
     List<List<MetaTag>> resultLists = ImmutableList.copyOf(finalTags.values());
-    assertTrue("expected tag name to be description", resultLists.get(0).get(0).display().contains(
-        ENameStandard.DESCRIPTION.toString().toLowerCase()));
+    assertTrue("expected tag name to be description", resultLists.get(0).get(0).display()
+        .contains(ENameStandard.DESCRIPTION.toString().toLowerCase()));
   }
 
   @Test
   public void testGetMetaTagsForDoc_filterEmptyTag() {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Spc", "Doc");
     XWikiDocument doc = new XWikiDocument(docRef);
-    doc.addXObject(createMetaTagBaseObject(docRef, "keywords", "test,schluessel,wort", "de",
-        null));
+    doc.addXObject(createMetaTagBaseObject(docRef, "keywords", "test,schluessel,wort", "de", null));
     doc.addXObject(createMetaTagBaseObject(docRef, "", "", "", false));
     doc.addXObject(createMetaTagBaseObject(docRef, "description", "", "en", null));
     replayDefault();

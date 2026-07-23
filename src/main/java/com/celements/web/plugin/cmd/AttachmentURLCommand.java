@@ -74,8 +74,8 @@ public class AttachmentURLCommand {
 
   public String getAttachmentURLPrefix(String action) {
     XWikiURLFactory urlf = getContext().getURLFactory();
-    return urlf.createResourceURL("", true, getContext()).toString().replace("/skin/", "/" + action
-        + "/");
+    return urlf.createResourceURL("", true, getContext()).toString().replace("/skin/",
+        "/" + action + "/");
   }
 
   /**
@@ -83,9 +83,7 @@ public class AttachmentURLCommand {
    */
   @Deprecated(since = "6.2")
   public String getAttachmentURL(String link, String action, XWikiContext context) {
-    return getAttachmentURL(link, action, "")
-        .map(UriComponents::toUriString)
-        .orElse(null);
+    return getAttachmentURL(link, action, "").map(UriComponents::toUriString).orElse(null);
   }
 
   public Optional<UriComponents> getAttachmentURL(String link, String action, String queryString) {
@@ -166,8 +164,7 @@ public class AttachmentURLCommand {
   }
 
   public String getDiskFileUrl(String path, String action) {
-    return getXWiki().getSkinFile(path, true, getContext())
-        .replace("/skin/", "/" + action + "/");
+    return getXWiki().getSkinFile(path, true, getContext()).replace("/skin/", "/" + action + "/");
   }
 
   public String getDiskFileUrl(String path) {
@@ -176,8 +173,8 @@ public class AttachmentURLCommand {
 
   public String getExternalAttachmentURL(String fileName, String action, XWikiContext context) {
     try {
-      return context.getURLFactory().getServerURL(context).toExternalForm() + getAttachmentURL(
-          fileName, action, context);
+      return context.getURLFactory().getServerURL(context).toExternalForm()
+          + getAttachmentURL(fileName, action, context);
     } catch (MalformedURLException exp) {
       LOGGER.error("Failed to getServerURL.", exp);
     }

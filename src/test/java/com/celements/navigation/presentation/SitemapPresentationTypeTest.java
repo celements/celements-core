@@ -85,8 +85,8 @@ public class SitemapPresentationTypeTest extends AbstractComponentTest {
     List<String> docTransList = new ArrayList<>();
     // docTransList.add("de"); <-- defaultLanguage DOES NOT show up in translist!!!
     docTransList.add("en");
-    expect(mockXWikiStore.getTranslationList(same(currentDoc), same(context))).andReturn(
-        docTransList).atLeastOnce();
+    expect(mockXWikiStore.getTranslationList(same(currentDoc), same(context)))
+        .andReturn(docTransList).atLeastOnce();
     expect(wUServiceMock.getDefaultLanguage(eq("MySpace"))).andReturn("de").anyTimes();
     expect(wUServiceMock.getAllowedLanguages(eq("MySpace"))).andReturn(allowedLangs).anyTimes();
     expect(admMessTool.get(eq("cel_de"))).andReturn("German").once();
@@ -95,26 +95,26 @@ public class SitemapPresentationTypeTest extends AbstractComponentTest {
     String currDocDeEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=de"
         + "&windowClose=true";
     URL currentDocDeEditUrl = new URL(currDocDeEditUrlStr);
-    expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"), eq(
-        "language=de&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
-            .andReturn(currentDocDeEditUrl);
-    expect(urlFactoryMock.getURL(same(currentDocDeEditUrl), same(context))).andReturn(
-        currDocDeEditUrlStr);
+    expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"),
+        eq("language=de&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
+        .andReturn(currentDocDeEditUrl);
+    expect(urlFactoryMock.getURL(same(currentDocDeEditUrl), same(context)))
+        .andReturn(currDocDeEditUrlStr);
     String currDocFrEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=fr"
         + "&windowClose=true";
     URL currentDocFrEditUrl = new URL(currDocFrEditUrlStr);
-    expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"), eq(
-        "language=fr&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
-            .andReturn(currentDocFrEditUrl);
-    expect(urlFactoryMock.getURL(same(currentDocFrEditUrl), same(context))).andReturn(
-        currDocFrEditUrlStr);
+    expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"),
+        eq("language=fr&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
+        .andReturn(currentDocFrEditUrl);
+    expect(urlFactoryMock.getURL(same(currentDocFrEditUrl), same(context)))
+        .andReturn(currDocFrEditUrlStr);
     String currDocEnEditUrlStr = "http://test.ch/edit/MySpace/MyCurrentDoc?language=en&windowClose=true";
     URL currentDocEnEditUrl = new URL(currDocEnEditUrlStr);
-    expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"), eq(
-        "language=en&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
-            .andReturn(currentDocEnEditUrl);
-    expect(urlFactoryMock.getURL(same(currentDocEnEditUrl), same(context))).andReturn(
-        currDocEnEditUrlStr);
+    expect(urlFactoryMock.createURL(eq("MySpace"), eq("MyCurrentDoc"), eq("edit"),
+        eq("language=en&windowClose=true"), (String) isNull(), eq("xwikidb"), same(context)))
+        .andReturn(currentDocEnEditUrl);
+    expect(urlFactoryMock.getURL(same(currentDocEnEditUrl), same(context)))
+        .andReturn(currDocEnEditUrlStr);
     replayAll();
     sitemapPres.addLanguageLinks(outStream, currentDocRef);
     assertEquals("<div class=\"docLangs\"><a title=\"German\" href=\"" + currDocDeEditUrlStr
@@ -122,8 +122,7 @@ public class SitemapPresentationTypeTest extends AbstractComponentTest {
         + "<a title=\"French\" href=\"" + currDocFrEditUrlStr
         + "\" target=\"_blank\" rel=\"opener\" class=\"transNotExists\">fr</a>"
         + "<a title=\"English\"" + " href=\"" + currDocEnEditUrlStr + "\" target=\"_blank\""
-        + " rel=\"opener\" class=\"transExists\">" + "en</a></div>",
-        outStream.toString());
+        + " rel=\"opener\" class=\"transExists\">" + "en</a></div>", outStream.toString());
     verifyAll();
   }
 

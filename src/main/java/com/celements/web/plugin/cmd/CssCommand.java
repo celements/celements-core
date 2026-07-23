@@ -68,12 +68,8 @@ public class CssCommand {
   private final Execution execution;
 
   @Inject
-  public CssCommand(
-      CSSEngine cssEngine,
-      IModelAccessFacade modelAccess,
-      LayoutServiceRole layoutService,
-      List<ICssExtensionRole> cssExtensions,
-      Execution execution) {
+  public CssCommand(CSSEngine cssEngine, IModelAccessFacade modelAccess,
+      LayoutServiceRole layoutService, List<ICssExtensionRole> cssExtensions, Execution execution) {
     this.cssEngine = cssEngine;
     this.modelAccess = modelAccess;
     this.layoutService = layoutService;
@@ -151,14 +147,12 @@ public class CssCommand {
 
   public List<CSS> includeCSSPage(String css, XWikiContext context) {
     List<BaseObject> skins = null;
-    if ((context != null) && (context.getDoc() != null) && !new PageLayoutCommand().layoutExists(
-        context.getDoc().getDocumentReference().getLastSpaceReference())) {
+    if ((context != null) && (context.getDoc() != null) && !new PageLayoutCommand()
+        .layoutExists(context.getDoc().getDocumentReference().getLastSpaceReference())) {
       XWikiDocument doc = context.getDoc();
       skins = doc.getXObjects(getSkinsUserCssClassRef(context.getDatabase()));
       LOGGER.debug("CSS Page: {} has attached {} Skins.UserCSS objects.",
-          doc.getDocumentReference(), ((skins != null)
-              ? skins.size()
-              : "0"));
+          doc.getDocumentReference(), ((skins != null) ? skins.size() : "0"));
     }
     return includeCSS(css, "cel_css_list_page", skins, context);
   }
@@ -224,8 +218,8 @@ public class CssCommand {
   public List<CSS> includeCSSAfterPageType(String css, XWikiContext context) {
     XWikiDocument pageTypeDoc = null;
     try {
-      pageTypeDoc = PageTypeCommand.getInstance().getPageTypeObj(context.getDoc(),
-          context).getTemplateDocument(context);
+      pageTypeDoc = PageTypeCommand.getInstance().getPageTypeObj(context.getDoc(), context)
+          .getTemplateDocument(context);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to include css after pageType.", exp);
     }
@@ -255,8 +249,8 @@ public class CssCommand {
         LOGGER.info("includeCSSAfterPageLayout pageLayoutDoc {} does not exist",
             pageLayoutDocRefOpt.get(), dne);
       }
-      baseList.addAll(addUserSkinCss((DocumentReference) vcontext.get(
-          "after_pagelayout_cssdocref")));
+      baseList
+          .addAll(addUserSkinCss((DocumentReference) vcontext.get("after_pagelayout_cssdocref")));
       cssList = includeCSS(css, "cel_css_list_pagelayout", baseList, context);
     }
     return cssList;
@@ -275,12 +269,10 @@ public class CssCommand {
 
   private List<BaseObject> addUserSkinCss(XWikiDocument docAPI) {
     if (docAPI != null) {
-      List<BaseObject> objs = docAPI.getXObjects(getSkinsUserCssClassRef(
-          docAPI.getDocumentReference().getWikiReference().getName()));
+      List<BaseObject> objs = docAPI.getXObjects(
+          getSkinsUserCssClassRef(docAPI.getDocumentReference().getWikiReference().getName()));
       LOGGER.debug("CSS Skin: {} has attached {} Skins.UserCSS objects.",
-          docAPI.getDocumentReference(), ((objs != null)
-              ? objs.size()
-              : "0"));
+          docAPI.getDocumentReference(), ((objs != null) ? objs.size() : "0"));
       if (objs != null) {
         return objs;
       }

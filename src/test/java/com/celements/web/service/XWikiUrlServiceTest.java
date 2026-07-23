@@ -39,8 +39,9 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
     String queryString = "key=value1&key=value2";
     String file = "/" + action + "/space/page?" + queryString;
     URL url = new URL("http", "wiki.celements.com", 8080, file);
-    expect(urlFactoryMock.createURL("space", "page", action, queryString, null, "wiki",
-        getContext())).andReturn(url);
+    expect(
+        urlFactoryMock.createURL("space", "page", action, queryString, null, "wiki", getContext()))
+        .andReturn(url);
 
     replayDefault();
     assertEquals(file, service.getURL(docRef, action, queryString));
@@ -51,8 +52,8 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
   public void test_getURL_defaults() throws Exception {
     String file = "/space/page";
     URL url = new URL("http", "wiki.celements.com", 8080, file);
-    expect(urlFactoryMock.createURL("space", "page", "view", null, null, "wiki",
-        getContext())).andReturn(url);
+    expect(urlFactoryMock.createURL("space", "page", "view", null, null, "wiki", getContext()))
+        .andReturn(url);
 
     replayDefault();
     assertEquals(file, service.getURL(docRef));
@@ -64,8 +65,8 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
     SpaceReference spaceRef = docRef.getLastSpaceReference();
     String file = "/space/";
     URL url = new URL("http", "wiki.celements.com", 8080, file);
-    expect(urlFactoryMock.createURL("space", "", "view", null, null, "wiki",
-        getContext())).andReturn(url);
+    expect(urlFactoryMock.createURL("space", "", "view", null, null, "wiki", getContext()))
+        .andReturn(url);
 
     replayDefault();
     assertEquals(file, service.getURL(spaceRef));
@@ -117,8 +118,9 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
     String queryString = "key=value1&key=value2";
     String file = "/" + action + "/space/page?" + queryString;
     URL url = new URL("http", "wiki.celements.com", 8080, file);
-    expect(urlFactoryMock.createURL("space", "page", action, queryString, null, "wiki",
-        getContext())).andReturn(url);
+    expect(
+        urlFactoryMock.createURL("space", "page", action, queryString, null, "wiki", getContext()))
+        .andReturn(url);
 
     replayDefault();
     assertEquals(url.toString(), service.getExternalURL(docRef, action, queryString));
@@ -171,8 +173,8 @@ public class XWikiUrlServiceTest extends AbstractComponentTest {
     EntityReference docRefContentWebHome = new DocumentReference(getContext().getDatabase(),
         "Content", "WebHome");
     expect(urlFactoryMock.createURL(eq("Content"), eq("WebHome"), eq("view"), eq(""),
-        (String) isNull(), eq(getContext().getDatabase()), same(getContext()))).andReturn(new URL(
-            "http", "myTest.domain", ""));
+        (String) isNull(), eq(getContext().getDatabase()), same(getContext())))
+        .andReturn(new URL("http", "myTest.domain", ""));
     replayDefault();
     String urlStr = ((XWikiUrlService) service).getURL(docRefContentWebHome, "view", "");
     assertEquals("/", urlStr);

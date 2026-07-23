@@ -24,9 +24,7 @@ public class DocFormRequestParam implements Comparable<DocFormRequestParam> {
 
   public DocFormRequestParam(DocFormRequestKey key, List<String> values) {
     this.key = checkNotNull(key);
-    this.values = values.stream()
-        .map(s -> nullToEmpty(s).trim())
-        .filter(not(String::isEmpty))
+    this.values = values.stream().map(s -> nullToEmpty(s).trim()).filter(not(String::isEmpty))
         .collect(toImmutableList());
   }
 

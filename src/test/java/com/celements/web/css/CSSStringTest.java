@@ -132,8 +132,8 @@ public class CSSStringTest extends AbstractComponentTest {
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(doc);
     XWikiRightService rightSerivce = createDefaultMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightSerivce);
-    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq(
-        getContext().getDatabase() + ":" + fullName), same(getContext()))).andReturn(true);
+    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()),
+        eq(getContext().getDatabase() + ":" + fullName), same(getContext()))).andReturn(true);
     replayDefault();
     assertNotNull("attachment must not be null", cssFile.getAttachment());
     verifyDefault();

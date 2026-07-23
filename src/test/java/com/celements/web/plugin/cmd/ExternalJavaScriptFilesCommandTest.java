@@ -85,9 +85,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(true).atLeastOnce();
     replayDefault();
-    assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(file)
-        .build()));
+    assertEquals("",
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(file).build()));
     verifyDefault();
   }
 
@@ -101,9 +100,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(true).atLeastOnce();
     expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).anyTimes();
     replayDefault();
-    assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(fileNotFound)
-        .build()));
+    assertEquals("",
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(fileNotFound).build()));
     verifyDefault();
   }
 
@@ -126,15 +124,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
 
     replayDefault();
 
-    command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(frontendFile)
-        .build());
-    command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(legacyFile)
-        .build());
-    command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(otherFrontendFile)
-        .build());
+    command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(frontendFile).build());
+    command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(legacyFile).build());
+    command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(otherFrontendFile).build());
 
     assertEquals(Arrays.asList(frontendFile, legacyFile, otherFrontendFile),
         command.streamExtJsFiles().toList());
@@ -161,14 +153,11 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
 
     command.injectDisplayAll(true);
-    String includes = command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(frontendFile)
-        .setAction("file")
-        .build());
+    String includes = command.addExtJSfileOnce(
+        new ExtJsFileParameter.Builder().setJsFile(frontendFile).setAction("file").build());
 
     assertEquals("<link rel=\"stylesheet\" title=\"\" media=\"all\" type=\"text/css\" href=\""
-        + cssUrl + "\" />\n"
-        + "<script type=\"module\" src=\"" + jsUrl + "\"></script>", includes);
+        + cssUrl + "\" />\n" + "<script type=\"module\" src=\"" + jsUrl + "\"></script>", includes);
     verifyDefault();
   }
 
@@ -183,8 +172,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).atLeastOnce();
     replayDefault();
     command.injectDisplayAll(true);
-    final ExtJsFileParameter extJsFileParam = new ExtJsFileParameter.Builder()
-        .setJsFile(file)
+    final ExtJsFileParameter extJsFileParam = new ExtJsFileParameter.Builder().setJsFile(file)
         .build();
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>",
         command.addExtJSfileOnce(extJsFileParam));
@@ -203,10 +191,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).atLeastOnce();
     replayDefault();
     command.injectDisplayAll(true);
-    final ExtJsFileParameter extJsFile = new ExtJsFileParameter.Builder()
-        .setJsFile(file)
-        .setAction("file")
-        .build();
+    final ExtJsFileParameter extJsFile = new ExtJsFileParameter.Builder().setJsFile(file)
+        .setAction("file").build();
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>",
         command.addExtJSfileOnce(extJsFile));
     assertEquals("", command.addExtJSfileOnce(extJsFile));
@@ -225,16 +211,10 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "?me=blu\"></script>",
-        command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-            .setJsFile(file)
-            .setAction("file")
-            .setQueryString("me=blu")
-            .build()));
-    assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(file)
-        .setAction("file")
-        .setQueryString("me=blu")
-        .build()));
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(file).setAction("file")
+            .setQueryString("me=blu").build()));
+    assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(file)
+        .setAction("file").setQueryString("me=blu").build()));
     verifyDefault();
   }
 
@@ -250,11 +230,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(true).atLeastOnce();
     replayDefault();
     command.injectDisplayAll(true);
-    final ExtJsFileParameter extJsFileParam = new ExtJsFileParameter.Builder()
-        .setJsFile(file)
-        .setAction("file")
-        .setQueryString("me=blu")
-        .build();
+    final ExtJsFileParameter extJsFileParam = new ExtJsFileParameter.Builder().setJsFile(file)
+        .setAction("file").setQueryString("me=blu").build();
     assertEquals("<script type=\"text/javascript\" src=\"" + fileURL + "&amp;me=blu\"></script>",
         command.addExtJSfileOnce(extJsFileParam));
     assertEquals("", command.addExtJSfileOnce(extJsFileParam));
@@ -273,12 +250,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>",
-        command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-            .setJsFile(file)
-            .build()));
-    assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(file)
-        .build()));
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(file).build()));
+    assertEquals("",
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(file).build()));
     verifyDefault();
   }
 
@@ -363,8 +337,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     simpleLayoutDoc.addXObject(extJsFileObj);
     expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
         .atLeastOnce();
-    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
-        simpleLayoutDocRef)).atLeastOnce();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc())
+        .andReturn(Optional.of(simpleLayoutDocRef)).atLeastOnce();
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
@@ -404,8 +378,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     simpleLayoutDoc.addXObject(extJsFileObj);
     expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
         .atLeastOnce();
-    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
-        simpleLayoutDocRef)).atLeastOnce();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc())
+        .andReturn(Optional.of(simpleLayoutDocRef)).atLeastOnce();
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
@@ -445,8 +419,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     simpleLayoutDoc.addXObject(extJsFileObj);
     expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
         .atLeastOnce();
-    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
-        simpleLayoutDocRef)).atLeastOnce();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc())
+        .andReturn(Optional.of(simpleLayoutDocRef)).atLeastOnce();
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
@@ -476,12 +450,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<!-- WARNING: js-file not found: " + fileNotFound + "-->",
-        command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-            .setJsFile(fileNotFound)
-            .build()));
-    assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(fileNotFound)
-        .build()));
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(fileNotFound).build()));
+    assertEquals("",
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(fileNotFound).build()));
     verifyDefault();
   }
 
@@ -497,12 +468,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<!-- WARNING: js-file not found: " + fileNotFound + "-->",
-        command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-            .setJsFile(fileNotFound)
-            .build()));
-    assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(fileNotFound)
-        .build()));
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(fileNotFound).build()));
+    assertEquals("",
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(fileNotFound).build()));
     verifyDefault();
   }
 
@@ -537,9 +505,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     command.addAllExtJSfilesFromDocRef(contextDocRef);
     assertEquals("must be already added by addAllExtJSfilesFromDocRef", "",
-        command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-            .setJsFile(filePath)
-            .build()));
+        command.addExtJSfileOnce(new ExtJsFileParameter.Builder().setJsFile(filePath).build()));
     verifyDefault();
   }
 
@@ -565,10 +531,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     command.addAllExtJSfilesFromDocRef(contextDocRef);
     assertEquals("must be already added by addAllExtJSfilesFromDocRef", "",
-        command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-            .setJsFile(filePath)
-            .setLoadMode(loadMode)
-            .build()));
+        command.addExtJSfileOnce(
+            new ExtJsFileParameter.Builder().setJsFile(filePath).setLoadMode(loadMode).build()));
     verifyDefault();
   }
 
@@ -594,10 +558,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     replayDefault();
     command.addAllExtJSfilesFromDocRef(contextDocRef);
     assertEquals("must be already added by addAllExtJSfilesFromDocRef", "",
-        command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-            .setJsFile(filePath)
-            .setLoadMode(loadMode)
-            .build()));
+        command.addExtJSfileOnce(
+            new ExtJsFileParameter.Builder().setJsFile(filePath).setLoadMode(loadMode).build()));
     verifyDefault();
   }
 
@@ -655,14 +617,11 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
     expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
         .atLeastOnce();
-    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
-        simpleLayoutDocRef)).atLeastOnce();
-    final ExtJsFileParameter fileParams = new ExtJsFileParameter.Builder()
-        .setJsFile(file)
-        .build();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc())
+        .andReturn(Optional.of(simpleLayoutDocRef)).atLeastOnce();
+    final ExtJsFileParameter fileParams = new ExtJsFileParameter.Builder().setJsFile(file).build();
     final ExtJsFileParameter fileNotFoundParams = new ExtJsFileParameter.Builder()
-        .setJsFile(fileNotFound)
-        .build();
+        .setJsFile(fileNotFound).build();
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(fileParams));
     assertEquals("", command.addExtJSfileOnce(fileParams));
@@ -721,20 +680,14 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
     expect(modelAccessMock.getDocument(eq(simpleLayoutDocRef))).andReturn(simpleLayoutDoc)
         .atLeastOnce();
-    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc()).andReturn(Optional.of(
-        simpleLayoutDocRef)).atLeastOnce();
+    expect(pageLayoutCmdMock.getLayoutPropDocRefForCurrentDoc())
+        .andReturn(Optional.of(simpleLayoutDocRef)).atLeastOnce();
     replayDefault();
-    assertEquals("", command.addExtJSfileOnce(new ExtJsFileParameter.Builder()
-        .setJsFile(attFileURL)
-        .setAction("file")
-        .build()));
+    assertEquals("", command.addExtJSfileOnce(
+        new ExtJsFileParameter.Builder().setJsFile(attFileURL).setAction("file").build()));
     Builder paramBuilder = new ExtJsFileParameter.Builder();
-    assertEquals("", command.addExtJSfileOnce(paramBuilder
-        .setJsFile(attFileURL)
-        .build()));
-    assertEquals("", command.addExtJSfileOnce(paramBuilder
-        .setJsFile(fileNotFound)
-        .build()));
+    assertEquals("", command.addExtJSfileOnce(paramBuilder.setJsFile(attFileURL).build()));
+    assertEquals("", command.addExtJSfileOnce(paramBuilder.setJsFile(fileNotFound).build()));
     String allStr = command.getAllExternalJavaScriptFiles();
     assertEquals("<script type=\"text/javascript\""
         + " src=\"/file/celJS/prototype.js?version=20110401120000\"></script>\n"
@@ -750,11 +703,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
         .andReturn(Optional.of(fromUriString(jsFileURL).build()));
     replayDefault();
     assertEquals(
-        "<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\">"
-            + "</cel-lazy-load-js>",
-        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
-            .setJsFile(jsFile)
-            .build()));
+        "<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\">" + "</cel-lazy-load-js>",
+        command.getLazyLoadTag(new ExtJsFileParameter.Builder().setJsFile(jsFile).build()));
     verifyDefault();
   }
 
@@ -766,12 +716,10 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.getAttachmentURL(jsFile, action, (String) null))
         .andReturn(Optional.of(fromUriString(jsFileURL).build()));
     replayDefault();
-    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\">"
-        + "</cel-lazy-load-js>",
-        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
-            .setJsFile(jsFile)
-            .setAction(action)
-            .build()));
+    assertEquals(
+        "<cel-lazy-load-js src=\"" + jsFileURL + "\" loadMode=\"SYNC\">" + "</cel-lazy-load-js>",
+        command.getLazyLoadTag(
+            new ExtJsFileParameter.Builder().setJsFile(jsFile).setAction(action).build()));
     verifyDefault();
   }
 
@@ -783,13 +731,11 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.getAttachmentURL(jsFile, action, "me=blu"))
         .andReturn(Optional.of(fromUriString(jsFileURL).queryParam("me", "blu").build()));
     replayDefault();
-    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL + "?me=blu\" loadMode=\"SYNC\">"
-        + "</cel-lazy-load-js>",
-        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
-            .setJsFile(jsFile)
-            .setAction(action)
-            .setQueryString("me=blu")
-            .build()));
+    assertEquals(
+        "<cel-lazy-load-js src=\"" + jsFileURL + "?me=blu\" loadMode=\"SYNC\">"
+            + "</cel-lazy-load-js>",
+        command.getLazyLoadTag(new ExtJsFileParameter.Builder().setJsFile(jsFile).setAction(action)
+            .setQueryString("me=blu").build()));
     verifyDefault();
   }
 
@@ -802,13 +748,10 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractComponentTest {
     expect(attUrlCmd.getAttachmentURL(jsFile, action, "me=blu"))
         .andReturn(Optional.of(fromUriString(jsFileURL).queryParam("me", "blu").build()));
     replayDefault();
-    assertEquals("<cel-lazy-load-js src=\"" + jsFileURL
-        + "&me=blu\" loadMode=\"SYNC\"></cel-lazy-load-js>",
-        command.getLazyLoadTag(new ExtJsFileParameter.Builder()
-            .setJsFile(jsFile)
-            .setAction(action)
-            .setQueryString("me=blu")
-            .build()));
+    assertEquals(
+        "<cel-lazy-load-js src=\"" + jsFileURL + "&me=blu\" loadMode=\"SYNC\"></cel-lazy-load-js>",
+        command.getLazyLoadTag(new ExtJsFileParameter.Builder().setJsFile(jsFile).setAction(action)
+            .setQueryString("me=blu").build()));
     verifyDefault();
   }
 

@@ -129,8 +129,8 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
   void moveToNextDoc() {
     try {
       String nextFN = getDocIterator().next();
-      DocumentReference nextDocRef = Utils.getComponent(
-          IWebUtilsService.class).resolveDocumentReference(nextFN);
+      DocumentReference nextDocRef = Utils.getComponent(IWebUtilsService.class)
+          .resolveDocumentReference(nextFN);
       _currentDoc = _xwiki.getDocument(nextDocRef, _context);
       _objectIterator = null;
     } catch (XWikiException exp) {
@@ -180,8 +180,8 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
     if (getCurrentDoc() == null) {
       return Collections.emptyList();
     }
-    List<BaseObject> objs = getCurrentDoc().getXObjects(
-        getWebUtilsService().resolveDocumentReference(_xwikiClassName));
+    List<BaseObject> objs = getCurrentDoc()
+        .getXObjects(getWebUtilsService().resolveDocumentReference(_xwikiClassName));
     if (objs != null) {
       return objs;
     } else {

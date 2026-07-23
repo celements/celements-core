@@ -45,10 +45,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("TreeNodeDocumentUpdatedListener")
-public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentListener implements
-    EventListener {
+public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentListener
+    implements EventListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TreeNodeDocumentUpdatedListener.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(TreeNodeDocumentUpdatedListener.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -119,30 +120,30 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
   }
 
   boolean isMenuItemAdded(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    BaseObject menuItemOrigObj = origDoc.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
+    BaseObject menuItemObj = document
+        .getXObject(getNavClasses().getMenuItemClassRef(getContext().getDatabase()));
+    BaseObject menuItemOrigObj = origDoc
+        .getXObject(getNavClasses().getMenuItemClassRef(getContext().getDatabase()));
     LOGGER.trace("checkMenuItemAdded checkMenuItemDiffs menuItemObj [" + menuItemObj
         + "], menuItemOrigObj [" + menuItemOrigObj + "]");
     return ((menuItemObj != null) && (menuItemOrigObj == null));
   }
 
   boolean isMenuItemDeleted(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    BaseObject menuItemOrigObj = origDoc.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
+    BaseObject menuItemObj = document
+        .getXObject(getNavClasses().getMenuItemClassRef(getContext().getDatabase()));
+    BaseObject menuItemOrigObj = origDoc
+        .getXObject(getNavClasses().getMenuItemClassRef(getContext().getDatabase()));
     LOGGER.trace("checkMenuItemAdded checkMenuItemDiffs menuItemObj [" + menuItemObj
         + "], menuItemOrigObj [" + menuItemOrigObj + "]");
     return ((menuItemObj == null) && (menuItemOrigObj != null));
   }
 
   boolean isMenuItemUpdated(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    BaseObject menuItemOrigObj = origDoc.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
+    BaseObject menuItemObj = document
+        .getXObject(getNavClasses().getMenuItemClassRef(getContext().getDatabase()));
+    BaseObject menuItemOrigObj = origDoc
+        .getXObject(getNavClasses().getMenuItemClassRef(getContext().getDatabase()));
     LOGGER.trace("TreeNodeDocumentUpdatedListener checkMenuItemDiffs menuItemObj [" + menuItemObj
         + "], menuItemOrigObj [" + menuItemOrigObj + "]");
     if ((menuItemObj != null) && (menuItemOrigObj != null)) {

@@ -148,10 +148,10 @@ public class PageType {
   // TODO check where to move to. RenderCommand or PageTypeTemplateResolver?
   public String resolveTemplatePath(String specView, XWikiContext context) {
     // TODO replace implementation with WebUtils getInheritedTemplatedPath
-    if ((specView != null) && (specView.trim().length() > 0) && !context.getWiki().exists(specView,
-        context)) {
-      if (!specView.startsWith("celements2web:") && context.getWiki().exists("celements2web:"
-          + specView, context)) {
+    if ((specView != null) && (specView.trim().length() > 0)
+        && !context.getWiki().exists(specView, context)) {
+      if (!specView.startsWith("celements2web:")
+          && context.getWiki().exists("celements2web:" + specView, context)) {
         specView = "celements2web:" + specView;
       } else {
         specView = ":" + specView.replaceAll("celements2web:", "");

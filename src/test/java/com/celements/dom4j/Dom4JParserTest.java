@@ -105,10 +105,9 @@ public class Dom4JParserTest extends AbstractComponentTest {
   public void test_xhtml_umlaute() throws Exception {
     Dom4JParser<XHTMLDocument> parser = Dom4JParser.createXHtmlParser();
     String xml = "<html><body><div>Aä</div><div>Bö</div><div>Cü</div></body></html>";
-    Optional<String> ret = parser.allowDTDs().readAndExecute("<!DOCTYPE html>"
-        + xml, document -> {
-          return Stream.of(document.getRootElement());
-        });
+    Optional<String> ret = parser.allowDTDs().readAndExecute("<!DOCTYPE html>" + xml, document -> {
+      return Stream.of(document.getRootElement());
+    });
     assertEquals(xml, ret.orElse(""));
   }
 

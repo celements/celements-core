@@ -43,14 +43,14 @@ public class JavaNavigationFactoryTest extends AbstractComponentTest {
     pageTypeRef = new PageTypeReference(pageTypeDocRef.getName(),
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER, Collections.<String>emptyList());
     testDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyTestDoc");
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(testDocRef))).andReturn(
-        pageTypeRef).anyTimes();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(testDocRef)))
+        .andReturn(pageTypeRef).anyTimes();
     defaultPageTypeDocRef = new DocumentReference(getContext().getDatabase(), "PageTypes",
         "RichText");
     defaultPageTypeRef = new PageTypeReference(defaultPageTypeDocRef.getName(),
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER, Collections.<String>emptyList());
-    expect(pageTypeResolverMock.getPageTypeRefForCurrentDoc()).andReturn(
-        defaultPageTypeRef).anyTimes();
+    expect(pageTypeResolverMock.getPageTypeRefForCurrentDoc()).andReturn(defaultPageTypeRef)
+        .anyTimes();
   }
 
   @Test
@@ -78,16 +78,16 @@ public class JavaNavigationFactoryTest extends AbstractComponentTest {
     Integer showInactiveToLevel = 55;
     String menuPart = "menuPart";
     String dataType = "dataType";
-    SpaceReference nodeSpaceRef = new SpaceReference("NavConfigSpace", new WikiReference(
-        getContext().getDatabase()));
+    SpaceReference nodeSpaceRef = new SpaceReference("NavConfigSpace",
+        new WikiReference(getContext().getDatabase()));
     String layoutType = "navConfig2LayoutType";
     Integer itemsPerPage = 20;
     String cmCssClass = "cm_cssTestClass2";
-    final NavigationConfig expectedNavConfig = new NavigationConfig.Builder().configName(
-        configName).fromHierarchyLevel(fromHierarchyLevel).toHierarchyLevel(
-            toHierarchyLevel).showInactiveToLevel(showInactiveToLevel).menuPart(menuPart).dataType(
-                dataType).nodeSpaceRef(nodeSpaceRef).layoutType(layoutType).nrOfItemsPerPage(
-                    itemsPerPage).cmCssClass(cmCssClass).build();
+    final NavigationConfig expectedNavConfig = new NavigationConfig.Builder().configName(configName)
+        .fromHierarchyLevel(fromHierarchyLevel).toHierarchyLevel(toHierarchyLevel)
+        .showInactiveToLevel(showInactiveToLevel).menuPart(menuPart).dataType(dataType)
+        .nodeSpaceRef(nodeSpaceRef).layoutType(layoutType).nrOfItemsPerPage(itemsPerPage)
+        .cmCssClass(cmCssClass).build();
     expect(testConfigurator.handles(eq(pageTypeRef))).andReturn(true);
     expect(testConfigurator.getNavigationConfig(eq(pageTypeRef))).andReturn(expectedNavConfig);
     replayDefault();

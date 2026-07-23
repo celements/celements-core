@@ -46,8 +46,8 @@ public class EmptyCheckCommand {
    **/
   @Deprecated
   public boolean isEmptyRTEDocument(String fullname, XWikiContext context) {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), fullname.split(
-        "\\.")[0], fullname.split("\\.")[1]);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(),
+        fullname.split("\\.")[0], fullname.split("\\.")[1]);
     return isEmptyRTEDocument(docRef);
   }
 

@@ -49,12 +49,12 @@ public class CaptchaService implements ICaptchaServiceRole {
     String answer = getContext().getRequest().get("captcha_answer");
     if ((answer != null) && (answer.length() > 0)) {
       try {
-        LOGGER.info("Checking answer for user id '" + getCaptchaVerifier().getUserId(
-            getContext().getRequest()) + "'");
+        LOGGER.info("Checking answer for user id '"
+            + getCaptchaVerifier().getUserId(getContext().getRequest()) + "'");
         String anwserCacheKey = "captcha_" + getCaptchaType() + "_anwserCache";
         if (!getContext().containsKey(anwserCacheKey)) {
-          Boolean isAnswerCorrect = getCaptchaVerifier().isAnswerCorrect(
-              getContext().getRequest().get("captcha_id"), answer);
+          Boolean isAnswerCorrect = getCaptchaVerifier()
+              .isAnswerCorrect(getContext().getRequest().get("captcha_id"), answer);
           getContext().put(anwserCacheKey, isAnswerCorrect);
         }
         return (Boolean) getContext().get(anwserCacheKey);

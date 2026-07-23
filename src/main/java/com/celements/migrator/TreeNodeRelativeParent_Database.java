@@ -43,8 +43,8 @@ import com.xpn.xwiki.web.Utils;
 @Component("TreeNodeRelativeParent_Database")
 public class TreeNodeRelativeParent_Database extends AbstractCelementsHibernateMigrator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      TreeNodeRelativeParent_Database.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(TreeNodeRelativeParent_Database.class);
 
   @Requirement
   private QueryManager queryManager;
@@ -54,40 +54,38 @@ public class TreeNodeRelativeParent_Database extends AbstractCelementsHibernateM
 
   EntityReference getRelativeParentReference(String parentFN) {
     @SuppressWarnings("unchecked")
-    EntityReferenceResolver<String> relativResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
+    EntityReferenceResolver<String> relativResolver = Utils
+        .getComponent(EntityReferenceResolver.class, "relative");
     return relativResolver.resolve(parentFN, EntityType.DOCUMENT);
   }
 
   @Override
-  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context
-      ) throws XWikiException {
+  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
+      throws XWikiException {
     Query theQuery;
     try {
-      theQuery = queryManager.createQuery("from doc.object(Celements2.MenuItem) as mItem"
-          + " where doc.parent like :buggyParent", Query.XWQL);
+      theQuery = queryManager.createQuery(
+          "from doc.object(Celements2.MenuItem) as mItem" + " where doc.parent like :buggyParent",
+          Query.XWQL);
       theQuery.bindValue("buggyParent", context.getDatabase() + ":%");
       List<String> result = theQuery.execute();
-      LOGGER.info("found [" + ((result != null) ? result.size() : result)
-          + "] documents to migrate.");
+      LOGGER.info(
+          "found [" + ((result != null) ? result.size() : result) + "] documents to migrate.");
       for (String fullName : result) {
-        XWikiDocument doc = context.getWiki().getDocument(
-            webUtilsService.resolveDocumentReference(fullName), context);
-        String parentFN = webUtilsService.getRefLocalSerializer().serialize(
-            doc.getParentReference());
+        XWikiDocument doc = context.getWiki()
+            .getDocument(webUtilsService.resolveDocumentReference(fullName), context);
+        String parentFN = webUtilsService.getRefLocalSerializer()
+            .serialize(doc.getParentReference());
         doc.setParentReference(getRelativeParentReference(parentFN));
-        LOGGER.debug("migrating TreeNodes parent on [" + fullName + "] "
-            + doc.isMetaDataDirty() + ", " + doc.isContentDirty());
+        LOGGER.debug("migrating TreeNodes parent on [" + fullName + "] " + doc.isMetaDataDirty()
+            + ", " + doc.isContentDirty());
         // save directly over store method to prevent observation manager executing events.
-        context.getWiki().saveDocument(doc, "TreeNodeRelativeParent_Database Migration",
-            context);
+        context.getWiki().saveDocument(doc, "TreeNodeRelativeParent_Database Migration", context);
       }
     } catch (QueryException exp) {
-      LOGGER.error("cannot create query for TreeNodeRelativeParent_Database Migration ",
-          exp);
-      throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-          XWikiException.MODULE_XWIKI, "Failed to execute migration"
-          + " TreeNodeRelativeParent_Database", exp);
+      LOGGER.error("cannot create query for TreeNodeRelativeParent_Database Migration ", exp);
+      throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.MODULE_XWIKI,
+          "Failed to execute migration" + " TreeNodeRelativeParent_Database", exp);
     }
   }
 

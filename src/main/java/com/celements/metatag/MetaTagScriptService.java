@@ -50,8 +50,8 @@ public class MetaTagScriptService implements ScriptService {
 
   public void addMetaTagToCollector(@NotNull String attributeName, @NotNull String attributeValue,
       @Nullable String content) {
-    metaTag.addMetaTagToCollector(new MetaTag(attributeName, attributeValue, Strings.nullToEmpty(
-        content)));
+    metaTag.addMetaTagToCollector(
+        new MetaTag(attributeName, attributeValue, Strings.nullToEmpty(content)));
   }
 
   public void addMetaTagToCollector(@NotNull Map<String, String> attributes,

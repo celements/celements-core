@@ -126,12 +126,12 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
   public void testGetRenderTemplateForRenderMode_view() {
     String templateName = "ImageStatsView";
     String expectedViewTemplates = "Templates." + templateName;
-    expect(pageTypeImplMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
-        templateName).anyTimes();
+    expect(pageTypeImplMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(templateName)
+        .anyTimes();
     DocumentReference localTemplateDocRef = new DocumentReference(context.getDatabase(),
         "Templates", templateName);
-    expect(webUtilsMock.getInheritedTemplatedPath(eq(localTemplateDocRef))).andReturn(
-        expectedViewTemplates);
+    expect(webUtilsMock.getInheritedTemplatedPath(eq(localTemplateDocRef)))
+        .andReturn(expectedViewTemplates);
     replayDefault();
     assertEquals(expectedViewTemplates, testPageType.getRenderTemplateForRenderMode("view"));
     verifyDefault();
@@ -141,12 +141,12 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
   public void testGetRenderTemplateForRenderMode_edit() {
     String templateName = "ImageStatsEdit";
     String expectedEditTemplates = "Templates." + templateName;
-    expect(pageTypeImplMock.getRenderTemplateForRenderMode(eq("edit"))).andReturn(
-        templateName).anyTimes();
+    expect(pageTypeImplMock.getRenderTemplateForRenderMode(eq("edit"))).andReturn(templateName)
+        .anyTimes();
     DocumentReference localTemplateDocRef = new DocumentReference(context.getDatabase(),
         "Templates", templateName);
-    expect(webUtilsMock.getInheritedTemplatedPath(eq(localTemplateDocRef))).andReturn(
-        expectedEditTemplates);
+    expect(webUtilsMock.getInheritedTemplatedPath(eq(localTemplateDocRef)))
+        .andReturn(expectedEditTemplates);
     replayDefault();
     assertEquals(expectedEditTemplates, testPageType.getRenderTemplateForRenderMode("edit"));
     verifyDefault();

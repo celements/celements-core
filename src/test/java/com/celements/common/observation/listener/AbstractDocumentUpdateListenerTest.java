@@ -71,8 +71,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractComponentTest {
     listener.injectCopyDocService(Utils.getComponent(ICopyDocumentRole.class));
     listener.injectRemoteObservationManagerContext(
         remoteObsManContextMock = createDefaultMock(RemoteObservationManagerContext.class));
-    listener.injectObservationManager(obsManagerMock = createDefaultMock(
-        ObservationManager.class));
+    listener.injectObservationManager(obsManagerMock = createDefaultMock(ObservationManager.class));
     listener.configSrc = Utils.getComponent(ConfigurationSource.class);
 
     creatingEventMock = createDefaultMock(Event.class);
@@ -90,10 +89,10 @@ public class AbstractDocumentUpdateListenerTest extends AbstractComponentTest {
       eventClasses.add(theEvent.getClass());
     }
     assertEquals(2, eventClasses.size());
-    assertTrue("Expecting registration for DocumentUpdatingEvent", eventClasses.contains(
-        DocumentUpdatingEvent.class));
-    assertTrue("Expecting registration for DocumentUpdatedEvent events", eventClasses.contains(
-        DocumentUpdatedEvent.class));
+    assertTrue("Expecting registration for DocumentUpdatingEvent",
+        eventClasses.contains(DocumentUpdatingEvent.class));
+    assertTrue("Expecting registration for DocumentUpdatedEvent events",
+        eventClasses.contains(DocumentUpdatedEvent.class));
   }
 
   @Test

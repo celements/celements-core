@@ -121,8 +121,8 @@ public class XObjectPageTypeConfigTest extends AbstractComponentTest {
   @Test
   public void testGetRenderTemplateForRenderMode_view() throws Exception {
     String expectedRenderTemplate = "Templates.TestPageTypeView";
-    expect(pageTypeMock.getRenderTemplate(eq("view"), same(context))).andReturn(
-        expectedRenderTemplate);
+    expect(pageTypeMock.getRenderTemplate(eq("view"), same(context)))
+        .andReturn(expectedRenderTemplate);
     replayDefault();
     assertEquals(expectedRenderTemplate, xObjPTconfig.getRenderTemplateForRenderMode("view"));
     verifyDefault();
@@ -131,8 +131,8 @@ public class XObjectPageTypeConfigTest extends AbstractComponentTest {
   @Test
   public void testGetRenderTemplateForRenderMode_edit() throws Exception {
     String expectedRenderTemplate = "Templates.TestPageTypeEdit";
-    expect(pageTypeMock.getRenderTemplate(eq("edit"), same(context))).andReturn(
-        expectedRenderTemplate);
+    expect(pageTypeMock.getRenderTemplate(eq("edit"), same(context)))
+        .andReturn(expectedRenderTemplate);
     replayDefault();
     assertEquals(expectedRenderTemplate, xObjPTconfig.getRenderTemplateForRenderMode("edit"));
     verifyDefault();
@@ -188,8 +188,8 @@ public class XObjectPageTypeConfigTest extends AbstractComponentTest {
         IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
     testPageTypePropObj.setXClassReference(pageTypePropClassRef);
     testPageTypePropObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME, tagName);
-    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(
-        testPageTypePropObj).atLeastOnce();
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(testPageTypePropObj)
+        .atLeastOnce();
     replayDefault();
     assertTrue(xObjPTconfig.defaultTagName().isPresent());
     assertEquals(tagName, xObjPTconfig.defaultTagName().get());
@@ -225,8 +225,8 @@ public class XObjectPageTypeConfigTest extends AbstractComponentTest {
         IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
     testPageTypePropObj.setXClassReference(pageTypePropClassRef);
     testPageTypePropObj.setIntValue(IPageTypeClassConfig.PAGETYPE_PROP_INLINE_EDITOR_MODE, 0);
-    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(
-        testPageTypePropObj).atLeastOnce();
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(testPageTypePropObj)
+        .atLeastOnce();
     replayDefault();
     assertFalse(xObjPTconfig.useInlineEditorMode());
     verifyDefault();
@@ -240,8 +240,8 @@ public class XObjectPageTypeConfigTest extends AbstractComponentTest {
         IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
     testPageTypePropObj.setXClassReference(pageTypePropClassRef);
     testPageTypePropObj.setIntValue(IPageTypeClassConfig.PAGETYPE_PROP_INLINE_EDITOR_MODE, 1);
-    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(
-        testPageTypePropObj).atLeastOnce();
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(testPageTypePropObj)
+        .atLeastOnce();
     replayDefault();
     assertTrue(xObjPTconfig.useInlineEditorMode());
     verifyDefault();

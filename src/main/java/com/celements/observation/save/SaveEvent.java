@@ -36,8 +36,7 @@ public class SaveEvent<I extends Serializable> extends AbstractFilterableEvent {
   @Override
   public boolean equals(Object obj) {
     return tryCast(obj, SaveEvent.class)
-        .map(other -> Objects.equals(this.getEventFilter(), other.getEventFilter()))
-        .orElse(false);
+        .map(other -> Objects.equals(this.getEventFilter(), other.getEventFilter())).orElse(false);
   }
 
   @Override

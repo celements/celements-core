@@ -34,8 +34,8 @@ public class RenderedContentPresentationType implements IPresentationTypeRole<IN
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
     LOGGER.debug("writeNodeContent for [{}].", docRef);
     outStream.append("<div ");
-    outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
-        + " ");
+    outStream
+        .append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem) + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
     addRenderedContent(outStream, docRef);
     outStream.append("</div>\n");

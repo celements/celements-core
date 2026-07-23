@@ -160,8 +160,7 @@ public class FileBaseTagsCmd {
       if (!existsTagWithName(tagName) && createIfNotExists) {
         tagDoc = modelAccess.getOrCreateDocument(getTagDocRef(tagName));
         BaseObject menuItemObj = XWikiObjectEditor.on(tagDoc)
-            .filter(INavigationClassConfig.MENU_ITEM_CLASS_REF)
-            .createFirstIfNotExists();
+            .filter(INavigationClassConfig.MENU_ITEM_CLASS_REF).createFirstIfNotExists();
         menuItemObj.setIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
             getAllFileBaseTags().size());
         menuItemObj.setStringValue("menu_parent", "");
@@ -174,8 +173,8 @@ public class FileBaseTagsCmd {
     try {
       return modelAccess.getDocument(getTagDocRef(tagName));
     } catch (DocumentNotExistsException exp) {
-      throw new FailedToCreateTagException("Failed to get tag document [" + getTagDocRef(tagName)
-          + "].", exp);
+      throw new FailedToCreateTagException(
+          "Failed to get tag document [" + getTagDocRef(tagName) + "].", exp);
     }
   }
 

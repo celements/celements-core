@@ -111,8 +111,8 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
   private List<DocumentReference> checkPageTypes(List<DocumentReference> parents) {
     List<DocumentReference> ret = new ArrayList<>();
     for (DocumentReference parent : parents) {
-      IPageTypeConfig pageTypeConf = pageTypeProvider.getPageTypeByReference(
-          pageTypeResolver.getPageTypeRefForDocWithDefault(parent));
+      IPageTypeConfig pageTypeConf = pageTypeProvider
+          .getPageTypeByReference(pageTypeResolver.getPageTypeRefForDocWithDefault(parent));
       if (pageTypeConf.isUnconnectedParent()) {
         ret.add(parent);
       }

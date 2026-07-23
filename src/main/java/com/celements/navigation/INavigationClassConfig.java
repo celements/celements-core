@@ -15,8 +15,8 @@ public interface INavigationClassConfig {
   public static final String MENU_NAME_IMAGE_FIELD = "image";
   public static final String MENU_NAME_TOOLTIP_FIELD = "tooltip";
   public static final String MENU_NAME_LANG_FIELD = "lang";
-  public static final ClassReference MENU_NAME_CLASS_REF = new ClassReference(
-      MENU_NAME_CLASS_SPACE, MENU_NAME_CLASS_DOC);
+  public static final ClassReference MENU_NAME_CLASS_REF = new ClassReference(MENU_NAME_CLASS_SPACE,
+      MENU_NAME_CLASS_DOC);
 
   public static final String MAPPED_MENU_ITEM_CLASS_SPACE = "Classes";
   public static final String MAPPED_MENU_ITEM_CLASS_DOC = "MenuItemClass";
@@ -49,8 +49,8 @@ public interface INavigationClassConfig {
   public static final String MENU_POSITION_FIELD = "menu_position";
   public static final String PART_NAME_FIELD = "part_name";
   public static final String TARGET_FIELD = "link_target";
-  public static final ClassReference MENU_ITEM_CLASS_REF = new ClassReference(
-      MENU_ITEM_CLASS_SPACE, MENU_ITEM_CLASS_DOC);
+  public static final ClassReference MENU_ITEM_CLASS_REF = new ClassReference(MENU_ITEM_CLASS_SPACE,
+      MENU_ITEM_CLASS_DOC);
 
   @Deprecated
   public DocumentReference getMenuNameClassRef(String wikiName);

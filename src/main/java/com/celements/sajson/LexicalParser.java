@@ -139,8 +139,8 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
   @Override
   final public void finishEvent() {
     if (!workerStack.isEmpty()) {
-      throw new IllegalStateException("SyntaxError: finishEvent on nonempty" + " stack:"
-          + workerStack.peek());
+      throw new IllegalStateException(
+          "SyntaxError: finishEvent on nonempty" + " stack:" + workerStack.peek());
     }
   }
 
@@ -151,9 +151,9 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
       LOGGER.debug("reopen " + workerStack.peek() + " ; " + workerStack.peek().getCommand());
     }
     if (workerStack.isEmpty() || (workerStack.peek().getCommand() != expectedCommand)) {
-      throw new IllegalStateException("Expecting: " + workerStack.peek().getCommand() + " for "
-          + workerStack.peek() + " but received " + expectedCommand + ". " + "Stack: "
-          + workerStack.toString());
+      throw new IllegalStateException(
+          "Expecting: " + workerStack.peek().getCommand() + " for " + workerStack.peek()
+              + " but received " + expectedCommand + ". " + "Stack: " + workerStack.toString());
     }
   }
 

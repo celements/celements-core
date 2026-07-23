@@ -76,8 +76,7 @@ public class PageLayoutCommand {
   private Map<String, String> convertMap(Map<SpaceReference, String> pageLayoutMap) {
     return EntryStream.of(pageLayoutMap)
         .filterKeys(spaceRef -> getModelContext().getWikiRef().equals(spaceRef.getParent()))
-        .mapKeys(SpaceReference::getName)
-        .toImmutableMap();
+        .mapKeys(SpaceReference::getName).toImmutableMap();
   }
 
   /**
@@ -172,8 +171,8 @@ public class PageLayoutCommand {
    */
   @Deprecated
   public XWikiDocument getLayoutPropDoc(SpaceReference layoutSpaceRef) {
-    Optional<DocumentReference> layoutPropDocRef = layoutService.getLayoutPropDocRef(
-        layoutSpaceRef);
+    Optional<DocumentReference> layoutPropDocRef = layoutService
+        .getLayoutPropDocRef(layoutSpaceRef);
     if (layoutPropDocRef.isPresent()) {
       try {
         XWikiDocument layoutPropDoc = getModelAccess().getDocument(layoutPropDocRef.get());

@@ -64,12 +64,10 @@ public class AjaxAction extends XWikiAction {
   }
 
   private Optional<String> getAjaxScript(XWikiContext context) {
-    List<String> pathParts = parseRequestPath(context)
-        .limit(3).collect(toImmutableList());
+    List<String> pathParts = parseRequestPath(context).limit(3).collect(toImmutableList());
     if ((pathParts.size() > 2) && pathParts.get(0).equals(AJAX_SCRIPT_ACTION)) {
-      String celAjaxScript = "/" + Stream.concat(
-          Stream.of(CEL_AJAX_SCRIPT_DIR_PROPERTY),
-          parseRequestPath(context).skip(1))
+      String celAjaxScript = "/" + Stream
+          .concat(Stream.of(CEL_AJAX_SCRIPT_DIR_PROPERTY), parseRequestPath(context).skip(1))
           .collect(joining("/"));
       LOGGER.debug("ajax: found script path '{}'", celAjaxScript);
       return Optional.of(celAjaxScript);
@@ -78,8 +76,7 @@ public class AjaxAction extends XWikiAction {
   }
 
   private Stream<String> parseRequestPath(XWikiContext context) {
-    return Splitter.on('/')
-        .splitToStream(context.getRequest().getPathInfo())
+    return Splitter.on('/').splitToStream(context.getRequest().getPathInfo())
         .filter(not(String::isEmpty));
   }
 

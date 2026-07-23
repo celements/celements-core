@@ -113,23 +113,24 @@ public class RenderedExtractPresentationTypeTest extends AbstractComponentTest {
     boolean isLeaf = true;
     String expectedNodeExtract = "expected rendered extract for node";
     BaseObject extractObj = new BaseObject();
-    extractObj.setXClassReference(getDocDetailsClasses().getDocumentExtractClassRef(
-        context.getDatabase()));
+    extractObj.setXClassReference(
+        getDocDetailsClasses().getDocumentExtractClassRef(context.getDatabase()));
     extractObj.setStringValue(DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE, "de");
     extractObj.setStringValue(DocumentDetailsClasses.FIELD_DOC_EXTRACT_CONTENT,
         expectedNodeExtract);
     currentDoc.addXObject(extractObj);
-    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
-        "id=\"N3:Content:Content.MyPage\"").once();
-    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
-        isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
-            + " first cel_nav_isLeaf RichText\"").once();
+    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn("id=\"N3:Content:Content.MyPage\"")
+        .once();
+    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem),
+        eq(isLeaf), eq(1)))
+        .andReturn("class=\"cel_cm_navigation_menuitem" + " first cel_nav_isLeaf RichText\"")
+        .once();
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).atLeastOnce();
     DocumentReference templateDocRef = new DocumentReference(context.getDatabase(), "Templates",
         "RenderedExtract");
     String templateDiskPath = ":celTemplates/RenderedExtract.vm";
-    expect(webUtilsServiceMock.getInheritedTemplatedPath(eq(templateDocRef))).andReturn(
-        templateDiskPath);
+    expect(webUtilsServiceMock.getInheritedTemplatedPath(eq(templateDocRef)))
+        .andReturn(templateDiskPath);
     expect(renderCmdMock.renderTemplatePath(eq(templateDiskPath), eq("de"), eq("")))
         .andReturn(expectedNodeExtract);
     replayDefault();

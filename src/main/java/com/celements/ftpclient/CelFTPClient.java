@@ -47,8 +47,8 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
 
   /** A convenience method for connecting and logging in */
   @Override
-  public boolean connectAndLogin(String host, String userName, String password) throws IOException,
-      UnknownHostException, FTPConnectionClosedException {
+  public boolean connectAndLogin(String host, String userName, String password)
+      throws IOException, UnknownHostException, FTPConnectionClosedException {
     return connectAndLogin(host, null, userName, password);
   }
 
@@ -81,8 +81,8 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
 
   /** Download a file from the server, and save it to the specified local file */
   @Override
-  public boolean downloadFile(String serverFile, String localFile) throws IOException,
-      FTPConnectionClosedException {
+  public boolean downloadFile(String serverFile, String localFile)
+      throws IOException, FTPConnectionClosedException {
     FileOutputStream out = new FileOutputStream(localFile);
     boolean result = retrieveFile(serverFile, out);
     out.close();
@@ -91,8 +91,8 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
 
   /** Upload a file to the server */
   @Override
-  public boolean uploadFile(String localFile, String serverFile) throws IOException,
-      FTPConnectionClosedException {
+  public boolean uploadFile(String localFile, String serverFile)
+      throws IOException, FTPConnectionClosedException {
     FileInputStream in = new FileInputStream(localFile);
     boolean result = storeFile(serverFile, in);
     in.close();
