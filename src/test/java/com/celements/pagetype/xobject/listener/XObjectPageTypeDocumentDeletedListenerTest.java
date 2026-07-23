@@ -19,62 +19,38 @@
  */
 package com.celements.pagetype.xobject.listener;
 
-import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.pagetype.IPageTypeClassConfig;
+import com.celements.pagetype.classes.PageTypePropertiesClass;
 import com.celements.pagetype.xobject.event.XObjectPageTypeDeletedEvent;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.Utils;
 
 public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractComponentTest {
 
-  private static final String _COMPONENT_NAME = "XObjectPageTypeDocumentDeletedListener";
   private XObjectPageTypeDocumentDeletedListener eventListener;
   private XWikiContext context;
-  private ObservationManager defaultObservationManager;
-  private ComponentManager componentManager;
   private ObservationManager obsManagerMock;
 
   @Before
-  public void setUp_XObjectPageTypeDocumentDeletedListenerTest() throws Exception {
-    componentManager = Utils.getComponentManager();
-    context = getContext();
+  public void prepareTest() throws Exception {
+    context = getXContext();
+    obsManagerMock = registerComponentMock(ObservationManager.class);
     eventListener = getXObjPageTypeDocUpdatedListener();
-    defaultObservationManager = Utils.getComponent(ObservationManager.class);
-    componentManager.release(defaultObservationManager);
-    ComponentDescriptor<ObservationManager> obsManagDesc = componentManager.getComponentDescriptor(
-        ObservationManager.class, "default");
-    obsManagerMock = createDefaultMock(ObservationManager.class);
-    componentManager.registerComponent(obsManagDesc, obsManagerMock);
-  }
-
-  @After
-  public void tearDown_XObjectPageTypeDocumentDeletedListenerTest() throws Exception {
-    componentManager.release(obsManagerMock);
-    ComponentDescriptor<ObservationManager> obsManagDesc = componentManager.getComponentDescriptor(
-        ObservationManager.class, "default");
-    componentManager.registerComponent(obsManagDesc, defaultObservationManager);
   }
 
   @Test
@@ -84,13 +60,12 @@ public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractComponen
 
   @Test
   public void testGetName() {
-    assertEquals(_COMPONENT_NAME, eventListener.getName());
+    assertEquals("XObjectPageTypeDocumentDeletedListener", eventListener.getName());
   }
 
   @Test
   public void testGetEvents() {
-    List<String> expectedEventClassList = Arrays.asList(
-        new DocumentDeletedEvent().getClass().getName());
+    List<String> expectedEventClassList = List.of(DocumentDeletedEvent.class.getName());
     replayDefault();
     List<Event> actualEventList = eventListener.getEvents();
     assertEquals(expectedEventClassList.size(), actualEventList.size());
@@ -188,7 +163,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractComponen
     XWikiDocument origDoc = new XWikiDocument(pageTypeDocRef);
     sourceDoc.setOriginalDocument(origDoc);
     BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
+    pageTypePropObj.setXClassReference(PageTypePropertiesClass.CLASS_REF);
     origDoc.addXObject(pageTypePropObj);
     RemoteObservationManagerContext remoteObsManagerCtx = createDefaultMock(
         RemoteObservationManagerContext.class);
@@ -201,14 +176,9 @@ public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractComponen
     verifyDefault();
   }
 
-  private DocumentReference getPageTypePropertiesClassRef() {
-    return Utils.getComponent(IPageTypeClassConfig.class).getPageTypePropertiesClassRef(
-        new WikiReference(context.getDatabase()));
-  }
-
   private XObjectPageTypeDocumentDeletedListener getXObjPageTypeDocUpdatedListener() {
-    return (XObjectPageTypeDocumentDeletedListener) Utils.getComponent(EventListener.class,
-        _COMPONENT_NAME);
+    return (XObjectPageTypeDocumentDeletedListener) getBeanFactory()
+        .getBean(XObjectPageTypeDocumentDeletedListener.NAME, EventListener.class);
   }
 
 }

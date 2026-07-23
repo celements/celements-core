@@ -1,6 +1,4 @@
 com.celements.cells.CellsScriptService
-com.celements.common.classes.listener.WikiCreatedEventListener
-com.celements.common.classes.listener.DocumentUpdatedEventListener
 com.celements.web.classcollections.RemoteUserValidationClasses
 com.celements.web.classcollections.ImageMapClasses
 com.celements.web.classcollections.MetaTagClasses
@@ -40,14 +38,12 @@ com.celements.web.classcollections.DocumentDetailsClasses
 com.celements.web.service.WebUtilsScriptService
 com.celements.web.classcollections.OldCoreClasses
 com.celements.web.classcollections.OldCoreLegacyClasses
-com.celements.mandatory.XWikiXWikiPreferences
 com.celements.menu.access.MenuAccessService
 com.celements.menu.access.DefaultMenuAccessProvider
 com.celements.navigation.listener.TreeNodeDocumentCreatedListener
 com.celements.navigation.listener.TreeNodeDocumentDeletedListener
 com.celements.navigation.listener.TreeNodeDocumentUpdatedListener
 com.celements.navigation.service.TreeNodeCacheListener
-com.celements.mandatory.listener.WikiCreatedEventListener
 com.celements.mandatory.FileBaseTag0
 com.celements.mandatory.FileBaseTag1
 com.celements.mandatory.HTMLWebPreferences
@@ -62,7 +58,6 @@ com.celements.css.CssScriptService
 com.celements.docform.DocFormScriptService
 com.celements.web.service.EditorSupportScriptService
 com.celements.emptycheck.service.EmptyCheckScriptService
-com.celements.filebase.FileBaseScriptService
 com.celements.javascript.JSScriptService
 com.celements.web.service.LegacySkinScriptService
 com.celements.navigation.service.TreeNodeScriptService
@@ -82,7 +77,6 @@ com.celements.copydoc.CopyDocumentService
 com.celements.webform.WebFormService
 com.celements.webform.WebFormScriptService
 com.celements.appScript.AppScriptScriptService
-com.celements.mandatory.XWikiXWikiRights
 com.celements.parents.XDocParents
 com.celements.parents.DocumentParentsLister
 com.celements.navigation.listener.NavigationCreateListener
@@ -95,10 +89,7 @@ com.celements.web.service.DeprecatedUsageScriptService
 com.celements.web.classcollections.OldCoreClassConfig
 com.celements.lastChanged.LastChangedService
 com.celements.lastChanged.DocumentChangesListener
-com.celements.filebase.SingleDocFileBaseService
-com.celements.filebase.FileBaseAccessService
 com.celements.rights.publication.PublicationService
-com.celements.common.observation.listener.LocalEventListener
 com.celements.pagetype.category.DefaultPageTypeCategory
 com.celements.cells.CellTypeCategory
 com.celements.web.service.LastStartupTimeStamp

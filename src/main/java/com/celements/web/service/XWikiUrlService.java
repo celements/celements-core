@@ -67,21 +67,6 @@ public class XWikiUrlService implements UrlService {
     return createURLObject(ref, action, queryString).toExternalForm();
   }
 
-  @Override
-  public UriBuilder createURIBuilder(EntityReference ref) {
-    return createURIBuilder(ref, null);
-  }
-
-  @Override
-  public UriBuilder createURIBuilder(EntityReference ref, String action) {
-    checkArgument(ref != null, "reference may not be null");
-    try {
-      return UriBuilder.fromUri(createURLObject(ref, action, null).toURI());
-    } catch (URISyntaxException exc) {
-      throw new IllegalArgumentException("illegal reference provided: " + ref, exc);
-    }
-  }
-
   private URL createURLObject(EntityReference ref, String action, String queryString) {
     URL url;
     String wikiName = extractName(ref, EntityType.WIKI);

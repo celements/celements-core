@@ -19,17 +19,23 @@
  */
 package com.celements.web.css;
 
-import static com.celements.common.test.CelementsTestUtils.*;
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.javascript.FrontendResourceResolver;
+import com.celements.javascript.FrontendResourceResolver.FrontendResource;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -37,11 +43,14 @@ public class CSSEngineTest extends AbstractComponentTest {
 
   private CSSEngine cssEngine;
   private XWikiContext context;
+  private XWiki wiki;
 
   @Before
   public void setUp_CSSEngineTest() throws Exception {
-    context = getContext();
-    cssEngine = (CSSEngine) CSSEngine.getCSSEngine(context);
+    registerComponentMocks(FrontendResourceResolver.class);
+    context = getXContext();
+    wiki = getMock(XWiki.class);
+    cssEngine = getBeanFactory().getBean(CSSEngine.class);
     context.put("vcontext", new VelocityContext());
   }
 
@@ -61,6 +70,65 @@ public class CSSEngineTest extends AbstractComponentTest {
     assertTrue("includeCSS must add cssObj to the css list.", cssListContains(cssList, cssObj));
     assertTrue("includeCSS must not add cssObj1 to the css list.", cssListContains(cssList,
         cssObj1));
+  }
+
+  @Test
+  public void testIncludeCSS_frontend() {
+    String sourcePath = ":frontend/progon/vue-poc/main.ts";
+    expect(getMock(FrontendResourceResolver.class).isFrontendSource(eq(sourcePath)))
+        .andReturn(true);
+    expect(getMock(FrontendResourceResolver.class).get(eq(sourcePath)))
+        .andReturn(Optional.of(new FrontendResource(
+            "dist/vue-poc.BOsmCSyo.mjs",
+            Arrays.asList(
+                "dist/assets/vue-poc-ahBOTvOT.css",
+                "dist/assets/shared.Df9z3kSS.css"))));
+
+    replayDefault();
+
+    List<CSS> cssList = cssEngine.includeCSS(sourcePath, "css", null, context);
+
+    assertEquals(2, cssList.size());
+    assertEquals("dist/assets/vue-poc-ahBOTvOT.css", cssList.get(0).getCssBasePath());
+    assertEquals("dist/assets/shared.Df9z3kSS.css", cssList.get(1).getCssBasePath());
+    verifyDefault();
+  }
+
+  @Test
+  public void testIncludeCSS_frontend_getCSS() {
+    String sourcePath = ":frontend/progon/vue-poc/main.ts";
+    expect(getMock(FrontendResourceResolver.class).isFrontendSource(eq(sourcePath)))
+        .andReturn(true);
+    expect(getMock(FrontendResourceResolver.class).get(eq(sourcePath)))
+        .andReturn(Optional.of(new FrontendResource("dist/vue-poc.BOsmCSyo.mjs",
+            Collections.singletonList("dist/assets/vue-poc-ahBOTvOT.css"))));
+    expect(wiki.getSkinFile(eq("dist/assets/vue-poc-ahBOTvOT.css"), eq(true), same(context)))
+        .andReturn("/appname/skin/resources/dist/assets/vue-poc-ahBOTvOT.css");
+
+    replayDefault();
+
+    List<CSS> cssList = cssEngine.includeCSS(sourcePath, "css", null, context);
+
+    assertEquals("/appname/file/resources/dist/assets/vue-poc-ahBOTvOT.css",
+        cssList.get(0).getCSS(context));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIncludeCSS_frontend_noCss() {
+    String sourcePath = ":frontend/progon/eventview/main.ts";
+    expect(getMock(FrontendResourceResolver.class).isFrontendSource(eq(sourcePath)))
+        .andReturn(true);
+    expect(getMock(FrontendResourceResolver.class).get(eq(sourcePath)))
+        .andReturn(Optional.of(new FrontendResource("dist/eventview.Cq6C1_9z.mjs",
+            Collections.emptyList())));
+
+    replayDefault();
+
+    List<CSS> cssList = cssEngine.includeCSS(sourcePath, "css", null, context);
+
+    assertTrue(cssList.isEmpty());
+    verifyDefault();
   }
 
   // *****************************************************************

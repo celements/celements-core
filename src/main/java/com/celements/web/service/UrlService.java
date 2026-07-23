@@ -21,7 +21,6 @@ package com.celements.web.service;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.EntityReference;
@@ -52,11 +51,5 @@ public interface UrlService {
   @NotNull
   public String getExternalURL(@NotNull EntityReference ref, @Nullable String action,
       @Nullable String queryString);
-
-  @NotNull
-  UriBuilder createURIBuilder(@NotNull EntityReference ref);
-
-  @NotNull
-  UriBuilder createURIBuilder(@NotNull EntityReference ref, @Nullable String action);
 
 }

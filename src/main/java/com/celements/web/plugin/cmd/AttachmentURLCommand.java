@@ -21,6 +21,7 @@ package com.celements.web.plugin.cmd;
 
 import static com.celements.common.MoreOptional.*;
 import static com.celements.execution.XWikiExecutionProp.*;
+import static com.celements.spring.context.SpringContextProvider.*;
 import static com.google.common.base.Strings.*;
 
 import java.net.MalformedURLException;
@@ -41,6 +42,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.init.XWikiProvider;
 import com.celements.javascript.FrontendResourceResolver;
+import com.celements.javascript.FrontendResourceResolver.FrontendResource;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.util.ModelUtils;
@@ -104,10 +106,9 @@ public class AttachmentURLCommand {
         return Optional.empty();
       }
     } else if (isOnDiskLink(link)) {
-      var resolved = getFrontendResourceResolver().resolve(link.trim());
+      var resolved = getFrontendResourceResolver().get(link.trim()).map(FrontendResource::jsPath);
       var path = resolved.orElseGet(() -> link.trim().substring(1));
-      url = getXWiki().getSkinFile(path, true, getContext())
-          .replace("/skin/", "/" + action + "/");
+      url = getDiskFileUrl(path, action);
       if (resolved.isEmpty()) { // frontend resource is already versioned by build process
         versionProvider = () -> getLastStartupTimeStamp().getFileModificationDate(path);
       }
@@ -164,6 +165,15 @@ public class AttachmentURLCommand {
     return isAttachmentLink;
   }
 
+  public String getDiskFileUrl(String path, String action) {
+    return getXWiki().getSkinFile(path, true, getContext())
+        .replace("/skin/", "/" + action + "/");
+  }
+
+  public String getDiskFileUrl(String path) {
+    return getDiskFileUrl(path, "file");
+  }
+
   public String getExternalAttachmentURL(String fileName, String action, XWikiContext context) {
     try {
       return context.getURLFactory().getServerURL(context).toExternalForm() + getAttachmentURL(
@@ -175,7 +185,7 @@ public class AttachmentURLCommand {
   }
 
   private FrontendResourceResolver getFrontendResourceResolver() {
-    return Utils.getComponent(FrontendResourceResolver.class);
+    return getSpringContext().getBean(FrontendResourceResolver.class);
   }
 
   private IAttachmentServiceRole getAttachmentService() {

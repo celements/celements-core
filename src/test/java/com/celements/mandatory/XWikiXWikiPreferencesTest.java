@@ -19,46 +19,26 @@
  */
 package com.celements.mandatory;
 
-import static com.celements.common.test.CelementsTestUtils.*;
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
 
 public class XWikiXWikiPreferencesTest extends AbstractComponentTest {
 
   private XWikiXWikiPreferences mandatoryXWikiPref;
-  private XWikiContext context;
-  private XWiki xwiki;
 
   @Before
-  public void setUp_XWikiXWikiPreferencesTest() throws Exception {
-    context = getContext();
-    xwiki = getWikiMock();
-    mandatoryXWikiPref = (XWikiXWikiPreferences) Utils.getComponent(IMandatoryDocumentRole.class,
-        "celements.mandatory.wikipreferences");
+  public void prepareTest() throws Exception {
+    mandatoryXWikiPref = (XWikiXWikiPreferences) getBeanFactory().getBean(
+        "celements.mandatory.wikipreferences", IMandatoryDocumentRole.class);
   }
 
   @Test
   public void testDependsOnMandatoryDocuments() throws Exception {
     assertEquals(0, mandatoryXWikiPref.dependsOnMandatoryDocuments().size());
-  }
-
-  @Test
-  public void testSkip_illegalValue() {
-    expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"))).andThrow(
-        new NumberFormatException(null)).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"), eq(0L))).andReturn(
-        0L).anyTimes();
-    replayDefault();
-    mandatoryXWikiPref.skip();
-    verifyDefault();
   }
 
 }

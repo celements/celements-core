@@ -75,7 +75,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
 
   @Test
   public void testGetCacheKey_space_different_db() {
-    context.setDatabase("theWiki");
+    context.setDatabase("thewiki");
     assertEquals("mydatabase", notMappedItemsCmd.getWikiCacheKey("mydatabase:MySpace."));
   }
 
@@ -213,7 +213,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
 
   @Test
   public void testGetTreeNodesForParentKey_differentDbs() throws Exception {
-    context.setDatabase("myTestWiki");
+    context.setDatabase("mytestwiki");
     String searchParentKey = "mydatabase:MySpace.";
     String expectedPartName = "mainPart";
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference("mydatabase",
@@ -257,7 +257,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
   @Test
   @Deprecated
   public void testGetTreeNodesForParentKey_differentDbs_deprecated() throws Exception {
-    context.setDatabase("myTestWiki");
+    context.setDatabase("mytestwiki");
     String searchParentKey = "mydatabase:MySpace.";
     DocumentReference myDoc1Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc1");
     DocumentReference myDoc2Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc2");
@@ -317,7 +317,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
 
   @Test
   public void testGetParentKey_Name_differentdb() {
-    context.setDatabase("myTestWiki");
+    context.setDatabase("mytestwiki");
     replayDefault();
     assertEquals("mydatabase:Space.Name", notMappedItemsCmd.getParentKey("mydatabase", "Name",
         "Space"));
@@ -326,7 +326,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
 
   @Test
   public void testFlushMenuItemCache() {
-    String dbName = "testDatabase";
+    String dbName = "testdatabase";
     context.setDatabase(dbName);
     notMappedItemsCmd.injectMapForTests(dbName, new HashMap<String, List<TreeNode>>());
     replayDefault();
@@ -381,7 +381,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
 
   @Test
   public void testExecuteSearch_fixDbForSearch() throws Exception {
-    context.setDatabase("myTestWiki");
+    context.setDatabase("mytestwiki");
     List<Object[]> resultList = Arrays.asList(
         Arrays.<Object>asList(".MyDoc1", "", "", 1).toArray(),
         Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
@@ -396,7 +396,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
 
   @Test
   public void testGetFromDBForParentKey_preserve_db() throws Exception {
-    context.setDatabase("myTestWiki");
+    context.setDatabase("mytestwiki");
     List<Object[]> resultList = Arrays.asList(
         Arrays.<Object>asList("MySpace.MyDoc1", "MySpace", "", 1).toArray(),
         Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
@@ -404,7 +404,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
         resultList).atLeastOnce();
     replayDefault();
     List<Object[]> result = notMappedItemsCmd.getFromDBForParentKey("mydatabase:MySpace.");
-    assertEquals("expect database being preserved.", "myTestWiki", context.getDatabase());
+    assertEquals("expect database being preserved.", "mytestwiki", context.getDatabase());
     assertEquals(resultList, result);
     verifyDefault();
   }

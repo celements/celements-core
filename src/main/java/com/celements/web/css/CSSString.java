@@ -47,10 +47,15 @@ public class CSSString extends CSS {
   private String media;
   private boolean isContentCSS;
 
-  public CSSString(String file, XWikiContext context) {
-    super(context);
+  public CSSString(String file) {
+    super();
     boolean contentCSS = (file.endsWith("-content.css") || file.endsWith("_content.css"));
     initFields(file, false, "", "all", contentCSS);
+  }
+
+  @Deprecated
+  public CSSString(String file, XWikiContext context) {
+    this(file);
   }
 
   public CSSString(String file, String media, XWikiContext context) {

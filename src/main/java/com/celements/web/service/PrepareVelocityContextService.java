@@ -28,7 +28,7 @@ import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
-import com.celements.web.plugin.cmd.CheckClassesCommand;
+import com.celements.web.classcollections.OldCoreClasses;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -414,7 +414,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
   private BaseObject getPagePanelObj(String configName, XWikiDocument theDoc) {
     if (theDoc != null) {
-      return theDoc.getObject(CheckClassesCommand.CLASS_PANEL_CONFIG_CLASS, "config_name",
+      return theDoc.getObject(OldCoreClasses.PANEL_CONFIG_CLASS, "config_name",
           getPanelType(configName), false);
     } else {
       return null;

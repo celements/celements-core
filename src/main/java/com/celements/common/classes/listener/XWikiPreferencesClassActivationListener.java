@@ -19,16 +19,14 @@
  */
 package com.celements.common.classes.listener;
 
-import static com.celements.execution.XWikiExecutionProp.*;
-
-import java.util.Arrays;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -36,35 +34,35 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 import com.celements.common.classes.IClassesCompositorComponent;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-@Component(DocumentUpdatedEventListener.NAME)
-public class DocumentUpdatedEventListener implements EventListener {
+@Component
+public class XWikiPreferencesClassActivationListener implements EventListener {
 
-  public static final String NAME = "celements.classes.DocumentUpdatedEventListener";
+  public static final String NAME = "celements.classes.XWikiPreferencesClassActivationListener";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-      DocumentUpdatedEventListener.class);
+      XWikiPreferencesClassActivationListener.class);
 
-  @Requirement
-  IClassesCompositorComponent classesCompositor;
+  private final IClassesCompositorComponent classesCompositor;
+  private final Execution execution;
 
-  @Requirement
-  private Execution execution;
+  @Inject
+  public XWikiPreferencesClassActivationListener(
+      IClassesCompositorComponent classesCompositor,
+      Execution execution) {
+    this.classesCompositor = classesCompositor;
+    this.execution = execution;
+  }
 
   protected ExecutionContext getEContext() {
     return execution.getContext();
   }
 
-  protected XWikiContext getContext() {
-    return getEContext().get(XWIKI_CONTEXT).orElseThrow();
-  }
-
   @Override
   public List<Event> getEvents() {
     LOGGER.info("getEvents: registering for document update events.");
-    return Arrays.<Event>asList(new DocumentUpdatedEvent());
+    return List.of(new DocumentUpdatedEvent());
   }
 
   @Override
@@ -85,12 +83,15 @@ public class DocumentUpdatedEventListener implements EventListener {
         LOGGER.debug("cycle detected in [{}], skipping", NAME, new Throwable());
       } else {
         getEContext().setProperty(NAME, true);
-        LOGGER.info("changes on [{}] saved. Checking all Class Collections", xwikiPrefDoc);
-        classesCompositor.checkClasses();
-        getEContext().removeProperty(NAME);
+        try {
+          LOGGER.info("changes on [{}] saved. Checking all Class Collections", xwikiPrefDoc);
+          classesCompositor.checkClasses();
+        } finally {
+          getEContext().removeProperty(NAME);
+        }
       }
     } else {
-      LOGGER.warn("unrecognised event [{}] in classes.CompositorComonent", event.getClass());
+      LOGGER.warn("unrecognised event [{}] in classes.CompositorComponent", event.getClass());
     }
   }
 

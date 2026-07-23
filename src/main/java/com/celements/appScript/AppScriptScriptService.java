@@ -74,6 +74,10 @@ public class AppScriptScriptService implements ScriptService {
     return appScriptService.getAppRecursiveScript(scriptName).orElse(null);
   }
 
+  public String getAppRecursiveSetupScript(String scriptName) {
+    return appScriptService.getAppRecursiveSetupScript(scriptName).orElse(null);
+  }
+
   public String getAppScriptTemplatePath(String scriptName) {
     return appScriptService.getAppScriptTemplatePath(scriptName);
   }

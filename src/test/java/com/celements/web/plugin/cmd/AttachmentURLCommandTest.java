@@ -35,9 +35,11 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.javascript.FrontendResourceResolver;
+import com.celements.javascript.FrontendResourceResolver.FrontendResource;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.url.UrlService;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -100,8 +102,9 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
 
   @Test
   public void test_getAttachmentURL_fullInternalLink() throws Exception {
+    context.setDatabase(XWikiConstant.CENTRAL_WIKI.getName());
     var attRef = new AttachmentReference("bla.txt",
-        new DocumentReference("celements2web", "A", "B"));
+        new DocumentReference(XWikiConstant.CENTRAL_WIKI.getName(), "A", "B"));
     String resultURL = "http://celements2web.localhost/file/A/B/bla.txt";
     expect(getMock(UrlService.class).getURL(attRef, "file")).andReturn(resultURL);
     XWikiAttachment blaAtt = new XWikiAttachment();
@@ -151,7 +154,7 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
     expect(wiki.getSkinFile(eq("celJS/bla.js"), eq(true), same(context))).andReturn(resultURL);
     expect(wiki.getResourceLastModificationDate(eq("resources/celJS/bla.js"))).andReturn(
         new Date());
-    expect(getMock(FrontendResourceResolver.class).resolve(eq(input)))
+    expect(getMock(FrontendResourceResolver.class).get(eq(input)))
         .andReturn(Optional.empty());
     replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL(input, context);
@@ -164,8 +167,8 @@ public class AttachmentURLCommandTest extends AbstractComponentTest {
   public void test_getAttachmentURL_frontend() {
     var input = ":frontend/bla.ts";
     var resolved = "dist/bla.mjs";
-    expect(getMock(FrontendResourceResolver.class).resolve(eq(input)))
-        .andReturn(Optional.of(resolved));
+    expect(getMock(FrontendResourceResolver.class).get(eq(input)))
+        .andReturn(Optional.of(new FrontendResource(resolved, java.util.List.of())));
     expect(wiki.getSkinFile(eq(resolved), eq(true), same(context)))
         .andReturn("/appname/skin/resources/dist/bla.mjs");
     replayDefault();
