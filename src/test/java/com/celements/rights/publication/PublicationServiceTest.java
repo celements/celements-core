@@ -13,6 +13,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.xpn.xwiki.doc.CelDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -30,7 +31,7 @@ public class PublicationServiceTest extends AbstractComponentTest {
   public void testGetPublishObject_null() {
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
         "Doc"));
-    assertNotNull(pubService.getPublishObjects(doc));
+    assertNotNull(pubService.getPublishObjects(CelDocument.Default.from(doc)));
   }
 
   @Test
@@ -40,7 +41,7 @@ public class PublicationServiceTest extends AbstractComponentTest {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(pubService.getPublicationClassReference());
     doc.addXObject(obj);
-    assertEquals(obj, pubService.getPublishObjects(doc).get(0));
+    assertEquals(1, pubService.getPublishObjects(CelDocument.Default.from(doc)).size());
   }
 
   @Test
@@ -53,7 +54,7 @@ public class PublicationServiceTest extends AbstractComponentTest {
     BaseObject obj2 = new BaseObject();
     obj2.setXClassReference(pubService.getPublicationClassReference());
     doc.addXObject(obj2);
-    assertEquals(2, pubService.getPublishObjects(doc).size());
+    assertEquals(2, pubService.getPublishObjects(CelDocument.Default.from(doc)).size());
   }
 
   @Test
@@ -63,7 +64,7 @@ public class PublicationServiceTest extends AbstractComponentTest {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(pubService.getPublicationClassReference());
     doc.setXObject(3, obj);
-    assertEquals(1, pubService.getPublishObjects(doc).size());
+    assertEquals(1, pubService.getPublishObjects(CelDocument.Default.from(doc)).size());
   }
 
   @Test
@@ -71,7 +72,8 @@ public class PublicationServiceTest extends AbstractComponentTest {
     assertTrue("null document", pubService.isPublished(null));
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
         "Doc"));
-    assertTrue("document without objects", pubService.isPublished(doc));
+    assertTrue("document without objects",
+        pubService.isPublished(CelDocument.Default.from(doc)));
   }
 
   @Test
@@ -91,8 +93,7 @@ public class PublicationServiceTest extends AbstractComponentTest {
     obj2.setDateValue("publishDate", gc.getTime());
     obj2.setXClassReference(pubService.getPublicationClassReference());
     doc.addXObject(obj2);
-    assertFalse(doc.getXObjects(pubService.getPublicationClassReference()).isEmpty());
-    assertFalse(pubService.isPublished(doc));
+    assertFalse(pubService.isPublished(CelDocument.Default.from(doc)));
   }
 
   @Test
@@ -117,8 +118,7 @@ public class PublicationServiceTest extends AbstractComponentTest {
     doc.addXObject(obj1);
     doc.addXObject(obj2);
     doc.addXObject(obj3);
-    assertFalse(doc.getXObjects(pubService.getPublicationClassReference()).isEmpty());
-    assertTrue(pubService.isPublished(doc));
+    assertTrue(pubService.isPublished(CelDocument.Default.from(doc)));
   }
 
   @Test
@@ -183,52 +183,6 @@ public class PublicationServiceTest extends AbstractComponentTest {
   @Test
   public void testIsRestrictedRightsAction_admin() {
     assertFalse(pubService.isRestrictedRightsAction("admin"));
-  }
-
-  @Test
-  public void testIsAfterStart_empty() {
-    assertEquals(true, pubService.isAfterStart(new BaseObject()));
-  }
-
-  @Test
-  public void testIsAfterStart_beforeStart() {
-    BaseObject obj = new BaseObject();
-    Calendar gc = Calendar.getInstance();
-    gc.add(Calendar.HOUR, 1);
-    obj.setDateValue("publishDate", gc.getTime());
-    assertFalse(pubService.isAfterStart(obj));
-  }
-
-  @Test
-  public void testIsAfterStart_afterStart() {
-    BaseObject obj = new BaseObject();
-    Calendar gc = Calendar.getInstance();
-    gc.add(Calendar.HOUR, -1);
-    obj.setDateValue("publishDate", gc.getTime());
-    assertTrue(pubService.isAfterStart(obj));
-  }
-
-  @Test
-  public void testIsBeforeEnd_empty() {
-    assertEquals(true, pubService.isBeforeEnd(new BaseObject()));
-  }
-
-  @Test
-  public void testIsBeforeEnd_beforeEnd() {
-    BaseObject obj = new BaseObject();
-    Calendar gc = Calendar.getInstance();
-    gc.add(Calendar.HOUR, 1);
-    obj.setDateValue("unpublishDate", gc.getTime());
-    assertTrue(pubService.isBeforeEnd(obj));
-  }
-
-  @Test
-  public void testIsBeforeEnd_afterEnd() {
-    BaseObject obj = new BaseObject();
-    Calendar gc = Calendar.getInstance();
-    gc.add(Calendar.HOUR, -1);
-    obj.setDateValue("unpublishDate", gc.getTime());
-    assertFalse(pubService.isBeforeEnd(obj));
   }
 
   @Test

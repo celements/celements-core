@@ -19,9 +19,7 @@
  */
 package com.celements.rights.publication;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,17 +29,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.context.ModelContext;
-import com.celements.model.util.References;
 import com.celements.web.classcollections.DocumentDetailsClasses;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.doc.CelDocument;
+import com.xpn.xwiki.doc.CelObject;
 
 @Component
 public class PublicationService implements IPublicationServiceRole {
@@ -53,9 +48,6 @@ public class PublicationService implements IPublicationServiceRole {
 
   @Requirement
   private DocumentAccessBridge documentAccessBridge;
-
-  @Requirement
-  IModelAccessFacade modelAccess;
 
   @Requirement
   private Execution execution;
@@ -101,21 +93,19 @@ public class PublicationService implements IPublicationServiceRole {
     execution.getContext().setProperty(OVERRIDE_PUB_CHECK, value);
   }
 
-  List<BaseObject> getPublishObjects(XWikiDocument doc) {
-    if (doc != null) {
-      return modelAccess.getXObjects(doc, getPublicationClassReference(doc.getDocumentReference()));
+  List<CelObject> getPublishObjects(CelDocument.Default doc) {
+    if (doc == null) {
+      return List.of();
     }
-    return Collections.emptyList();
+    var classRef = getPublicationClassReference();
+    return doc.getXObjects().stream()
+        .filter(object -> object.getClassReference().equals(classRef))
+        .toList();
   }
 
-  DocumentReference getPublicationClassReference() {
-    return getPublicationClassReference(null);
-  }
-
-  DocumentReference getPublicationClassReference(EntityReference entityRef) {
-    return ((DocumentDetailsClasses) documentDetailsClasses).getDocumentPublicationClassRef(
-        References.extractRef(entityRef, WikiReference.class).or(
-            modelContext.getWikiRef()).getName());
+  LocalDocumentReference getPublicationClassReference() {
+    return new LocalDocumentReference(((DocumentDetailsClasses) documentDetailsClasses)
+        .getDocumentPublicationClassRef(modelContext.getWikiRef().getName()));
   }
 
   @Override
@@ -148,31 +138,23 @@ public class PublicationService implements IPublicationServiceRole {
   }
 
   @Override
-  public boolean isPublished(XWikiDocument doc) {
-    List<BaseObject> objs = getPublishObjects(doc);
-    boolean isPublished = false;
-    if (!objs.isEmpty()) {
-      for (BaseObject obj : objs) {
-        isPublished |= isAfterStart(obj) && isBeforeEnd(obj);
-      }
-    } else {
-      LOGGER.debug("no publish objects found for '{}': no limits set means always" + " published",
-          doc);
-      isPublished = true;
+  public boolean isPublished(CelDocument.Default doc) {
+    List<CelObject> objects = getPublishObjects(doc);
+    if (objects.isEmpty()) {
+      LOGGER.debug("no publish objects found for '{}': no limits set means always published", doc);
+      return true;
     }
-    return isPublished;
+    return objects.stream().anyMatch(object -> isAfterStart(object) && isBeforeEnd(object));
   }
 
-  boolean isAfterStart(BaseObject obj) {
-    Calendar cal = Calendar.getInstance();
-    Date pubDate = obj.getDateValue(DocumentDetailsClasses.PUBLISH_DATE_FIELD);
-    return (pubDate == null) || cal.getTime().after(pubDate);
+  boolean isAfterStart(CelObject object) {
+    Instant publishDate = object.getDateValue(DocumentDetailsClasses.PUBLISH_DATE_FIELD);
+    return (publishDate == null) || Instant.now().isAfter(publishDate);
   }
 
-  boolean isBeforeEnd(BaseObject obj) {
-    Calendar cal = Calendar.getInstance();
-    Date unpubDate = obj.getDateValue(DocumentDetailsClasses.UNPUBLISH_DATE_FIELD);
-    return (unpubDate == null) || cal.getTime().before(unpubDate);
+  boolean isBeforeEnd(CelObject object) {
+    Instant unpublishDate = object.getDateValue(DocumentDetailsClasses.UNPUBLISH_DATE_FIELD);
+    return (unpublishDate == null) || Instant.now().isBefore(unpublishDate);
   }
 
 }
