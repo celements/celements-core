@@ -18,6 +18,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.classcollections.DocumentDetailsClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.CelDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiGroupService;
@@ -62,7 +63,8 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     rightObj.setIntValue("allow", 1);
     doc.addXObject(rightObj);
     replay(gs, xwiki);
-    assertTrue(rightService.checkRight("XWiki.user", doc, "view", true, true, false, getContext()));
+    assertTrue(rightService.checkRight("XWiki.user", CelDocument.Default.from(doc), "view", true,
+        true, false, getContext()));
     verify(gs, xwiki);
   }
 
@@ -93,7 +95,8 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     rightObj.setIntValue("allow", 1);
     doc.addXObject(rightObj);
     replay(gs, xwiki);
-    assertTrue(rightService.checkRight("XWiki.user", doc, "view", true, true, false, getContext()));
+    assertTrue(rightService.checkRight("XWiki.user", CelDocument.Default.from(doc), "view", true,
+        true, false, getContext()));
     verify(gs, xwiki);
   }
 
@@ -130,8 +133,8 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     obj.setXClassReference(getPublicationClassReference());
     doc.addXObject(obj);
     replay(gs, xwiki);
-    assertFalse(rightService.checkRight("XWiki.user", doc, "view", true, true, false,
-        getContext()));
+    assertFalse(rightService.checkRight("XWiki.user", CelDocument.Default.from(doc), "view", true,
+        true, false, getContext()));
     verify(gs, xwiki);
   }
 
@@ -171,7 +174,8 @@ public class CelementsRightServiceImplTest extends AbstractComponentTest {
     obj.setXClassReference(getPublicationClassReference());
     doc.addXObject(obj);
     replay(gs, xwiki);
-    assertTrue(rightService.checkRight("XWiki.user", doc, "view", true, true, false, getContext()));
+    assertTrue(rightService.checkRight("XWiki.user", CelDocument.Default.from(doc), "view", true,
+        true, false, getContext()));
     verify(gs, xwiki);
   }
 
