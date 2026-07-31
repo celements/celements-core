@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements-parent</artifactId>
@@ -9,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-core</artifactId>
-  <version>7.1-SNAPSHOT</version>
+  <version>7.1-RC1</version>
   <description>Celements Core</description>
   <dependencies>
     <dependency>
@@ -219,6 +217,6 @@
     <connection>scm:git:git@github.com:celements/celements-core.git</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-core.git</developerConnection>
     <url>https://github.com/celements/celements-core</url>
-    <tag>HEAD</tag>
+    <tag>celements-core-7.1-RC1</tag>
   </scm>
 </project>
