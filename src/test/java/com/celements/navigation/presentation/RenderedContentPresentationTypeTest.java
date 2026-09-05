@@ -72,6 +72,7 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
   @Test
   public void testComponentLoaded() {
     assertNotNull(Utils.getComponent(IPresentationTypeRole.class, "renderedContent"));
+    assertNotNull(Utils.getComponent(PresentationContentRenderer.class, "renderedContent"));
   }
 
   @Test
@@ -98,8 +99,8 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
     boolean isLastItem = false;
     boolean isLeaf = true;
     String expectedNodeContent = "expected rendered content for node";
-    expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view"))).andReturn(
-        expectedNodeContent);
+    expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view")))
+        .andReturn(expectedNodeContent);
     expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
         "id=\"N3:Content:Content.MyPage\"").once();
     expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
@@ -110,6 +111,30 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
         + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
         outStream.toString());
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderInnerContent() throws Exception {
+    expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view")))
+        .andReturn("inner content");
+    replayDefault();
+    assertEquals("inner content", vtPresType.renderInnerContent(currentDocRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderInnerContent_propagatesFailure() throws Exception {
+    XWikiException expected = new XWikiException();
+    expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view")))
+        .andThrow(expected);
+    replayDefault();
+    try {
+      vtPresType.renderInnerContent(currentDocRef);
+      fail("Expected XWikiException");
+    } catch (XWikiException actual) {
+      assertSame(expected, actual);
+    }
     verifyDefault();
   }
 

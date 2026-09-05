@@ -156,6 +156,8 @@ public interface INavigation extends PresentationNodeData {
   public String addCssClasses(DocumentReference docRef, boolean withCM, boolean isFirstItem,
       boolean isLastItem, boolean isLeaf, int numItem);
 
+  public List<String> getCssClassTokens(NavigationItemContext itemContext);
+
   public void setPresentationType(String presentationTypeHint);
 
   public void setOffset(int offset);

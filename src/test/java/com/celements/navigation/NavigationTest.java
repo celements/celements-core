@@ -41,6 +41,10 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.TestMessageTool;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.navigation.NavigationItemContext.ChildState;
+import com.celements.navigation.NavigationItemContext.ContainerCssClasses;
+import com.celements.navigation.NavigationItemContext.ContextualState;
+import com.celements.navigation.NavigationItemContext.Position;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.presentation.DefaultPresentationType;
@@ -621,6 +625,89 @@ public class NavigationTest extends AbstractComponentTest {
     verifyDefault();
     assertTrue("Expected to find 'cel_nav_item4321' in css classes." + " [" + cssClasses + "]", (" "
         + cssClasses + " ").contains(" cel_nav_item4321 "));
+  }
+
+  @Test
+  public void testGetCssClassTokens_withoutContextualState() throws XWikiException {
+    String pageType = "myPageType";
+    DocumentReference docRef = currentDocRef;
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef)))
+        .andReturn(pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null);
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyCurrentDoc"), same(getXContext()))).andReturn(true);
+    replayDefault();
+    List<String> tokens = nav.getCssClassTokens(new NavigationItemContext(docRef,
+        ContainerCssClasses.INCLUDE, Position.ONLY, ChildState.LEAF, 1, ContextualState.OMIT));
+    verifyDefault();
+    assertEquals(Arrays.asList("cel_cm_navigation_menuitem", "first", "last", "cel_nav_odd",
+        "cel_nav_item1", "cel_nav_isLeaf", "cel_nav_nodeSpace_MySpace",
+        "cel_nav_nodeName_MyCurrentDoc", pageType), tokens);
+    assertFalse(tokens.contains("currentPage"));
+    assertFalse(tokens.contains("active"));
+  }
+
+  @Test
+  public void testGetCssClassTokens_exactPresentationMetadataAndContextSuppression()
+      throws XWikiException {
+    nav.setCMcssClass("cel_cm_presentation_treenode");
+    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef)))
+        .andReturn(pageTypeRef).times(2);
+    expect(pageTypeRef.getConfigName()).andReturn("SomePageType").times(2);
+    SpaceReference layoutRef = new SpaceReference("About-Layout",
+        new SpaceReference("Layouts", currentDocRef.getWikiReference()));
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(layoutRef).times(2);
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), eq(true)))
+        .andReturn(Collections.emptyList());
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyCurrentDoc"), same(getXContext()))).andReturn(false).times(2);
+    replayDefault();
+    List<String> restTokens = nav.getCssClassTokens(new NavigationItemContext(currentDocRef,
+        ContainerCssClasses.INCLUDE, Position.ONLY, ChildState.LEAF, 1,
+        ContextualState.OMIT));
+    List<String> legacyTokens = nav.getCssClassTokens(new NavigationItemContext(currentDocRef,
+        ContainerCssClasses.INCLUDE, Position.ONLY, ChildState.LEAF, 1,
+        ContextualState.INCLUDE));
+    verifyDefault();
+    assertEquals(Arrays.asList("cel_cm_presentation_treenode", "first", "last", "cel_nav_odd",
+        "cel_nav_item1", "cel_nav_isLeaf", "cel_nav_nodeSpace_MySpace",
+        "cel_nav_nodeName_MyCurrentDoc", "SomePageType", "layout_About-Layout",
+        "cel_nav_restricted_rights"), restTokens);
+    assertEquals(Arrays.asList("cel_cm_presentation_treenode", "first", "last", "cel_nav_odd",
+        "cel_nav_item1", "cel_nav_isLeaf", "cel_nav_nodeSpace_MySpace",
+        "cel_nav_nodeName_MyCurrentDoc", "currentPage", "SomePageType",
+        "layout_About-Layout", "active", "cel_nav_restricted_rights"), legacyTokens);
+  }
+
+  @Test
+  public void testGetUniqueId_exactPresentationNavigationNumberVariants() {
+    SpaceReference menuSpace = new SpaceReference("Content", currentDocRef.getWikiReference());
+    DocumentReference slideRef = new DocumentReference(getXContext().getDatabase(), "Content",
+        "First");
+    nav.setNodeSpace(menuSpace);
+    Navigation secondNavigation = new Navigation("N2");
+    secondNavigation.setNodeSpace(menuSpace);
+    replayDefault();
+    assertEquals("N1:Content:Content.First", nav.getUniqueId(slideRef));
+    assertEquals("N2:Content:Content.First", secondNavigation.getUniqueId(slideRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCssClasses_preservesConfiguredWhitespace() throws XWikiException {
+    nav.setCMcssClass("  alpha   beta  ");
+    replayDefault();
+    String cssClasses = nav.getCssClasses(null, true, true, false, true, 1);
+    List<String> tokens = nav.getCssClassTokens(new NavigationItemContext(null,
+        ContainerCssClasses.INCLUDE, Position.FIRST, ChildState.LEAF, 1,
+        ContextualState.INCLUDE));
+    verifyDefault();
+    assertEquals("alpha   beta   first cel_nav_odd cel_nav_item1 cel_nav_isLeaf", cssClasses);
+    assertEquals(Arrays.asList("alpha", "beta", "first", "cel_nav_odd", "cel_nav_item1",
+        "cel_nav_isLeaf"), tokens);
   }
 
   @Test
