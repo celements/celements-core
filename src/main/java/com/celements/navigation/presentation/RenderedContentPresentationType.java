@@ -13,8 +13,10 @@ import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
 import com.xpn.xwiki.XWikiException;
 
-@Component("renderedContent")
-public class RenderedContentPresentationType implements IPresentationTypeRole<INavigation> {
+@Component(value = PresentationContentRenderer.RENDERED_CONTENT_HINT, roles = {
+    IPresentationTypeRole.class, PresentationContentRenderer.class })
+public class RenderedContentPresentationType
+    implements IPresentationTypeRole<INavigation>, PresentationContentRenderer {
 
   private static final Logger LOGGER = LoggerFactory
       .getLogger(RenderedContentPresentationType.class);
@@ -44,10 +46,15 @@ public class RenderedContentPresentationType implements IPresentationTypeRole<IN
   protected void addRenderedContent(@NotNull StringBuilder outStream,
       @NotNull DocumentReference docRef) {
     try {
-      outStream.append(getRenderCommand().renderCelementsDocument(docRef, "view"));
+      outStream.append(renderInnerContent(docRef));
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get document for [" + docRef + "].", exp);
     }
+  }
+
+  @Override
+  public String renderInnerContent(@NotNull DocumentReference docRef) throws XWikiException {
+    return getRenderCommand().renderCelementsDocument(docRef, "view");
   }
 
   RenderCommand getRenderCommand() {

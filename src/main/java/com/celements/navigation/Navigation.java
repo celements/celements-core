@@ -23,6 +23,7 @@ import static com.celements.navigation.INavigationClassConfig.*;
 import static com.google.common.base.Predicates.*;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -51,6 +52,10 @@ import com.celements.configuration.ConfigSourceUtils;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.object.xwiki.XWikiObjectEditor;
 import com.celements.model.util.ModelUtils;
+import com.celements.navigation.NavigationItemContext.ChildState;
+import com.celements.navigation.NavigationItemContext.ContainerCssClasses;
+import com.celements.navigation.NavigationItemContext.ContextualState;
+import com.celements.navigation.NavigationItemContext.Position;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
@@ -608,47 +613,88 @@ public class Navigation implements INavigation {
 
   String getCssClasses(DocumentReference docRef, boolean withCM, boolean isFirstItem,
       boolean isLastItem, boolean isLeaf, int numItem) {
-    String cssClass = "";
-    if (withCM) {
-      cssClass += getCMcssClass();
+    return buildCssClassMetadata(new NavigationItemContext(docRef,
+        withCM ? ContainerCssClasses.INCLUDE : ContainerCssClasses.OMIT,
+        getPosition(isFirstItem, isLastItem),
+        isLeaf ? ChildState.LEAF : ChildState.HAS_CHILDREN, numItem,
+        ContextualState.INCLUDE)).legacyCssClasses();
+  }
+
+  @Override
+  public List<String> getCssClassTokens(NavigationItemContext itemContext) {
+    return buildCssClassMetadata(itemContext).tokens();
+  }
+
+  private CssClassMetadata buildCssClassMetadata(NavigationItemContext itemContext) {
+    List<String> cssClasses = new ArrayList<>();
+    StringBuilder legacyCssClasses = new StringBuilder();
+    if (itemContext.containerCssClasses() == ContainerCssClasses.INCLUDE) {
+      String cmCssClass = getCMcssClass();
+      cssClasses.addAll(Arrays.asList(cmCssClass.trim().split("\\s+")));
+      legacyCssClasses.append(cmCssClass);
     }
-    if (isFirstItem) {
-      cssClass += " first";
+    if (itemContext.position().isFirst()) {
+      addCssClass(cssClasses, legacyCssClasses, "first");
     }
-    if (isLastItem) {
-      cssClass += " last";
+    if (itemContext.position().isLast()) {
+      addCssClass(cssClasses, legacyCssClasses, "last");
     }
-    if ((numItem & 1) == 0) {
-      cssClass += " cel_nav_even";
+    if ((itemContext.itemNumber() & 1) == 0) {
+      addCssClass(cssClasses, legacyCssClasses, "cel_nav_even");
     } else {
-      cssClass += " cel_nav_odd";
+      addCssClass(cssClasses, legacyCssClasses, "cel_nav_odd");
     }
-    cssClass += " cel_nav_item" + numItem;
-    if (isLeaf) {
-      cssClass += " cel_nav_isLeaf";
+    addCssClass(cssClasses, legacyCssClasses, "cel_nav_item" + itemContext.itemNumber());
+    if (itemContext.childState() == ChildState.LEAF) {
+      addCssClass(cssClasses, legacyCssClasses, "cel_nav_isLeaf");
     } else {
-      cssClass += " cel_nav_hasChildren";
+      addCssClass(cssClasses, legacyCssClasses, "cel_nav_hasChildren");
     }
+    DocumentReference docRef = itemContext.documentReference();
     if (docRef != null) {
-      cssClass += " cel_nav_nodeSpace_" + docRef.getLastSpaceReference().getName();
-      cssClass += " cel_nav_nodeName_" + docRef.getName();
-      if (docRef.equals(getContext().getDoc().getDocumentReference())) {
-        cssClass += " currentPage";
+      addCssClass(cssClasses, legacyCssClasses,
+          "cel_nav_nodeSpace_" + docRef.getLastSpaceReference().getName());
+      addCssClass(cssClasses, legacyCssClasses, "cel_nav_nodeName_" + docRef.getName());
+      if ((itemContext.contextualState() == ContextualState.INCLUDE)
+          && docRef.equals(getContext().getDoc().getDocumentReference())) {
+        addCssClass(cssClasses, legacyCssClasses, "currentPage");
       }
-      cssClass += " " + getPageTypeConfigName(docRef);
+      addCssClass(cssClasses, legacyCssClasses, getPageTypeConfigName(docRef));
       String pageLayoutName = getPageLayoutName(docRef);
       if (!"".equals(pageLayoutName)) {
-        cssClass += " " + pageLayoutName;
+        addCssClass(cssClasses, legacyCssClasses, pageLayoutName);
       }
-      if (isActiveMenuItem(docRef)) {
-        cssClass += " active";
+      if ((itemContext.contextualState() == ContextualState.INCLUDE) && isActiveMenuItem(docRef)) {
+        addCssClass(cssClasses, legacyCssClasses, "active");
       }
       if (isRestrictedRights(docRef)) {
-        cssClass += " cel_nav_restricted_rights";
+        addCssClass(cssClasses, legacyCssClasses, "cel_nav_restricted_rights");
       }
     }
-    return cssClass.trim();
+    cssClasses.removeIf(String::isEmpty);
+    return new CssClassMetadata(legacyCssClasses.toString().trim(),
+        Collections.unmodifiableList(cssClasses));
   }
+
+  private void addCssClass(List<String> cssClasses, StringBuilder legacyCssClasses,
+      String cssClass) {
+    cssClasses.add(cssClass);
+    legacyCssClasses.append(" ").append(cssClass);
+  }
+
+  private Position getPosition(boolean first, boolean last) {
+    if (first && last) {
+      return Position.ONLY;
+    } else if (first) {
+      return Position.FIRST;
+    } else if (last) {
+      return Position.LAST;
+    } else {
+      return Position.MIDDLE;
+    }
+  }
+
+  private record CssClassMetadata(String legacyCssClasses, List<String> tokens) {}
 
   boolean isRestrictedRights(DocumentReference docRef) {
     try {
