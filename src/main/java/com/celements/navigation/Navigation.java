@@ -654,7 +654,8 @@ public class Navigation implements INavigation {
     if (docRef != null) {
       addCssClass(cssClasses, legacyCssClasses,
           "cel_nav_nodeSpace_" + docRef.getLastSpaceReference().getName());
-      addCssClass(cssClasses, legacyCssClasses, "cel_nav_nodeName_" + docRef.getName());
+      addCssClass(cssClasses, legacyCssClasses,
+          "cel_nav_nodeName_" + docRef.getName());
       if ((itemContext.contextualState() == ContextualState.INCLUDE)
           && docRef.equals(getContext().getDoc().getDocumentReference())) {
         addCssClass(cssClasses, legacyCssClasses, "currentPage");
@@ -678,8 +679,13 @@ public class Navigation implements INavigation {
 
   private void addCssClass(List<String> cssClasses, StringBuilder legacyCssClasses,
       String cssClass) {
+    cssClass = encodeCssClassToken(cssClass);
     cssClasses.add(cssClass);
     legacyCssClasses.append(" ").append(cssClass);
+  }
+
+  private String encodeCssClassToken(String cssClass) {
+    return cssClass.replaceAll("\\p{javaWhitespace}", "_");
   }
 
   private Position getPosition(boolean first, boolean last) {
