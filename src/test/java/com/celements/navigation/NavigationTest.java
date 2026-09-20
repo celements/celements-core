@@ -628,20 +628,20 @@ public class NavigationTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetCssClassTokens_withoutContextualState() throws XWikiException {
+  public void test_getCssClassTokens_withoutContextualState() throws XWikiException {
     String pageType = "myPageType";
     DocumentReference docRef = currentDocRef;
-    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef)))
         .andReturn(pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null);
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("MySpace.MyCurrentDoc"), same(getXContext()))).andReturn(true);
-    replayDefault();
+    replayDefault(pageTypeRef);
     List<String> tokens = nav.getCssClassTokens(new NavigationItemContext(docRef,
         ContainerCssClasses.INCLUDE, Position.ONLY, ChildState.LEAF, 1, ContextualState.OMIT));
-    verifyDefault();
+    verifyDefault(pageTypeRef);
     assertEquals(Arrays.asList("cel_cm_navigation_menuitem", "first", "last", "cel_nav_odd",
         "cel_nav_item1", "cel_nav_isLeaf", "cel_nav_nodeSpace_MySpace",
         "cel_nav_nodeName_MyCurrentDoc", pageType), tokens);
@@ -650,10 +650,10 @@ public class NavigationTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetCssClassTokens_exactPresentationMetadataAndContextSuppression()
+  public void test_getCssClassTokens_exactPresentationMetadataAndContextSuppression()
       throws XWikiException {
     nav.setCMcssClass("cel_cm_presentation_treenode");
-    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef)))
         .andReturn(pageTypeRef).times(2);
     expect(pageTypeRef.getConfigName()).andReturn("SomePageType").times(2);
@@ -664,14 +664,14 @@ public class NavigationTest extends AbstractComponentTest {
         .andReturn(Collections.emptyList());
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("MySpace.MyCurrentDoc"), same(getXContext()))).andReturn(false).times(2);
-    replayDefault();
+    replayDefault(pageTypeRef);
     List<String> restTokens = nav.getCssClassTokens(new NavigationItemContext(currentDocRef,
         ContainerCssClasses.INCLUDE, Position.ONLY, ChildState.LEAF, 1,
         ContextualState.OMIT));
     List<String> legacyTokens = nav.getCssClassTokens(new NavigationItemContext(currentDocRef,
         ContainerCssClasses.INCLUDE, Position.ONLY, ChildState.LEAF, 1,
         ContextualState.INCLUDE));
-    verifyDefault();
+    verifyDefault(pageTypeRef);
     assertEquals(Arrays.asList("cel_cm_presentation_treenode", "first", "last", "cel_nav_odd",
         "cel_nav_item1", "cel_nav_isLeaf", "cel_nav_nodeSpace_MySpace",
         "cel_nav_nodeName_MyCurrentDoc", "SomePageType", "layout_About-Layout",
@@ -683,10 +683,11 @@ public class NavigationTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetCssClassTokens_encodesWhitespaceInDynamicClasses() throws XWikiException {
+  public void test_getCssClassTokens_preservesLegacyWhitespaceInDynamicClasses()
+      throws XWikiException {
     DocumentReference docRef = new DocumentReference(getXContext().getDatabase(), "My\u2003Space",
         "My Document");
-    PageTypeReference pageTypeRef = createDefaultMock(PageTypeReference.class);
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef)))
         .andReturn(pageTypeRef).times(2);
     expect(pageTypeRef.getConfigName()).andReturn("Some Page Type").times(2);
@@ -697,22 +698,23 @@ public class NavigationTest extends AbstractComponentTest {
         .andReturn(Collections.emptyList());
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("My\u2003Space.My Document"), same(getXContext()))).andReturn(true).times(2);
-    replayDefault();
+    replayDefault(pageTypeRef);
 
     List<String> tokens = nav.getCssClassTokens(new NavigationItemContext(docRef,
         ContainerCssClasses.OMIT, Position.MIDDLE, ChildState.LEAF, 2,
         ContextualState.OMIT));
     String legacyCssClasses = nav.getCssClasses(docRef, false, false, false, true, 2);
 
-    verifyDefault();
+    verifyDefault(pageTypeRef);
     assertEquals(Arrays.asList("cel_nav_even", "cel_nav_item2", "cel_nav_isLeaf",
-        "cel_nav_nodeSpace_My_Space", "cel_nav_nodeName_My_Document", "Some_Page_Type",
-        "layout_About_Layout"), tokens);
-    assertEquals(String.join(" ", tokens), legacyCssClasses);
+        "cel_nav_nodeSpace_My\u2003Space", "cel_nav_nodeName_My", "Document", "Some", "Page",
+        "Type", "layout_About", "Layout"), tokens);
+    assertEquals("cel_nav_even cel_nav_item2 cel_nav_isLeaf cel_nav_nodeSpace_My\u2003Space"
+        + " cel_nav_nodeName_My Document Some Page Type layout_About Layout", legacyCssClasses);
   }
 
   @Test
-  public void testGetUniqueId_exactPresentationNavigationNumberVariants() {
+  public void test_getUniqueId_exactPresentationNavigationNumberVariants() {
     SpaceReference menuSpace = new SpaceReference("Content", currentDocRef.getWikiReference());
     DocumentReference slideRef = new DocumentReference(getXContext().getDatabase(), "Content",
         "First");
@@ -726,7 +728,7 @@ public class NavigationTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetCssClasses_preservesConfiguredWhitespace() throws XWikiException {
+  public void test_getCssClasses_preservesConfiguredWhitespace() throws XWikiException {
     nav.setCMcssClass("  alpha   beta  ");
     replayDefault();
     String cssClasses = nav.getCssClasses(null, true, true, false, true, 1);

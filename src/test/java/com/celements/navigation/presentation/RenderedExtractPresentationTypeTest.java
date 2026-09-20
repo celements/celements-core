@@ -82,7 +82,7 @@ public class RenderedExtractPresentationTypeTest extends AbstractComponentTest {
   @Test
   public void testComponentLoaded() {
     assertNotNull(Utils.getComponent(IPresentationTypeRole.class, "renderedExtract"));
-    assertNotNull(Utils.getComponent(PresentationContentRenderer.class, "renderedExtract"));
+    assertNotNull(getBeanFactory().getBean("renderedExtract", PresentationContentRenderer.class));
   }
 
   @Test
@@ -100,7 +100,7 @@ public class RenderedExtractPresentationTypeTest extends AbstractComponentTest {
 
   @Test
   public void testWriteNodeContent() throws Exception {
-    IWebUtilsService webUtilsServiceMock = createDefaultMock(IWebUtilsService.class);
+    IWebUtilsService webUtilsServiceMock = createMock(IWebUtilsService.class);
     vtPresType.webUtilsService = webUtilsServiceMock;
     context.put("vcontext", new VelocityContext());
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
@@ -132,7 +132,7 @@ public class RenderedExtractPresentationTypeTest extends AbstractComponentTest {
         templateDiskPath).times(2);
     expect(renderCmdMock.renderTemplatePath(eq(templateDiskPath), eq("de"), eq("")))
         .andReturn(expectedNodeExtract).times(2);
-    replayDefault();
+    replayDefault(webUtilsServiceMock);
     String expectedRenderedExtract = "<div class=\"cel_cm_navigation_menuitem first"
         + " cel_nav_isLeaf RichText\" id=\"N3:Content:Content.MyPage\">\n" + expectedNodeExtract
         + "</div>\n";
@@ -143,35 +143,47 @@ public class RenderedExtractPresentationTypeTest extends AbstractComponentTest {
     assertNull(vcontext.get("extractContent"));
     assertNull(vcontext.get("extractDocRef"));
     assertNull(vcontext.get("extractDoc"));
-    verifyDefault();
+    verifyDefault(webUtilsServiceMock);
   }
 
   @Test
-  public void testRenderInnerContent_propagatesFailureAndRestoresVelocityContext()
+  public void test_renderInnerContent_propagatesFailureAndRestoresVelocityContext()
       throws Exception {
-    IWebUtilsService webUtilsServiceMock = createDefaultMock(IWebUtilsService.class);
+    IWebUtilsService webUtilsServiceMock = createMock(IWebUtilsService.class);
     vtPresType.webUtilsService = webUtilsServiceMock;
     VelocityContext vcontext = new VelocityContext();
+    Object previousDocRef = new Object();
     Object previousDoc = new Object();
+    Object previousContent = new Object();
+    vcontext.put("extractDocRef", previousDocRef);
     vcontext.put("extractDoc", previousDoc);
+    vcontext.put("extractContent", previousContent);
     context.put("vcontext", vcontext);
+    BaseObject extractObj = new BaseObject();
+    extractObj.setXClassReference(getDocDetailsClasses().getDocumentExtractClassRef(
+        context.getDatabase()));
+    extractObj.setStringValue(DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE, "de");
+    extractObj.setStringValue(DocumentDetailsClasses.FIELD_DOC_EXTRACT_CONTENT, "new content");
+    currentDoc.addXObject(extractObj);
     DocumentReference templateDocRef = new DocumentReference(context.getDatabase(), "Templates",
         "RenderedExtract");
     expect(webUtilsServiceMock.getInheritedTemplatedPath(eq(templateDocRef)))
         .andReturn(":celTemplates/RenderedExtract.vm");
+    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).times(2);
     XWikiException expected = new XWikiException();
-    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andThrow(expected);
-    replayDefault();
+    expect(renderCmdMock.renderTemplatePath(eq(":celTemplates/RenderedExtract.vm"), eq("de"),
+        eq(""))).andThrow(expected);
+    replayDefault(webUtilsServiceMock);
     try {
       vtPresType.renderInnerContent(currentDocRef);
       fail("Expected XWikiException");
     } catch (XWikiException actual) {
       assertSame(expected, actual);
     }
-    assertNull(vcontext.get("extractDocRef"));
+    assertSame(previousDocRef, vcontext.get("extractDocRef"));
     assertSame(previousDoc, vcontext.get("extractDoc"));
-    assertNull(vcontext.get("extractContent"));
-    verifyDefault();
+    assertSame(previousContent, vcontext.get("extractContent"));
+    verifyDefault(webUtilsServiceMock);
   }
 
   // *****************************************************************

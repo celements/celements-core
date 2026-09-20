@@ -72,7 +72,7 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
   @Test
   public void testComponentLoaded() {
     assertNotNull(Utils.getComponent(IPresentationTypeRole.class, "renderedContent"));
-    assertNotNull(Utils.getComponent(PresentationContentRenderer.class, "renderedContent"));
+    assertNotNull(getBeanFactory().getBean("renderedContent", PresentationContentRenderer.class));
   }
 
   @Test
@@ -115,7 +115,7 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testRenderInnerContent() throws Exception {
+  public void test_renderInnerContent() throws Exception {
     expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view")))
         .andReturn("inner content");
     replayDefault();
@@ -124,7 +124,7 @@ public class RenderedContentPresentationTypeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testRenderInnerContent_propagatesFailure() throws Exception {
+  public void test_renderInnerContent_propagatesFailure() throws Exception {
     XWikiException expected = new XWikiException();
     expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view")))
         .andThrow(expected);

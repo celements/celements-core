@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.validation.constraints.NotNull;
 
@@ -109,6 +110,8 @@ public class Navigation implements INavigation {
       + "_NavigationCounter";
 
   private static final String LANGUAGE_MENU_DATA_TYPE = "languages";
+
+  private static final Pattern HTML_CLASS_TOKEN_DELIMITER = Pattern.compile("[\\t\\n\\f\\r ]+");
 
   public PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
 
@@ -630,7 +633,7 @@ public class Navigation implements INavigation {
     StringBuilder legacyCssClasses = new StringBuilder();
     if (itemContext.containerCssClasses() == ContainerCssClasses.INCLUDE) {
       String cmCssClass = getCMcssClass();
-      cssClasses.addAll(Arrays.asList(cmCssClass.trim().split("\\s+")));
+      addCssClassTokens(cssClasses, cmCssClass);
       legacyCssClasses.append(cmCssClass);
     }
     if (itemContext.position().isFirst()) {
@@ -679,13 +682,12 @@ public class Navigation implements INavigation {
 
   private void addCssClass(List<String> cssClasses, StringBuilder legacyCssClasses,
       String cssClass) {
-    cssClass = encodeCssClassToken(cssClass);
-    cssClasses.add(cssClass);
+    addCssClassTokens(cssClasses, cssClass);
     legacyCssClasses.append(" ").append(cssClass);
   }
 
-  private String encodeCssClassToken(String cssClass) {
-    return cssClass.replaceAll("\\p{javaWhitespace}", "_");
+  private void addCssClassTokens(List<String> cssClasses, String cssClass) {
+    cssClasses.addAll(Arrays.asList(HTML_CLASS_TOKEN_DELIMITER.split(cssClass)));
   }
 
   private Position getPosition(boolean first, boolean last) {
