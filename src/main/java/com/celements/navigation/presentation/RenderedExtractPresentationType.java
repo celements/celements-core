@@ -23,8 +23,10 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-@Component("renderedExtract")
-public class RenderedExtractPresentationType implements IPresentationTypeRole<INavigation> {
+@Component(value = PresentationContentRenderer.RENDERED_EXTRACT_HINT, roles = {
+    IPresentationTypeRole.class, PresentationContentRenderer.class })
+public class RenderedExtractPresentationType
+    implements IPresentationTypeRole<INavigation>, PresentationContentRenderer {
 
   private static final Logger LOGGER = LoggerFactory
       .getLogger(RenderedExtractPresentationType.class);
@@ -68,27 +70,39 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole<IN
         + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
     try {
-      outStream.append(getRenderedExtract(docRef));
+      outStream.append(renderInnerContent(docRef));
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get document for [" + docRef + "].", exp);
     }
     outStream.append("</div>\n");
   }
 
-  String getRenderedExtract(DocumentReference docRef) throws XWikiException {
+  @Override
+  public String renderInnerContent(DocumentReference docRef) throws XWikiException {
     String templatePath = webUtilsService.getInheritedTemplatedPath(getTemplateRef());
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+    Object previousDocRef = vcontext.get("extractDocRef");
+    Object previousDoc = vcontext.get("extractDoc");
+    Object previousContent = vcontext.get("extractContent");
     try {
-      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       vcontext.put("extractDocRef", docRef);
       XWikiDocument contentDoc = getContext().getWiki().getDocument(docRef, getContext());
       vcontext.put("extractDoc", contentDoc.newDocument(getContext()));
       vcontext.put("extractContent", getDocExtract(docRef));
       return getRenderCommand().renderTemplatePath(templatePath, getContext().getLanguage(), "");
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to render template path [" + templatePath + "] for [" + docRef + "].",
-          exp);
+    } finally {
+      restoreVelocityValue(vcontext, "extractDocRef", previousDocRef);
+      restoreVelocityValue(vcontext, "extractDoc", previousDoc);
+      restoreVelocityValue(vcontext, "extractContent", previousContent);
     }
-    return "";
+  }
+
+  private void restoreVelocityValue(VelocityContext vcontext, String key, Object value) {
+    if (value != null) {
+      vcontext.put(key, value);
+    } else {
+      vcontext.remove(key);
+    }
   }
 
   private DocumentReference getTemplateRef() {
