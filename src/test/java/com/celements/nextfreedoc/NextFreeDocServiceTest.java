@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.easymock.Capture;
@@ -46,6 +47,8 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     queryExecutorMock = createDefaultMock(QueryExecutor.class);
     storeMock = createDefaultMock(XWikiStoreInterface.class);
     expect(getWikiMock().getStore()).andReturn(storeMock).anyTimes();
+    expect(getWikiMock().getXWikiPreferenceAsInt(anyObject(WikiReference.class),
+        eq("lock_Timeout"), eq(30 * 60))).andReturn(30 * 60).anyTimes();
   }
 
   @Test
@@ -63,14 +66,14 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     XWikiDocument doc2 = new XWikiDocument(docRef2);
     expect(getMock(IModelAccessFacade.class).createDocument(docRef2)).andReturn(doc2);
     Capture<XWikiLock> collisionLock = newCapture();
-    expect(storeMock.tryLock(capture(collisionLock), eq(docRef2.getWikiReference())))
+    expect(storeMock.tryLock(capture(collisionLock), anyObject(Date.class)))
         .andReturn(false);
 
     DocumentReference docRef3 = new DocumentReference(title + 7, spaceRef);
     XWikiDocument doc3 = new XWikiDocument(docRef3);
     expect(getMock(IModelAccessFacade.class).createDocument(docRef3)).andReturn(doc3);
     Capture<XWikiLock> reservedLock = newCapture();
-    expect(storeMock.tryLock(capture(reservedLock), eq(docRef3.getWikiReference())))
+    expect(storeMock.tryLock(capture(reservedLock), anyObject(Date.class)))
         .andReturn(true);
 
     replayDefault();
@@ -80,6 +83,10 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     assertEquals(docRef3, ret);
     assertEquals(doc2.getId(), collisionLock.getValue().getDocId());
     assertEquals(doc3.getId(), reservedLock.getValue().getDocId());
+    assertEquals(docRef2.getWikiReference(),
+        collisionLock.getValue().getWikiRef().orElseThrow());
+    assertEquals(docRef3.getWikiReference(),
+        reservedLock.getValue().getWikiRef().orElseThrow());
     assertEquals(context.getUser(), reservedLock.getValue().getUserName());
     assertEquals(callerWiki, context.getWikiRef());
   }
@@ -128,7 +135,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference docRef2 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 6, spaceRef);
     XWikiDocument doc2 = new XWikiDocument(docRef2);
     expect(getMock(IModelAccessFacade.class).createDocument(docRef2)).andReturn(doc2);
-    expect(storeMock.tryLock(anyObject(XWikiLock.class), eq(docRef2.getWikiReference())))
+    expect(storeMock.tryLock(anyObject(XWikiLock.class), anyObject(Date.class)))
         .andReturn(true);
 
     replayDefault();
