@@ -65,6 +65,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference docRef2 = new DocumentReference(title + 6, spaceRef);
     XWikiDocument doc2 = new XWikiDocument(docRef2);
     expect(getMock(IModelAccessFacade.class).createDocument(docRef2)).andReturn(doc2);
+    expect(storeMock.loadLock(doc2.getId(), context, true)).andReturn(null);
     Capture<XWikiLock> collisionLock = newCapture();
     expect(storeMock.tryLock(capture(collisionLock), anyObject(Date.class)))
         .andReturn(false);
@@ -72,6 +73,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference docRef3 = new DocumentReference(title + 7, spaceRef);
     XWikiDocument doc3 = new XWikiDocument(docRef3);
     expect(getMock(IModelAccessFacade.class).createDocument(docRef3)).andReturn(doc3);
+    expect(storeMock.loadLock(doc3.getId(), context, true)).andReturn(null);
     Capture<XWikiLock> reservedLock = newCapture();
     expect(storeMock.tryLock(capture(reservedLock), anyObject(Date.class)))
         .andReturn(true);
@@ -89,6 +91,50 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
         reservedLock.getValue().getWikiRef().orElseThrow());
     assertEquals(context.getUser(), reservedLock.getValue().getUserName());
     assertEquals(callerWiki, context.getWikiRef());
+  }
+
+  @Test
+  public void test_getNextTitledPageDocRef_skipsActiveReservationForSameUser() throws Exception {
+    context.setUser("XWiki.user");
+    SpaceReference spaceRef = new SpaceReference("mySpace", context.getWikiRef());
+    nextFreeDocService.injectNum(spaceRef, "Page", 1);
+    DocumentReference reservedRef = new DocumentReference("Page1", spaceRef);
+    XWikiDocument reserved = new XWikiDocument(reservedRef);
+    expect(getMock(IModelAccessFacade.class).createDocument(reservedRef)).andReturn(reserved);
+    expect(storeMock.loadLock(reserved.getId(), context, true))
+        .andReturn(new XWikiLock(reserved.getId(), context.getUser()));
+    DocumentReference availableRef = new DocumentReference("Page2", spaceRef);
+    XWikiDocument available = new XWikiDocument(availableRef);
+    expect(getMock(IModelAccessFacade.class).createDocument(availableRef)).andReturn(available);
+    expect(storeMock.loadLock(available.getId(), context, true)).andReturn(null);
+    Capture<XWikiLock> acquired = newCapture();
+    expect(storeMock.tryLock(capture(acquired), anyObject(Date.class))).andReturn(true);
+
+    replayDefault();
+    assertEquals(availableRef, nextFreeDocService.getNextTitledPageDocRef(spaceRef, "Page"));
+    assertEquals(available.getId(), acquired.getValue().getDocId());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getNextTitledPageDocRef_reclaimsExpiredReservation() throws Exception {
+    context.setUser("XWiki.user");
+    SpaceReference spaceRef = new SpaceReference("mySpace", context.getWikiRef());
+    nextFreeDocService.injectNum(spaceRef, "Page", 1);
+    DocumentReference docRef = new DocumentReference("Page1", spaceRef);
+    XWikiDocument doc = new XWikiDocument(docRef);
+    XWikiLock expired = new XWikiLock(doc.getId(), "XWiki.other");
+    expired.setDate(new Date(System.currentTimeMillis() - 3_600_000L));
+    expect(getMock(IModelAccessFacade.class).createDocument(docRef)).andReturn(doc);
+    expect(storeMock.loadLock(doc.getId(), context, true)).andReturn(expired);
+    Capture<XWikiLock> acquired = newCapture();
+    expect(storeMock.tryLock(capture(acquired), anyObject(Date.class))).andReturn(true);
+
+    replayDefault();
+    assertEquals(docRef, nextFreeDocService.getNextTitledPageDocRef(spaceRef, "Page"));
+    assertEquals(doc.getId(), acquired.getValue().getDocId());
+    assertEquals(context.getUser(), acquired.getValue().getUserName());
+    verifyDefault();
   }
 
   @Test
@@ -135,6 +181,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference docRef2 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 6, spaceRef);
     XWikiDocument doc2 = new XWikiDocument(docRef2);
     expect(getMock(IModelAccessFacade.class).createDocument(docRef2)).andReturn(doc2);
+    expect(storeMock.loadLock(doc2.getId(), context, true)).andReturn(null);
     expect(storeMock.tryLock(anyObject(XWikiLock.class), anyObject(Date.class)))
         .andReturn(true);
 

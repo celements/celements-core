@@ -80,7 +80,7 @@ public class NextFreeDocService implements INextFreeDocRole {
   private boolean isAvailableDocRef(DocumentReference newDocRef) {
     try {
       XWikiDocument doc = modelAccess.createDocument(newDocRef);
-      return doc.tryLock(getContext().getUser());
+      return (doc.getLock(getContext()) == null) && doc.tryLock(getContext().getUser());
     } catch (DocumentAlreadyExistsException exp) {
       LOGGER.trace("New docRef already exists '{}'", newDocRef, exp);
     } catch (XWikiException | DocumentLoadException exp) {
